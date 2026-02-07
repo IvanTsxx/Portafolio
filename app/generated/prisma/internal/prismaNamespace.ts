@@ -1255,7 +1255,8 @@ export const PostScalarFieldEnum = {
   content: 'content',
   published: 'published',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  categoryId: 'categoryId'
 } as const
 
 export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
@@ -1267,7 +1268,8 @@ export const ProjectScalarFieldEnum = {
   slug: 'slug',
   description: 'description',
   content: 'content',
-  url: 'url',
+  demoUrl: 'demoUrl',
+  githubUrl: 'githubUrl',
   repository: 'repository',
   image: 'image',
   published: 'published',

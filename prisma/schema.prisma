@@ -72,19 +72,21 @@ model Verification {
 
 // Portfolio content models
 model Post {
-  id          String     @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
-  slug        String     @unique
+  slug        String   @unique
   description String?
-  content     String     @db.Text
-  published   Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  tags        Tag[]      @relation("PostToTag")
-  categories  Category[] @relation("PostToCategory")
+  content     String   @db.Text
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tags        Tag[]    @relation("PostToTag")
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
 
   @@index([slug])
   @@index([published])
+  @@index([categoryId])
   @@map("posts")
 }
 
@@ -94,7 +96,8 @@ model Project {
   slug         String       @unique
   description  String?
   content      String       @db.Text
-  url          String?
+  demoUrl      String?
+  githubUrl    String?
   repository   String?
   image        String?
   published    Boolean      @default(false)
@@ -152,7 +155,7 @@ model Category {
   slug      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  posts     Post[]   @relation("PostToCategory")
+  posts     Post[]
 
   @@index([slug])
   @@map("categories")

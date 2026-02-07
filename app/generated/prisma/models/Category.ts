@@ -234,7 +234,7 @@ export type CategoryCreateInput = {
   slug: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  posts?: Prisma.PostCreateNestedManyWithoutCategoriesInput
+  posts?: Prisma.PostCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateInput = {
@@ -243,7 +243,7 @@ export type CategoryUncheckedCreateInput = {
   slug: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  posts?: Prisma.PostUncheckedCreateNestedManyWithoutCategoriesInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUpdateInput = {
@@ -252,7 +252,7 @@ export type CategoryUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  posts?: Prisma.PostUpdateManyWithoutCategoriesNestedInput
+  posts?: Prisma.PostUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateInput = {
@@ -261,7 +261,7 @@ export type CategoryUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  posts?: Prisma.PostUncheckedUpdateManyWithoutCategoriesNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryCreateManyInput = {
@@ -288,14 +288,9 @@ export type CategoryUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type CategoryListRelationFilter = {
-  every?: Prisma.CategoryWhereInput
-  some?: Prisma.CategoryWhereInput
-  none?: Prisma.CategoryWhereInput
-}
-
-export type CategoryOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+export type CategoryScalarRelationFilter = {
+  is?: Prisma.CategoryWhereInput
+  isNot?: Prisma.CategoryWhereInput
 }
 
 export type CategoryCountOrderByAggregateInput = {
@@ -322,42 +317,18 @@ export type CategoryMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type CategoryCreateNestedManyWithoutPostsInput = {
-  create?: Prisma.XOR<Prisma.CategoryCreateWithoutPostsInput, Prisma.CategoryUncheckedCreateWithoutPostsInput> | Prisma.CategoryCreateWithoutPostsInput[] | Prisma.CategoryUncheckedCreateWithoutPostsInput[]
-  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutPostsInput | Prisma.CategoryCreateOrConnectWithoutPostsInput[]
-  connect?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
+export type CategoryCreateNestedOneWithoutPostsInput = {
+  create?: Prisma.XOR<Prisma.CategoryCreateWithoutPostsInput, Prisma.CategoryUncheckedCreateWithoutPostsInput>
+  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutPostsInput
+  connect?: Prisma.CategoryWhereUniqueInput
 }
 
-export type CategoryUncheckedCreateNestedManyWithoutPostsInput = {
-  create?: Prisma.XOR<Prisma.CategoryCreateWithoutPostsInput, Prisma.CategoryUncheckedCreateWithoutPostsInput> | Prisma.CategoryCreateWithoutPostsInput[] | Prisma.CategoryUncheckedCreateWithoutPostsInput[]
-  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutPostsInput | Prisma.CategoryCreateOrConnectWithoutPostsInput[]
-  connect?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-}
-
-export type CategoryUpdateManyWithoutPostsNestedInput = {
-  create?: Prisma.XOR<Prisma.CategoryCreateWithoutPostsInput, Prisma.CategoryUncheckedCreateWithoutPostsInput> | Prisma.CategoryCreateWithoutPostsInput[] | Prisma.CategoryUncheckedCreateWithoutPostsInput[]
-  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutPostsInput | Prisma.CategoryCreateOrConnectWithoutPostsInput[]
-  upsert?: Prisma.CategoryUpsertWithWhereUniqueWithoutPostsInput | Prisma.CategoryUpsertWithWhereUniqueWithoutPostsInput[]
-  set?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-  disconnect?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-  delete?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-  connect?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-  update?: Prisma.CategoryUpdateWithWhereUniqueWithoutPostsInput | Prisma.CategoryUpdateWithWhereUniqueWithoutPostsInput[]
-  updateMany?: Prisma.CategoryUpdateManyWithWhereWithoutPostsInput | Prisma.CategoryUpdateManyWithWhereWithoutPostsInput[]
-  deleteMany?: Prisma.CategoryScalarWhereInput | Prisma.CategoryScalarWhereInput[]
-}
-
-export type CategoryUncheckedUpdateManyWithoutPostsNestedInput = {
-  create?: Prisma.XOR<Prisma.CategoryCreateWithoutPostsInput, Prisma.CategoryUncheckedCreateWithoutPostsInput> | Prisma.CategoryCreateWithoutPostsInput[] | Prisma.CategoryUncheckedCreateWithoutPostsInput[]
-  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutPostsInput | Prisma.CategoryCreateOrConnectWithoutPostsInput[]
-  upsert?: Prisma.CategoryUpsertWithWhereUniqueWithoutPostsInput | Prisma.CategoryUpsertWithWhereUniqueWithoutPostsInput[]
-  set?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-  disconnect?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-  delete?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-  connect?: Prisma.CategoryWhereUniqueInput | Prisma.CategoryWhereUniqueInput[]
-  update?: Prisma.CategoryUpdateWithWhereUniqueWithoutPostsInput | Prisma.CategoryUpdateWithWhereUniqueWithoutPostsInput[]
-  updateMany?: Prisma.CategoryUpdateManyWithWhereWithoutPostsInput | Prisma.CategoryUpdateManyWithWhereWithoutPostsInput[]
-  deleteMany?: Prisma.CategoryScalarWhereInput | Prisma.CategoryScalarWhereInput[]
+export type CategoryUpdateOneRequiredWithoutPostsNestedInput = {
+  create?: Prisma.XOR<Prisma.CategoryCreateWithoutPostsInput, Prisma.CategoryUncheckedCreateWithoutPostsInput>
+  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutPostsInput
+  upsert?: Prisma.CategoryUpsertWithoutPostsInput
+  connect?: Prisma.CategoryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CategoryUpdateToOneWithWhereWithoutPostsInput, Prisma.CategoryUpdateWithoutPostsInput>, Prisma.CategoryUncheckedUpdateWithoutPostsInput>
 }
 
 export type CategoryCreateWithoutPostsInput = {
@@ -381,31 +352,15 @@ export type CategoryCreateOrConnectWithoutPostsInput = {
   create: Prisma.XOR<Prisma.CategoryCreateWithoutPostsInput, Prisma.CategoryUncheckedCreateWithoutPostsInput>
 }
 
-export type CategoryUpsertWithWhereUniqueWithoutPostsInput = {
-  where: Prisma.CategoryWhereUniqueInput
+export type CategoryUpsertWithoutPostsInput = {
   update: Prisma.XOR<Prisma.CategoryUpdateWithoutPostsInput, Prisma.CategoryUncheckedUpdateWithoutPostsInput>
   create: Prisma.XOR<Prisma.CategoryCreateWithoutPostsInput, Prisma.CategoryUncheckedCreateWithoutPostsInput>
+  where?: Prisma.CategoryWhereInput
 }
 
-export type CategoryUpdateWithWhereUniqueWithoutPostsInput = {
-  where: Prisma.CategoryWhereUniqueInput
+export type CategoryUpdateToOneWithWhereWithoutPostsInput = {
+  where?: Prisma.CategoryWhereInput
   data: Prisma.XOR<Prisma.CategoryUpdateWithoutPostsInput, Prisma.CategoryUncheckedUpdateWithoutPostsInput>
-}
-
-export type CategoryUpdateManyWithWhereWithoutPostsInput = {
-  where: Prisma.CategoryScalarWhereInput
-  data: Prisma.XOR<Prisma.CategoryUpdateManyMutationInput, Prisma.CategoryUncheckedUpdateManyWithoutPostsInput>
-}
-
-export type CategoryScalarWhereInput = {
-  AND?: Prisma.CategoryScalarWhereInput | Prisma.CategoryScalarWhereInput[]
-  OR?: Prisma.CategoryScalarWhereInput[]
-  NOT?: Prisma.CategoryScalarWhereInput | Prisma.CategoryScalarWhereInput[]
-  id?: Prisma.StringFilter<"Category"> | string
-  name?: Prisma.StringFilter<"Category"> | string
-  slug?: Prisma.StringFilter<"Category"> | string
-  createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Category"> | Date | string
 }
 
 export type CategoryUpdateWithoutPostsInput = {
@@ -417,14 +372,6 @@ export type CategoryUpdateWithoutPostsInput = {
 }
 
 export type CategoryUncheckedUpdateWithoutPostsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type CategoryUncheckedUpdateManyWithoutPostsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string

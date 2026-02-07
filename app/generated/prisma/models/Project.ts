@@ -40,7 +40,8 @@ export type ProjectMinAggregateOutputType = {
   slug: string | null
   description: string | null
   content: string | null
-  url: string | null
+  demoUrl: string | null
+  githubUrl: string | null
   repository: string | null
   image: string | null
   published: boolean | null
@@ -56,7 +57,8 @@ export type ProjectMaxAggregateOutputType = {
   slug: string | null
   description: string | null
   content: string | null
-  url: string | null
+  demoUrl: string | null
+  githubUrl: string | null
   repository: string | null
   image: string | null
   published: boolean | null
@@ -72,7 +74,8 @@ export type ProjectCountAggregateOutputType = {
   slug: number
   description: number
   content: number
-  url: number
+  demoUrl: number
+  githubUrl: number
   repository: number
   image: number
   published: number
@@ -98,7 +101,8 @@ export type ProjectMinAggregateInputType = {
   slug?: true
   description?: true
   content?: true
-  url?: true
+  demoUrl?: true
+  githubUrl?: true
   repository?: true
   image?: true
   published?: true
@@ -114,7 +118,8 @@ export type ProjectMaxAggregateInputType = {
   slug?: true
   description?: true
   content?: true
-  url?: true
+  demoUrl?: true
+  githubUrl?: true
   repository?: true
   image?: true
   published?: true
@@ -130,7 +135,8 @@ export type ProjectCountAggregateInputType = {
   slug?: true
   description?: true
   content?: true
-  url?: true
+  demoUrl?: true
+  githubUrl?: true
   repository?: true
   image?: true
   published?: true
@@ -233,7 +239,8 @@ export type ProjectGroupByOutputType = {
   slug: string
   description: string | null
   content: string
-  url: string | null
+  demoUrl: string | null
+  githubUrl: string | null
   repository: string | null
   image: string | null
   published: boolean
@@ -272,7 +279,8 @@ export type ProjectWhereInput = {
   slug?: Prisma.StringFilter<"Project"> | string
   description?: Prisma.StringNullableFilter<"Project"> | string | null
   content?: Prisma.StringFilter<"Project"> | string
-  url?: Prisma.StringNullableFilter<"Project"> | string | null
+  demoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
+  githubUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   repository?: Prisma.StringNullableFilter<"Project"> | string | null
   image?: Prisma.StringNullableFilter<"Project"> | string | null
   published?: Prisma.BoolFilter<"Project"> | boolean
@@ -290,7 +298,8 @@ export type ProjectOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   content?: Prisma.SortOrder
-  url?: Prisma.SortOrderInput | Prisma.SortOrder
+  demoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  githubUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   repository?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   published?: Prisma.SortOrder
@@ -311,7 +320,8 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Project"> | string
   description?: Prisma.StringNullableFilter<"Project"> | string | null
   content?: Prisma.StringFilter<"Project"> | string
-  url?: Prisma.StringNullableFilter<"Project"> | string | null
+  demoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
+  githubUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   repository?: Prisma.StringNullableFilter<"Project"> | string | null
   image?: Prisma.StringNullableFilter<"Project"> | string | null
   published?: Prisma.BoolFilter<"Project"> | boolean
@@ -329,7 +339,8 @@ export type ProjectOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   content?: Prisma.SortOrder
-  url?: Prisma.SortOrderInput | Prisma.SortOrder
+  demoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  githubUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   repository?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   published?: Prisma.SortOrder
@@ -353,7 +364,8 @@ export type ProjectScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Project"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   content?: Prisma.StringWithAggregatesFilter<"Project"> | string
-  url?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
+  demoUrl?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
+  githubUrl?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   repository?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   image?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   published?: Prisma.BoolWithAggregatesFilter<"Project"> | boolean
@@ -369,7 +381,8 @@ export type ProjectCreateInput = {
   slug: string
   description?: string | null
   content: string
-  url?: string | null
+  demoUrl?: string | null
+  githubUrl?: string | null
   repository?: string | null
   image?: string | null
   published?: boolean
@@ -387,7 +400,8 @@ export type ProjectUncheckedCreateInput = {
   slug: string
   description?: string | null
   content: string
-  url?: string | null
+  demoUrl?: string | null
+  githubUrl?: string | null
   repository?: string | null
   image?: string | null
   published?: boolean
@@ -405,7 +419,8 @@ export type ProjectUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -423,7 +438,8 @@ export type ProjectUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -441,7 +457,8 @@ export type ProjectCreateManyInput = {
   slug: string
   description?: string | null
   content: string
-  url?: string | null
+  demoUrl?: string | null
+  githubUrl?: string | null
   repository?: string | null
   image?: string | null
   published?: boolean
@@ -457,7 +474,8 @@ export type ProjectUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -473,7 +491,8 @@ export type ProjectUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -489,7 +508,8 @@ export type ProjectCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   content?: Prisma.SortOrder
-  url?: Prisma.SortOrder
+  demoUrl?: Prisma.SortOrder
+  githubUrl?: Prisma.SortOrder
   repository?: Prisma.SortOrder
   image?: Prisma.SortOrder
   published?: Prisma.SortOrder
@@ -509,7 +529,8 @@ export type ProjectMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   content?: Prisma.SortOrder
-  url?: Prisma.SortOrder
+  demoUrl?: Prisma.SortOrder
+  githubUrl?: Prisma.SortOrder
   repository?: Prisma.SortOrder
   image?: Prisma.SortOrder
   published?: Prisma.SortOrder
@@ -525,7 +546,8 @@ export type ProjectMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
   content?: Prisma.SortOrder
-  url?: Prisma.SortOrder
+  demoUrl?: Prisma.SortOrder
+  githubUrl?: Prisma.SortOrder
   repository?: Prisma.SortOrder
   image?: Prisma.SortOrder
   published?: Prisma.SortOrder
@@ -639,7 +661,8 @@ export type ProjectCreateWithoutTagsInput = {
   slug: string
   description?: string | null
   content: string
-  url?: string | null
+  demoUrl?: string | null
+  githubUrl?: string | null
   repository?: string | null
   image?: string | null
   published?: boolean
@@ -656,7 +679,8 @@ export type ProjectUncheckedCreateWithoutTagsInput = {
   slug: string
   description?: string | null
   content: string
-  url?: string | null
+  demoUrl?: string | null
+  githubUrl?: string | null
   repository?: string | null
   image?: string | null
   published?: boolean
@@ -697,7 +721,8 @@ export type ProjectScalarWhereInput = {
   slug?: Prisma.StringFilter<"Project"> | string
   description?: Prisma.StringNullableFilter<"Project"> | string | null
   content?: Prisma.StringFilter<"Project"> | string
-  url?: Prisma.StringNullableFilter<"Project"> | string | null
+  demoUrl?: Prisma.StringNullableFilter<"Project"> | string | null
+  githubUrl?: Prisma.StringNullableFilter<"Project"> | string | null
   repository?: Prisma.StringNullableFilter<"Project"> | string | null
   image?: Prisma.StringNullableFilter<"Project"> | string | null
   published?: Prisma.BoolFilter<"Project"> | boolean
@@ -713,7 +738,8 @@ export type ProjectCreateWithoutTechnologiesInput = {
   slug: string
   description?: string | null
   content: string
-  url?: string | null
+  demoUrl?: string | null
+  githubUrl?: string | null
   repository?: string | null
   image?: string | null
   published?: boolean
@@ -730,7 +756,8 @@ export type ProjectUncheckedCreateWithoutTechnologiesInput = {
   slug: string
   description?: string | null
   content: string
-  url?: string | null
+  demoUrl?: string | null
+  githubUrl?: string | null
   repository?: string | null
   image?: string | null
   published?: boolean
@@ -768,7 +795,8 @@ export type ProjectUpdateWithoutTagsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -785,7 +813,8 @@ export type ProjectUncheckedUpdateWithoutTagsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -802,7 +831,8 @@ export type ProjectUncheckedUpdateManyWithoutTagsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -818,7 +848,8 @@ export type ProjectUpdateWithoutTechnologiesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -835,7 +866,8 @@ export type ProjectUncheckedUpdateWithoutTechnologiesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -852,7 +884,8 @@ export type ProjectUncheckedUpdateManyWithoutTechnologiesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
-  url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  demoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   repository?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -908,7 +941,8 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   slug?: boolean
   description?: boolean
   content?: boolean
-  url?: boolean
+  demoUrl?: boolean
+  githubUrl?: boolean
   repository?: boolean
   image?: boolean
   published?: boolean
@@ -927,7 +961,8 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   slug?: boolean
   description?: boolean
   content?: boolean
-  url?: boolean
+  demoUrl?: boolean
+  githubUrl?: boolean
   repository?: boolean
   image?: boolean
   published?: boolean
@@ -943,7 +978,8 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   slug?: boolean
   description?: boolean
   content?: boolean
-  url?: boolean
+  demoUrl?: boolean
+  githubUrl?: boolean
   repository?: boolean
   image?: boolean
   published?: boolean
@@ -959,7 +995,8 @@ export type ProjectSelectScalar = {
   slug?: boolean
   description?: boolean
   content?: boolean
-  url?: boolean
+  demoUrl?: boolean
+  githubUrl?: boolean
   repository?: boolean
   image?: boolean
   published?: boolean
@@ -969,7 +1006,7 @@ export type ProjectSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "description" | "content" | "url" | "repository" | "image" | "published" | "featured" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "description" | "content" | "demoUrl" | "githubUrl" | "repository" | "image" | "published" | "featured" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | Prisma.Project$tagsArgs<ExtArgs>
   technologies?: boolean | Prisma.Project$technologiesArgs<ExtArgs>
@@ -990,7 +1027,8 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     slug: string
     description: string | null
     content: string
-    url: string | null
+    demoUrl: string | null
+    githubUrl: string | null
     repository: string | null
     image: string | null
     published: boolean
@@ -1428,7 +1466,8 @@ export interface ProjectFieldRefs {
   readonly slug: Prisma.FieldRef<"Project", 'String'>
   readonly description: Prisma.FieldRef<"Project", 'String'>
   readonly content: Prisma.FieldRef<"Project", 'String'>
-  readonly url: Prisma.FieldRef<"Project", 'String'>
+  readonly demoUrl: Prisma.FieldRef<"Project", 'String'>
+  readonly githubUrl: Prisma.FieldRef<"Project", 'String'>
   readonly repository: Prisma.FieldRef<"Project", 'String'>
   readonly image: Prisma.FieldRef<"Project", 'String'>
   readonly published: Prisma.FieldRef<"Project", 'Boolean'>
