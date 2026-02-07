@@ -8,6 +8,9 @@ export const env = createEnv({
     BETTER_AUTH_URL: z.url(),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   // runtimeEnv: {

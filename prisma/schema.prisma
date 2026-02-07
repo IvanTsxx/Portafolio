@@ -1,0 +1,172 @@
+// Pikuu - Schema Prisma completo
+// Sistema de créditos pay-per-generation con free tier
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider     = "postgresql"
+  relationMode = "prisma"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id           String    @id @default(cuid())
+  userId       String
+  accountId    String
+  providerId   String
+  accessToken  String?
+  refreshToken String?
+  idToken      String?
+  expiresAt    DateTime?
+  password     String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+  @@map("verifications")
+}
+
+// Portfolio content models
+model Post {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  description String?
+  content     String     @db.Text
+  published   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  tags        Tag[]      @relation("PostToTag")
+  categories  Category[] @relation("PostToCategory")
+
+  @@index([slug])
+  @@index([published])
+  @@map("posts")
+}
+
+model Project {
+  id           String       @id @default(cuid())
+  title        String
+  slug         String       @unique
+  description  String?
+  content      String       @db.Text
+  url          String?
+  repository   String?
+  image        String?
+  published    Boolean      @default(false)
+  featured     Boolean      @default(false)
+  order        Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  tags         Tag[]        @relation("ProjectToTag")
+  technologies Technology[] @relation("ProjectToTechnology")
+
+  @@index([slug])
+  @@index([published])
+  @@index([featured])
+  @@map("projects")
+}
+
+model Experience {
+  id           String       @id @default(cuid())
+  company      String
+  position     String
+  slug         String       @unique
+  description  String?
+  content      String       @db.Text
+  startDate    DateTime
+  endDate      DateTime?
+  current      Boolean      @default(false)
+  location     String?
+  published    Boolean      @default(true)
+  order        Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  technologies Technology[] @relation("ExperienceToTechnology")
+
+  @@index([slug])
+  @@index([published])
+  @@map("experiences")
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  posts     Post[]    @relation("PostToTag")
+  projects  Project[] @relation("ProjectToTag")
+
+  @@index([slug])
+  @@map("tags")
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post[]   @relation("PostToCategory")
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Technology {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  slug        String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  projects    Project[]    @relation("ProjectToTechnology")
+  experiences Experience[] @relation("ExperienceToTechnology")
+
+  @@index([slug])
+  @@map("technologies")
+}
