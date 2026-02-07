@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
+import { DirectionProvider } from "@/components/ui/direction"
 
-const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" });
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +15,11 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const fontSans = Noto_Sans_Arabic({
+  subsets: ["arabic"],
+  variable: "--font-sans",
+})
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,11 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={roboto.variable}>
+    <html dir="rtl" lang="ar" className={fontSans.variable} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <DirectionProvider direction="rtl">{children}</DirectionProvider>
       </body>
     </html>
   );
