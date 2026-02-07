@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireAuth } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import type { ExperienceWithRelations } from "@/lib/types";
+import { generateSlug } from "@/lib/utils";
 import { type ExperienceInput, experienceSchema } from "@/lib/validations";
 
 export async function createExperience(data: ExperienceInput) {
@@ -90,10 +91,3 @@ export async function getExperiences(): Promise<ExperienceWithRelations[]> {
 
   return experiences;
 }
-
-export const generateSlug = (text: string) => {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-};
