@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
 import { env } from "@/env/server";
 import { prisma } from "./prisma";
 
@@ -26,11 +27,14 @@ export const auth = betterAuth({
     async session({ session, user }: { session: Session; user: User }) {
       // Only allow specific emails
       if (!ALLOWED_EMAILS.includes(user.email)) {
+        console.log("Unauthorized");
         throw new Error("Unauthorized");
       }
+      console.log("Authorized");
       return session;
     },
   },
+  plugins: [nextCookies()],
 });
 
 export type Session = typeof auth.$Infer.Session.session;

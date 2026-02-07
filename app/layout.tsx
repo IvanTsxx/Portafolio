@@ -4,7 +4,6 @@ import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SearchDialog } from "@/components/search-dialog";
-import { DirectionProvider } from "@/components/ui/direction";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
@@ -75,22 +74,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      dir="rtl"
-      lang="ar"
-      className={fontSans.variable}
-      suppressHydrationWarning
-    >
+    <html lang="ar" className={fontSans.variable} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <DirectionProvider direction="rtl">
-          <Header />
-          {children}
-          <Footer />
-          <SearchDialog />
-          <Toaster richColors position="top-center" />
-        </DirectionProvider>
+        <Header />
+        {children}
+        <Footer />
+        <SearchDialog />
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );
