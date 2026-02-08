@@ -41,14 +41,15 @@ export default async function ProjectsPage() {
                 key={project.id}
                 className="group flex flex-col overflow-hidden p-0 transition-all hover:shadow-lg hover:shadow-primary/10"
               >
-                <div className="relative aspect-video w-full overflow-hidden bg-muted">
-                  <img
-                    /*       src={project.coverImage || "/placeholder.svg"} */
-                    src="https://imgs.search.brave.com/wH8kQ40LGUwBSaQRtG00Z-oYS2vz2H4qXfuNDSkna8M/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAyLzQ3LzY3LzEz/LzM2MF9GXzI0NzY3/MTMzN19ocTFQTVBG/enRaNWhac01iVjlu/V055eE03QllubEQ2/SS5qcGc"
-                    alt={project.title}
-                    className="size-full object-cover transition-transform group-hover:scale-105"
-                  />
-                </div>
+                {project.coverImage && (
+                  <div className="relative aspect-video w-full overflow-hidden bg-muted">
+                    <img
+                      src={project.coverImage || "/placeholder.svg"}
+                      alt={project.title}
+                      className="size-full object-cover transition-transform group-hover:scale-105"
+                    />
+                  </div>
+                )}
 
                 <CardHeader>
                   <CardTitle className="line-clamp-2">
