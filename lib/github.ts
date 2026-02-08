@@ -3,68 +3,76 @@ import { env } from "@/env/server";
 interface GithubEvent {
   type: string;
   repo: {
-    name: string;
-    url: string;
+    name: string; // owner/repo
   };
   created_at: string;
   payload: {
-    commits?: Array<{
-      message: string;
-    }>;
+    head?: string; // commit SHA
+    ref?: string;
+  };
+}
+
+interface GithubCommitResponse {
+  html_url: string;
+  commit: {
+    message: string;
   };
 }
 
 export const getRecentActivity = async () => {
-  // Replace with your actual GitHub username
-  const username = "ivantsxx"; // Using the username seen in previous contexts
+  const username = "IvanTsxx";
+
+  const headers = {
+    Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+    Accept: "application/vnd.github+json",
+  };
 
   try {
-    const response = await fetch(
+    // 1️⃣ Obtener eventos públicos
+    const eventsRes = await fetch(
       `https://api.github.com/users/${username}/events/public`,
       {
-        headers: {
-          // Add token if hitting rate limits: Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
-          Authorization: `Bearer ${env.GITHUB_TOKEN}`,
-        },
-        next: { revalidate: 18000 }, // Cache for 5 hour
+        headers,
+        next: { revalidate: 18000 }, // 5 horas
       },
     );
 
-    if (!response.ok) {
-      // Mock data fallback
-      return {
-        type: "PushEvent",
-        repo: "ivantsxx/portafolio-v2",
-        message: "feat: implementing awesome features",
-        date: new Date().toISOString(),
-        url: "https://github.com/ivantsxx",
-      };
-    }
+    if (!eventsRes.ok) return null;
 
-    const events: GithubEvent[] = await response.json();
+    const events: GithubEvent[] = await eventsRes.json();
 
-    const pushEvent = events.find((e) => e.type === "PushEvent");
+    // 2️⃣ Buscar el último PushEvent válido
+    const pushEvent = events.find(
+      (e) => e.type === "PushEvent" && e.payload?.head,
+    );
 
-    if (pushEvent) {
-      console.log("pushEvent", pushEvent);
-      return {
-        type: "PushEvent",
-        repo: pushEvent.repo.name,
-        message: pushEvent.payload.commits?.[0]?.message || "Updates",
-        date: pushEvent.created_at,
-        url: `https://github.com/${pushEvent.repo.name}`,
-      };
-    }
+    if (!pushEvent) return null;
 
-    return null;
-  } catch (error) {
-    console.error("Error fetching GitHub activity", error);
+    const [owner, repo] = pushEvent.repo.name.split("/");
+    const sha = pushEvent.payload.head;
+
+    // 3️⃣ Obtener el commit real
+    const commitRes = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/commits/${sha}`,
+      {
+        headers,
+      },
+    );
+
+    if (!commitRes.ok) return null;
+
+    const commit: GithubCommitResponse = await commitRes.json();
+
+    // 4️⃣ Resultado final
     return {
       type: "PushEvent",
-      repo: "ivantsxx/portafolio-v2",
-      message: "feat: implementing awesome features (mock)",
-      date: new Date().toISOString(),
-      url: "https://github.com/ivantsxx",
+      repo: pushEvent.repo.name,
+      message: commit.commit.message,
+      date: pushEvent.created_at,
+      url: commit.html_url,
     };
+  } catch (error) {
+    console.error("Error fetching GitHub activity:", error);
+    return null;
   }
 };
