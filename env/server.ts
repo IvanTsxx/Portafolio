@@ -15,6 +15,7 @@ export const env = createEnv({
     LASTFM_USERNAME: z.string(),
     LASTFM_API_KEY: z.string(),
     GOOGLE_GENERATIVE_AI_API_KEY: z.string(),
+    OPENROUTER_API_KEY: z.string(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   // runtimeEnv: {

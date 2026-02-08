@@ -170,11 +170,11 @@ export function ChatWidget() {
                               </div>
                             )}
                             {/* Handling potential future reasoning parts */}
-                            {part.type === "reasoning" && (
+                            {/*  {part.type === "reasoning" && (
                               <span className="my-1 block border-white/30 border-l-2 pl-2 italic opacity-70">
                                 {part.text}
                               </span>
-                            )}
+                            )} */}
                           </div>
                         ))
                       ) : (
