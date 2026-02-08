@@ -50,7 +50,7 @@ export function ShareButton({ url, title, description }: ShareButtonProps) {
             render={
               <DropdownMenuTrigger
                 render={
-                  <Button variant="ghost" size="icon" nativeButton={false}>
+                  <Button variant="ghost" size="icon">
                     <Share2 className="size-4" />
                     <span className="sr-only">Compartir</span>
                   </Button>
