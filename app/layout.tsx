@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SearchDialog } from "@/components/search-dialog";
 import { Toaster } from "@/components/ui/sonner";
+import { env } from "@/env/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "https://ivantsx.dev",
+    url: env.BETTER_AUTH_URL,
     title: "Iván Bongiovanni - Full-Stack Developer",
     description:
       "Desarrollador Full-Stack especializado en TypeScript, React, Next.js y Node.js.",

@@ -10,13 +10,14 @@ import { Guestbook } from "@/components/guestbook";
 import { TechOrbit } from "@/components/tech-orbit";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { env } from "@/env/server";
 import { socials } from "@/lib/constants";
 
 // formatDate moved to experience-timeline.tsx
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: "https://ivantsx.dev",
+    canonical: env.BETTER_AUTH_URL,
   },
 };
 

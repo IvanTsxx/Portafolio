@@ -7,13 +7,14 @@ import { getPosts } from "@/app/actions/posts";
 import { getCategories } from "@/app/actions/taxonamy";
 import { ListFilters } from "@/components/list-filters";
 import { Badge } from "@/components/ui/badge";
+import { env } from "@/env/server";
 
 export const metadata: Metadata = {
   title: "Blog",
   description:
     "Artículos y reflexiones sobre desarrollo web, tecnología y programación por Iván Bongiovanni.",
   alternates: {
-    canonical: "https://ivantsx.dev/blog",
+    canonical: `${env.BETTER_AUTH_URL}/blog`,
   },
 };
 

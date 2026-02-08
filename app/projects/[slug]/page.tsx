@@ -7,6 +7,7 @@ import { MDXRenderer } from "@/components/mdx-renderer";
 import { ShareButton } from "@/components/share-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { env } from "@/env/server";
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -38,13 +39,12 @@ export async function generateMetadata({
     description: project.description,
     keywords: project.technologies.map((tech) => tech.name),
     alternates: {
-      canonical: `https://ivantsx.dev/projects/${project.slug}`,
+      canonical: `${env.BETTER_AUTH_URL}/projects/${project.slug}`,
     },
     openGraph: {
       title: project.title,
       description: project.description || "",
-      images: project.coverImage ? [project.coverImage] : ["/og-image.webp"],
-      url: `https://ivantsx.dev/projects/${project.slug}`,
+      url: `${env.BETTER_AUTH_URL}/projects/${project.slug}`,
       siteName: "Iván Bongiovanni - Proyectos",
       type: "website",
     },
@@ -52,7 +52,6 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: project.title,
       description: project.description || "",
-      images: project.coverImage ? [project.coverImage] : ["/og-image.webp"],
     },
   };
 }
@@ -65,7 +64,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound();
   }
 
-  const url = `https://ivantsx.dev/projects/${project.slug}`;
+  const url = `${env.BETTER_AUTH_URL}/projects/${project.slug}`;
 
   return (
     <main className="min-h-screen">

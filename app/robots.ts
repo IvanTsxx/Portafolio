@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { env } from "@/env/server";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: "/admin/",
       },
     ],
-    sitemap: "https://ivantsx.dev/sitemap.xml",
+    sitemap: `${env.BETTER_AUTH_URL}/sitemap.xml`,
   };
 }

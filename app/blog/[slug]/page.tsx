@@ -9,6 +9,7 @@ import { MDXRenderer } from "@/components/mdx-renderer";
 import { ShareButton } from "@/components/share-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { env } from "@/env/server";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -42,7 +43,7 @@ export async function generateMetadata({
     description: post.description,
     keywords: post.tags.map((tag) => tag.name),
     alternates: {
-      canonical: `https://ivantsx.dev/blog/${post.slug}`,
+      canonical: `${env.BETTER_AUTH_URL}/blog/${post.slug}`,
     },
     authors: authors.map((author) => ({ name: author })),
     openGraph: {
@@ -52,15 +53,13 @@ export async function generateMetadata({
       publishedTime: publishedAt,
       modifiedTime: modifiedAt,
       authors: authors,
-      url: `https://ivantsx.dev/blog/${post.slug}`,
+      url: `${env.BETTER_AUTH_URL}/blog/${post.slug}`,
       siteName: "Iván Bongiovanni",
-      images: post.coverImage ? [post.coverImage] : [],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.description || "",
-      images: post.coverImage ? [post.coverImage] : ["/og-image.webp"],
     },
   };
 }
@@ -73,7 +72,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
-  const url = `https://ivantsx.dev/blog/${post.slug}`;
+  const url = `${env.BETTER_AUTH_URL}/blog/${post.slug}`;
 
   return (
     <main className="min-h-screen">

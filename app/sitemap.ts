@@ -1,20 +1,23 @@
 import type { MetadataRoute } from "next";
 import { getPosts } from "@/app/actions/posts";
 import { getProjects } from "@/app/actions/projects";
+import { env } from "@/env/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getPosts({ limit: 100 });
   const projects = await getProjects({ limit: 100 });
 
+  const baseUrl = env.BETTER_AUTH_URL;
+
   const postUrls = posts.map((post) => ({
-    url: `https://ivantsx.dev/blog/${post.slug}`,
+    url: `${baseUrl}/blog/${post.slug}`,
     lastModified: post.updatedAt,
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
   const projectUrls = projects.map((project) => ({
-    url: `https://ivantsx.dev/projects/${project.slug}`,
+    url: `${baseUrl}/projects/${project.slug}`,
     lastModified: project.updatedAt,
     changeFrequency: "monthly" as const,
     priority: 0.8,
@@ -22,25 +25,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: "https://ivantsx.dev",
+      url: `${baseUrl}`,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 1,
     },
     {
-      url: "https://ivantsx.dev/blog",
+      url: `${baseUrl}/blog`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: "https://ivantsx.dev/projects",
+      url: `${baseUrl}/projects`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
-      url: "https://ivantsx.dev/experience",
+      url: `${baseUrl}/experience`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,

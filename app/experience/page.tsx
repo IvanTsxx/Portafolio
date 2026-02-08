@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getExperiences } from "@/app/actions/experiences";
 import { MDXRenderer } from "@/components/mdx-renderer";
 import { Badge } from "@/components/ui/badge";
+import { env } from "@/env/server";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,13 +25,13 @@ export async function generateMetadata(): Promise<Metadata> {
       ...technologies,
     ],
     alternates: {
-      canonical: "https://ivantsx.dev/experience",
+      canonical: `${env.BETTER_AUTH_URL}/experience`,
     },
     openGraph: {
       title: "Experiencia Profesional - Iván Bongiovanni",
       description:
         "Trayectoria profesional de Iván Bongiovanni como Full-Stack Developer.",
-      url: "https://ivantsx.dev/experience",
+      url: `${env.BETTER_AUTH_URL}/experience`,
       siteName: "Iván Bongiovanni",
       type: "website",
     },

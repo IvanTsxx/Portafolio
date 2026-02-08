@@ -5,13 +5,14 @@ import { getTechnologies } from "@/app/actions/taxonamy";
 import { ListFilters } from "@/components/list-filters";
 import { ProjectActions } from "@/components/project-actions";
 import { Badge } from "@/components/ui/badge";
+import { env } from "@/env/server";
 
 export const metadata: Metadata = {
   title: "Proyectos",
   description:
     "Proyectos destacados de Iván Bongiovanni, Full-Stack Developer especializado en Next.js y React.",
   alternates: {
-    canonical: "https://ivantsx.dev/projects",
+    canonical: `${env.BETTER_AUTH_URL}/projects`,
   },
 };
 
