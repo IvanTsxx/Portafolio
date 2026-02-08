@@ -60,9 +60,9 @@ model Session {
 
   token String
 
+  @@unique([token])
   @@index([userId])
   @@map("sessions")
-  @@unique([token])
 }
 
 model Verification {
@@ -74,8 +74,8 @@ model Verification {
   updatedAt  DateTime @updatedAt
 
   @@unique([identifier, value])
-  @@map("verifications")
   @@index([identifier])
+  @@map("verifications")
 }
 
 // Portfolio content models
@@ -108,7 +108,7 @@ model Project {
   demoUrl      String?
   githubUrl    String?
   repository   String?
-  image        String?
+  coverImage   String?
   published    Boolean      @default(false)
   featured     Boolean      @default(false)
   order        Int          @default(0)

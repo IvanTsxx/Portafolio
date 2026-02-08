@@ -36,7 +36,7 @@ export async function generateMetadata({
     openGraph: {
       title: project.title,
       description: project.description || "",
-      images: project.image ? [project.image] : [],
+      images: project.coverImage ? [project.coverImage] : [],
     },
   };
 }
@@ -114,10 +114,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </div>
           </div>
 
-          {project.image && (
+          {project.coverImage && (
             <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted shadow-lg">
               <img
-                src={project.image || "/placeholder.svg"}
+                src={project.coverImage || "/placeholder.svg"}
                 alt={project.title}
                 className="size-full object-cover"
               />

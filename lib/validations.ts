@@ -2,7 +2,14 @@ import { z } from "zod";
 
 export const postSchema = z.object({
   title: z.string().min(1, "El título es requerido").max(200),
-  slug: z.string().min(1, "El slug es requerido").max(200).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "El slug debe estar en formato kebab-case"),
+  slug: z
+    .string()
+    .min(1, "El slug es requerido")
+    .max(200)
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "El slug debe estar en formato kebab-case",
+    ),
   description: z.string().min(1, "La descripción es requerida").max(500),
   content: z.string().min(1, "El contenido es requerido"),
   coverImage: z.string().url("Debe ser una URL válida").optional().nullable(),
@@ -13,7 +20,14 @@ export const postSchema = z.object({
 
 export const projectSchema = z.object({
   title: z.string().min(1, "El título es requerido").max(200),
-  slug: z.string().min(1, "El slug es requerido").max(200).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "El slug debe estar en formato kebab-case"),
+  slug: z
+    .string()
+    .min(1, "El slug es requerido")
+    .max(200)
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "El slug debe estar en formato kebab-case",
+    ),
   description: z.string().min(1, "La descripción es requerida").max(500),
   content: z.string().min(1, "El contenido es requerido"),
   coverImage: z.string().url("Debe ser una URL válida").optional().nullable(),
@@ -38,17 +52,38 @@ export const experienceSchema = z.object({
 
 export const categorySchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100),
-  slug: z.string().min(1, "El slug es requerido").max(100).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "El slug debe estar en formato kebab-case"),
+  slug: z
+    .string()
+    .min(1, "El slug es requerido")
+    .max(100)
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "El slug debe estar en formato kebab-case",
+    ),
 });
 
 export const tagSchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100),
-  slug: z.string().min(1, "El slug es requerido").max(100).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "El slug debe estar en formato kebab-case"),
+  slug: z
+    .string()
+    .min(1, "El slug es requerido")
+    .max(100)
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "El slug debe estar en formato kebab-case",
+    ),
 });
 
 export const technologySchema = z.object({
   name: z.string().min(1, "El nombre es requerido").max(100),
-  slug: z.string().min(1, "El slug es requerido").max(100).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "El slug debe estar en formato kebab-case"),
+  slug: z
+    .string()
+    .min(1, "El slug es requerido")
+    .max(100)
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "El slug debe estar en formato kebab-case",
+    ),
 });
 
 export type PostInput = z.infer<typeof postSchema>;

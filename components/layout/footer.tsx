@@ -1,23 +1,5 @@
-import { Github, Linkedin, Mail } from "lucide-react";
 import Link from "next/link";
-
-const socials = [
-  {
-    name: "GitHub",
-    href: "https://github.com/IvanTsxx",
-    icon: Github,
-  },
-  {
-    name: "LinkedIn",
-    href: "https://www.linkedin.com/in/bongiovanni-ivan45",
-    icon: Linkedin,
-  },
-  {
-    name: "Email",
-    href: "mailto:bongiovannidev@gmail.com",
-    icon: Mail,
-  },
-];
+import { socials } from "@/lib/constants";
 
 export function Footer() {
   return (

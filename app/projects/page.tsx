@@ -41,10 +41,10 @@ export default async function ProjectsPage() {
                 key={project.id}
                 className="group flex flex-col transition-all hover:shadow-lg hover:shadow-primary/10"
               >
-                {project.image && (
+                {project.coverImage && (
                   <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
                     <img
-                      src={project.image || "/placeholder.svg"}
+                      src={project.coverImage || "/placeholder.svg"}
                       alt={project.title}
                       className="size-full object-cover transition-transform group-hover:scale-105"
                     />

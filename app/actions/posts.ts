@@ -89,6 +89,20 @@ export async function getPost(slug: string): Promise<PostWithRelations | null> {
   return post;
 }
 
+export async function getPostById(
+  id: string,
+): Promise<PostWithRelations | null> {
+  const post = await prisma.post.findUnique({
+    where: { id },
+    include: {
+      tags: true,
+      category: true,
+    },
+  });
+
+  return post;
+}
+
 export async function getPosts(published = true): Promise<PostWithRelations[]> {
   const posts = await prisma.post.findMany({
     where: published ? { published: true } : undefined,

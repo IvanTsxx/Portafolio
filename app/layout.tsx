@@ -74,10 +74,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" className={fontSans.variable} suppressHydrationWarning>
+    <html lang="es" className={fontSans.variable} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
+        suppressHydrationWarning
       >
+        {/* Blurred background blobs */}
+        <div className="blob-container" aria-hidden="true">
+          <div className="blob blob-1" />
+          <div className="blob blob-2" />
+          <div className="blob blob-3" />
+        </div>
+
         <Header />
         {children}
         <Footer />

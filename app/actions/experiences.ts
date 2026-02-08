@@ -91,3 +91,16 @@ export async function getExperiences(): Promise<ExperienceWithRelations[]> {
 
   return experiences;
 }
+
+export async function getExperienceById(
+  id: string,
+): Promise<ExperienceWithRelations | null> {
+  const experience = await prisma.experience.findUnique({
+    where: { id },
+    include: {
+      technologies: true,
+    },
+  });
+
+  return experience;
+}

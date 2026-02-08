@@ -84,7 +84,11 @@ export function SearchDialog() {
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
+    <CommandDialog
+      open={open}
+      onOpenChange={setOpen}
+      className="h-fit max-h-[400px] overflow-y-auto md:max-w-xl"
+    >
       <CommandInput
         placeholder="Buscar posts, proyectos..."
         value={query}

@@ -47,77 +47,65 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* Ultra-minimal white palette with subtle emerald green accent */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.65 0.18 132);
-  --primary-foreground: oklch(0.99 0.03 121);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.9 0.18 127);
-  --chart-2: oklch(0.85 0.21 129);
-  --chart-3: oklch(0.77 0.2 131);
-  --chart-4: oklch(0.65 0.18 132);
-  --chart-5: oklch(0.53 0.14 132);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.65 0.18 132);
-  --sidebar-primary-foreground: oklch(0.99 0.03 121);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  /* Pure white background */
+  --background: oklch(0.995 0.003 110);
+  --foreground: oklch(0.15 0.01 0);
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.77 0.2 131);
-  --primary-foreground: oklch(0.27 0.07 132);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.9 0.18 127);
-  --chart-2: oklch(0.85 0.21 129);
-  --chart-3: oklch(0.77 0.2 131);
-  --chart-4: oklch(0.65 0.18 132);
-  --chart-5: oklch(0.53 0.14 132);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.85 0.21 129);
-  --sidebar-primary-foreground: oklch(0.27 0.07 132);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Cards pure white */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.01 0);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 0);
+
+  /* Subtle emerald/jade green - elegant and minimal */
+  --primary: oklch(0.55 0.12 160);
+  --primary-foreground: oklch(0.98 0.01 160);
+
+  /* Soft green secondary */
+  --secondary: oklch(0.96 0.015 160);
+  --secondary-foreground: oklch(0.4 0.08 160);
+
+  /* Muted tones */
+  --muted: oklch(0.97 0.003 110);
+  --muted-foreground: oklch(0.5 0.01 0);
+
+  /* Accent - subtle green tint */
+  --accent: oklch(0.95 0.012 160);
+  --accent-foreground: oklch(0.35 0.08 160);
+
+  /* Destructive - muted red */
+  --destructive: oklch(0.55 0.18 25);
+
+  /* Borders - very subtle */
+  --border: oklch(0.93 0.003 110);
+  --input: oklch(0.95 0.003 110);
+  --ring: oklch(0.55 0.12 160);
+
+  /* Charts - green gradient */
+  --chart-1: oklch(0.65 0.14 160);
+  --chart-2: oklch(0.55 0.12 165);
+  --chart-3: oklch(0.5 0.1 155);
+  --chart-4: oklch(0.6 0.11 170);
+  --chart-5: oklch(0.45 0.09 160);
+
+  --radius: 0.5rem;
+
+  /* Sidebar */
+  --sidebar: oklch(0.99 0.002 110);
+  --sidebar-foreground: oklch(0.2 0.01 0);
+  --sidebar-primary: oklch(0.55 0.12 160);
+  --sidebar-primary-foreground: oklch(0.98 0.01 160);
+  --sidebar-accent: oklch(0.95 0.012 160);
+  --sidebar-accent-foreground: oklch(0.35 0.08 160);
+  --sidebar-border: oklch(0.93 0.003 110);
+  --sidebar-ring: oklch(0.55 0.12 160);
 }
 
 @layer base {
- * {
+  * {
     @apply border-border;
   }
   body {
@@ -134,23 +122,204 @@
   }
 }
 
+/* Blurred background blobs */
+.blob-container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
 
-/* Glow utility classes */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  animation: blob-float 20s ease-in-out infinite;
+}
+
+.blob-1 {
+  width: 600px;
+  height: 600px;
+  background: oklch(0.7 0.1 160 / 0.15); /* Subtle emerald */
+  top: -200px;
+  right: -100px;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 500px;
+  height: 500px;
+  background: oklch(0.65 0.08 170 / 0.12); /* Soft teal */
+  bottom: -150px;
+  left: -100px;
+  animation-delay: -5s;
+}
+
+.blob-3 {
+  width: 400px;
+  height: 400px;
+  background: oklch(0.6 0.09 155 / 0.1); /* Jade green */
+  top: 40%;
+  left: 50%;
+  animation-delay: -10s;
+}
+
+@keyframes blob-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -30px) scale(1.05);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  75% {
+    transform: translate(20px, 30px) scale(1.02);
+  }
+}
+
+/* Subtle emerald glow effects */
 @layer utilities {
   .glow-sm {
-    box-shadow: 0 0 15px -3px rgba(52, 211, 153, 0.15),
-                0 0 6px -4px rgba(52, 211, 153, 0.1);
+    box-shadow:
+      0 0 15px -3px oklch(0.55 0.12 160 / 0.12),
+      0 0 6px -4px oklch(0.55 0.12 160 / 0.08);
   }
   .glow-md {
-    box-shadow: 0 0 25px -5px rgba(52, 211, 153, 0.2),
-                0 0 10px -6px rgba(52, 211, 153, 0.15);
+    box-shadow:
+      0 0 25px -5px oklch(0.55 0.12 160 / 0.15),
+      0 0 10px -6px oklch(0.55 0.12 160 / 0.1);
   }
   .glow-lg {
-    box-shadow: 0 0 40px -5px rgba(52, 211, 153, 0.25),
-                0 0 20px -8px rgba(52, 211, 153, 0.2);
+    box-shadow:
+      0 0 40px -5px oklch(0.55 0.12 160 / 0.18),
+      0 0 20px -8px oklch(0.55 0.12 160 / 0.12);
   }
   .glow-xl {
-    box-shadow: 0 0 60px -10px rgba(52, 211, 153, 0.3),
-                0 0 30px -10px rgba(52, 211, 153, 0.25);
+    box-shadow:
+      0 0 60px -10px oklch(0.55 0.12 160 / 0.2),
+      0 0 30px -10px oklch(0.55 0.12 160 / 0.15);
   }
+}
+
+/* Minimal card styles */
+@layer components {
+  .card-minimal {
+    @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-lg;
+  }
+
+  .badge-minimal {
+    @apply px-2.5 py-0.5 text-xs rounded-md bg-secondary text-secondary-foreground border border-border/30;
+  }
+}
+
+/* Header glassmorphism */
+.header-glass {
+  background: oklch(0.995 0.003 110 / 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Smooth animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out forwards;
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 0.6s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.6s ease-out forwards;
+  }
+
+  /* Staggered delays */
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+  .delay-400 {
+    animation-delay: 400ms;
+  }
+  .delay-500 {
+    animation-delay: 500ms;
+  }
+
+  /* Initial state for animated elements */
+  .animate-initial {
+    opacity: 0;
+  }
+}
+
+/* Keyboard shortcut hint style */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--muted-foreground);
+  background-color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 2px oklch(0 0 0 / 0.05);
 }

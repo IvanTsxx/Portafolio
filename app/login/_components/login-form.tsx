@@ -38,7 +38,7 @@ export default function SignIn() {
               onClick={async () => {
                 await signIn.social({
                   provider: "google",
-                  callbackURL: "/dashboard",
+                  callbackURL: "/admin",
                   fetchOptions: {
                     onRequest: () => {
                       setLoading(true);

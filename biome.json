@@ -15,7 +15,9 @@
       "!build",
       "!e2e",
       "!.agent",
-      "!drizzle"
+      "!drizzle",
+      "!prisma",
+      "!app/generated"
     ]
   },
   "formatter": {

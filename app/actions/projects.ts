@@ -94,6 +94,19 @@ export async function getProject(
   return project;
 }
 
+export async function getProjectById(
+  id: string,
+): Promise<ProjectWithRelations | null> {
+  const project = await prisma.project.findUnique({
+    where: { id },
+    include: {
+      technologies: true,
+    },
+  });
+
+  return project;
+}
+
 export async function getProjects(
   published = true,
 ): Promise<ProjectWithRelations[]> {
