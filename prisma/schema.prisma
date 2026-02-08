@@ -22,6 +22,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
+  isAnonymous Boolean? @default(false)
+
   @@map("users")
 }
 
@@ -181,4 +183,12 @@ model Technology {
 
   @@index([slug])
   @@map("technologies")
+}
+
+model GuestbookEntry {
+  id        String   @id @default(cuid())
+  name      String?  @default("Anónimo")
+  message   String
+  createdAt DateTime @default(now())
+  userId    String?
 }

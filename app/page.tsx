@@ -1,9 +1,11 @@
 import { ArrowRight, ExternalLink, Github } from "lucide-react";
 import Link from "next/link";
 import { getExperiences } from "@/app/actions/experiences";
+import { getGuestbookEntries } from "@/app/actions/guestbook";
 import { getProjects } from "@/app/actions/projects";
 import { AboutBento } from "@/components/about-bento";
 import { ExperienceTimeline } from "@/components/experience-timeline";
+import { Guestbook } from "@/components/guestbook";
 import { TechOrbit } from "@/components/tech-orbit";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,9 +16,10 @@ import { socials } from "@/lib/constants";
 // formatDate moved to experience-timeline.tsx
 
 export default async function HomePage() {
-  const [projects, experiences] = await Promise.all([
+  const [projects, experiences, guestbookEntries] = await Promise.all([
     getProjects(true).then((p) => p.slice(0, 4)),
     getExperiences().then((e) => e.slice(0, 4)),
+    getGuestbookEntries(),
   ]);
 
   return (
@@ -246,6 +249,22 @@ export default async function HomePage() {
 
       {/* About Section - Bento Grid */}
       <AboutBento />
+
+      {/* Guestbook Section */}
+      <section id="guestbook" className="py-20 lg:py-28">
+        <div className="mx-auto max-w-2xl px-4 lg:px-8">
+          <div className="mb-12 space-y-4 text-center">
+            <h2 className="font-semibold text-2xl text-foreground tracking-tight lg:text-3xl">
+              Guestbook
+            </h2>
+            <p className="mx-auto max-w-md text-muted-foreground leading-relaxed">
+              Deja un mensaje, un saludo o simplemente firma para decir que
+              estuviste aquí. Sin registros complicados.
+            </p>
+          </div>
+          <Guestbook entries={guestbookEntries} />
+        </div>
+      </section>
     </main>
   );
 }

@@ -11,6 +11,10 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
+    SPOTIFY_CLIENT_ID: z.string(),
+    SPOTIFY_CLIENT_SECRET: z.string(),
+    SPOTIFY_REFRESH_TOKEN: z.string(),
+    GITHUB_TOKEN: z.string(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   // runtimeEnv: {
