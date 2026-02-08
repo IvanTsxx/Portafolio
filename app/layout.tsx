@@ -25,6 +25,7 @@ const fontSans = Noto_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(env.BETTER_AUTH_URL),
   title: {
     default: "Iván Bongiovanni - Full-Stack Developer",
     template: "%s | Iván Bongiovanni",

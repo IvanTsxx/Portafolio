@@ -39,7 +39,7 @@ export default async function Image({
 
   const fontData = await fetch(
     new URL(
-      "https://github.com/google/fonts/raw/main/ofl/inter/Inter-Bold.ttf",
+      "https://raw.githubusercontent.com/vercel/satori/main/playground/public/inter-latin-ext-700-normal.woff",
       import.meta.url,
     ),
   ).then((res) => res.arrayBuffer());
