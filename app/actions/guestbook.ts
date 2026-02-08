@@ -69,3 +69,36 @@ export async function getGuestbookEntries() {
     return [];
   }
 }
+
+export async function deleteGuestbookEntries(ids: string[]) {
+  try {
+    await prisma.guestbookEntry.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    revalidatePath("/guestbook");
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting guestbook entries:", error);
+    return { error: "Error al eliminar las firmas" };
+  }
+}
+
+export async function getAdminGuestbookEntries() {
+  try {
+    const entries = await prisma.guestbookEntry.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return entries;
+  } catch (error) {
+    console.error("Error fetching admin guestbook entries:", error);
+    return [];
+  }
+}

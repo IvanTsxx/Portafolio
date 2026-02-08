@@ -92,8 +92,9 @@
   --destructive: oklch(0.58 0.16 25);
 
   /* Borders - barely visible */
-  --border: oklch(0.94 0.002 90);
-  --input: oklch(0.96 0.002 90);
+  --border: oklch(0.85 0.002 90);
+--input: oklch(0.88 0.002 90);
+
   --ring: oklch(0.62 0.08 152);
 
   /* Charts - sage gradient */

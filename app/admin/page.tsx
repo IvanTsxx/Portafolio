@@ -1,8 +1,10 @@
 import { Briefcase, FileText, FolderKanban, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { getExperiences } from "@/app/actions/experiences";
+import { getAdminGuestbookEntries } from "@/app/actions/guestbook";
 import { getPosts } from "@/app/actions/posts";
 import { getProjects } from "@/app/actions/projects";
+import { GuestbookManager } from "@/app/admin/_components/guestbook-manager";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +17,7 @@ export default async function AdminDashboard() {
     limit: 100,
   });
   const experiences = await getExperiences({ limit: 100 });
+  const guestbookEntries = await getAdminGuestbookEntries();
 
   const stats = [
     {
@@ -95,6 +98,7 @@ export default async function AdminDashboard() {
                 </Link>
               }
             />
+            <GuestbookManager entries={guestbookEntries} />
           </div>
         </CardContent>
       </Card>
