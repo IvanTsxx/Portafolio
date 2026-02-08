@@ -8,6 +8,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deletePost, updatePost } from "@/app/actions/posts";
 import { MarkdownEditor } from "@/components/admin/markdown-editor";
+import { TagSelector } from "@/components/admin/tag-selector";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +31,7 @@ import { postSchema } from "@/lib/validations";
 interface Tag {
   id: string;
   name: string;
+  slug: string;
 }
 
 interface Category {
@@ -79,14 +81,6 @@ export function EditPostForm({ post, categories, tags }: EditPostFormProps) {
   const handleSlugChange = (value: string) => {
     setSlugEdited(true);
     setSlug(value);
-  };
-
-  const toggleTag = (tagId: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId],
-    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -250,27 +244,11 @@ export function EditPostForm({ post, categories, tags }: EditPostFormProps) {
             <CardTitle>Tags</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => toggleTag(tag.id)}
-                  className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                    selectedTags.includes(tag.id)
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border hover:border-primary"
-                  }`}
-                >
-                  {tag.name}
-                </button>
-              ))}
-              {tags.length === 0 && (
-                <p className="text-muted-foreground text-sm">
-                  No hay tags. Créalos primero en la sección de Tags.
-                </p>
-              )}
-            </div>
+            <TagSelector
+              tags={tags}
+              selectedTagIds={selectedTags}
+              onSelectionChange={setSelectedTags}
+            />
           </CardContent>
         </Card>
 

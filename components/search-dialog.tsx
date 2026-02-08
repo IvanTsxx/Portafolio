@@ -47,7 +47,7 @@ export function SearchDialog() {
         const searchResults = await searchContent(query);
         setResults(searchResults);
       });
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [query]);
@@ -64,23 +64,49 @@ export function SearchDialog() {
     }
   };
 
+  const escapeRegExp = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
   const getHighlightedText = (text: string, highlight: string) => {
-    if (!highlight.trim()) {
-      return text;
+    if (!highlight.trim()) return text;
+
+    const escapedHighlight = escapeRegExp(highlight);
+    const regex = new RegExp(escapedHighlight, "gi");
+    const matches = [...text.matchAll(regex)];
+
+    if (matches.length === 0) return text;
+
+    const result: React.ReactNode[] = [];
+    let lastIndex = 0;
+
+    matches.forEach((match, i) => {
+      const matchStart = match.index!;
+      const matchEnd = matchStart + match[0].length;
+
+      // Añadir texto antes de la coincidencia
+      if (matchStart > lastIndex) {
+        result.push(text.slice(lastIndex, matchStart));
+      }
+
+      // Añadir la coincidencia resaltada
+      result.push(
+        <mark
+          key={i}
+          className="rounded-sm bg-primary/20 font-medium text-inherit"
+        >
+          {match[0]}
+        </mark>,
+      );
+
+      lastIndex = matchEnd;
+    });
+
+    // Añadir texto restante después de la última coincidencia
+    if (lastIndex < text.length) {
+      result.push(text.slice(lastIndex));
     }
 
-    const regex = new RegExp(`(${highlight})`, "gi");
-    const parts = text.split(regex);
-
-    return parts.map((part, i) =>
-      regex.test(part) ? (
-        <mark key={i} className="bg-primary/20 font-medium text-foreground">
-          {part}
-        </mark>
-      ) : (
-        part
-      ),
-    );
+    return <span>{result}</span>;
   };
 
   return (

@@ -12,6 +12,20 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type React from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { getSession } from "@/lib/dal";
 
 const navigation = [
@@ -36,49 +50,57 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-64 flex-col border-border/40 border-r bg-background lg:flex">
-        <div className="flex h-16 items-center border-border/40 border-b px-6">
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarHeader className="border-border/40 border-b px-4 py-4">
           <Link href="/admin" className="font-bold text-lg">
             Admin Panel
           </Link>
-        </div>
+        </SidebarHeader>
 
-        <nav className="flex-1 space-y-1 p-4">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <Icon className="size-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {navigation.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <SidebarMenuItem key={item.name}>
+                      <SidebarMenuButton
+                        tooltip={item.name}
+                        render={
+                          <Link href={item.href}>
+                            <Icon className="size-4" />
+                            <span>{item.name}</span>
+                          </Link>
+                        }
+                      />
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
 
-        <div className="border-border/40 border-t p-4">
+        <SidebarFooter className="border-border/40 border-t p-2">
           <form action="/api/auth/signout" method="POST">
             <Button
               type="submit"
               variant="ghost"
               className="w-full justify-start"
             >
-              <LogOut className="mr-3 size-5" />
+              <LogOut className="mr-2 size-4" />
               Cerrar sesión
             </Button>
           </form>
-        </div>
-      </aside>
+        </SidebarFooter>
+      </Sidebar>
 
-      {/* Main content */}
-      <div className="flex-1">
+      <SidebarInset>
         <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-border/40 border-b bg-background/80 px-6 backdrop-blur-md">
-          <div>
+          <div className="flex items-center gap-4">
+            <SidebarTrigger className="-ml-1" />
             <h2 className="font-semibold text-lg">Panel de Administración</h2>
           </div>
           <div className="flex items-center gap-4">
@@ -90,7 +112,7 @@ export default async function AdminLayout({
           </div>
         </header>
         <main className="p-6">{children}</main>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

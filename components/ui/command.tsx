@@ -64,8 +64,24 @@ function CommandDialog({
 
 function CommandInput({
   className,
+  onKeyDown,
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Allow Home/End keys to move cursor (with or without Shift for selection)
+    if (["Home", "End"].includes(e.key)) {
+      e.stopPropagation();
+    }
+    // Allow text selection with Shift + Arrow keys
+    if (
+      e.shiftKey &&
+      ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)
+    ) {
+      e.stopPropagation();
+    }
+    onKeyDown?.(e);
+  };
+
   return (
     <div data-slot="command-input-wrapper" className="border-b pb-0">
       <InputGroup className="h-8 border-input/30 border-none bg-input/30 shadow-none! *:data-[slot=input-group-addon]:ps-2!">
@@ -75,6 +91,7 @@ function CommandInput({
             "w-full text-xs outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
             className,
           )}
+          onKeyDown={handleKeyDown}
           {...props}
         />
         <InputGroupAddon>

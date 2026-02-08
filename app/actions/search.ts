@@ -17,6 +17,11 @@ export async function searchContent(query: string): Promise<SearchResult[]> {
       OR: [
         { title: { contains: searchTerm, mode: "insensitive" } },
         { description: { contains: searchTerm, mode: "insensitive" } },
+        {
+          tags: {
+            some: { name: { contains: searchTerm, mode: "insensitive" } },
+          },
+        },
       ],
     },
     include: {
@@ -33,6 +38,11 @@ export async function searchContent(query: string): Promise<SearchResult[]> {
       OR: [
         { title: { contains: searchTerm, mode: "insensitive" } },
         { description: { contains: searchTerm, mode: "insensitive" } },
+        {
+          technologies: {
+            some: { name: { contains: searchTerm, mode: "insensitive" } },
+          },
+        },
       ],
     },
     include: {
