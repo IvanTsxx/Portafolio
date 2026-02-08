@@ -30,6 +30,7 @@ export type GuestbookEntryMinAggregateOutputType = {
   message: string | null
   createdAt: Date | null
   userId: string | null
+  ipHash: string | null
 }
 
 export type GuestbookEntryMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type GuestbookEntryMaxAggregateOutputType = {
   message: string | null
   createdAt: Date | null
   userId: string | null
+  ipHash: string | null
 }
 
 export type GuestbookEntryCountAggregateOutputType = {
@@ -46,6 +48,8 @@ export type GuestbookEntryCountAggregateOutputType = {
   message: number
   createdAt: number
   userId: number
+  ipHash: number
+  style: number
   _all: number
 }
 
@@ -56,6 +60,7 @@ export type GuestbookEntryMinAggregateInputType = {
   message?: true
   createdAt?: true
   userId?: true
+  ipHash?: true
 }
 
 export type GuestbookEntryMaxAggregateInputType = {
@@ -64,6 +69,7 @@ export type GuestbookEntryMaxAggregateInputType = {
   message?: true
   createdAt?: true
   userId?: true
+  ipHash?: true
 }
 
 export type GuestbookEntryCountAggregateInputType = {
@@ -72,6 +78,8 @@ export type GuestbookEntryCountAggregateInputType = {
   message?: true
   createdAt?: true
   userId?: true
+  ipHash?: true
+  style?: true
   _all?: true
 }
 
@@ -153,6 +161,8 @@ export type GuestbookEntryGroupByOutputType = {
   message: string
   createdAt: Date
   userId: string | null
+  ipHash: string | null
+  style: runtime.JsonValue | null
   _count: GuestbookEntryCountAggregateOutputType | null
   _min: GuestbookEntryMinAggregateOutputType | null
   _max: GuestbookEntryMaxAggregateOutputType | null
@@ -182,6 +192,8 @@ export type GuestbookEntryWhereInput = {
   message?: Prisma.StringFilter<"GuestbookEntry"> | string
   createdAt?: Prisma.DateTimeFilter<"GuestbookEntry"> | Date | string
   userId?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  ipHash?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  style?: Prisma.JsonNullableFilter<"GuestbookEntry">
 }
 
 export type GuestbookEntryOrderByWithRelationInput = {
@@ -190,6 +202,8 @@ export type GuestbookEntryOrderByWithRelationInput = {
   message?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ipHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  style?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type GuestbookEntryWhereUniqueInput = Prisma.AtLeast<{
@@ -201,6 +215,8 @@ export type GuestbookEntryWhereUniqueInput = Prisma.AtLeast<{
   message?: Prisma.StringFilter<"GuestbookEntry"> | string
   createdAt?: Prisma.DateTimeFilter<"GuestbookEntry"> | Date | string
   userId?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  ipHash?: Prisma.StringNullableFilter<"GuestbookEntry"> | string | null
+  style?: Prisma.JsonNullableFilter<"GuestbookEntry">
 }, "id">
 
 export type GuestbookEntryOrderByWithAggregationInput = {
@@ -209,6 +225,8 @@ export type GuestbookEntryOrderByWithAggregationInput = {
   message?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ipHash?: Prisma.SortOrderInput | Prisma.SortOrder
+  style?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.GuestbookEntryCountOrderByAggregateInput
   _max?: Prisma.GuestbookEntryMaxOrderByAggregateInput
   _min?: Prisma.GuestbookEntryMinOrderByAggregateInput
@@ -223,6 +241,8 @@ export type GuestbookEntryScalarWhereWithAggregatesInput = {
   message?: Prisma.StringWithAggregatesFilter<"GuestbookEntry"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"GuestbookEntry"> | Date | string
   userId?: Prisma.StringNullableWithAggregatesFilter<"GuestbookEntry"> | string | null
+  ipHash?: Prisma.StringNullableWithAggregatesFilter<"GuestbookEntry"> | string | null
+  style?: Prisma.JsonNullableWithAggregatesFilter<"GuestbookEntry">
 }
 
 export type GuestbookEntryCreateInput = {
@@ -231,6 +251,8 @@ export type GuestbookEntryCreateInput = {
   message: string
   createdAt?: Date | string
   userId?: string | null
+  ipHash?: string | null
+  style?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type GuestbookEntryUncheckedCreateInput = {
@@ -239,6 +261,8 @@ export type GuestbookEntryUncheckedCreateInput = {
   message: string
   createdAt?: Date | string
   userId?: string | null
+  ipHash?: string | null
+  style?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type GuestbookEntryUpdateInput = {
@@ -247,6 +271,8 @@ export type GuestbookEntryUpdateInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type GuestbookEntryUncheckedUpdateInput = {
@@ -255,6 +281,8 @@ export type GuestbookEntryUncheckedUpdateInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type GuestbookEntryCreateManyInput = {
@@ -263,6 +291,8 @@ export type GuestbookEntryCreateManyInput = {
   message: string
   createdAt?: Date | string
   userId?: string | null
+  ipHash?: string | null
+  style?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type GuestbookEntryUpdateManyMutationInput = {
@@ -271,6 +301,8 @@ export type GuestbookEntryUpdateManyMutationInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type GuestbookEntryUncheckedUpdateManyInput = {
@@ -279,6 +311,8 @@ export type GuestbookEntryUncheckedUpdateManyInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ipHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  style?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
 export type GuestbookEntryCountOrderByAggregateInput = {
@@ -287,6 +321,8 @@ export type GuestbookEntryCountOrderByAggregateInput = {
   message?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  ipHash?: Prisma.SortOrder
+  style?: Prisma.SortOrder
 }
 
 export type GuestbookEntryMaxOrderByAggregateInput = {
@@ -295,6 +331,7 @@ export type GuestbookEntryMaxOrderByAggregateInput = {
   message?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  ipHash?: Prisma.SortOrder
 }
 
 export type GuestbookEntryMinOrderByAggregateInput = {
@@ -303,6 +340,7 @@ export type GuestbookEntryMinOrderByAggregateInput = {
   message?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  ipHash?: Prisma.SortOrder
 }
 
 
@@ -313,6 +351,8 @@ export type GuestbookEntrySelect<ExtArgs extends runtime.Types.Extensions.Intern
   message?: boolean
   createdAt?: boolean
   userId?: boolean
+  ipHash?: boolean
+  style?: boolean
 }, ExtArgs["result"]["guestbookEntry"]>
 
 export type GuestbookEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -321,6 +361,8 @@ export type GuestbookEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Type
   message?: boolean
   createdAt?: boolean
   userId?: boolean
+  ipHash?: boolean
+  style?: boolean
 }, ExtArgs["result"]["guestbookEntry"]>
 
 export type GuestbookEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -329,6 +371,8 @@ export type GuestbookEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   message?: boolean
   createdAt?: boolean
   userId?: boolean
+  ipHash?: boolean
+  style?: boolean
 }, ExtArgs["result"]["guestbookEntry"]>
 
 export type GuestbookEntrySelectScalar = {
@@ -337,9 +381,11 @@ export type GuestbookEntrySelectScalar = {
   message?: boolean
   createdAt?: boolean
   userId?: boolean
+  ipHash?: boolean
+  style?: boolean
 }
 
-export type GuestbookEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "message" | "createdAt" | "userId", ExtArgs["result"]["guestbookEntry"]>
+export type GuestbookEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "message" | "createdAt" | "userId" | "ipHash" | "style", ExtArgs["result"]["guestbookEntry"]>
 
 export type $GuestbookEntryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "GuestbookEntry"
@@ -350,6 +396,8 @@ export type $GuestbookEntryPayload<ExtArgs extends runtime.Types.Extensions.Inte
     message: string
     createdAt: Date
     userId: string | null
+    ipHash: string | null
+    style: runtime.JsonValue | null
   }, ExtArgs["result"]["guestbookEntry"]>
   composites: {}
 }
@@ -778,6 +826,8 @@ export interface GuestbookEntryFieldRefs {
   readonly message: Prisma.FieldRef<"GuestbookEntry", 'String'>
   readonly createdAt: Prisma.FieldRef<"GuestbookEntry", 'DateTime'>
   readonly userId: Prisma.FieldRef<"GuestbookEntry", 'String'>
+  readonly ipHash: Prisma.FieldRef<"GuestbookEntry", 'String'>
+  readonly style: Prisma.FieldRef<"GuestbookEntry", 'Json'>
 }
     
 
