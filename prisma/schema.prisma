@@ -90,8 +90,8 @@ model Post {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   tags        Tag[]       @relation("PostToTag")
-  categoryId  String
-  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  String?
+  category    Category?   @relation(fields: [categoryId], references: [id])
   embeddings  Embedding[]
 
   @@index([slug])

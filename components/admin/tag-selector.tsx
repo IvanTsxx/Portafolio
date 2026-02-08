@@ -40,7 +40,9 @@ export function TagSelector({
     }
   };
 
-  const handleCreateTag = async (e: React.FormEvent) => {
+  const handleCreateTag = async (
+    e: React.FormEvent | React.KeyboardEvent | React.MouseEvent,
+  ) => {
     e.preventDefault();
     if (!newTagName.trim()) return;
 
@@ -76,23 +78,30 @@ export function TagSelector({
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleCreateTag} className="flex gap-2">
+      <div className="flex gap-2">
         <Input
           value={newTagName}
           onChange={(e) => setNewTagName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleCreateTag(e);
+            }
+          }}
           placeholder="Escribir para crear nuevo tag..."
           disabled={isPending}
           className="flex-1"
         />
         <Button
-          type="submit"
+          type="button"
+          onClick={handleCreateTag}
           size="sm"
           disabled={isPending || !newTagName.trim()}
         >
           <Plus className="mr-1 size-4" />
           Crear
         </Button>
-      </form>
+      </div>
 
       <div className="flex flex-wrap gap-2">
         {localTags.map((tag) => {

@@ -1,30 +1,44 @@
 "use client";
 
-import { ArrowLeft, Save } from "lucide-react";
+import {
+  ArrowLeft,
+  Briefcase,
+  Calendar,
+  Folder,
+  Loader2,
+  Save,
+  Tags,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { createExperience } from "@/app/actions/experiences";
+import { createTechnology } from "@/app/actions/taxonamy";
 import { MarkdownEditor } from "@/components/admin/markdown-editor";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { TagInput } from "@/components/ui/tag-input";
+import { Textarea } from "@/components/ui/textarea";
+import { generateSlug } from "@/lib/utils";
 import { experienceSchema } from "@/lib/validations";
 
 interface Technology {
   id: string;
   name: string;
+  slug: string;
 }
 
 interface ExperienceFormProps {
   technologies: Technology[];
 }
 
-export function ExperienceForm({ technologies }: ExperienceFormProps) {
+export function ExperienceForm({
+  technologies: initialTechnologies,
+}: ExperienceFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -35,14 +49,20 @@ export function ExperienceForm({ technologies }: ExperienceFormProps) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [current, setCurrent] = useState(false);
-  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
 
-  const toggleTech = (techId: string) => {
-    setSelectedTechs((prev) =>
-      prev.includes(techId)
-        ? prev.filter((id) => id !== techId)
-        : [...prev, techId],
+  const [selectedTechnologies, setSelectedTechnologies] = useState<
+    Technology[]
+  >([]);
+  const [availableTechnologies, setAvailableTechnologies] =
+    useState<Technology[]>(initialTechnologies);
+
+  const handleCreateTechnology = async (name: string) => {
+    const slug = generateSlug(name);
+    const newTech = await createTechnology({ name, slug });
+    setAvailableTechnologies((prev) =>
+      [...prev, newTech].sort((a, b) => a.name.localeCompare(b.name)),
     );
+    return newTech;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +77,7 @@ export function ExperienceForm({ technologies }: ExperienceFormProps) {
         startDate: new Date(startDate),
         endDate: current ? null : endDate ? new Date(endDate) : null,
         current,
-        technologyIds: selectedTechs,
+        technologyIds: selectedTechnologies.map((t) => t.id),
       });
 
       startTransition(async () => {
@@ -76,162 +96,138 @@ export function ExperienceForm({ technologies }: ExperienceFormProps) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          render={
-            <Link href="/admin/experiences">
-              <ArrowLeft className="mr-2 size-4" />
-              Volver
-            </Link>
-          }
-        />
-
-        <div>
-          <h1 className="font-bold text-3xl tracking-tight">
-            Nueva experiencia
-          </h1>
-          <p className="text-muted-foreground">
-            Agrega una nueva experiencia laboral
-          </p>
+    <div className="min-h-screen bg-background pb-20">
+      {/* Top Navigation Bar */}
+      <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background/95 px-6 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="flex items-center gap-4">
+          <Link href="/admin/experiences">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <span className="font-medium text-muted-foreground text-sm">
+            Nueva Experiencia
+          </span>
         </div>
-      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Información básica</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="company">Empresa *</Label>
-                <Input
-                  id="company"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="Nombre de la empresa"
-                  required
-                />
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleSubmit}
+            disabled={isPending}
+            size="sm"
+            className="font-medium"
+          >
+            {isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            Guardar
+          </Button>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-3xl px-6 py-10">
+        {/* Document Header */}
+        <div className="group relative mb-8 space-y-2">
+          <Input
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
+            placeholder="Cargo / Posición"
+            className="h-auto border-none bg-transparent px-0 py-2 font-bold text-4xl tracking-tight shadow-none placeholder:text-muted-foreground/40 focus-visible:ring-0 md:text-5xl"
+            autoFocus
+          />
+          <Input
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            placeholder="Empresa / Organización"
+            className="h-auto border-none bg-transparent px-0 font-semibold text-2xl text-muted-foreground shadow-none placeholder:text-muted-foreground/30 focus-visible:ring-0"
+          />
+          <Textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Breve descripción del rol..."
+            className="min-h-[60px] resize-none border-none bg-transparent px-0 text-muted-foreground text-xl shadow-none placeholder:text-muted-foreground/30 focus-visible:ring-0"
+          />
+        </div>
+
+        {/* Properties Panel (Notion-style) */}
+        <div className="mb-10 space-y-10">
+          <div className="grid gap-y-1">
+            {/* Stack (Tags) */}
+            <div className="grid grid-cols-[140px_1fr] items-baseline gap-4 py-1.5">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Tags className="h-4 w-4" />
+                <span>Stack Tecnológico</span>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="position">Posición *</Label>
-                <Input
-                  id="position"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                  placeholder="Tu cargo o rol"
-                  required
+              <div className="min-w-0">
+                <TagInput
+                  placeholder="Tecnologías utilizadas..."
+                  availableTags={availableTechnologies}
+                  selectedTags={selectedTechnologies}
+                  onTagsChange={setSelectedTechnologies}
+                  onCreateTag={handleCreateTechnology}
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Descripción breve</Label>
-              <Input
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Una línea describiendo tu rol"
-              />
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="startDate">Fecha de inicio *</Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  required
-                />
+            {/* Dates */}
+            <div className="grid grid-cols-[140px_1fr] items-center gap-4 py-1.5">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Calendar className="h-4 w-4" />
+                <span>Período</span>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="endDate">Fecha de fin</Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  disabled={current}
-                />
-              </div>
-
-              <div className="flex items-end">
-                <div className="flex items-center gap-2 pb-2">
-                  <Switch
-                    id="current"
-                    checked={current}
-                    onCheckedChange={setCurrent}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="h-8 w-auto min-w-[150px] border-none bg-transparent px-2 text-muted-foreground text-sm hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-0"
                   />
-                  <Label htmlFor="current">Trabajo actual</Label>
+                  <span className="text-muted-foreground">-</span>
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    disabled={current}
+                    className="h-8 w-auto min-w-[150px] border-none bg-transparent px-2 text-muted-foreground text-sm hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-0 disabled:opacity-50"
+                  />
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Tecnologías utilizadas</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {technologies.map((tech) => (
-                <button
-                  key={tech.id}
-                  type="button"
-                  onClick={() => toggleTech(tech.id)}
-                  className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                    selectedTechs.includes(tech.id)
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border hover:border-primary"
-                  }`}
-                >
-                  {tech.name}
-                </button>
-              ))}
-              {technologies.length === 0 && (
-                <p className="text-muted-foreground text-sm">
-                  No hay tecnologías. Créalas primero en la sección de
-                  Tecnologías.
-                </p>
-              )}
+            {/* Current Job */}
+            <div className="grid grid-cols-[140px_1fr] items-center gap-4 py-1.5">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Briefcase className="h-4 w-4" />
+                <span>Trabajo Actual</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={current} onCheckedChange={setCurrent} />
+                <span className="text-muted-foreground text-xs">
+                  {current ? "Sí, actualmente aquí" : "No, finalizado"}
+                </span>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Contenido detallado</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MarkdownEditor
-              value={content}
-              onChange={setContent}
-              placeholder="Describe tus responsabilidades, logros y proyectos destacados..."
-            />
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            render={<Link href="/admin/experiences">Cancelar</Link>}
-          />
-
-          <Button type="submit" disabled={isPending}>
-            <Save className="mr-2 size-4" />
-            {isPending ? "Guardando..." : "Guardar experiencia"}
-          </Button>
+          </div>
         </div>
-      </form>
+
+        <Separator className="my-8" />
+
+        {/* Content Editor */}
+        <div className="min-h-[500px]">
+          <MarkdownEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Detalla tus logros, responsabilidades y proyectos clave..."
+          />
+        </div>
+      </div>
     </div>
   );
 }

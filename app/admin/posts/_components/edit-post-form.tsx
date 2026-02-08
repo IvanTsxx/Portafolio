@@ -1,14 +1,23 @@
 "use client";
 
-import { ArrowLeft, Save, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Folder,
+  Globe,
+  Image as ImageIcon,
+  Loader2,
+  Save,
+  Tags,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deletePost, updatePost } from "@/app/actions/posts";
+import { createCategory, createTag } from "@/app/actions/taxonamy";
 import { MarkdownEditor } from "@/components/admin/markdown-editor";
-import { TagSelector } from "@/components/admin/tag-selector";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,10 +30,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CategoryInput } from "@/components/ui/category-input";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { TagInput } from "@/components/ui/tag-input";
+import { Textarea } from "@/components/ui/textarea";
 import { generateSlug } from "@/lib/utils";
 import { postSchema } from "@/lib/validations";
 
@@ -45,6 +56,7 @@ interface Post {
   slug: string;
   description: string | null;
   content: string;
+  coverImage: string | null;
   published: boolean;
   categoryId: string | null;
   tags: Tag[];
@@ -56,7 +68,11 @@ interface EditPostFormProps {
   tags: Tag[];
 }
 
-export function EditPostForm({ post, categories, tags }: EditPostFormProps) {
+export function EditPostForm({
+  post,
+  categories: initialCategories,
+  tags: initialTags,
+}: EditPostFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -64,11 +80,15 @@ export function EditPostForm({ post, categories, tags }: EditPostFormProps) {
   const [slug, setSlug] = useState(post.slug);
   const [description, setDescription] = useState(post.description || "");
   const [content, setContent] = useState(post.content);
+  const [coverImage, setCoverImage] = useState(post.coverImage || "");
   const [published, setPublished] = useState(post.published);
   const [categoryId, setCategoryId] = useState(post.categoryId || "");
-  const [selectedTags, setSelectedTags] = useState<string[]>(
-    post.tags.map((t) => t.id),
-  );
+
+  const [selectedTags, setSelectedTags] = useState<Tag[]>(post.tags);
+  const [availableTags, setAvailableTags] = useState<Tag[]>(initialTags);
+  const [availableCategories, setAvailableCategories] =
+    useState<Category[]>(initialCategories);
+
   const [slugEdited, setSlugEdited] = useState(true);
 
   const handleTitleChange = (value: string) => {
@@ -78,9 +98,22 @@ export function EditPostForm({ post, categories, tags }: EditPostFormProps) {
     }
   };
 
-  const handleSlugChange = (value: string) => {
-    setSlugEdited(true);
-    setSlug(value);
+  const handleCreateTag = async (name: string) => {
+    const slug = generateSlug(name);
+    const newTag = await createTag({ name, slug });
+    setAvailableTags((prev) =>
+      [...prev, newTag].sort((a, b) => a.name.localeCompare(b.name)),
+    );
+    return newTag;
+  };
+
+  const handleCreateCategory = async (name: string) => {
+    const slug = generateSlug(name);
+    const newCategory = await createCategory({ name, slug });
+    setAvailableCategories((prev) =>
+      [...prev, newCategory].sort((a, b) => a.name.localeCompare(b.name)),
+    );
+    return newCategory;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,9 +125,10 @@ export function EditPostForm({ post, categories, tags }: EditPostFormProps) {
         slug,
         description,
         content,
+        coverImage: coverImage || null,
         published,
         categoryId: categoryId || null,
-        tagIds: selectedTags,
+        tagIds: selectedTags.map((t) => t.id),
       });
 
       startTransition(async () => {
@@ -126,158 +160,196 @@ export function EditPostForm({ post, categories, tags }: EditPostFormProps) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-background pb-20">
+      {/* Top Navigation Bar */}
+      <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background/95 px-6 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            render={
-              <Link href="/admin/posts">
-                <ArrowLeft className="mr-2 size-4" />
-                Volver
-              </Link>
-            }
-          />
+          <Link href="/admin/posts">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <span className="font-medium text-muted-foreground text-sm">
+            Editar Artículo
+          </span>
+        </div>
 
-          <div>
-            <h1 className="font-bold text-3xl tracking-tight">Editar post</h1>
-            <p className="text-muted-foreground">{post.title}</p>
+        <div className="flex items-center gap-2">
+          <div className="mr-4 flex items-center gap-2 rounded-full bg-muted/50 px-3 py-1.5">
+            <div
+              className={`h-2 w-2 rounded-full ${published ? "bg-green-500 shadow-green-500/50 shadow-sm" : "bg-amber-500"}`}
+            />
+            <span className="font-medium text-muted-foreground text-xs">
+              {published ? "Publicado" : "Borrador"}
+            </span>
+            <Switch
+              checked={published}
+              onCheckedChange={setPublished}
+              className="ml-1 scale-75"
+            />
+          </div>
+
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  disabled={isPending}
+                  className="mr-2 h-8 w-8"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              }
+            />
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Eliminar post?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta acción no se puede deshacer. Se eliminará el post "
+                  {post.title}" permanentemente.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>
+                  Eliminar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          <Button
+            onClick={handleSubmit}
+            disabled={isPending}
+            size="sm"
+            className="font-medium"
+          >
+            {isPending ? (
+              <Loader2 className="mr-2 size-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 size-4" />
+            )}
+            Guardar
+          </Button>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-3xl px-6 py-10">
+        {/* Document Header */}
+        <div className="group relative mb-8 space-y-2">
+          <Input
+            value={title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            placeholder="Título del Artículo"
+            className="h-auto border-none bg-transparent px-0 py-2 font-bold text-4xl tracking-tight shadow-none placeholder:text-muted-foreground/40 focus-visible:ring-0 md:text-5xl"
+          />
+          <Textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Escribe una breve introducción o subtítulo..."
+            className="min-h-[60px] resize-none border-none bg-transparent px-0 text-muted-foreground text-xl shadow-none placeholder:text-muted-foreground/30 focus-visible:ring-0"
+          />
+        </div>
+
+        {/* Properties Panel (Notion-style) */}
+        <div className="mb-10 space-y-10">
+          <div className="grid gap-y-1">
+            {/* Category */}
+            <div className="grid grid-cols-[140px_1fr] items-baseline gap-4 py-1.5">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Folder className="h-4 w-4" />
+                <span>Categoría</span>
+              </div>
+              <div className="min-w-0">
+                <CategoryInput
+                  categories={availableCategories}
+                  value={categoryId}
+                  onValueChange={setCategoryId}
+                  onCreateCategory={handleCreateCategory}
+                />
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div className="grid grid-cols-[140px_1fr] items-baseline gap-4 py-1.5">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Tags className="h-4 w-4" />
+                <span>Etiquetas</span>
+              </div>
+              <div className="min-w-0">
+                <TagInput
+                  availableTags={availableTags}
+                  selectedTags={selectedTags}
+                  onTagsChange={setSelectedTags}
+                  onCreateTag={handleCreateTag}
+                />
+              </div>
+            </div>
+
+            {/* Slug */}
+            <div className="grid grid-cols-[140px_1fr] items-center gap-4 py-1.5">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Globe className="h-4 w-4" />
+                <span>Slug URL</span>
+              </div>
+              <div className="min-w-0">
+                <Input
+                  value={slug}
+                  onChange={(e) => {
+                    setSlugEdited(true);
+                    setSlug(e.target.value);
+                  }}
+                  className="h-8 border-none bg-transparent px-2 font-mono text-muted-foreground text-sm hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-0"
+                  placeholder="url-amigable-del-post"
+                />
+              </div>
+            </div>
+
+            {/* Cover Image */}
+            <div className="grid grid-cols-[140px_1fr] items-start gap-4 py-1.5">
+              <div className="flex items-center gap-2 pt-1.5 text-muted-foreground text-sm">
+                <ImageIcon className="h-4 w-4" />
+                <span>Portada</span>
+              </div>
+              <div className="min-w-0 space-y-3">
+                <Input
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  className="h-8 border-none bg-transparent px-2 text-muted-foreground text-sm hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-0"
+                  placeholder="https://..."
+                />
+                {coverImage && (
+                  <div className="relative aspect-video w-full max-w-sm overflow-hidden rounded-lg border bg-muted shadow-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={coverImage}
+                      alt="Preview"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={
-              <Button variant="destructive" disabled={isPending}>
-                <Trash2 className="mr-2 size-4" />
-                Eliminar
-              </Button>
-            }
+        <Separator className="my-8" />
+
+        {/* Content Editor */}
+        <div className="min-h-[500px]">
+          <MarkdownEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Comienza a escribir tu historia..."
           />
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>¿Eliminar post?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Esta acción no se puede deshacer. Se eliminará el post "
-                {post.title}" permanentemente.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDelete}>
-                Eliminar
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Información básica</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Título *</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder="Título del post"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="slug">Slug *</Label>
-              <Input
-                id="slug"
-                value={slug}
-                onChange={(e) => handleSlugChange(e.target.value)}
-                placeholder="titulo-del-post"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Descripción</Label>
-              <Input
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Breve descripción del post"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="category">Categoría</Label>
-              <select
-                id="category"
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">Sin categoría</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Switch
-                id="published"
-                checked={published}
-                onCheckedChange={setPublished}
-              />
-              <Label htmlFor="published">Publicado</Label>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Tags</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TagSelector
-              tags={tags}
-              selectedTagIds={selectedTags}
-              onSelectionChange={setSelectedTags}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Contenido</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <MarkdownEditor
-              value={content}
-              onChange={setContent}
-              placeholder="Escribe tu post en markdown..."
-            />
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            render={<Link href="/admin/posts">Cancelar</Link>}
-          />
-
-          <Button type="submit" disabled={isPending}>
-            <Save className="mr-2 size-4" />
-            {isPending ? "Guardando..." : "Guardar cambios"}
-          </Button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
