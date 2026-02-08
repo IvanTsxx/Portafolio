@@ -39,17 +39,17 @@ export default async function ProjectsPage() {
             {projects.map((project) => (
               <Card
                 key={project.id}
-                className="group flex flex-col transition-all hover:shadow-lg hover:shadow-primary/10"
+                className="group flex flex-col overflow-hidden p-0 transition-all hover:shadow-lg hover:shadow-primary/10"
               >
-                {project.coverImage && (
-                  <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
-                    <img
-                      src={project.coverImage || "/placeholder.svg"}
-                      alt={project.title}
-                      className="size-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  </div>
-                )}
+                <div className="relative aspect-video w-full overflow-hidden bg-muted">
+                  <img
+                    /*       src={project.coverImage || "/placeholder.svg"} */
+                    src="https://imgs.search.brave.com/wH8kQ40LGUwBSaQRtG00Z-oYS2vz2H4qXfuNDSkna8M/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAyLzQ3LzY3LzEz/LzM2MF9GXzI0NzY3/MTMzN19ocTFQTVBG/enRaNWhac01iVjlu/V055eE03QllubEQ2/SS5qcGc"
+                    alt={project.title}
+                    className="size-full object-cover transition-transform group-hover:scale-105"
+                  />
+                </div>
+
                 <CardHeader>
                   <CardTitle className="line-clamp-2">
                     <Link
@@ -80,7 +80,7 @@ export default async function ProjectsPage() {
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 pb-4">
                     {project.demoUrl && (
                       <Button
                         size="sm"
