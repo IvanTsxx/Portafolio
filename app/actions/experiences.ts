@@ -79,8 +79,13 @@ export async function deleteExperience(id: string) {
   revalidatePath("/admin/experiences");
 }
 
-export async function getExperiences(): Promise<ExperienceWithRelations[]> {
+export async function getExperiences({
+  limit = 4,
+}: {
+  limit?: number;
+}): Promise<ExperienceWithRelations[]> {
   const experiences = await prisma.experience.findMany({
+    ...(limit && { take: limit }),
     include: {
       technologies: true,
     },

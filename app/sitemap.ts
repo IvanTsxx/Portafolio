@@ -4,7 +4,7 @@ import { getProjects } from "@/app/actions/projects";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getPosts();
-  const projects = await getProjects();
+  const projects = await getProjects({ limit: 100 });
 
   const postUrls = posts.map((post) => ({
     url: `https://ivantsx.dev/blog/${post.slug}`,

@@ -151,11 +151,14 @@ export async function getProjectById(
   return project;
 }
 
-export async function getProjects(
-  published = true,
-): Promise<ProjectWithRelations[]> {
+export async function getProjects({
+  limit = 4,
+}: {
+  limit?: number;
+}): Promise<ProjectWithRelations[]> {
   const projects = await prisma.project.findMany({
-    where: published ? { published: true } : undefined,
+    where: { published: true },
+    ...(limit && { take: limit }),
     include: {
       technologies: true,
     },

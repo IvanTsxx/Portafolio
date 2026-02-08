@@ -24,15 +24,19 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const [projects, experiences, guestbookEntries] = await Promise.all([
-    getProjects(true).then((p) => p.slice(0, 4)),
-    getExperiences().then((e) => e.slice(0, 4)),
+    getProjects({
+      limit: 4,
+    }),
+    getExperiences({
+      limit: 4,
+    }),
     getGuestbookEntries(),
   ]);
 
   return (
     <main className="min-h-screen">
       {/* Hero Section - Apple-inspired minimal */}
-      <section className="relative mx-auto max-w-5xl px-4 py-8 lg:px-8 lg:py-40">
+      <section className="relative mx-auto max-w-5xl px-4 py-8 lg:px-8">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute top-1/5 left-1/2 h-[200px] w-[200px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl md:top-1/6 md:right-15 md:left-auto md:h-[300px] md:w-[300px] md:-translate-y-1/2" />
         </div>

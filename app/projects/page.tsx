@@ -30,7 +30,9 @@ export default async function ProjectsPage({
 }: ProjectsPageProps) {
   const params = await searchParams;
   const [allProjects, technologies] = await Promise.all([
-    getProjects(true),
+    getProjects({
+      limit: 100,
+    }),
     getTechnologies(),
   ]);
 
