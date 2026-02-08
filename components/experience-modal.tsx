@@ -3,7 +3,7 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Briefcase, Calendar, X } from "lucide-react";
-import { MDXRenderer } from "@/components/mdx-renderer";
+import { MDXClientRenderer } from "@/components/mdx-client-renderer";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -95,7 +95,7 @@ export function ExperienceModal({
           {/* MDX Content - Responsibilities */}
           {experience.content && (
             <div className="prose prose-slate prose-sm max-w-none">
-              <MDXRenderer content={experience.content} />
+              <MDXClientRenderer content={experience.content} />
             </div>
           )}
 

@@ -60,6 +60,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <Button
               variant="ghost"
               size="sm"
+              nativeButton={false}
               render={
                 <Link href="/projects">
                   <ArrowLeft className="mr-2 size-4" />
@@ -87,6 +88,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <div className="flex items-center gap-2">
               {project.demoUrl && (
                 <Button
+                  nativeButton={false}
                   render={
                     <a
                       href={project.demoUrl}
@@ -102,6 +104,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               {project.githubUrl && (
                 <Button
                   variant="outline"
+                  nativeButton={false}
                   render={
                     <a
                       href={project.githubUrl}

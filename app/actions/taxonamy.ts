@@ -52,6 +52,16 @@ export async function createTag(data: TagInput) {
   await requireAuth();
   const validated = tagSchema.parse(data);
 
+  const existing = await prisma.tag.findFirst({
+    where: {
+      OR: [{ name: validated.name }, { slug: validated.slug }],
+    },
+  });
+
+  if (existing) {
+    return existing;
+  }
+
   const tag = await prisma.tag.create({
     data: validated,
   });
@@ -80,6 +90,16 @@ export async function getTechnologies() {
 export async function createTechnology(data: TechnologyInput) {
   await requireAuth();
   const validated = technologySchema.parse(data);
+
+  const existing = await prisma.technology.findFirst({
+    where: {
+      OR: [{ name: validated.name }, { slug: validated.slug }],
+    },
+  });
+
+  if (existing) {
+    return existing;
+  }
 
   const technology = await prisma.technology.create({
     data: validated,

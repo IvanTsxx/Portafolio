@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MDXRenderer } from "@/components/mdx-renderer";
+import { MDXClientRenderer } from "@/components/mdx-client-renderer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -44,7 +44,7 @@ export function MarkdownEditor({
       <TabsContent value="preview" className="mt-4">
         <div className="min-h-[400px] rounded-lg border border-border bg-background p-6">
           {value ? (
-            <MDXRenderer content={value} />
+            <MDXClientRenderer content={value} />
           ) : (
             <p className="text-muted-foreground text-sm">
               No hay contenido para previsualizar

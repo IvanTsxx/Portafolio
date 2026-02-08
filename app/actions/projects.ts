@@ -12,10 +12,18 @@ export async function createProject(data: ProjectInput) {
 
   const validated = projectSchema.parse(data);
 
+  /* 1. Ensure unique slug */
+  let slug = validated.slug;
+  let counter = 1;
+  while (await prisma.project.findUnique({ where: { slug } })) {
+    slug = `${validated.slug}-${counter}`;
+    counter++;
+  }
+
   const project = await prisma.project.create({
     data: {
       title: validated.title,
-      slug: validated.slug,
+      slug: slug,
       description: validated.description,
       content: validated.content,
       coverImage: validated.coverImage,
@@ -52,11 +60,26 @@ export async function updateProject(id: string, data: ProjectInput) {
     select: { content: true, published: true },
   });
 
+  /* Ensure unique slug (excluding current project) */
+  let slug = validated.slug;
+  let counter = 1;
+  while (true) {
+    const existing = await prisma.project.findUnique({
+      where: { slug },
+      select: { id: true },
+    });
+    if (!existing || existing.id === id) {
+      break;
+    }
+    slug = `${validated.slug}-${counter}`;
+    counter++;
+  }
+
   const project = await prisma.project.update({
     where: { id },
     data: {
       title: validated.title,
-      slug: validated.slug,
+      slug: slug,
       description: validated.description,
       content: validated.content,
       coverImage: validated.coverImage,

@@ -67,6 +67,78 @@ export function TagInput({
     }
   };
 
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text");
+    if (!text) return;
+
+    const items = text
+      .split(/[,;\n]/) // Split by comma, semicolon, or newline
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
+
+    if (items.length === 0) return;
+
+    setIsPending(true);
+
+    // Avoid processing duplicates within the pasted content
+    const uniqueItems = Array.from(new Set(items));
+
+    const newSelectedTags: SimpleTag[] = [...selectedTags];
+    const tagsToAdd: SimpleTag[] = [];
+
+    try {
+      for (const itemName of uniqueItems) {
+        // Check if already selected
+        if (
+          newSelectedTags.some(
+            (t) => t.name.toLowerCase() === itemName.toLowerCase(),
+          )
+        ) {
+          continue;
+        }
+
+        // Check if available in existing options
+        const existing = availableTags.find(
+          (t) => t.name.toLowerCase() === itemName.toLowerCase(),
+        );
+
+        if (existing) {
+          tagsToAdd.push(existing);
+          // Add to local list to prevent re-adding if duplicate in source
+          newSelectedTags.push(existing);
+        } else {
+          // Create new
+          try {
+            // Check if we just created it in this loop (to avoid duplicates if onCreateTag doesn't return existing immediately although we fixed that in backend, local state update lag might be an issue)
+            // But valid "onCreateTag" call returns the tag object.
+            const newTag = await onCreateTag(itemName);
+            if (newTag) {
+              // Verify we haven't added it already (backend might return existing)
+              if (!newSelectedTags.some((t) => t.id === newTag.id)) {
+                tagsToAdd.push(newTag);
+                newSelectedTags.push(newTag);
+              }
+            }
+          } catch (err) {
+            console.error(`Failed to create tag: ${itemName}`, err);
+          }
+        }
+      }
+
+      if (tagsToAdd.length > 0) {
+        onTagsChange([...selectedTags, ...tagsToAdd]);
+        // Also clear input and potentially close
+        setInputValue("");
+        setOpen(false);
+      }
+    } catch (error) {
+      console.error("Paste handling error", error);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   const filteredTags = availableTags.filter((tag) =>
     tag.name.toLowerCase().includes(inputValue.toLowerCase()),
   );
@@ -126,6 +198,7 @@ export function TagInput({
             <CommandInput
               placeholder="Buscar o crear..."
               onValueChange={setInputValue}
+              onPaste={handlePaste}
             />
             <CommandList>
               <CommandEmpty className="px-2 py-2 text-center text-muted-foreground text-xs">

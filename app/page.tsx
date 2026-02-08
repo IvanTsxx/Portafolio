@@ -62,6 +62,7 @@ export default async function HomePage() {
               size="lg"
               sound={true}
               className="px-6"
+              nativeButton={false}
               render={
                 <Link href="#projects">
                   Ver proyectos
@@ -74,6 +75,7 @@ export default async function HomePage() {
               size="lg"
               variant="outline"
               className="px-6"
+              nativeButton={false}
               render={
                 <a href="/CV.pdf" download>
                   Descargar CV
@@ -89,6 +91,7 @@ export default async function HomePage() {
                 size="icon"
                 variant="outline"
                 className="text-muted-foreground transition-colors hover:text-foreground"
+                nativeButton={false}
                 render={
                   <Link target="_blank" href={social.href}>
                     <social.icon className="size-5" />
@@ -120,6 +123,7 @@ export default async function HomePage() {
             <Button
               variant="ghost"
               size="sm"
+              nativeButton={false}
               render={
                 <Link href="/experience">
                   Ver toda
@@ -168,6 +172,7 @@ export default async function HomePage() {
               variant="ghost"
               size="sm"
               className="text-muted-foreground hover:text-foreground"
+              nativeButton={false}
               render={
                 <Link href="/projects">
                   Ver todos

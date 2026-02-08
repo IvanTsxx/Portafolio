@@ -83,6 +83,7 @@ export function Header() {
 
           <Button
             size="sm"
+            nativeButton={false}
             render={
               <a href="/CV.pdf" download>
                 <Download className="mr-2 size-4" />
@@ -104,6 +105,7 @@ export function Header() {
 
           <Button
             size="sm"
+            nativeButton={false}
             render={
               <a href="/cv.pdf" download>
                 <Download className="size-4" />

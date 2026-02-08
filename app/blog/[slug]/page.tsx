@@ -64,6 +64,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <Button
               variant="ghost"
               size="sm"
+              nativeButton={false}
               render={
                 <Link href="/blog">
                   <ArrowLeft className="mr-2 size-4" />
