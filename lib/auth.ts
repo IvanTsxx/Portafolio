@@ -15,14 +15,10 @@ export const auth = betterAuth({
     google: {
       clientId: env.GOOGLE_CLIENT_ID || "",
       clientSecret: env.GOOGLE_CLIENT_SECRET || "",
-      redirectURI: `${env.BETTER_AUTH_URL}/api/auth/callback/google`,
     },
   },
   emailAndPassword: {
     enabled: false,
-  },
-  advanced: {
-    useSecureCookies: env.NODE_ENV === "production",
   },
   callbacks: {
     async session({ session, user }: { session: Session; user: User }) {
