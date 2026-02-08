@@ -2,7 +2,7 @@
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
-import { useMemo } from "react";
+import { useRef } from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
@@ -51,25 +51,34 @@ function Button({
   size = "default",
   sound = true,
   onClick,
+  onPointerDown,
   ...props
 }: ButtonProps) {
-  const audio = useMemo(() => {
-    if (typeof window === "undefined" || !sound) return null;
-    const a = new Audio("/sounds/click.wav");
-    a.volume = 0.25;
-    return a;
-  }, [sound]);
+  const lastPlayedTimeRef = useRef<number>(0);
+
+  const playSound = () => {
+    if (!sound || typeof window === "undefined") return;
+
+    const now = Date.now();
+    if (now - lastPlayedTimeRef.current < 100) return;
+
+    lastPlayedTimeRef.current = now;
+    const audio = new Audio("/sounds/click.wav");
+    audio.volume = 0.25;
+    audio.play().catch(() => {});
+  };
 
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
+      onPointerDown={(e) => {
+        playSound();
+        onPointerDown?.(e);
+      }}
       onClick={(e) => {
-        if (sound && audio) {
-          audio.currentTime = 0;
-          audio.play().catch(() => {});
-        }
+        playSound();
         onClick?.(e);
       }}
     />

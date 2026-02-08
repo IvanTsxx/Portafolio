@@ -35,7 +35,11 @@ export function AboutBento() {
                 <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-primary/20">
                   {/* Placeholder for avatar if available, or Initials */}
                   <div className="flex h-full w-full items-center justify-center bg-primary/10 font-bold text-primary">
-                    IB
+                    <img
+                      src="https://avatars.githubusercontent.com/ivantsxx?s=256"
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                 </div>
                 <div>

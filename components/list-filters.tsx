@@ -86,7 +86,7 @@ export function ListFilters({
         <span className="text-muted-foreground text-sm">{filterLabel}:</span>
         <div className="flex flex-wrap gap-2">
           {filters.map((item) => (
-            <button
+            <Button
               key={item.id}
               type="button"
               onClick={() => handleFilterChange(item.slug)}
@@ -97,7 +97,7 @@ export function ListFilters({
               }`}
             >
               {item.name}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -109,9 +109,10 @@ export function ListFilters({
           <span className="text-muted-foreground text-sm">Ordenar:</span>
           <div className="flex gap-1">
             {sortOptions.map((option) => (
-              <button
+              <Button
                 key={option.value}
                 type="button"
+                variant="ghost"
                 onClick={() => handleSortChange(option.value)}
                 className={`rounded-lg px-2.5 py-1 text-sm transition-all ${
                   currentSort === option.value
@@ -120,7 +121,7 @@ export function ListFilters({
                 }`}
               >
                 {option.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -142,14 +143,17 @@ export function ListFilters({
       {currentFilter && (
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground text-xs">Filtro activo:</span>
-          <Badge
-            variant="secondary"
-            className="cursor-pointer rounded-lg"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => handleFilterChange(currentFilter)}
+            className="text-muted-foreground hover:text-foreground"
           >
-            {filters.find((f) => f.slug === currentFilter)?.name}
-            <X className="ml-1 size-3" />
-          </Badge>
+            <Badge variant="secondary" className="cursor-pointer rounded-lg">
+              {filters.find((f) => f.slug === currentFilter)?.name}
+              <X className="ml-1 size-3" />
+            </Badge>
+          </Button>
         </div>
       )}
     </div>
