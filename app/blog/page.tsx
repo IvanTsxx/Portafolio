@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "Blog",
   description:
     "Artículos y reflexiones sobre desarrollo web, tecnología y programación por Iván Bongiovanni.",
+  alternates: {
+    canonical: "https://ivantsx.dev/blog",
+  },
 };
 
 const sortOptions = [

@@ -1,4 +1,5 @@
 import { ArrowRight, ExternalLink, Github } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getExperiences } from "@/app/actions/experiences";
 import { getGuestbookEntries } from "@/app/actions/guestbook";
@@ -12,6 +13,12 @@ import { Button } from "@/components/ui/button";
 import { socials } from "@/lib/constants";
 
 // formatDate moved to experience-timeline.tsx
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "https://ivantsx.dev",
+  },
+};
 
 // formatDate moved to experience-timeline.tsx
 

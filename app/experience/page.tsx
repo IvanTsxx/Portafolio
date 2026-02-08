@@ -6,11 +6,42 @@ import { MDXRenderer } from "@/components/mdx-renderer";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = {
-  title: "Experiencia",
-  description:
-    "Experiencia profesional de Iván Bongiovanni, Full-Stack Developer.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const experiences = await getExperiences();
+  const technologies = Array.from(
+    new Set(experiences.flatMap((exp) => exp.technologies.map((t) => t.name))),
+  );
+
+  return {
+    title: "Experiencia Profesional",
+    description:
+      "Trayectoria profesional de Iván Bongiovanni como Full-Stack Developer. Experiencia en desarrollo web, TypeScript, React y Node.js.",
+    keywords: [
+      "Experiencia",
+      "Full-Stack",
+      "Desarrollador",
+      "Trayectoria",
+      ...technologies,
+    ],
+    alternates: {
+      canonical: "https://ivantsx.dev/experience",
+    },
+    openGraph: {
+      title: "Experiencia Profesional - Iván Bongiovanni",
+      description:
+        "Trayectoria profesional de Iván Bongiovanni como Full-Stack Developer.",
+      url: "https://ivantsx.dev/experience",
+      siteName: "Iván Bongiovanni",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Experiencia Profesional - Iván Bongiovanni",
+      description:
+        "Trayectoria profesional de Iván Bongiovanni como Full-Stack Developer.",
+    },
+  };
+}
 
 export default async function ExperiencePage() {
   const experiences = await getExperiences();

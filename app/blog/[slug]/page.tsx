@@ -32,15 +32,34 @@ export async function generateMetadata({
     };
   }
 
+  const publishedAt = post.createdAt.toISOString();
+  const modifiedAt = post.updatedAt.toISOString();
+  const authors = ["Iván Bongiovanni"];
+
   return {
     title: post.title,
     description: post.description,
+    keywords: post.tags.map((tag) => tag.name),
+    alternates: {
+      canonical: `https://ivantsx.dev/blog/${post.slug}`,
+    },
+    authors: authors.map((author) => ({ name: author })),
     openGraph: {
       title: post.title,
       description: post.description || "",
-      /* images: post.coverImage ? [post.coverImage] : [], */
       type: "article",
-      publishedTime: post.createdAt.toISOString(),
+      publishedTime: publishedAt,
+      modifiedTime: modifiedAt,
+      authors: authors,
+      url: `https://ivantsx.dev/blog/${post.slug}`,
+      siteName: "Iván Bongiovanni",
+      images: post.coverImage ? [post.coverImage] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description || "",
+      images: post.coverImage ? [post.coverImage] : [],
     },
   };
 }

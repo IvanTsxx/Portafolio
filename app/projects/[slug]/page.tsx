@@ -33,7 +33,20 @@ export async function generateMetadata({
   return {
     title: project.title,
     description: project.description,
+    keywords: project.technologies.map((tech) => tech.name),
+    alternates: {
+      canonical: `https://ivantsx.dev/projects/${project.slug}`,
+    },
     openGraph: {
+      title: project.title,
+      description: project.description || "",
+      images: project.coverImage ? [project.coverImage] : [],
+      url: `https://ivantsx.dev/projects/${project.slug}`,
+      siteName: "Iván Bongiovanni - Proyectos",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
       title: project.title,
       description: project.description || "",
       images: project.coverImage ? [project.coverImage] : [],

@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "Proyectos",
   description:
     "Proyectos destacados de Iván Bongiovanni, Full-Stack Developer especializado en Next.js y React.",
+  alternates: {
+    canonical: "https://ivantsx.dev/projects",
+  },
 };
 
 const sortOptions = [
