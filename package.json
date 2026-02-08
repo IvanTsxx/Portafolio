@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --name init",

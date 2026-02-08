@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProject, getProjects } from "@/app/actions/projects";
 import { MDXRenderer } from "@/components/mdx-renderer";
+import { ShareButton } from "@/components/share-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -42,7 +43,7 @@ export async function generateMetadata({
     openGraph: {
       title: project.title,
       description: project.description || "",
-      images: project.coverImage ? [project.coverImage] : [],
+      images: project.coverImage ? [project.coverImage] : ["/og-image.webp"],
       url: `https://ivantsx.dev/projects/${project.slug}`,
       siteName: "Iván Bongiovanni - Proyectos",
       type: "website",
@@ -51,7 +52,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: project.title,
       description: project.description || "",
-      images: project.coverImage ? [project.coverImage] : [],
+      images: project.coverImage ? [project.coverImage] : ["/og-image.webp"],
     },
   };
 }
@@ -64,6 +65,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound();
   }
 
+  const url = `https://ivantsx.dev/projects/${project.slug}`;
+
   return (
     <main className="min-h-screen">
       <article className="relative mx-auto max-w-4xl px-4 py-20 lg:px-8">
@@ -72,17 +75,24 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
         <div className="space-y-8">
           <div className="space-y-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              nativeButton={false}
-              render={
-                <Link href="/projects">
-                  <ArrowLeft className="mr-2 size-4" />
-                  Volver a proyectos
-                </Link>
-              }
-            />
+            <div className="flex w-full items-center justify-between">
+              <Button
+                variant="ghost"
+                size="sm"
+                nativeButton={false}
+                render={
+                  <Link href="/projects">
+                    <ArrowLeft className="mr-2 size-4" />
+                    Volver a proyectos
+                  </Link>
+                }
+              />
+              <ShareButton
+                url={url}
+                title={project.title}
+                description={project.description || undefined}
+              />
+            </div>
 
             <h1 className="font-bold text-4xl text-foreground tracking-tight lg:text-5xl">
               {project.title}

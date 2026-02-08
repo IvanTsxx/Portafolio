@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPost, getPosts } from "@/app/actions/posts";
 import { MDXRenderer } from "@/components/mdx-renderer";
+import { ShareButton } from "@/components/share-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -59,7 +60,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: post.title,
       description: post.description || "",
-      images: post.coverImage ? [post.coverImage] : [],
+      images: post.coverImage ? [post.coverImage] : ["/og-image.webp"],
     },
   };
 }
@@ -72,6 +73,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
+  const url = `https://ivantsx.dev/blog/${post.slug}`;
+
   return (
     <main className="min-h-screen">
       <article className="relative mx-auto max-w-4xl px-4 py-20 lg:px-8">
@@ -80,17 +83,24 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
         <div className="space-y-8">
           <div className="space-y-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              nativeButton={false}
-              render={
-                <Link href="/blog">
-                  <ArrowLeft className="mr-2 size-4" />
-                  Volver al blog
-                </Link>
-              }
-            />
+            <div className="flex w-full items-center justify-between">
+              <Button
+                variant="ghost"
+                size="sm"
+                nativeButton={false}
+                render={
+                  <Link href="/blog">
+                    <ArrowLeft className="mr-2 size-4" />
+                    Volver al blog
+                  </Link>
+                }
+              />
+              <ShareButton
+                url={url}
+                title={post.title}
+                description={post.description || undefined}
+              />
+            </div>
 
             <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <Calendar className="size-4" />

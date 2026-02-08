@@ -49,6 +49,7 @@ export const metadata: Metadata = {
     description:
       "Desarrollador Full-Stack especializado en TypeScript, React, Next.js y Node.js.",
     siteName: "Iván Bongiovanni Portfolio",
+    images: ["/og-image.webp"],
   },
   twitter: {
     card: "summary_large_image",
@@ -56,6 +57,7 @@ export const metadata: Metadata = {
     description:
       "Desarrollador Full-Stack especializado en TypeScript, React, Next.js y Node.js.",
     creator: "@IvanTsxx",
+    images: ["/og-image.webp"],
   },
   robots: {
     index: true,
