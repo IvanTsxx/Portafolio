@@ -47,7 +47,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
   return (
     <main className="min-h-screen">
-      <section className="mx-auto max-w-7xl px-4 py-20 lg:px-8 lg:py-28">
+      <section className="relative mx-auto max-w-7xl px-4 py-20 lg:px-8 lg:py-28">
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-1/5 right-0 h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+        </div>
         <div className="space-y-12">
           {/* Header */}
           <div className="space-y-4 text-center">

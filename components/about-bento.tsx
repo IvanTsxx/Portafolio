@@ -1,14 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Code2, Cpu, Globe, MapPin, Terminal } from "lucide-react";
-import Image from "next/image";
+import { ArrowRight, Globe, MapPin } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { NextjsIcon, ReactIcon } from "./icons";
 
 export function AboutBento() {
   return (
-    <section id="about" className="py-20 lg:py-32">
+    <section id="about" className="relative overflow-hidden py-20 lg:py-32">
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-2/3 right-[10%] h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+      </div>
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-12 text-center">
           <h2 className="font-bold text-3xl text-foreground tracking-tight sm:text-4xl">
@@ -95,14 +97,14 @@ export function AboutBento() {
             </h4>
             <div className="flex gap-4">
               <div className="flex flex-col items-center gap-2">
-                <div className="rounded-2xl bg-black/5 p-3 transition-transform duration-300 group-hover:scale-110 dark:bg-white/5">
-                  <Code2 className="size-6 text-foreground" />
+                <div className="bg-black/5 p-3 transition-transform duration-300 group-hover:scale-110 dark:bg-white/5">
+                  <NextjsIcon className="size-6 text-foreground" />
                 </div>
                 <span className="font-medium text-xs">Next.js</span>
               </div>
               <div className="flex flex-col items-center gap-2">
-                <div className="rounded-2xl bg-blue-500/10 p-3 transition-transform duration-300 group-hover:scale-110">
-                  <AtomIcon className="size-6 text-blue-500" />
+                <div className="bg-blue-500/10 p-3 transition-transform duration-300 group-hover:scale-110">
+                  <ReactIcon className="size-6 text-blue-500" />
                 </div>
                 <span className="font-medium text-xs">React</span>
               </div>
@@ -156,26 +158,5 @@ export function AboutBento() {
         </div>
       </div>
     </section>
-  );
-}
-
-// Simple Atom Icon for React
-function AtomIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <circle cx="12" cy="12" r="1" />
-      <ellipse cx="12" cy="12" rx="11" ry="4.2" transform="rotate(0)" />
-      <ellipse cx="12" cy="12" rx="11" ry="4.2" transform="rotate(60)" />
-      <ellipse cx="12" cy="12" rx="11" ry="4.2" transform="rotate(120)" />
-    </svg>
   );
 }

@@ -1,11 +1,4 @@
-import {
-  ArrowRight,
-  Code2,
-  ExternalLink,
-  Github,
-  Rocket,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, ExternalLink, Github } from "lucide-react";
 import Link from "next/link";
 import { getExperiences } from "@/app/actions/experiences";
 import { getProjects } from "@/app/actions/projects";
@@ -16,14 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { socials } from "@/lib/constants";
 
-const skills = {
-  frontend: ["Next.js", "React", "Angular", "Astro", "TypeScript"],
-  backend: ["Node.js", "NestJS", "Express", "ElysiaJS", ".NET"],
-  databases: ["PostgreSQL", "Redis", "Prisma", "Drizzle"],
-  ai: ["Vercel AI SDK", "OpenRouter", "AI Elements"],
-  cloud: ["Vercel", "Neon", "Tigris S3"],
-  tools: ["shadcn/ui", "Tailwind CSS", "Better Auth", "MercadoPago", "Zod"],
-};
+// formatDate moved to experience-timeline.tsx
 
 // formatDate moved to experience-timeline.tsx
 
@@ -36,10 +22,14 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section - Apple-inspired minimal */}
-      <section className="mx-auto max-w-5xl px-4 py-32 lg:px-8 lg:py-40">
-        <div className="space-y-10">
+      <section className="relative mx-auto max-w-5xl px-4 py-32 lg:px-8 lg:py-40">
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-1/4 right-0 h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+        </div>
+
+        <div className="relative z-10 space-y-10">
           <div className="animate-fade-in animate-initial">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3.5 py-1.5 font-medium text-primary/90 text-xs tracking-wide">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 px-3.5 py-1.5 font-medium text-primary/90 text-xs tracking-wide">
               <span className="relative flex size-1.5">
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
                 <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
@@ -53,7 +43,7 @@ export default async function HomePage() {
               Iván Bongiovanni
             </h1>
             <p className="max-w-2xl text-muted-foreground text-xl leading-relaxed lg:text-2xl">
-              Full‑Stack Developer especializado en{" "}
+              Full Stack Developer especializado en{" "}
               <span className="font-medium text-foreground">Next.js</span> y{" "}
               <span className="font-medium text-foreground">React</span>
             </p>
@@ -68,7 +58,7 @@ export default async function HomePage() {
             <Button
               size="lg"
               sound={true}
-              className="rounded-xl px-6"
+              className="px-6"
               render={
                 <Link href="#projects">
                   Ver proyectos
@@ -80,7 +70,7 @@ export default async function HomePage() {
             <Button
               size="lg"
               variant="outline"
-              className="rounded-xl px-6"
+              className="px-6"
               render={
                 <a href="/CV.pdf" download>
                   Descargar CV
@@ -94,8 +84,8 @@ export default async function HomePage() {
               <Button
                 key={social.name}
                 size="icon"
-                variant="ghost"
-                className="rounded-xl text-muted-foreground transition-colors hover:text-foreground"
+                variant="outline"
+                className="text-muted-foreground transition-colors hover:text-foreground"
                 render={
                   <Link target="_blank" href={social.href}>
                     <social.icon className="size-5" />
@@ -109,6 +99,11 @@ export default async function HomePage() {
 
       {/* Experience Timeline - Horizontal */}
       <section id="experience" className="py-16 lg:py-20">
+        {/* Glow */}
+        {/* <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-2/3 left-[10%] h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+        </div> */}
+
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mb-12 flex items-center justify-between">
             <div>
@@ -136,7 +131,10 @@ export default async function HomePage() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="bg-muted/20 py-20 lg:py-28">
+      <section id="projects" className="relative bg-muted/20 py-20 lg:py-28">
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-2/3 right-[10%] h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+        </div>
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="mb-14 flex items-center justify-between">
             <div>
@@ -150,7 +148,7 @@ export default async function HomePage() {
             <Button
               variant="ghost"
               size="sm"
-              className="rounded-xl text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
               render={
                 <Link href="/projects">
                   Ver todos
@@ -176,7 +174,7 @@ export default async function HomePage() {
                       alt={project.title}
                       className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-linear-to-t from-card/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </div>
                 )}
 
@@ -194,12 +192,12 @@ export default async function HomePage() {
 
                     <div className="flex gap-2">
                       {project.demoUrl && (
-                        <span className="flex size-9 items-center justify-center rounded-xl border border-border/40 bg-background/80 text-muted-foreground transition-all group-hover:border-primary/20 group-hover:text-primary">
+                        <span className="flex size-9 items-center justify-center border border-border/40 bg-background/80 text-muted-foreground transition-all group-hover:border-primary/20 group-hover:text-primary">
                           <ExternalLink className="size-4" />
                         </span>
                       )}
                       {project.githubUrl && (
-                        <span className="flex size-9 items-center justify-center rounded-xl border border-border/40 bg-background/80 text-muted-foreground transition-all group-hover:border-primary/20 group-hover:text-primary">
+                        <span className="flex size-9 items-center justify-center border border-border/40 bg-background/80 text-muted-foreground transition-all group-hover:border-primary/20 group-hover:text-primary">
                           <Github className="size-4" />
                         </span>
                       )}
@@ -211,13 +209,13 @@ export default async function HomePage() {
                       <Badge
                         key={tech.id}
                         variant="secondary"
-                        className="rounded-lg text-xs"
+                        className="text-xs"
                       >
                         {tech.name}
                       </Badge>
                     ))}
                     {project.technologies.length > 5 && (
-                      <Badge variant="secondary" className="rounded-lg text-xs">
+                      <Badge variant="secondary" className="text-xs">
                         +{project.technologies.length - 5}
                       </Badge>
                     )}
@@ -235,9 +233,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Skills Section */}
       {/* Tech Stack - Orbit Style */}
-      <section id="skills" className="overflow-hidden py-20 lg:py-28">
+      <section id="skills" className="relative overflow-hidden py-20 lg:py-28">
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+        </div>
+
         <div className="mx-auto max-w-5xl px-4 lg:px-8">
           <TechOrbit />
         </div>

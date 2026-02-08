@@ -5,7 +5,6 @@ import {
   FolderKanban,
   FolderTree,
   LayoutDashboard,
-  LogOut,
   Tags,
 } from "lucide-react";
 import Link from "next/link";
@@ -27,6 +26,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { getSession } from "@/lib/dal";
+import { SignOutButton } from "./_components/sign-out-button";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -83,16 +83,7 @@ export default async function AdminLayout({
         </SidebarContent>
 
         <SidebarFooter className="border-border/40 border-t p-2">
-          <form action="/api/auth/signout" method="POST">
-            <Button
-              type="submit"
-              variant="ghost"
-              className="w-full justify-start"
-            >
-              <LogOut className="mr-2 size-4" />
-              Cerrar sesión
-            </Button>
-          </form>
+          <SignOutButton />
         </SidebarFooter>
       </Sidebar>
 

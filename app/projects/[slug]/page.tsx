@@ -51,7 +51,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <main className="min-h-screen">
-      <article className="mx-auto max-w-4xl px-4 py-20 lg:px-8">
+      <article className="relative mx-auto max-w-4xl px-4 py-20 lg:px-8">
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-1/6 right-0 h-[200px] w-[200px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+        </div>
         <div className="space-y-8">
           <div className="space-y-4">
             <Button

@@ -49,16 +49,17 @@ function Button({
   className,
   variant = "default",
   size = "default",
-  sound = false,
+  sound = true,
   onClick,
   ...props
 }: ButtonProps) {
   const audio = useMemo(() => {
     if (typeof window === "undefined" || !sound) return null;
     const a = new Audio("/sounds/click.wav");
-    a.volume = 0.12;
+    a.volume = 0.25;
     return a;
   }, [sound]);
+
   return (
     <ButtonPrimitive
       data-slot="button"

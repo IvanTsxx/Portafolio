@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getExperiences } from "@/app/actions/experiences";
 import { MDXRenderer } from "@/components/mdx-renderer";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Experiencia",
@@ -19,7 +20,7 @@ export default async function ExperiencePage() {
       <section className="mx-auto max-w-4xl px-4 py-20 lg:px-8 lg:py-28">
         <div className="space-y-16">
           {/* Header */}
-          <div className="space-y-4 text-center">
+          <div className="space-y-4 text-cente">
             <h1 className="font-semibold text-4xl text-foreground tracking-tight lg:text-5xl">
               Experiencia profesional
             </h1>
@@ -47,6 +48,15 @@ export default async function ExperiencePage() {
                   <div
                     className={`absolute top-8 left-5 size-3 -translate-x-1/2 rounded-full border-2 border-primary bg-background lg:left-1/2`}
                   />
+
+                  <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                    <div
+                      className={cn(
+                        "absolute top-1/6 right-0 h-[200px] w-[200px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl",
+                        index % 2 === 0 ? "lg:right-0" : "lg:left-0",
+                      )}
+                    />
+                  </div>
 
                   {/* Card */}
                   <div className="ml-12 rounded-2xl border border-border/30 bg-card/80 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/20 hover:shadow-lg lg:ml-0">
