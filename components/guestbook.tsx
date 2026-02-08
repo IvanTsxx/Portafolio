@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { ScrollArea } from "./ui/scroll-area";
 
 interface GuestbookProps {
   entries: {
@@ -56,7 +57,7 @@ export function Guestbook({ entries }: GuestbookProps) {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-12">
+    <div className="mx-auto max-w-2xl space-y-4">
       <div className="space-y-4 rounded-xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm">
         <div className="flex items-center gap-4">
           <Avatar className="h-10 w-10 border border-border">
@@ -110,42 +111,44 @@ export function Guestbook({ entries }: GuestbookProps) {
         )}
       </div>
 
-      <div className="space-y-8">
-        {entries.map((entry) => (
-          <div
-            key={entry.id}
-            className="group fade-in slide-in-from-bottom-4 flex animate-in gap-4 duration-500"
-          >
-            <Avatar className="h-10 w-10 border border-border transition-transform group-hover:scale-105">
-              <AvatarImage
-                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${entry.name}`}
-              />
-              <AvatarFallback>{entry.name?.[0]}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-foreground text-sm">
-                  {entry.name}
-                </span>
-                <span className="text-muted-foreground text-xs">
-                  {new Date(entry.createdAt).toLocaleDateString("es-ES", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
+      <ScrollArea className="h-[200px] rounded-xl border px-4 py-2">
+        <div className="flex flex-col gap-2">
+          {entries.map((entry) => (
+            <div
+              key={entry.id}
+              className="group fade-in slide-in-from-bottom-4 flex animate-in gap-4 duration-500"
+            >
+              <Avatar className="h-10 w-10 border border-border transition-transform group-hover:scale-105">
+                <AvatarImage
+                  src={`https://api.dicebear.com/9.x/notionists/svg?seed=${entry.name}`}
+                />
+                <AvatarFallback>{entry.name?.[0]}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-foreground text-sm">
+                    {entry.name}
+                  </span>
+                  <span className="text-muted-foreground text-xs">
+                    {new Date(entry.createdAt).toLocaleDateString("es-ES", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {entry.message}
+                </p>
               </div>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {entry.message}
-              </p>
             </div>
-          </div>
-        ))}
-        {entries.length === 0 && (
-          <div className="py-12 text-center text-muted-foreground">
-            Sé el primero en firmar el libro de visitas.
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      </ScrollArea>
+      {entries.length === 0 && (
+        <div className="text-center text-muted-foreground">
+          Sé el primero en firmar el libro de visitas.
+        </div>
+      )}
     </div>
   );
 }

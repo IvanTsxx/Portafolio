@@ -133,6 +133,22 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Guestbook Section */}
+      <section id="guestbook">
+        <div className="mx-auto max-w-2xl px-4">
+          <div className="space-y-4 text-center">
+            <h2 className="font-semibold text-2xl text-foreground tracking-tight lg:text-3xl">
+              Guestbook
+            </h2>
+            <p className="mx-auto max-w-md text-muted-foreground leading-relaxed">
+              Deja un mensaje, un saludo o simplemente firma para decir que
+              estuviste aquí. Sin registros complicados.
+            </p>
+          </div>
+          <Guestbook entries={guestbookEntries} />
+        </div>
+      </section>
+
       {/* Projects Section */}
       <section id="projects" className="relative bg-muted/20 py-20 lg:py-28">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -249,22 +265,6 @@ export default async function HomePage() {
 
       {/* About Section - Bento Grid */}
       <AboutBento />
-
-      {/* Guestbook Section */}
-      <section id="guestbook" className="py-20 lg:py-28">
-        <div className="mx-auto max-w-2xl px-4 lg:px-8">
-          <div className="mb-12 space-y-4 text-center">
-            <h2 className="font-semibold text-2xl text-foreground tracking-tight lg:text-3xl">
-              Guestbook
-            </h2>
-            <p className="mx-auto max-w-md text-muted-foreground leading-relaxed">
-              Deja un mensaje, un saludo o simplemente firma para decir que
-              estuviste aquí. Sin registros complicados.
-            </p>
-          </div>
-          <Guestbook entries={guestbookEntries} />
-        </div>
-      </section>
     </main>
   );
 }
