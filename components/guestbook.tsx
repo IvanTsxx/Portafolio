@@ -297,14 +297,14 @@ export function Guestbook({ entries }: GuestbookProps) {
                       className={cn(
                         "group relative rounded-xl border bg-card/30 p-4 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1",
                         "hover:border-border/80 hover:shadow-lg",
-                        colorTheme.value.split(" ")[2], // Border color from value
+                        colorTheme?.value.split(" ")[2], // Border color from value
                         style ? "" : "border-border/40",
                       )}
                     >
                       <div
                         className={cn(
                           "pointer-events-none absolute inset-0 rounded-xl bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100",
-                          colorTheme.value,
+                          colorTheme?.value,
                         )}
                       />
 

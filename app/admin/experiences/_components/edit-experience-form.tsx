@@ -1,9 +1,11 @@
 "use client";
 
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import {
   ArrowLeft,
   Briefcase,
-  Calendar,
+  Calendar as CalendarIcon,
   Loader2,
   Save,
   Tags,
@@ -29,12 +31,18 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { TagInput } from "@/components/ui/tag-input";
 import { Textarea } from "@/components/ui/textarea";
-import { generateSlug } from "@/lib/utils";
+import { cn, generateSlug } from "@/lib/utils";
 import { experienceSchema } from "@/lib/validations";
 
 interface Technology {
@@ -60,10 +68,6 @@ interface EditExperienceFormProps {
   technologies: Technology[];
 }
 
-function formatDateForInput(date: Date): string {
-  return date.toISOString().split("T")[0];
-}
-
 export function EditExperienceForm({
   experience,
   technologies: initialTechnologies,
@@ -75,11 +79,11 @@ export function EditExperienceForm({
   const [position, setPosition] = useState(experience.position);
   const [description, setDescription] = useState(experience.description || "");
   const [content, setContent] = useState(experience.content);
-  const [startDate, setStartDate] = useState(
-    formatDateForInput(experience.startDate),
+  const [startDate, setStartDate] = useState<Date | undefined>(
+    experience.startDate,
   );
-  const [endDate, setEndDate] = useState(
-    experience.endDate ? formatDateForInput(experience.endDate) : "",
+  const [endDate, setEndDate] = useState<Date | undefined>(
+    experience.endDate || undefined,
   );
   const [current, setCurrent] = useState(experience.current);
 
@@ -102,14 +106,19 @@ export function EditExperienceForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!startDate) {
+      toast.error("La fecha de inicio es requerida");
+      return;
+    }
+
     try {
       const data = experienceSchema.parse({
         company,
         position,
         description,
         content,
-        startDate: new Date(startDate),
-        endDate: current ? null : endDate ? new Date(endDate) : null,
+        startDate,
+        endDate: current ? null : endDate,
         current,
         technologyIds: selectedTechnologies.map((t) => t.id),
       });
@@ -175,7 +184,6 @@ export function EditExperienceForm({
                 </Button>
               }
             />
-
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>¿Eliminar experiencia?</AlertDialogTitle>
@@ -255,25 +263,75 @@ export function EditExperienceForm({
             {/* Dates */}
             <div className="grid grid-cols-[140px_1fr] items-center gap-4 py-1.5">
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Calendar className="h-4 w-4" />
+                <CalendarIcon className="h-4 w-4" />
                 <span>Período</span>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <Input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="h-8 w-auto min-w-[150px] border-none bg-transparent px-2 text-muted-foreground text-sm hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-0"
-                  />
-                  <span className="text-muted-foreground">-</span>
-                  <Input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    disabled={current}
-                    className="h-8 w-auto min-w-[150px] border-none bg-transparent px-2 text-muted-foreground text-sm hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-0 disabled:opacity-50"
-                  />
+                  <Popover>
+                    <PopoverTrigger
+                      render={
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "h-8 w-[160px] justify-start border-dashed text-left font-normal text-xs",
+                            !startDate && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                          {startDate ? (
+                            format(startDate, "PPP", { locale: es })
+                          ) : (
+                            <span>Fecha inicio</span>
+                          )}
+                        </Button>
+                      }
+                    />
+
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={setStartDate}
+                        initialFocus
+                        locale={es}
+                      />
+                    </PopoverContent>
+                  </Popover>
+
+                  <span className="text-muted-foreground text-xs">-</span>
+
+                  <Popover>
+                    <PopoverTrigger
+                      render={
+                        <Button
+                          variant={"outline"}
+                          disabled={current}
+                          className={cn(
+                            "h-8 w-[160px] justify-start border-dashed text-left font-normal text-xs",
+                            !endDate && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                          {endDate ? (
+                            format(endDate, "PPP", { locale: es })
+                          ) : (
+                            <span>Fecha fin</span>
+                          )}
+                        </Button>
+                      }
+                    />
+
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={setEndDate}
+                        initialFocus
+                        locale={es}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </div>
@@ -285,7 +343,13 @@ export function EditExperienceForm({
                 <span>Trabajo Actual</span>
               </div>
               <div className="flex items-center gap-2">
-                <Switch checked={current} onCheckedChange={setCurrent} />
+                <Switch
+                  checked={current}
+                  onCheckedChange={(checked) => {
+                    setCurrent(checked);
+                    if (checked) setEndDate(undefined);
+                  }}
+                />
                 <span className="text-muted-foreground text-xs">
                   {current ? "Sí, actualmente aquí" : "No, finalizado"}
                 </span>
