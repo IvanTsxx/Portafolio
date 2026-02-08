@@ -14,5 +14,5 @@ export async function POST(req: Request) {
     messages: await convertToModelMessages(messages),
   });
 
-  return result.toTextStreamResponse();
+  return result.toUIMessageStreamResponse();
 }

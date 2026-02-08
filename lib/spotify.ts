@@ -37,7 +37,7 @@ export const getNowPlaying = cache(async () => {
     if (!track) return { isPlaying: false };
 
     const isPlaying = track["@attr"]?.nowplaying === "true";
-    console.log(track);
+
     return {
       isPlaying,
       title: track.name,

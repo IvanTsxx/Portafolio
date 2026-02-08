@@ -1,7 +1,6 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
 import {
   FileText,
   FolderKanban,
@@ -13,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 
 import { searchContent } from "@/app/actions/search";
+import { useChatContext } from "@/components/chat-feature/chat-context";
 import { Badge } from "@/components/ui/badge";
 import {
   CommandDialog,
@@ -22,42 +22,34 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import type { SearchResult } from "@/lib/types";
+import { Input } from "./ui/input";
 
 export function SearchDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [dbResults, setDbResults] = useState<SearchResult[]>([]);
   const [isPending, startTransition] = useTransition();
-
-  // Vercel AI SDK hook for chat
-  // Casting to MyUIMessage[] for type safety with the custom schema
   const [input, setInput] = useState("");
 
-  const { messages, status, stop, sendMessage } = useChat<UIMessage>({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-    }),
-    onFinish: () => {
-      console.log("AI finished");
-    },
-  });
+  const { chat, setIsOpen: setChatOpen } = useChatContext();
+  const { sendMessage } = useChat({ chat });
 
-  const isLoadingAI = status === "streaming" || status === "submitted";
+  const handleAskAI = (query: string) => {
+    if (!query.trim()) return;
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-    // Use parts as content might not be available in strict types or sendMessage expects this structure
-    void sendMessage({
-      role: "user",
-      parts: [{ type: "text", text: input }],
-    });
+    setOpen(false);
+    setChatOpen(true);
+
+    // Add user message to chat context which triggers the AI response
+    // Using setTimeout to allow state updates and avoid potential conflicts
+    setTimeout(() => {
+      void sendMessage({
+        text: query,
+      });
+    }, 100);
+
     setInput("");
   };
-
-  const lastAssistantMessage = messages
-    .filter((m) => m.role === "assistant")
-    .pop();
 
   // Listen for Cmd+K / Ctrl+K
   useEffect(() => {
@@ -101,13 +93,15 @@ export function SearchDialog() {
     }
   };
 
+  const hasNoResults =
+    !isPending && input?.length >= 2 && dbResults.length === 0;
+
   return (
     <CommandDialog
       open={open}
       onOpenChange={(val) => {
         setOpen(val);
         if (!val) {
-          stop(); // Stop generation if closed
           setInput("");
         }
       }}
@@ -115,85 +109,64 @@ export function SearchDialog() {
     >
       <div className="relative">
         <Search className="absolute top-3.5 left-4 size-4 text-muted-foreground" />
-        <input
-          className="flex h-11 w-full rounded-md bg-transparent py-3 pr-4 pl-10 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="Buscar proyectos, posts o preguntar a la AI..."
+        <Input
+          className="flex h-11 w-full rounded-md bg-transparent py-5 pr-4 pl-10 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          placeholder="Buscar proyectos, posts o presiona Enter para preguntar a la AI..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleSubmit(e);
+              if (hasNoResults || input?.length > 0) {
+                if (hasNoResults) {
+                  handleAskAI(input);
+                }
+              }
             }
           }}
-          // biome-ignore lint/a11y/noAutofocus: <>
+          // biome-ignore lint/a11y/noAutofocus: <explanation>
           autoFocus={open}
         />
-        {isLoadingAI && (
-          <div className="absolute top-3.5 right-4">
-            <Loader2 className="size-4 animate-spin text-primary" />
-          </div>
-        )}
       </div>
 
       <CommandList>
-        {/* AI Response Section */}
-        {(lastAssistantMessage || isLoadingAI) && (
-          <div className="border-border/50 border-b bg-muted/20 p-4">
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 rounded-full bg-primary/10 p-1.5 text-primary">
-                <Sparkles className="size-4" />
-              </div>
-              <div className="space-y-1">
-                <p className="font-medium text-foreground text-sm">Iván AI</p>
-                <div className="prose-sm dark:prose-invert text-muted-foreground text-sm leading-relaxed">
-                  {lastAssistantMessage ? (
-                    lastAssistantMessage.parts.map((part, index) => {
-                      if (part.type === "text") {
-                        return <span key={index}>{part.text}</span>;
-                      }
-
-                      // Handle reasoning parts if enabled in future
-                      if (part.type === "reasoning") {
-                        return (
-                          <div
-                            key={index}
-                            className="my-1 border-l-2 pl-2 text-muted-foreground text-xs italic"
-                          >
-                            {part.text}
-                          </div>
-                        );
-                      }
-
-                      // Handle custom data or tools here
-                      return null;
-                    })
-                  ) : (
-                    <span className="animate-pulse">Pensando...</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Database Results */}
-        {isPending && !lastAssistantMessage && (
+        {isPending && (
           <div className="flex items-center justify-center py-6">
             <Loader2 className="size-6 animate-spin text-muted-foreground" />
           </div>
         )}
 
-        {!isPending &&
-          input?.length >= 2 &&
-          dbResults.length === 0 &&
-          !lastAssistantMessage &&
-          !isLoadingAI && (
-            <CommandEmpty className="py-6 text-center text-muted-foreground">
-              Presiona{" "}
-              <span className="font-medium text-foreground">Enter</span> para
-              preguntar a la AI.
-            </CommandEmpty>
-          )}
+        {hasNoResults && (
+          <CommandEmpty className="py-6 text-center text-muted-foreground">
+            <div className="flex flex-col items-center gap-2">
+              <p>
+                No se encontraron resultados para{" "}
+                <span className="font-medium">"{input}"</span>
+              </p>
+              <button
+                onClick={() => handleAskAI(input)}
+                className="mt-2 flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-primary text-sm transition-colors hover:bg-primary/10"
+                type="button"
+              >
+                <Sparkles className="size-4" />
+                Preguntar a la IA
+              </button>
+              <p className="mt-2 text-muted-foreground text-xs">
+                Presiona{" "}
+                <span className="font-medium text-foreground">Enter</span> para
+                enviar automáticamente
+              </p>
+            </div>
+          </CommandEmpty>
+        )}
+
+        {!isPending && input.length < 1 && dbResults.length === 0 && (
+          <CommandEmpty className="py-6 text-center text-muted-foreground">
+            <div className="flex flex-col items-center gap-2">
+              <p>Empieza a escribir para buscar</p>
+            </div>
+          </CommandEmpty>
+        )}
 
         {!isPending && dbResults.length > 0 && (
           <CommandGroup heading="Resultados encontrados">

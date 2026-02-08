@@ -28,10 +28,9 @@ export const auth = betterAuth({
     async session({ session, user }: { session: Session; user: User }) {
       // Only allow specific emails
       if (!ALLOWED_EMAILS.includes(user.email)) {
-        console.log("Unauthorized");
         throw new Error("Unauthorized");
       }
-      console.log("Authorized");
+
       return session;
     },
   },

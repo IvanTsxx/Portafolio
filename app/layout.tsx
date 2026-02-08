@@ -1,6 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
+import { ChatProvider } from "@/components/chat-feature/chat-context";
+import { ChatWidget } from "@/components/chat-feature/chat-widget";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SearchDialog } from "@/components/search-dialog";
@@ -86,10 +88,14 @@ export default function RootLayout({
           <div className="blob blob-3" />
         </div>
 
-        <Header />
-        {children}
-        <Footer />
-        <SearchDialog />
+        <ChatProvider>
+          <Header />
+          {children}
+          <Footer />
+          <SearchDialog />
+          <ChatWidget />
+        </ChatProvider>
+
         <Toaster richColors position="top-center" />
       </body>
     </html>
