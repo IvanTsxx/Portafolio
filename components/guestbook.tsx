@@ -1,5 +1,6 @@
 "use client";
 
+import type { JsonValue } from "@prisma/client/runtime/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Palette, Send, Sparkles, User } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
@@ -19,7 +20,7 @@ interface GuestbookProps {
     createdAt: Date;
     userId: string | null;
     ipHash?: string | null;
-    style?: JSON;
+    style?: JsonValue;
   }[];
 }
 
