@@ -1,4 +1,5 @@
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
 import { ChatProvider } from "@/components/chat-feature/chat-context";
@@ -99,7 +100,7 @@ export default function RootLayout({
           <SearchDialog />
           <ChatWidget />
         </ChatProvider>
-
+        <Analytics />
         <Toaster richColors position="top-center" />
       </body>
     </html>
