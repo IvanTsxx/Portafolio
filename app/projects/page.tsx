@@ -1,16 +1,10 @@
-import { ExternalLink, Github } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getProjects } from "@/app/actions/projects";
+import { getTechnologies } from "@/app/actions/taxonamy";
+import { ListFilters } from "@/components/list-filters";
+import { ProjectActions } from "@/components/project-actions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Proyectos",
@@ -18,15 +12,59 @@ export const metadata: Metadata = {
     "Proyectos destacados de Iván Bongiovanni, Full-Stack Developer especializado en Next.js y React.",
 };
 
-export default async function ProjectsPage() {
-  const projects = await getProjects(true);
+const sortOptions = [
+  { value: "recent", label: "Más recientes" },
+  { value: "oldest", label: "Más antiguos" },
+  { value: "featured", label: "Destacados" },
+];
+
+interface ProjectsPageProps {
+  searchParams: Promise<{ tech?: string; sort?: string }>;
+}
+
+export default async function ProjectsPage({
+  searchParams,
+}: ProjectsPageProps) {
+  const params = await searchParams;
+  const [allProjects, technologies] = await Promise.all([
+    getProjects(true),
+    getTechnologies(),
+  ]);
+
+  // Filter by technology
+  let projects = allProjects;
+  if (params.tech) {
+    projects = projects.filter((p) =>
+      p.technologies.some((t) => t.slug === params.tech),
+    );
+  }
+
+  // Sort
+  const sortValue = params.sort || "recent";
+  switch (sortValue) {
+    case "oldest":
+      projects = [...projects].sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      );
+      break;
+    case "featured":
+      projects = [...projects].sort(
+        (a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0),
+      );
+      break;
+    default:
+      // recent - already sorted by createdAt desc from DB
+      break;
+  }
 
   return (
     <main className="min-h-screen">
-      <section className="mx-auto max-w-7xl px-4 py-20 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-20 lg:px-8 lg:py-28">
         <div className="space-y-12">
+          {/* Header */}
           <div className="space-y-4 text-center">
-            <h1 className="font-bold text-4xl text-foreground tracking-tight lg:text-5xl">
+            <h1 className="font-semibold text-4xl text-foreground tracking-tight lg:text-5xl">
               Proyectos destacados
             </h1>
             <p className="mx-auto max-w-2xl text-balance text-lg text-muted-foreground">
@@ -35,95 +73,92 @@ export default async function ProjectsPage() {
             </p>
           </div>
 
+          {/* Filters */}
+          <ListFilters
+            filters={technologies}
+            filterKey="tech"
+            filterLabel="Tecnología"
+            sortOptions={sortOptions}
+            currentFilter={params.tech}
+            currentSort={sortValue}
+          />
+
+          {/* Projects Grid */}
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
-              <Card
+              <Link
                 key={project.id}
-                className="group flex flex-col overflow-hidden p-0 transition-all hover:shadow-lg hover:shadow-primary/10"
+                href={`/projects/${project.slug}`}
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/30 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:bg-card hover:shadow-xl"
               >
-                {project.coverImage && (
-                  <div className="relative aspect-video w-full overflow-hidden bg-muted">
+                {/* Cover Image */}
+                {project.coverImage ? (
+                  <div className="relative aspect-video w-full overflow-hidden bg-muted/50">
                     <img
-                      src={project.coverImage || "/placeholder.svg"}
+                      src={project.coverImage}
                       alt={project.title}
-                      className="size-full object-cover transition-transform group-hover:scale-105"
+                      className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
+                    {project.featured && (
+                      <Badge className="absolute top-3 right-3 rounded-lg">
+                        Destacado
+                      </Badge>
+                    )}
+                  </div>
+                ) : (
+                  <div className="relative flex aspect-video w-full items-center justify-center bg-muted/30">
+                    <span className="text-4xl text-muted-foreground/30">
+                      {project.title.charAt(0)}
+                    </span>
+                    {project.featured && (
+                      <Badge className="absolute top-3 right-3 rounded-lg">
+                        Destacado
+                      </Badge>
+                    )}
                   </div>
                 )}
 
-                <CardHeader>
-                  <CardTitle className="line-clamp-2">
-                    <Link
-                      href={`/projects/${project.slug}`}
-                      className="hover:text-primary"
-                    >
-                      {project.title}
-                    </Link>
-                  </CardTitle>
-                  <CardDescription className="line-clamp-3">
+                {/* Content */}
+                <div className="flex flex-1 flex-col p-5">
+                  <h2 className="font-medium text-foreground text-lg transition-colors group-hover:text-primary">
+                    {project.title}
+                  </h2>
+                  <p className="mt-2 line-clamp-2 flex-1 text-muted-foreground text-sm leading-relaxed">
                     {project.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col justify-between gap-4">
-                  <div className="flex flex-wrap gap-2">
-                    {project.technologies.slice(0, 5).map((tech) => (
+                  </p>
+
+                  {/* Technologies */}
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {project.technologies.slice(0, 4).map((tech) => (
                       <Badge
                         key={tech.id}
                         variant="secondary"
-                        className="text-xs"
+                        className="rounded-lg text-xs"
                       >
                         {tech.name}
                       </Badge>
                     ))}
-                    {project.technologies.length > 5 && (
-                      <Badge variant="secondary" className="text-xs">
-                        +{project.technologies.length - 5}
+                    {project.technologies.length > 4 && (
+                      <Badge variant="secondary" className="rounded-lg text-xs">
+                        +{project.technologies.length - 4}
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 pb-4">
-                    {project.demoUrl && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        render={
-                          <a
-                            href={project.demoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="mr-2 size-4" />
-                            Demo
-                          </a>
-                        }
-                      />
-                    )}
-                    {project.githubUrl && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        render={
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Github className="mr-2 size-4" />
-                            Código
-                          </a>
-                        }
-                      />
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+
+                  {/* Actions */}
+                  <ProjectActions
+                    demoUrl={project.demoUrl}
+                    githubUrl={project.githubUrl}
+                  />
+                </div>
+              </Link>
             ))}
           </div>
 
           {projects.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <p className="text-muted-foreground text-xl">
-                No hay proyectos publicados aún.
+                No hay proyectos que coincidan con los filtros.
               </p>
             </div>
           )}

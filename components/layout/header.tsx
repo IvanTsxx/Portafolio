@@ -84,7 +84,7 @@ export function Header() {
           <Button
             size="sm"
             render={
-              <a href="/cv.pdf" download>
+              <a href="/CV.pdf" download>
                 <Download className="mr-2 size-4" />
                 Descargar CV
               </a>

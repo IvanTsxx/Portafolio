@@ -67,7 +67,6 @@ export default async function AdminLayout({
                   return (
                     <SidebarMenuItem key={item.name}>
                       <SidebarMenuButton
-                        tooltip={item.name}
                         render={
                           <Link href={item.href}>
                             <Icon className="size-4" />
