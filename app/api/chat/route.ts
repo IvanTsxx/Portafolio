@@ -1,4 +1,4 @@
-import { google } from "@ai-sdk/google";
+import { type GoogleGenerativeAIProviderOptions, google } from "@ai-sdk/google";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { PORTFOLIO_CONTEXT } from "@/lib/ai-context";
 
@@ -12,6 +12,14 @@ export async function POST(req: Request) {
     model: google("gemini-2.5-flash"),
     system: PORTFOLIO_CONTEXT,
     messages: await convertToModelMessages(messages),
+    providerOptions: {
+      google: {
+        thinkingConfig: {
+          includeThoughts: true,
+          thinkingLevel: "minimal",
+        },
+      } satisfies GoogleGenerativeAIProviderOptions,
+    },
   });
 
   return result.toUIMessageStreamResponse();
