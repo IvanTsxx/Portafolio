@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { generateProjectEmbeddings } from "@/lib/actions/portfolio";
 import { requireAuth } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import type { ProjectWithRelations } from "@/lib/types";
@@ -31,6 +32,9 @@ export async function createProject(data: ProjectInput) {
     },
   });
 
+  // 2. ✅ Embedding se crea AUTOMÁTICAMENTE
+  await generateProjectEmbeddings(project.id);
+
   revalidatePath("/projects");
   revalidatePath("/admin/projects");
 
@@ -41,6 +45,12 @@ export async function updateProject(id: string, data: ProjectInput) {
   await requireAuth();
 
   const validated = projectSchema.parse(data);
+
+  // Obtener proyecto anterior para comparar
+  const previousProject = await prisma.project.findUnique({
+    where: { id },
+    select: { content: true, published: true },
+  });
 
   const project = await prisma.project.update({
     where: { id },
@@ -62,6 +72,17 @@ export async function updateProject(id: string, data: ProjectInput) {
       technologies: true,
     },
   });
+
+  // ✅ Regenerar embeddings solo si:
+  // 1. Cambió el contenido, O
+  // 2. Se publicó (antes no publicado → ahora publicado)
+  const contentChanged = previousProject?.content !== validated.content;
+  const wasPublished =
+    previousProject?.published === false && validated.published === true;
+
+  if (project.published && (contentChanged || wasPublished)) {
+    await generateProjectEmbeddings(project.id);
+  }
 
   revalidatePath("/projects");
   revalidatePath(`/projects/${validated.slug}`);
@@ -134,12 +155,25 @@ export async function toggleProjectPublish(id: string) {
     throw new Error("Proyecto no encontrado");
   }
 
+  const newPublishedState = !project.published;
+
   const updated = await prisma.project.update({
     where: { id },
     data: {
-      published: !project.published,
+      published: newPublishedState,
     },
   });
+
+  // ✅ Lógica inteligente:
+  // - Si se publica: generar embeddings
+  // - Si se despublica: eliminar embeddings (opcional, o dejarlos)
+  if (newPublishedState && project.content) {
+    // Acaba de publicarse → generar embeddings
+    await generateProjectEmbeddings(project.id);
+  } else if (!newPublishedState) {
+    // Se despublicó → eliminar embeddings (opcional)
+    // await deleteProjectEmbeddings(project.id); // Si implementas esta función
+  }
 
   revalidatePath("/projects");
   revalidatePath(`/projects/${project.slug}`);

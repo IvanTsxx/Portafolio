@@ -216,6 +216,7 @@ export type PostWhereInput = {
   categoryId?: Prisma.StringFilter<"Post"> | string
   tags?: Prisma.TagListRelationFilter
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
+  embeddings?: Prisma.EmbeddingListRelationFilter
 }
 
 export type PostOrderByWithRelationInput = {
@@ -230,6 +231,7 @@ export type PostOrderByWithRelationInput = {
   categoryId?: Prisma.SortOrder
   tags?: Prisma.TagOrderByRelationAggregateInput
   category?: Prisma.CategoryOrderByWithRelationInput
+  embeddings?: Prisma.EmbeddingOrderByRelationAggregateInput
 }
 
 export type PostWhereUniqueInput = Prisma.AtLeast<{
@@ -247,6 +249,7 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   categoryId?: Prisma.StringFilter<"Post"> | string
   tags?: Prisma.TagListRelationFilter
   category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
+  embeddings?: Prisma.EmbeddingListRelationFilter
 }, "id" | "slug">
 
 export type PostOrderByWithAggregationInput = {
@@ -290,6 +293,7 @@ export type PostCreateInput = {
   updatedAt?: Date | string
   tags?: Prisma.TagCreateNestedManyWithoutPostsInput
   category: Prisma.CategoryCreateNestedOneWithoutPostsInput
+  embeddings?: Prisma.EmbeddingCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateInput = {
@@ -303,6 +307,7 @@ export type PostUncheckedCreateInput = {
   updatedAt?: Date | string
   categoryId: string
   tags?: Prisma.TagUncheckedCreateNestedManyWithoutPostsInput
+  embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostUpdateInput = {
@@ -316,6 +321,7 @@ export type PostUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUpdateManyWithoutPostsNestedInput
   category?: Prisma.CategoryUpdateOneRequiredWithoutPostsNestedInput
+  embeddings?: Prisma.EmbeddingUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateInput = {
@@ -329,6 +335,7 @@ export type PostUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.TagUncheckedUpdateManyWithoutPostsNestedInput
+  embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostCreateManyInput = {
@@ -412,6 +419,11 @@ export type PostOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type PostNullableScalarRelationFilter = {
+  is?: Prisma.PostWhereInput | null
+  isNot?: Prisma.PostWhereInput | null
+}
+
 export type PostCreateNestedManyWithoutTagsInput = {
   create?: Prisma.XOR<Prisma.PostCreateWithoutTagsInput, Prisma.PostUncheckedCreateWithoutTagsInput> | Prisma.PostCreateWithoutTagsInput[] | Prisma.PostUncheckedCreateWithoutTagsInput[]
   connectOrCreate?: Prisma.PostCreateOrConnectWithoutTagsInput | Prisma.PostCreateOrConnectWithoutTagsInput[]
@@ -492,6 +504,16 @@ export type PostUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
 }
 
+export type PostUpdateOneWithoutEmbeddingsNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutEmbeddingsInput, Prisma.PostUncheckedCreateWithoutEmbeddingsInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutEmbeddingsInput
+  upsert?: Prisma.PostUpsertWithoutEmbeddingsInput
+  disconnect?: Prisma.PostWhereInput | boolean
+  delete?: Prisma.PostWhereInput | boolean
+  connect?: Prisma.PostWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutEmbeddingsInput, Prisma.PostUpdateWithoutEmbeddingsInput>, Prisma.PostUncheckedUpdateWithoutEmbeddingsInput>
+}
+
 export type PostCreateWithoutTagsInput = {
   id?: string
   title: string
@@ -502,6 +524,7 @@ export type PostCreateWithoutTagsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutPostsInput
+  embeddings?: Prisma.EmbeddingCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutTagsInput = {
@@ -514,6 +537,7 @@ export type PostUncheckedCreateWithoutTagsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   categoryId: string
+  embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutTagsInput = {
@@ -562,6 +586,7 @@ export type PostCreateWithoutCategoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.TagCreateNestedManyWithoutPostsInput
+  embeddings?: Prisma.EmbeddingCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutCategoryInput = {
@@ -574,6 +599,7 @@ export type PostUncheckedCreateWithoutCategoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   tags?: Prisma.TagUncheckedCreateNestedManyWithoutPostsInput
+  embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutCategoryInput = {
@@ -602,6 +628,74 @@ export type PostUpdateManyWithWhereWithoutCategoryInput = {
   data: Prisma.XOR<Prisma.PostUpdateManyMutationInput, Prisma.PostUncheckedUpdateManyWithoutCategoryInput>
 }
 
+export type PostCreateWithoutEmbeddingsInput = {
+  id?: string
+  title: string
+  slug: string
+  description?: string | null
+  content: string
+  published?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tags?: Prisma.TagCreateNestedManyWithoutPostsInput
+  category: Prisma.CategoryCreateNestedOneWithoutPostsInput
+}
+
+export type PostUncheckedCreateWithoutEmbeddingsInput = {
+  id?: string
+  title: string
+  slug: string
+  description?: string | null
+  content: string
+  published?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  categoryId: string
+  tags?: Prisma.TagUncheckedCreateNestedManyWithoutPostsInput
+}
+
+export type PostCreateOrConnectWithoutEmbeddingsInput = {
+  where: Prisma.PostWhereUniqueInput
+  create: Prisma.XOR<Prisma.PostCreateWithoutEmbeddingsInput, Prisma.PostUncheckedCreateWithoutEmbeddingsInput>
+}
+
+export type PostUpsertWithoutEmbeddingsInput = {
+  update: Prisma.XOR<Prisma.PostUpdateWithoutEmbeddingsInput, Prisma.PostUncheckedUpdateWithoutEmbeddingsInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutEmbeddingsInput, Prisma.PostUncheckedCreateWithoutEmbeddingsInput>
+  where?: Prisma.PostWhereInput
+}
+
+export type PostUpdateToOneWithWhereWithoutEmbeddingsInput = {
+  where?: Prisma.PostWhereInput
+  data: Prisma.XOR<Prisma.PostUpdateWithoutEmbeddingsInput, Prisma.PostUncheckedUpdateWithoutEmbeddingsInput>
+}
+
+export type PostUpdateWithoutEmbeddingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  published?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tags?: Prisma.TagUpdateManyWithoutPostsNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutPostsNestedInput
+}
+
+export type PostUncheckedUpdateWithoutEmbeddingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  published?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.TagUncheckedUpdateManyWithoutPostsNestedInput
+}
+
 export type PostUpdateWithoutTagsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -612,6 +706,7 @@ export type PostUpdateWithoutTagsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutPostsNestedInput
+  embeddings?: Prisma.EmbeddingUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutTagsInput = {
@@ -624,6 +719,7 @@ export type PostUncheckedUpdateWithoutTagsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateManyWithoutTagsInput = {
@@ -659,6 +755,7 @@ export type PostUpdateWithoutCategoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUpdateManyWithoutPostsNestedInput
+  embeddings?: Prisma.EmbeddingUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutCategoryInput = {
@@ -671,6 +768,7 @@ export type PostUncheckedUpdateWithoutCategoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tags?: Prisma.TagUncheckedUpdateManyWithoutPostsNestedInput
+  embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateManyWithoutCategoryInput = {
@@ -691,10 +789,12 @@ export type PostUncheckedUpdateManyWithoutCategoryInput = {
 
 export type PostCountOutputType = {
   tags: number
+  embeddings: number
 }
 
 export type PostCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | PostCountOutputTypeCountTagsArgs
+  embeddings?: boolean | PostCountOutputTypeCountEmbeddingsArgs
 }
 
 /**
@@ -714,6 +814,13 @@ export type PostCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.Exten
   where?: Prisma.TagWhereInput
 }
 
+/**
+ * PostCountOutputType without action
+ */
+export type PostCountOutputTypeCountEmbeddingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmbeddingWhereInput
+}
+
 
 export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -727,6 +834,7 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   categoryId?: boolean
   tags?: boolean | Prisma.Post$tagsArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+  embeddings?: boolean | Prisma.Post$embeddingsArgs<ExtArgs>
   _count?: boolean | Prisma.PostCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
 
@@ -772,6 +880,7 @@ export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | Prisma.Post$tagsArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+  embeddings?: boolean | Prisma.Post$embeddingsArgs<ExtArgs>
   _count?: boolean | Prisma.PostCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PostIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -786,6 +895,7 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     tags: Prisma.$TagPayload<ExtArgs>[]
     category: Prisma.$CategoryPayload<ExtArgs>
+    embeddings: Prisma.$EmbeddingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1193,6 +1303,7 @@ export interface Prisma__PostClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tags<T extends Prisma.Post$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   category<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  embeddings<T extends Prisma.Post$embeddingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$embeddingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmbeddingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1648,6 +1759,30 @@ export type Post$tagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   take?: number
   skip?: number
   distinct?: Prisma.TagScalarFieldEnum | Prisma.TagScalarFieldEnum[]
+}
+
+/**
+ * Post.embeddings
+ */
+export type Post$embeddingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Embedding
+   */
+  select?: Prisma.EmbeddingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Embedding
+   */
+  omit?: Prisma.EmbeddingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmbeddingInclude<ExtArgs> | null
+  where?: Prisma.EmbeddingWhereInput
+  orderBy?: Prisma.EmbeddingOrderByWithRelationInput | Prisma.EmbeddingOrderByWithRelationInput[]
+  cursor?: Prisma.EmbeddingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmbeddingScalarFieldEnum | Prisma.EmbeddingScalarFieldEnum[]
 }
 
 /**

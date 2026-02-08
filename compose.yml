@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: portafolio-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: portafolio-db
+    volumes:
+      - portafolio-db:/var/lib/postgresql/data
+
+volumes:
+  portafolio-db:
+    driver: local

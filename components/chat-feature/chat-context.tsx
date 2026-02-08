@@ -1,7 +1,7 @@
 "use client";
 
 import { Chat } from "@ai-sdk/react";
-import { DefaultChatTransport, type UIMessage } from "ai";
+import { DefaultChatTransport } from "ai";
 import {
   createContext,
   type ReactNode,
@@ -9,9 +9,10 @@ import {
   useMemo,
   useState,
 } from "react";
+import type { MyUIMessage } from "@/app/api/chat/route";
 
 interface ChatContextType {
-  chat: Chat<UIMessage>;
+  chat: Chat<MyUIMessage>;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
 }
@@ -23,7 +24,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const chat = useMemo(
     () =>
-      new Chat({
+      new Chat<MyUIMessage>({
         transport: new DefaultChatTransport({
           api: "/api/chat",
         }),

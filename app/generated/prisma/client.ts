@@ -94,3 +94,8 @@ export type Technology = Prisma.TechnologyModel
  * 
  */
 export type GuestbookEntry = Prisma.GuestbookEntryModel
+/**
+ * Model Embedding
+ * 
+ */
+export type Embedding = Prisma.EmbeddingModel

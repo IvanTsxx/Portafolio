@@ -394,7 +394,8 @@ export const ModelName = {
   Tag: 'Tag',
   Category: 'Category',
   Technology: 'Technology',
-  GuestbookEntry: 'GuestbookEntry'
+  GuestbookEntry: 'GuestbookEntry',
+  Embedding: 'Embedding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verification" | "post" | "project" | "experience" | "tag" | "category" | "technology" | "guestbookEntry"
+    modelProps: "user" | "account" | "session" | "verification" | "post" | "project" | "experience" | "tag" | "category" | "technology" | "guestbookEntry" | "embedding"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1228,6 +1229,64 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Embedding: {
+      payload: Prisma.$EmbeddingPayload<ExtArgs>
+      fields: Prisma.EmbeddingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmbeddingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmbeddingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        findFirst: {
+          args: Prisma.EmbeddingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmbeddingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        findMany: {
+          args: Prisma.EmbeddingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>[]
+        }
+        delete: {
+          args: Prisma.EmbeddingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        update: {
+          args: Prisma.EmbeddingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmbeddingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmbeddingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmbeddingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmbeddingPayload>[]
+        }
+        aggregate: {
+          args: Prisma.EmbeddingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmbedding>
+        }
+        groupBy: {
+          args: Prisma.EmbeddingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmbeddingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmbeddingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmbeddingCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1424,6 +1483,19 @@ export const GuestbookEntryScalarFieldEnum = {
 } as const
 
 export type GuestbookEntryScalarFieldEnum = (typeof GuestbookEntryScalarFieldEnum)[keyof typeof GuestbookEntryScalarFieldEnum]
+
+
+export const EmbeddingScalarFieldEnum = {
+  id: 'id',
+  content: 'content',
+  projectId: 'projectId',
+  experienceId: 'experienceId',
+  postId: 'postId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1624,6 +1696,7 @@ export type GlobalOmitConfig = {
   category?: Prisma.CategoryOmit
   technology?: Prisma.TechnologyOmit
   guestbookEntry?: Prisma.GuestbookEntryOmit
+  embedding?: Prisma.EmbeddingOmit
 }
 
 /* Types for Logging */

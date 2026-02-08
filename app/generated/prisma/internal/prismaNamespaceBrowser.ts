@@ -61,7 +61,8 @@ export const ModelName = {
   Tag: 'Tag',
   Category: 'Category',
   Technology: 'Technology',
-  GuestbookEntry: 'GuestbookEntry'
+  GuestbookEntry: 'GuestbookEntry',
+  Embedding: 'Embedding'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -237,6 +238,19 @@ export const GuestbookEntryScalarFieldEnum = {
 } as const
 
 export type GuestbookEntryScalarFieldEnum = (typeof GuestbookEntryScalarFieldEnum)[keyof typeof GuestbookEntryScalarFieldEnum]
+
+
+export const EmbeddingScalarFieldEnum = {
+  id: 'id',
+  content: 'content',
+  projectId: 'projectId',
+  experienceId: 'experienceId',
+  postId: 'postId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EmbeddingScalarFieldEnum = (typeof EmbeddingScalarFieldEnum)[keyof typeof EmbeddingScalarFieldEnum]
 
 
 export const SortOrder = {

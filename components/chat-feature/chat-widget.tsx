@@ -3,14 +3,16 @@
 import { useChat } from "@ai-sdk/react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Brain,
   Loader2,
-  MessageCircle,
   Minimize2,
   Send,
   Sparkles,
+  Trash2,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import type { MyUIMessage } from "@/app/api/chat/route";
 import { useChatContext } from "@/components/chat-feature/chat-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +21,9 @@ import { MemoizedMarkdown } from "../memoized-markdown";
 
 export function ChatWidget() {
   const { chat, isOpen, setIsOpen } = useChatContext();
-  const { messages, sendMessage, status } = useChat({ chat });
+  const { messages, sendMessage, status, setMessages } = useChat<MyUIMessage>({
+    chat,
+  });
   const [input, setInput] = useState("");
 
   const isLoading = status === "streaming" || status === "submitted";
@@ -72,14 +76,28 @@ export function ChatWidget() {
                   </p>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-8"
-                onClick={() => setIsOpen(false)}
-              >
-                <Minimize2 className="size-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                {/* borrar chat y empezar de nuevo */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8"
+                  onClick={() => {
+                    setMessages([]);
+                  }}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Minimize2 className="size-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Messages */}
@@ -115,6 +133,41 @@ export function ChatWidget() {
                                 id={m.id}
                                 content={part.text}
                               />
+                            )}
+                            {/* Tool call visualization - UI legible */}
+                            {part.type === "tool-getInformation" && (
+                              <div className="my-3 rounded-lg border border-primary/20 bg-linear-to-br from-primary/5 to-primary/10 p-3">
+                                <div className="mb-2 flex items-center gap-2">
+                                  <Sparkles className="size-3.5 text-primary" />
+                                  <span className="font-medium text-primary text-xs">
+                                    {part.state === "output-available"
+                                      ? "Información encontrada"
+                                      : "Buscando en mi base de conocimientos..."}
+                                  </span>
+                                </div>
+
+                                {part.state === "output-available" &&
+                                  part.output &&
+                                  Array.isArray(part.output) &&
+                                  part.output.length > 0 && (
+                                    <div className="space-y-2">
+                                      <p className="font-medium text-[10px] text-muted-foreground">
+                                        Fuentes relevantes ({part.output.length}
+                                        ):
+                                      </p>
+                                    </div>
+                                  )}
+
+                                {part.state === "output-available" &&
+                                  (!part.output ||
+                                    (Array.isArray(part.output) &&
+                                      part.output.length === 0)) && (
+                                    <p className="text-muted-foreground text-xs italic">
+                                      No encontré información relevante en mi
+                                      base de conocimientos.
+                                    </p>
+                                  )}
+                              </div>
                             )}
                             {/* Handling potential future reasoning parts */}
                             {part.type === "reasoning" && (
@@ -180,17 +233,32 @@ export function ChatWidget() {
         )}
       </AnimatePresence>
 
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        size="icon"
-        className="size-12 rounded-full shadow-lg transition-transform hover:scale-110"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={
+          isOpen
+            ? { opacity: 1 }
+            : {
+                opacity: 1,
+                x: [0, -6, 6, -6, 6, 0],
+              }
+        }
+        transition={{
+          duration: 0.5, // sacudida rápida
+          ease: "easeInOut",
+          repeat: Infinity,
+          repeatDelay: 10, // cada 10s
+        }}
+        className="fixed right-6 bottom-6 z-50"
       >
-        {isOpen ? (
-          <X className="size-6" />
-        ) : (
-          <MessageCircle className="size-6" />
-        )}
-      </Button>
+        <Button
+          onClick={() => setIsOpen(!isOpen)}
+          size="icon"
+          className="size-12 rounded-full shadow-lg transition-transform hover:scale-110"
+        >
+          {isOpen ? <X className="size-6" /> : <Brain className="size-6" />}
+        </Button>
+      </motion.div>
     </div>
   );
 }

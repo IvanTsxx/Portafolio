@@ -381,6 +381,66 @@ Plataforma que permite a comercios locales publicar productos y servicios, mient
 
   console.log(`✅ Created ${projects.length} projects`);
 
+  // ========== GENERAR EMBEDDINGS ==========
+  console.log("\n🔮 Generando embeddings para contenido publicado...");
+
+  const {
+    regenerateProjectEmbeddings,
+    regenerateExperienceEmbeddings,
+    regeneratePostEmbeddings,
+  } = await import("../lib/actions/portfolio");
+
+  // Generar embeddings para proyectos publicados
+  const publishedProjects = await prisma.project.findMany({
+    where: { published: true },
+    select: { id: true, title: true },
+  });
+
+  for (const project of publishedProjects) {
+    const result = await regenerateProjectEmbeddings(project.id);
+    if (result.success) {
+      console.log(`  ✅ ${project.title}: ${result.count} embeddings`);
+    } else {
+      console.log(`  ⚠️  ${project.title}: ${result.message || result.error}`);
+    }
+  }
+
+  // Generar embeddings para experiencias publicadas
+  const publishedExperiences = await prisma.experience.findMany({
+    where: { published: true },
+    select: { id: true, company: true, position: true },
+  });
+
+  for (const experience of publishedExperiences) {
+    const result = await regenerateExperienceEmbeddings(experience.id);
+    if (result.success) {
+      console.log(
+        `  ✅ ${experience.position} en ${experience.company}: ${result.count} embeddings`
+      );
+    } else {
+      console.log(
+        `  ⚠️  ${experience.position} en ${experience.company}: ${result.message || result.error}`
+      );
+    }
+  }
+
+  // Generar embeddings para posts publicados
+  const publishedPosts = await prisma.post.findMany({
+    where: { published: true },
+    select: { id: true, title: true },
+  });
+
+  for (const post of publishedPosts) {
+    const result = await regeneratePostEmbeddings(post.id);
+    if (result.success) {
+      console.log(`  ✅ ${post.title}: ${result.count} embeddings`);
+    } else {
+      console.log(`  ⚠️  ${post.title}: ${result.message || result.error}`);
+    }
+  }
+
+  console.log("✨ Embeddings generados correctamente\n");
+
   console.log("🌱 Seeding complete!");
 }
 
@@ -391,4 +451,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    
   });

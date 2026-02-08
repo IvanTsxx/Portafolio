@@ -1,14 +1,12 @@
-// Pikuu - Schema Prisma completo
-// Sistema de créditos pay-per-generation con free tier
-
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../app/generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider     = "postgresql"
-  relationMode = "prisma"
+  provider   = "postgresql"
+  extensions = [vector]
 }
 
 model User {
@@ -83,17 +81,18 @@ model Verification {
 // Portfolio content models
 
 model Post {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String      @unique
   description String?
-  content     String   @db.Text
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tags        Tag[]    @relation("PostToTag")
+  content     String      @db.Text
+  published   Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  tags        Tag[]       @relation("PostToTag")
   categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
+  category    Category    @relation(fields: [categoryId], references: [id])
+  embeddings  Embedding[]
 
   @@index([slug])
   @@index([published])
@@ -118,6 +117,7 @@ model Project {
   updatedAt    DateTime     @updatedAt
   tags         Tag[]        @relation("ProjectToTag")
   technologies Technology[] @relation("ProjectToTechnology")
+  embeddings   Embedding[]
 
   @@index([slug])
   @@index([published])
@@ -141,6 +141,7 @@ model Experience {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   technologies Technology[] @relation("ExperienceToTechnology")
+  embeddings   Embedding[]
 
   @@index([slug])
   @@index([published])
@@ -191,4 +192,27 @@ model GuestbookEntry {
   message   String
   createdAt DateTime @default(now())
   userId    String?
+}
+
+// RAG Embeddings for semantic search
+model Embedding {
+  id        String                      @id @default(cuid())
+  content   String                      @db.Text
+  embedding Unsupported("vector(3072)")
+
+  // Polymorphic relations (mapped to snake_case)
+  projectId    String?     @map("project_id")
+  project      Project?    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  experienceId String?     @map("experience_id")
+  experience   Experience? @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  postId       String?     @map("post_id")
+  post         Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([projectId])
+  @@index([experienceId])
+  @@index([postId])
+  @@map("embeddings")
 }

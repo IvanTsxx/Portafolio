@@ -289,6 +289,7 @@ export type ExperienceWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Experience"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Experience"> | Date | string
   technologies?: Prisma.TechnologyListRelationFilter
+  embeddings?: Prisma.EmbeddingListRelationFilter
 }
 
 export type ExperienceOrderByWithRelationInput = {
@@ -307,6 +308,7 @@ export type ExperienceOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   technologies?: Prisma.TechnologyOrderByRelationAggregateInput
+  embeddings?: Prisma.EmbeddingOrderByRelationAggregateInput
 }
 
 export type ExperienceWhereUniqueInput = Prisma.AtLeast<{
@@ -328,6 +330,7 @@ export type ExperienceWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Experience"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Experience"> | Date | string
   technologies?: Prisma.TechnologyListRelationFilter
+  embeddings?: Prisma.EmbeddingListRelationFilter
 }, "id" | "slug">
 
 export type ExperienceOrderByWithAggregationInput = {
@@ -388,6 +391,7 @@ export type ExperienceCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   technologies?: Prisma.TechnologyCreateNestedManyWithoutExperiencesInput
+  embeddings?: Prisma.EmbeddingCreateNestedManyWithoutExperienceInput
 }
 
 export type ExperienceUncheckedCreateInput = {
@@ -406,6 +410,7 @@ export type ExperienceUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   technologies?: Prisma.TechnologyUncheckedCreateNestedManyWithoutExperiencesInput
+  embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutExperienceInput
 }
 
 export type ExperienceUpdateInput = {
@@ -424,6 +429,7 @@ export type ExperienceUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   technologies?: Prisma.TechnologyUpdateManyWithoutExperiencesNestedInput
+  embeddings?: Prisma.EmbeddingUpdateManyWithoutExperienceNestedInput
 }
 
 export type ExperienceUncheckedUpdateInput = {
@@ -442,6 +448,7 @@ export type ExperienceUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   technologies?: Prisma.TechnologyUncheckedUpdateManyWithoutExperiencesNestedInput
+  embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutExperienceNestedInput
 }
 
 export type ExperienceCreateManyInput = {
@@ -564,6 +571,11 @@ export type ExperienceOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type ExperienceNullableScalarRelationFilter = {
+  is?: Prisma.ExperienceWhereInput | null
+  isNot?: Prisma.ExperienceWhereInput | null
+}
+
 export type ExperienceCreateNestedManyWithoutTechnologiesInput = {
   create?: Prisma.XOR<Prisma.ExperienceCreateWithoutTechnologiesInput, Prisma.ExperienceUncheckedCreateWithoutTechnologiesInput> | Prisma.ExperienceCreateWithoutTechnologiesInput[] | Prisma.ExperienceUncheckedCreateWithoutTechnologiesInput[]
   connectOrCreate?: Prisma.ExperienceCreateOrConnectWithoutTechnologiesInput | Prisma.ExperienceCreateOrConnectWithoutTechnologiesInput[]
@@ -602,6 +614,16 @@ export type ExperienceUncheckedUpdateManyWithoutTechnologiesNestedInput = {
   deleteMany?: Prisma.ExperienceScalarWhereInput | Prisma.ExperienceScalarWhereInput[]
 }
 
+export type ExperienceUpdateOneWithoutEmbeddingsNestedInput = {
+  create?: Prisma.XOR<Prisma.ExperienceCreateWithoutEmbeddingsInput, Prisma.ExperienceUncheckedCreateWithoutEmbeddingsInput>
+  connectOrCreate?: Prisma.ExperienceCreateOrConnectWithoutEmbeddingsInput
+  upsert?: Prisma.ExperienceUpsertWithoutEmbeddingsInput
+  disconnect?: Prisma.ExperienceWhereInput | boolean
+  delete?: Prisma.ExperienceWhereInput | boolean
+  connect?: Prisma.ExperienceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ExperienceUpdateToOneWithWhereWithoutEmbeddingsInput, Prisma.ExperienceUpdateWithoutEmbeddingsInput>, Prisma.ExperienceUncheckedUpdateWithoutEmbeddingsInput>
+}
+
 export type ExperienceCreateWithoutTechnologiesInput = {
   id?: string
   company: string
@@ -617,6 +639,7 @@ export type ExperienceCreateWithoutTechnologiesInput = {
   order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  embeddings?: Prisma.EmbeddingCreateNestedManyWithoutExperienceInput
 }
 
 export type ExperienceUncheckedCreateWithoutTechnologiesInput = {
@@ -634,6 +657,7 @@ export type ExperienceUncheckedCreateWithoutTechnologiesInput = {
   order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  embeddings?: Prisma.EmbeddingUncheckedCreateNestedManyWithoutExperienceInput
 }
 
 export type ExperienceCreateOrConnectWithoutTechnologiesInput = {
@@ -677,6 +701,94 @@ export type ExperienceScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Experience"> | Date | string
 }
 
+export type ExperienceCreateWithoutEmbeddingsInput = {
+  id?: string
+  company: string
+  position: string
+  slug: string
+  description?: string | null
+  content: string
+  startDate: Date | string
+  endDate?: Date | string | null
+  current?: boolean
+  location?: string | null
+  published?: boolean
+  order?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  technologies?: Prisma.TechnologyCreateNestedManyWithoutExperiencesInput
+}
+
+export type ExperienceUncheckedCreateWithoutEmbeddingsInput = {
+  id?: string
+  company: string
+  position: string
+  slug: string
+  description?: string | null
+  content: string
+  startDate: Date | string
+  endDate?: Date | string | null
+  current?: boolean
+  location?: string | null
+  published?: boolean
+  order?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  technologies?: Prisma.TechnologyUncheckedCreateNestedManyWithoutExperiencesInput
+}
+
+export type ExperienceCreateOrConnectWithoutEmbeddingsInput = {
+  where: Prisma.ExperienceWhereUniqueInput
+  create: Prisma.XOR<Prisma.ExperienceCreateWithoutEmbeddingsInput, Prisma.ExperienceUncheckedCreateWithoutEmbeddingsInput>
+}
+
+export type ExperienceUpsertWithoutEmbeddingsInput = {
+  update: Prisma.XOR<Prisma.ExperienceUpdateWithoutEmbeddingsInput, Prisma.ExperienceUncheckedUpdateWithoutEmbeddingsInput>
+  create: Prisma.XOR<Prisma.ExperienceCreateWithoutEmbeddingsInput, Prisma.ExperienceUncheckedCreateWithoutEmbeddingsInput>
+  where?: Prisma.ExperienceWhereInput
+}
+
+export type ExperienceUpdateToOneWithWhereWithoutEmbeddingsInput = {
+  where?: Prisma.ExperienceWhereInput
+  data: Prisma.XOR<Prisma.ExperienceUpdateWithoutEmbeddingsInput, Prisma.ExperienceUncheckedUpdateWithoutEmbeddingsInput>
+}
+
+export type ExperienceUpdateWithoutEmbeddingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  company?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  current?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  published?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  technologies?: Prisma.TechnologyUpdateManyWithoutExperiencesNestedInput
+}
+
+export type ExperienceUncheckedUpdateWithoutEmbeddingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  company?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  current?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  published?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  technologies?: Prisma.TechnologyUncheckedUpdateManyWithoutExperiencesNestedInput
+}
+
 export type ExperienceUpdateWithoutTechnologiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   company?: Prisma.StringFieldUpdateOperationsInput | string
@@ -692,6 +804,7 @@ export type ExperienceUpdateWithoutTechnologiesInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  embeddings?: Prisma.EmbeddingUpdateManyWithoutExperienceNestedInput
 }
 
 export type ExperienceUncheckedUpdateWithoutTechnologiesInput = {
@@ -709,6 +822,7 @@ export type ExperienceUncheckedUpdateWithoutTechnologiesInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  embeddings?: Prisma.EmbeddingUncheckedUpdateManyWithoutExperienceNestedInput
 }
 
 export type ExperienceUncheckedUpdateManyWithoutTechnologiesInput = {
@@ -735,10 +849,12 @@ export type ExperienceUncheckedUpdateManyWithoutTechnologiesInput = {
 
 export type ExperienceCountOutputType = {
   technologies: number
+  embeddings: number
 }
 
 export type ExperienceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   technologies?: boolean | ExperienceCountOutputTypeCountTechnologiesArgs
+  embeddings?: boolean | ExperienceCountOutputTypeCountEmbeddingsArgs
 }
 
 /**
@@ -758,6 +874,13 @@ export type ExperienceCountOutputTypeCountTechnologiesArgs<ExtArgs extends runti
   where?: Prisma.TechnologyWhereInput
 }
 
+/**
+ * ExperienceCountOutputType without action
+ */
+export type ExperienceCountOutputTypeCountEmbeddingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmbeddingWhereInput
+}
+
 
 export type ExperienceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -775,6 +898,7 @@ export type ExperienceSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   createdAt?: boolean
   updatedAt?: boolean
   technologies?: boolean | Prisma.Experience$technologiesArgs<ExtArgs>
+  embeddings?: boolean | Prisma.Experience$embeddingsArgs<ExtArgs>
   _count?: boolean | Prisma.ExperienceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["experience"]>
 
@@ -832,6 +956,7 @@ export type ExperienceSelectScalar = {
 export type ExperienceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "company" | "position" | "slug" | "description" | "content" | "startDate" | "endDate" | "current" | "location" | "published" | "order" | "createdAt" | "updatedAt", ExtArgs["result"]["experience"]>
 export type ExperienceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   technologies?: boolean | Prisma.Experience$technologiesArgs<ExtArgs>
+  embeddings?: boolean | Prisma.Experience$embeddingsArgs<ExtArgs>
   _count?: boolean | Prisma.ExperienceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ExperienceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -841,6 +966,7 @@ export type $ExperiencePayload<ExtArgs extends runtime.Types.Extensions.Internal
   name: "Experience"
   objects: {
     technologies: Prisma.$TechnologyPayload<ExtArgs>[]
+    embeddings: Prisma.$EmbeddingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1252,6 +1378,7 @@ readonly fields: ExperienceFieldRefs;
 export interface Prisma__ExperienceClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   technologies<T extends Prisma.Experience$technologiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Experience$technologiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TechnologyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  embeddings<T extends Prisma.Experience$embeddingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Experience$embeddingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmbeddingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1704,6 +1831,30 @@ export type Experience$technologiesArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.TechnologyScalarFieldEnum | Prisma.TechnologyScalarFieldEnum[]
+}
+
+/**
+ * Experience.embeddings
+ */
+export type Experience$embeddingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Embedding
+   */
+  select?: Prisma.EmbeddingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Embedding
+   */
+  omit?: Prisma.EmbeddingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmbeddingInclude<ExtArgs> | null
+  where?: Prisma.EmbeddingWhereInput
+  orderBy?: Prisma.EmbeddingOrderByWithRelationInput | Prisma.EmbeddingOrderByWithRelationInput[]
+  cursor?: Prisma.EmbeddingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmbeddingScalarFieldEnum | Prisma.EmbeddingScalarFieldEnum[]
 }
 
 /**
