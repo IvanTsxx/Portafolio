@@ -172,7 +172,8 @@ export function ChatWidget() {
                 </Button>
               </form>
               <div className="mt-2 text-center text-[10px] text-muted-foreground/60">
-                La IA puede cometer errores. Verifica la información importante.
+                La IA puede cometer errores. Verifica la información importante
+                si es necesario.
               </div>
             </div>
           </motion.div>
