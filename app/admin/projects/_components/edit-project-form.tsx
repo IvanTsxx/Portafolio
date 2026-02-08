@@ -115,7 +115,7 @@ export function EditProjectForm({
         slug,
         description,
         content,
-        image,
+        coverImage: image,
         githubUrl: githubUrl || null,
         demoUrl: demoUrl || null,
         published,
