@@ -91,7 +91,9 @@ function ExperienceCard({
           {format(new Date(experience.startDate), "MMM yyyy", { locale: es })} —{" "}
           {experience.current
             ? "Presente"
-            : format(new Date(experience.endDate!), "MMM yyyy", { locale: es })}
+            : format(new Date(experience.endDate || new Date()), "MMM yyyy", {
+                locale: es,
+              })}
         </span>
       </div>
 
@@ -165,7 +167,9 @@ function DateBlock({
         {format(new Date(experience.startDate), "MMM", { locale: es })} —{" "}
         {experience.current
           ? "Presente"
-          : format(new Date(experience.endDate!), "MMM yyyy", { locale: es })}
+          : format(new Date(experience.endDate || new Date()), "MMM yyyy", {
+              locale: es,
+            })}
       </span>
     </div>
   );

@@ -32,6 +32,7 @@ export function OrbitingCircles({
             zIndex: 0,
           }}
         >
+          <title>Orbiting Circles</title>
           <circle
             className="stroke-1 stroke-black/5 dark:stroke-white/10"
             cx="50%"
@@ -52,7 +53,7 @@ export function OrbitingCircles({
         }
         className={cn(
           "absolute flex size-full transform-gpu animate-orbit items-center justify-center rounded-full border bg-black/5 [animation-delay:calc(var(--delay)*1000ms)] dark:bg-white/5",
-          { "[animation-direction:reverse]": reverse },
+          { "direction-[reverse]": reverse },
           className,
         )}
       >

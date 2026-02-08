@@ -1,84 +1,55 @@
+import { cache } from "react";
 import { env } from "@/env/server";
 
-const client_id = env.SPOTIFY_CLIENT_ID;
-const client_secret = env.SPOTIFY_CLIENT_SECRET;
-const refresh_token = env.SPOTIFY_REFRESH_TOKEN;
+const LASTFM_ENDPOINT = "https://ws.audioscrobbler.com/2.0/";
 
-const basic = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
-const NOW_PLAYING_ENDPOINT = `https://api.spotify.com/v1/me/player/currently-playing`;
-const TOKEN_ENDPOINT = `https://accounts.spotify.com/api/token`;
-
-const getAccessToken = async () => {
-  if (!refresh_token) return { access_token: "mock_token" }; // Mock mode support if envs missing
-
-  const response = await fetch(TOKEN_ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${basic}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token,
-    }),
-  });
-
-  return response.json();
+type LastFmResponse = {
+  recenttracks: {
+    track: Array<{
+      name: string;
+      artist: { "#text": string };
+      album: { "#text": string };
+      image: { "#text": string; size: string }[];
+      "@attr"?: { nowplaying: "true" };
+      url: string;
+    }>;
+  };
 };
 
-export const getNowPlaying = async () => {
-  /*  if (!client_id || !client_secret || !refresh_token) {
-    // Mock data if keys are missing
-    return {
-      isPlaying: true,
-      title: "Music for Programming",
-      artist: "Mock Spotify",
-      album: "Mock Album",
-      albumImageUrl:
-        "https://i.scdn.co/image/ab67616d0000b273b5247970ba7f09de814041e1",
-      songUrl: "https://spotify.com",
-    };
-  } */
-
+export const getNowPlaying = cache(async () => {
   try {
-    /*     const { access_token } = await getAccessToken();
-     */
-    const response = await fetch(NOW_PLAYING_ENDPOINT, {
-      headers: {
-        Authorization: `Bearer BQCAoiKG9SW3Kn8HrZskjVdtJwHqEuJbeeuBLWPA81`,
-      },
-      next: { revalidate: 30 }, // Cache for 30s
+    const url = new URL(LASTFM_ENDPOINT);
+    url.searchParams.set("method", "user.getrecenttracks");
+    url.searchParams.set("user", env.LASTFM_USERNAME);
+    url.searchParams.set("api_key", env.LASTFM_API_KEY);
+    url.searchParams.set("format", "json");
+    url.searchParams.set("limit", "1");
+
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 21600 },
     });
 
-    if (response.status === 204 || response.status > 400) {
-      return { isPlaying: false };
-    }
+    if (!res.ok) return { isPlaying: false };
 
-    const song = await response.json();
+    const data = (await res.json()) as LastFmResponse;
+    const track = data.recenttracks.track[0];
 
-    if (song.item === null) {
-      return { isPlaying: false };
-    }
+    if (!track) return { isPlaying: false };
 
-    const isPlaying = song.is_playing;
-    const title = song.item.name;
-    const artist = song.item.artists
-      .map((_artist: any) => _artist.name)
-      .join(", ");
-    const album = song.item.album.name;
-    const albumImageUrl = song.item.album.images[0].url;
-    const songUrl = song.item.external_urls.spotify;
-
+    const isPlaying = track["@attr"]?.nowplaying === "true";
+    console.log(track);
     return {
       isPlaying,
-      title,
-      artist,
-      album,
-      albumImageUrl,
-      songUrl,
+      title: track.name,
+      artist: track.artist["#text"],
+      album: track.album["#text"],
+      albumImageUrl:
+        track.image.find((img) => img.size === "extralarge")?.["#text"] ??
+        track.image.at(-1)?.["#text"],
+      songUrl: track.url,
     };
   } catch (error) {
-    console.error("Error fetching Spotify data", error);
+    console.error("Last.fm error", error);
     return { isPlaying: false };
   }
-};
+});

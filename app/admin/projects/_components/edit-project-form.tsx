@@ -38,7 +38,7 @@ interface Project {
   slug: string;
   description: string | null;
   content: string;
-  image: string | null;
+  coverImage: string | null;
   demoUrl: string | null;
   githubUrl: string | null;
   featured: boolean;

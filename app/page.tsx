@@ -25,9 +25,9 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section - Apple-inspired minimal */}
-      <section className="relative mx-auto max-w-5xl px-4 py-32 lg:px-8 lg:py-40">
+      <section className="relative mx-auto max-w-5xl px-4 py-8 lg:px-8 lg:py-40">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-1/4 right-0 h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+          <div className="absolute top-1/5 left-1/2 h-[200px] w-[200px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl md:top-1/4 md:right-0 md:h-[300px] md:w-[300px] md:-translate-y-1/2" />
         </div>
 
         <div className="relative z-10 space-y-10">
@@ -255,7 +255,7 @@ export default async function HomePage() {
       {/* Tech Stack - Orbit Style */}
       <section id="skills" className="relative overflow-hidden py-20 lg:py-28">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl md:h-[800px] md:w-[800px]" />
         </div>
 
         <div className="mx-auto max-w-5xl px-4 lg:px-8">

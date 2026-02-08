@@ -10,7 +10,7 @@ import {
   Music,
 } from "lucide-react";
 import Link from "next/link";
-import { NextjsIcon, ReactIcon } from "./icons";
+import { GitIcon, SpotifyIcon } from "./icons";
 
 interface AboutBentoGridProps {
   nowPlaying: {
@@ -37,7 +37,7 @@ export function AboutBentoGrid({
   return (
     <section id="about" className="relative overflow-hidden py-20 lg:py-32">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-2/3 right-[10%] h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl" />
+        <div className="absolute top-full right-0 h-[200px] w-[200px] -translate-y-1/2 rounded-full bg-linear-to-tr from-primary/60 via-primary/40 to-transparent blur-3xl md:top-2/3 md:right-[10%] md:h-[300px] md:w-[300px]" />
       </div>
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-12 text-center">
@@ -116,15 +116,15 @@ export function AboutBentoGrid({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="group relative flex items-center gap-4 overflow-hidden rounded-3xl border border-border/50 bg-card/50 p-6 transition-colors hover:border-primary/20"
+            className="group relative flex items-center gap-4 overflow-hidden rounded-3xl border border-border/50 bg-card/50 p-4 transition-colors hover:border-primary/20"
           >
-            <div className="rounded-full bg-green-500/10 p-3 text-green-600">
+            <div className="rounded-full bg-green-500/10 p-3 text-primary">
               <MapPin className="size-6" />
             </div>
             <div>
               <p className="text-muted-foreground text-sm">Ubicación</p>
               <p className="font-bold text-foreground text-lg">Argentina</p>
-              <p className="text-nowrap font-medium text-green-600/80 text-xs">
+              <p className="text-nowrap font-medium text-primary/80 text-xs">
                 Remoto Global
               </p>
             </div>
@@ -139,10 +139,10 @@ export function AboutBentoGrid({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="group relative flex flex-col justify-center overflow-hidden rounded-3xl border border-border/50 bg-card/50 p-6 transition-colors hover:border-primary/20"
+            className="group relative flex flex-col justify-center overflow-hidden rounded-3xl border border-border/50 bg-card/50 p-4 transition-colors hover:border-primary/20"
           >
             <div className="mb-2 flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
-              <Music className="size-3" />
+              <SpotifyIcon className="size-6" />
               {nowPlaying.isPlaying ? "Escuchando ahora" : "Última escuchada"}
             </div>
             {nowPlaying.isPlaying || nowPlaying.artist ? (
@@ -207,10 +207,10 @@ export function AboutBentoGrid({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/50 bg-card/50 p-6 transition-colors hover:border-primary/20 md:col-span-3 lg:col-span-1"
+            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/50 bg-card/50 p-4 transition-colors hover:border-primary/20 md:col-span-3 lg:col-span-1"
           >
             <div className="mb-2 flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
-              <GitCommit className="size-3" />
+              <GitIcon className="size-6" />
               Actividad Reciente
             </div>
 
@@ -240,6 +240,14 @@ export function AboutBentoGrid({
                 Sin actividad reciente pública.
               </p>
             )}
+            {/* pelotita redonda parpadeando verde a la derecha del todo */}
+            <div className="absolute top-5 right-4 -translate-y-1/2 opacity-20 transition-opacity group-hover:opacity-40">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ repeat: Infinity, duration: 1 }}
+                className="size-4 rounded-full bg-primary/80"
+              />
+            </div>
           </motion.div>
         </div>
       </div>
