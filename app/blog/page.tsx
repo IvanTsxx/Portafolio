@@ -29,7 +29,7 @@ interface BlogPageProps {
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const params = await searchParams;
   const [allPosts, categories] = await Promise.all([
-    getPosts(true),
+    getPosts({ limit: 100 }),
     getCategories(),
   ]);
 

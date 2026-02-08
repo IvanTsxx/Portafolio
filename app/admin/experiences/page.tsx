@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AdminExperiencesPage() {
-  const experiences = await getExperiences();
+  const experiences = await getExperiences({
+    limit: 100,
+  });
 
   return (
     <div className="space-y-8">

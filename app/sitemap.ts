@@ -3,7 +3,7 @@ import { getPosts } from "@/app/actions/posts";
 import { getProjects } from "@/app/actions/projects";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getPosts();
+  const posts = await getPosts({ limit: 100 });
   const projects = await getProjects({ limit: 100 });
 
   const postUrls = posts.map((post) => ({

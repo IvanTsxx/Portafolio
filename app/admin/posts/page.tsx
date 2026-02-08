@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AdminPostsPage() {
-  const posts = await getPosts(false);
+  const posts = await getPosts({
+    limit: 100,
+  });
 
   return (
     <div className="space-y-8">

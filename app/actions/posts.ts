@@ -103,9 +103,16 @@ export async function getPostById(
   return post;
 }
 
-export async function getPosts(published = true): Promise<PostWithRelations[]> {
+export async function getPosts({
+  limit = 10,
+}: {
+  limit?: number;
+}): Promise<PostWithRelations[]> {
   const posts = await prisma.post.findMany({
-    where: published ? { published: true } : undefined,
+    where: {
+      published: true,
+    },
+    take: limit,
     include: {
       tags: true,
       category: true,

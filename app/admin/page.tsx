@@ -8,9 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AdminDashboard() {
-  const posts = await getPosts(false);
-  const projects = await getProjects(false);
-  const experiences = await getExperiences();
+  const posts = await getPosts({
+    limit: 100,
+  });
+  const projects = await getProjects({
+    limit: 100,
+  });
+  const experiences = await getExperiences({ limit: 100 });
 
   const stats = [
     {

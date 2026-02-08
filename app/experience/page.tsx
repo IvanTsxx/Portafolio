@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const experiences = await getExperiences();
+  const experiences = await getExperiences({ limit: 100 });
   const technologies = Array.from(
     new Set(experiences.flatMap((exp) => exp.technologies.map((t) => t.name))),
   );
@@ -44,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ExperiencePage() {
-  const experiences = await getExperiences();
+  const experiences = await getExperiences({ limit: 100 });
 
   return (
     <main className="min-h-screen">
