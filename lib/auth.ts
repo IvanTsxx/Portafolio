@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { APIError, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { anonymous } from "better-auth/plugins";
@@ -20,17 +20,20 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: false,
   },
-  callbacks: {
-    async session({ session, user }: { session: Session; user: User }) {
-      // Only allow specific emails
-      if (!ALLOWED_EMAILS.includes(user.email)) {
-        throw new Error("Unauthorized");
-      }
-
-      return session;
+  plugins: [nextCookies(), anonymous()],
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          if (!ALLOWED_EMAILS.includes(user.email)) {
+            throw new APIError("BAD_REQUEST", {
+              message: "Email not allowed",
+            });
+          }
+        },
+      },
     },
   },
-  plugins: [nextCookies(), anonymous()],
 });
 
 export type Session = typeof auth.$Infer.Session.session;
