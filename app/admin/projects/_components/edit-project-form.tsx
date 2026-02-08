@@ -50,9 +50,9 @@ interface Project {
   id: string;
   title: string;
   slug: string;
-  description: string;
+  description: string | null;
   content: string;
-  image: string;
+  coverImage: string | null;
   githubUrl: string | null;
   demoUrl: string | null;
   published: boolean;
@@ -76,7 +76,7 @@ export function EditProjectForm({
   const [slug, setSlug] = useState(project.slug);
   const [description, setDescription] = useState(project.description);
   const [content, setContent] = useState(project.content);
-  const [image, setImage] = useState(project.image);
+  const [image, setImage] = useState(project.coverImage);
   const [githubUrl, setGithubUrl] = useState(project.githubUrl || "");
   const [demoUrl, setDemoUrl] = useState(project.demoUrl || "");
   const [published, setPublished] = useState(project.published);
@@ -242,7 +242,7 @@ export function EditProjectForm({
             className="h-auto border-none bg-transparent px-0 py-2 font-bold text-4xl tracking-tight shadow-none placeholder:text-muted-foreground/40 focus-visible:ring-0 md:text-5xl"
           />
           <Textarea
-            value={description}
+            value={description || ""}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Descripción corta del proyecto..."
             className="min-h-[60px] resize-none border-none bg-transparent px-0 text-muted-foreground text-xl shadow-none placeholder:text-muted-foreground/30 focus-visible:ring-0"
@@ -342,7 +342,7 @@ export function EditProjectForm({
               </div>
               <div className="min-w-0 space-y-3">
                 <Input
-                  value={image}
+                  value={image || ""}
                   onChange={(e) => setImage(e.target.value)}
                   className="h-8 border-none bg-transparent px-2 text-muted-foreground text-sm hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-0"
                   placeholder="https://..."

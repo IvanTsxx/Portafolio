@@ -29,6 +29,7 @@ export type PostMinAggregateOutputType = {
   title: string | null
   slug: string | null
   description: string | null
+  coverImage: string | null
   content: string | null
   published: boolean | null
   createdAt: Date | null
@@ -41,6 +42,7 @@ export type PostMaxAggregateOutputType = {
   title: string | null
   slug: string | null
   description: string | null
+  coverImage: string | null
   content: string | null
   published: boolean | null
   createdAt: Date | null
@@ -53,6 +55,7 @@ export type PostCountAggregateOutputType = {
   title: number
   slug: number
   description: number
+  coverImage: number
   content: number
   published: number
   createdAt: number
@@ -67,6 +70,7 @@ export type PostMinAggregateInputType = {
   title?: true
   slug?: true
   description?: true
+  coverImage?: true
   content?: true
   published?: true
   createdAt?: true
@@ -79,6 +83,7 @@ export type PostMaxAggregateInputType = {
   title?: true
   slug?: true
   description?: true
+  coverImage?: true
   content?: true
   published?: true
   createdAt?: true
@@ -91,6 +96,7 @@ export type PostCountAggregateInputType = {
   title?: true
   slug?: true
   description?: true
+  coverImage?: true
   content?: true
   published?: true
   createdAt?: true
@@ -176,6 +182,7 @@ export type PostGroupByOutputType = {
   title: string
   slug: string
   description: string | null
+  coverImage: string | null
   content: string
   published: boolean
   createdAt: Date
@@ -209,6 +216,7 @@ export type PostWhereInput = {
   title?: Prisma.StringFilter<"Post"> | string
   slug?: Prisma.StringFilter<"Post"> | string
   description?: Prisma.StringNullableFilter<"Post"> | string | null
+  coverImage?: Prisma.StringNullableFilter<"Post"> | string | null
   content?: Prisma.StringFilter<"Post"> | string
   published?: Prisma.BoolFilter<"Post"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -224,6 +232,7 @@ export type PostOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  coverImage?: Prisma.SortOrderInput | Prisma.SortOrder
   content?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -242,6 +251,7 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PostWhereInput | Prisma.PostWhereInput[]
   title?: Prisma.StringFilter<"Post"> | string
   description?: Prisma.StringNullableFilter<"Post"> | string | null
+  coverImage?: Prisma.StringNullableFilter<"Post"> | string | null
   content?: Prisma.StringFilter<"Post"> | string
   published?: Prisma.BoolFilter<"Post"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -257,6 +267,7 @@ export type PostOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  coverImage?: Prisma.SortOrderInput | Prisma.SortOrder
   content?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -275,6 +286,7 @@ export type PostScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Post"> | string
   slug?: Prisma.StringWithAggregatesFilter<"Post"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
+  coverImage?: Prisma.StringNullableWithAggregatesFilter<"Post"> | string | null
   content?: Prisma.StringWithAggregatesFilter<"Post"> | string
   published?: Prisma.BoolWithAggregatesFilter<"Post"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Post"> | Date | string
@@ -287,6 +299,7 @@ export type PostCreateInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -301,6 +314,7 @@ export type PostUncheckedCreateInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -315,6 +329,7 @@ export type PostUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -329,6 +344,7 @@ export type PostUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -343,6 +359,7 @@ export type PostCreateManyInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -355,6 +372,7 @@ export type PostUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -366,6 +384,7 @@ export type PostUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -378,6 +397,7 @@ export type PostCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  coverImage?: Prisma.SortOrder
   content?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -390,6 +410,7 @@ export type PostMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  coverImage?: Prisma.SortOrder
   content?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -402,6 +423,7 @@ export type PostMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  coverImage?: Prisma.SortOrder
   content?: Prisma.SortOrder
   published?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -519,6 +541,7 @@ export type PostCreateWithoutTagsInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -532,6 +555,7 @@ export type PostUncheckedCreateWithoutTagsInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -569,6 +593,7 @@ export type PostScalarWhereInput = {
   title?: Prisma.StringFilter<"Post"> | string
   slug?: Prisma.StringFilter<"Post"> | string
   description?: Prisma.StringNullableFilter<"Post"> | string | null
+  coverImage?: Prisma.StringNullableFilter<"Post"> | string | null
   content?: Prisma.StringFilter<"Post"> | string
   published?: Prisma.BoolFilter<"Post"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Post"> | Date | string
@@ -581,6 +606,7 @@ export type PostCreateWithoutCategoryInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -594,6 +620,7 @@ export type PostUncheckedCreateWithoutCategoryInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -633,6 +660,7 @@ export type PostCreateWithoutEmbeddingsInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -646,6 +674,7 @@ export type PostUncheckedCreateWithoutEmbeddingsInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -675,6 +704,7 @@ export type PostUpdateWithoutEmbeddingsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -688,6 +718,7 @@ export type PostUncheckedUpdateWithoutEmbeddingsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -701,6 +732,7 @@ export type PostUpdateWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -714,6 +746,7 @@ export type PostUncheckedUpdateWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -727,6 +760,7 @@ export type PostUncheckedUpdateManyWithoutTagsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -739,6 +773,7 @@ export type PostCreateManyCategoryInput = {
   title: string
   slug: string
   description?: string | null
+  coverImage?: string | null
   content: string
   published?: boolean
   createdAt?: Date | string
@@ -750,6 +785,7 @@ export type PostUpdateWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -763,6 +799,7 @@ export type PostUncheckedUpdateWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -776,6 +813,7 @@ export type PostUncheckedUpdateManyWithoutCategoryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   content?: Prisma.StringFieldUpdateOperationsInput | string
   published?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -827,6 +865,7 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   title?: boolean
   slug?: boolean
   description?: boolean
+  coverImage?: boolean
   content?: boolean
   published?: boolean
   createdAt?: boolean
@@ -843,6 +882,7 @@ export type PostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   title?: boolean
   slug?: boolean
   description?: boolean
+  coverImage?: boolean
   content?: boolean
   published?: boolean
   createdAt?: boolean
@@ -856,6 +896,7 @@ export type PostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   title?: boolean
   slug?: boolean
   description?: boolean
+  coverImage?: boolean
   content?: boolean
   published?: boolean
   createdAt?: boolean
@@ -869,6 +910,7 @@ export type PostSelectScalar = {
   title?: boolean
   slug?: boolean
   description?: boolean
+  coverImage?: boolean
   content?: boolean
   published?: boolean
   createdAt?: boolean
@@ -876,7 +918,7 @@ export type PostSelectScalar = {
   categoryId?: boolean
 }
 
-export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "description" | "content" | "published" | "createdAt" | "updatedAt" | "categoryId", ExtArgs["result"]["post"]>
+export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "description" | "coverImage" | "content" | "published" | "createdAt" | "updatedAt" | "categoryId", ExtArgs["result"]["post"]>
 export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tags?: boolean | Prisma.Post$tagsArgs<ExtArgs>
   category?: boolean | Prisma.Post$categoryArgs<ExtArgs>
@@ -902,6 +944,7 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     title: string
     slug: string
     description: string | null
+    coverImage: string | null
     content: string
     published: boolean
     createdAt: Date
@@ -1337,6 +1380,7 @@ export interface PostFieldRefs {
   readonly title: Prisma.FieldRef<"Post", 'String'>
   readonly slug: Prisma.FieldRef<"Post", 'String'>
   readonly description: Prisma.FieldRef<"Post", 'String'>
+  readonly coverImage: Prisma.FieldRef<"Post", 'String'>
   readonly content: Prisma.FieldRef<"Post", 'String'>
   readonly published: Prisma.FieldRef<"Post", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Post", 'DateTime'>

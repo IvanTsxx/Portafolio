@@ -85,6 +85,7 @@ model Post {
   title       String
   slug        String      @unique
   description String?
+  coverImage  String?
   content     String      @db.Text
   published   Boolean     @default(false)
   createdAt   DateTime    @default(now())
