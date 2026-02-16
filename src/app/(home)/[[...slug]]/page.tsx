@@ -2,7 +2,12 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LLMCopyButton, ViewOptions } from "@/components/ai/page-actions";
-import { DocsBody, DocsPage } from "@/components/layout/notebook/page";
+import {
+  DocsBody,
+  DocsDescription,
+  DocsPage,
+  DocsTitle,
+} from "@/components/layout/notebook/page";
 import { PageLastUpdate } from "@/components/layout/notebook/page/client";
 import { getPageImage, source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
@@ -19,11 +24,19 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
 
   return (
     <DocsPage full={page.data.full} toc={page.data.toc}>
-      <div className="flex flex-row items-center gap-2 border-b pb-6">
-        {lastModified && <PageLastUpdate date={lastModified} />}
+      {lastModified && <PageLastUpdate date={lastModified} />}
+      <div className="flex flex-row items-center justify-end gap-2">
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
         <ViewOptions markdownUrl={`${page.url}.mdx`} />
       </div>
+
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-y-2">
+          <DocsTitle>{page.data.title}</DocsTitle>
+          <DocsDescription>{page.data.description}</DocsDescription>
+        </div>
+      </div>
+
       <DocsBody>
         <MDX
           components={getMDXComponents({
