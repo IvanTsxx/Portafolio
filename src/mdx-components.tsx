@@ -1,9 +1,51 @@
-import defaultMdxComponents from 'fumadocs-ui/mdx';
-import type { MDXComponents } from 'mdx/types';
+import defaultMdxComponents from "fumadocs-ui/mdx";
+import type { MDXComponents } from "mdx/types";
+import {
+  ContactSection,
+  CVSection,
+  DetailHeader,
+  DownloadCVButton,
+  ExperienceCard,
+  ExperienceGrid,
+  GithubWidget,
+  Hero,
+  PitchCard,
+  PitchGrid,
+  ProjectCard,
+  ProjectGrid,
+  SpotifyWidget,
+  StatsCard,
+  StatsGrid,
+  TechBadge,
+  TechOrbit,
+  TechStack,
+  Timeline,
+  TimelineItem,
+} from "@/mdx";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
     ...components,
+    Hero,
+    TechBadge,
+    TechStack,
+    TechOrbit,
+    ExperienceCard,
+    ExperienceGrid,
+    ProjectCard,
+    ProjectGrid,
+    ContactSection,
+    DownloadCVButton,
+    CVSection,
+    DetailHeader,
+    PitchCard,
+    PitchGrid,
+    StatsCard,
+    StatsGrid,
+    SpotifyWidget,
+    GithubWidget,
+    Timeline,
+    TimelineItem,
   };
 }

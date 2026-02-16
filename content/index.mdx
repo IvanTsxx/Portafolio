@@ -1,13 +1,142 @@
 ---
-title: Hello World
-description: Your first document
+title: Ivan Bongiovanni
+description: Desarrollador full-stack con experiencia en Next.js y React
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+<Hero
+  name="Ivan Bongiovanni"
+  role="Full Stack Developer · Argentina 🇦🇷"
+  location="Argentina"
+  description="Diseño y desarrollo experiencias digitales modernas con un enfoque obsesivo en el rendimiento y la calidad visual. Especializado en el ecosistema Next.js y React, construyo aplicaciones escalables que priorizan la experiencia de usuario."
+  available={true}
+/>
 
-## What is Next?
+{/* Live Activity Widgets */}
+<div className="not-prose grid gap-3 sm:grid-cols-2 mb-10">
+  <SpotifyWidget />
+  <GithubWidget />
+</div>
 
-<Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.dev" />
-</Cards>
+## Qué aporto
+
+<PitchGrid>
+  <PitchCard 
+    title="Performance & SEO" 
+    description="Aplicaciones web modernas con renderizado estratégico (SSR, SSG, ISR, PPR) para máxima velocidad."
+    iconName="rocket"
+    href="/projects"
+    cta="Ver proyectos"
+  />
+  <PitchCard 
+    title="Arquitectura" 
+    description="Diseño escalable con Screaming Architecture, BFF y DAL. Código limpio y mantenible."
+    iconName="layout"
+    href="/projects"
+    cta="Ver proyectos"
+  />
+  <PitchCard 
+    title="Auth & Seguridad" 
+    description="Flujos completos de autenticación y autorización robusta. Protección de datos sensible."
+    iconName="lock"
+    href="/projects"
+    cta="Ver proyectos"
+  />
+  <PitchCard 
+    title="IA Generativa" 
+    description="Integración de IA aplicada al producto para features inteligentes y automatización."
+    iconName="sparkles"
+    href="/projects"
+    cta="Ver proyectos"
+  />
+  <PitchCard 
+    title="Integraciones" 
+    description="Pagos con MercadoPago/Stripe, emails transaccionales y storage escalable en la nube."
+    iconName="zap"
+    href="/projects"
+    cta="Ver proyectos"
+  />
+  <PitchCard 
+    title="Calidad de Código" 
+    description="Tipado estricto con TS, validación Zod, y testing e2e con Playwright."
+    iconName="shield"
+    href="/projects"
+    cta="Ver proyectos"
+  />
+</PitchGrid>
+
+## Stack
+
+<TechOrbit technologies={[
+  "Next.js",
+  "React",
+  "TypeScript",
+  "Node.js",
+  "NestJS",
+  "ElysiaJS",
+  "PostgreSQL",
+  "Redis",
+  "Prisma",
+  "Drizzle ORM",
+  "Tailwind CSS",
+  "shadcn/ui"
+]} />
+
+## Experiencia
+
+<Timeline>
+  <TimelineItem
+    title="Frontend Developer"
+    company="Aliva Shop"
+    period="Junio 2025 — Actualidad"
+    description="Desarrollo frontend en entorno remoto, liderando la migración tecnológica de Angular e Ionic."
+    technologies={["Angular", "Ionic", "TypeScript", "RxJS", "Capacitor", "BiomeJS"]}
+    current={true}
+    href="/experience/aliva-shop"
+  />
+  <TimelineItem
+    title="Full-Stack Developer"
+    company="Tensolite"
+    period="Julio 2023 — Noviembre 2023"
+    description="Desarrollo full-stack participando en productos internos y soluciones para clientes."
+    technologies={["React", "TypeScript", "Node.js", "Redux", "Zustand"]}
+    href="/experience/tensolite"
+  />
+  <TimelineItem
+    title="Frontend Developer"
+    company="Doctor Qali"
+    period="Enero 2023 — Junio 2023"
+    description="Desarrollo y refactor de interfaces en React, mejorando performance y experiencia de usuario."
+    technologies={["React", "TypeScript", "PrimeReact"]}
+    href="/experience/doctor-qali"
+  />
+</Timeline>
+
+## Sobre mí
+
+Soy **Ivan Bongiovanni**, Full-stack Developer con foco en **Next.js (App Router)** y **React**, especializado en construir aplicaciones web **rápidas, escalables y orientadas al negocio**.
+
+Trabajo con **SSR, SSG, ISR y PPR**, eligiendo estratégicamente el tipo de renderizado según el contenido para **maximizar performance, SEO y experiencia de usuario**.
+
+Diseño **arquitecturas limpias y mantenibles**, aplicando patrones como **Screaming Architecture, BFF y DAL**. Desarrollo flujos completos de **autenticación y autorización**, integro **IA generativa**, **pagos**, **emails transaccionales** y **storage escalable**, siempre con un enfoque claro: entregar productos sólidos, mantenibles y listos para crecer.
+
+## En resumen
+
+<StatsGrid>
+  <StatsCard label="Experiencia" value="3+ años" />
+  <StatsCard label="Proyectos" value="15+" />
+  <StatsCard label="Stack" value="Moderno" />
+  <StatsCard label="Ubicación" value="Argentina" />
+</StatsGrid>
+
+<CVSection
+  title="¿Querés mi CV?"
+  description="Descargá mi curriculum completo en PDF con toda mi experiencia, proyectos y stack tecnológico detallado."
+  cvUrl="/cv-ivan-bongiovanni.pdf"
+/>
+
+<ContactSection
+  title="¿Trabajamos juntos?"
+  subtitle="Estoy disponible para proyectos freelance y oportunidades full-time. Si buscás un developer que entregue valor desde el día uno, hablemos."
+  email="contacto@ivanbongiovanni.com"
+  github="https://github.com/IvanTsxx"
+/>

@@ -1,0 +1,6 @@
+{
+  "title": "Ivan Bongiovanni",
+  "description": "Full Stack Developer · Argentina 🇦🇷 👩🏻‍💻 Next.js · Vercel ▲ ❤️",
+  "root": true,
+  "pages": ["index", "experience", "projects", "blog"]
+}
