@@ -1,0 +1,52 @@
+---
+title: Lules Market
+description: Plataforma web para comercios locales con gestión de productos, suscripciones y pagos integrados.
+---
+
+<DetailHeader
+  title="Lules Market"
+  subtitle="Plataforma web para comercios locales que permite gestionar productos, suscripciones y pagos mediante MercadoPago, con una arquitectura simple, escalable y orientada a crecimiento."
+  backHref="/projects"
+  backLabel="Proyectos"
+  technologies={["Next.js", "TypeScript", "Zod", "shadcn/ui", "TanStack Form", "BiomeJS", "Drizzle ORM", "PostgreSQL", "MercadoPago", "ElysiaJS", "Vercel"]}
+  links={[
+    { label: "Demo", url: "https://lulesmarket.vercel.app" },
+    { label: "Código", url: "https://github.com/IvanTsxx/lules-market" }
+  ]}
+/>
+
+## Visión del producto
+
+Lules Market es una plataforma web pensada para **comercios locales** que necesitan presencia digital sin intermediarios complejos ni costos innecesarios.
+
+El objetivo fue construir un sistema **simple para el usuario final**, pero sólido a nivel técnico, permitiendo evolucionar el producto sin deuda técnica temprana.
+
+## Funcionalidad principal
+
+- Publicación de **productos y servicios**
+- Sistema de **suscripciones** para comercios
+- Contacto directo entre **cliente y negocio**
+- Gestión de archivos y **recursos multimedia**
+- Pagos integrados con **MercadoPago**
+
+## Decisiones técnicas clave
+
+El proyecto prioriza claridad arquitectónica y control sobre la infraestructura:
+
+- Backend liviano con **ElysiaJS**
+- **PostgreSQL** como base de datos principal
+- **Drizzle ORM** con enfoque SQL-first
+- Validación estricta con **Zod**
+- Infraestructura serverless desplegada en **Vercel**
+
+## Pagos y suscripciones
+
+La integración con **MercadoPago** fue diseñada para:
+
+- Manejar **webhooks de forma segura**
+- Desacoplar la lógica de pagos del resto del sistema
+- Permitir escalar el modelo de suscripción **sin reescribir el core**
+
+## Resultado
+
+Una plataforma lista para crecer, con arquitectura clara, mantenible y preparada para evolucionar sin fricción técnica.

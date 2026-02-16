@@ -1,0 +1,45 @@
+---
+title: Integración Better Auth + MercadoPago
+description: Plugin type-safe para pagos, suscripciones y webhooks de MercadoPago dentro del ecosistema Better Auth.
+---
+
+<DetailHeader
+  title="Better Auth + MercadoPago"
+  subtitle="Plugin que integra pagos, suscripciones y webhooks de MercadoPago dentro del ecosistema Better Auth, manteniendo una arquitectura desacoplada y completamente type-safe."
+  backHref="/projects"
+  backLabel="Proyectos"
+  technologies={["TypeScript", "Zod", "BiomeJS", "Better Auth", "MercadoPago", "Tsup"]}
+  links={[
+    { label: "NPM", url: "https://www.npmjs.com/package/better-auth-mercadopago" },
+    { label: "Código", url: "https://github.com/IvanTsxx/better-auth-mercadopago" }
+  ]}
+/>
+
+## Problema
+
+Integrar pagos en aplicaciones modernas suele **degradar arquitecturas bien diseñadas**:
+
+- Lógica duplicada
+- Webhooks acoplados a la aplicación
+- Pérdida de tipado end-to-end
+- Sistema de autenticación fragmentado
+
+## Solución
+
+Este plugin integra pagos, suscripciones y webhooks de **MercadoPago** directamente dentro del ecosistema Better Auth, permitiendo mantener **coherencia arquitectónica** sin sacrificar tipado ni mantenibilidad.
+
+El objetivo es que billing y autenticación convivan de forma **predecible, extensible** y fácil de integrar.
+
+## Principios de diseño
+
+- API completamente **type-safe**
+- Separación clara entre **auth y billing**
+- Integración simple en **proyectos existentes**
+- Arquitectura preparada para **escalar sin fricción**
+- Webhooks **desacoplados y tipados**
+
+## Resultado
+
+Menos complejidad operativa, reducción de bugs relacionados con pagos y una integración consistente dentro del flujo de autenticación.
+
+El plugin funciona tanto como **solución productiva** como referencia técnica para integrar sistemas de billing en aplicaciones modernas.
