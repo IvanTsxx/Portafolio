@@ -17,7 +17,7 @@ export default function ErrorPage({
   }, [error]);
 
   return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center px-6 py-20">
+    <div className="flex flex-col gap-4 px-4 py-6 [grid-area:main] *:max-w-[900px] md:px-6 md:pt-8 xl:px-8 xl:pt-14">
       <div className="max-w-lg text-center">
         {/* Error Icon */}
         <div className="mb-8">
