@@ -4,9 +4,8 @@ import { notFound } from "next/navigation";
 import { LLMCopyButton, ViewOptions } from "@/components/ai/page-actions";
 import {
   DocsBody,
-  DocsDescription,
   DocsPage,
-  DocsTitle,
+  PageLastUpdate,
 } from "@/components/layout/notebook/page";
 import { gitConfig } from "@/lib/layout.shared";
 import { getPageImage, source } from "@/lib/source";
@@ -16,16 +15,14 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
+  const { lastModified } = await page.data;
 
   const MDX = page.data.body;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
-      <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription className="mb-0">
-        {page.data.description}
-      </DocsDescription>
       <div className="flex flex-row gap-2 items-center border-b pb-6">
+        {lastModified && <PageLastUpdate date={lastModified} />}
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
         <ViewOptions
           markdownUrl={`${page.url}.mdx`}
