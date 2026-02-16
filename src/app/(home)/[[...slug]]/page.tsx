@@ -78,7 +78,7 @@ export async function generateMetadata(
     keywords: page.data.keywords,
     authors: [{ name: "Ivan Bongiovanni" }],
     creator: "Ivan Bongiovanni",
-    metadataBase: new URL("https://ivantsx.dev"),
+    metadataBase: new URL("https://ivantsx.vercel.app"),
 
     twitter: {
       card: "summary_large_image",

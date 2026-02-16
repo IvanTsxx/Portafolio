@@ -25,12 +25,12 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Ivan Bongiovanni" }],
   creator: "Ivan Bongiovanni",
-  metadataBase: new URL("https://ivantsx.dev"),
+  metadataBase: new URL("https://ivantsx.vercel.app"),
   openGraph: {
     title: "Ivan Bongiovanni | Full-Stack Developer",
     description:
       "Full-Stack Developer especializado en Next.js y React. Construyo aplicaciones web rápidas, escalables y orientadas al negocio.",
-    url: "https://ivantsx.dev",
+    url: "https://ivantsx.vercel.app",
     siteName: "Ivan Bongiovanni",
     locale: "es_AR",
     type: "website",

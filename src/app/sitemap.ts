@@ -4,7 +4,7 @@ import { source } from "@/lib/source";
 export const revalidate = false;
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const url = "https://ivantsx.dev";
+  const url = "https://ivantsx.vercel.app";
 
   return [
     {
