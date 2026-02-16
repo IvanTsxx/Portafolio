@@ -1,10 +1,5 @@
 import NextImage from "next/image";
-import {
-  GithubIcon,
-  GmailIcon,
-  LinkedinIcon,
-  XTwitterIcon,
-} from "@/components/icons";
+import { GithubIcon, LinkedInIcon, MailIcon, XIcon } from "@/components/icons";
 
 interface HeroProps {
   name?: string;
@@ -63,7 +58,7 @@ export function Hero({
             className="inline-flex items-center gap-1.5 underline-offset-4 transition-colors hover:text-brand hover:underline"
             href="mailto:contacto@ivanbongiovanni.com"
           >
-            <GmailIcon className="h-4 w-4" />
+            <MailIcon className="h-4 w-4" />
             Contactar
           </a>
           <a
@@ -81,7 +76,7 @@ export function Hero({
             rel="noopener noreferrer"
             target="_blank"
           >
-            <LinkedinIcon className="h-4 w-4" />
+            <LinkedInIcon className="h-4 w-4" />
             LinkedIn
           </a>
           <a
@@ -90,7 +85,7 @@ export function Hero({
             rel="noopener noreferrer"
             target="_blank"
           >
-            <XTwitterIcon className="h-4 w-4" />
+            <XIcon className="h-4 w-4" />
             Twitter
           </a>
         </div>

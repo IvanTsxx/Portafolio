@@ -21,7 +21,7 @@ import {
   TechStack,
   Timeline,
   TimelineItem,
-} from "@/mdx";
+} from "@/components/mdx";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {

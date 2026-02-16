@@ -1,5 +1,5 @@
 import { Mail } from "lucide-react";
-import { GithubIcon, LinkedinIcon, XTwitterIcon } from "@/components/icons";
+import { GithubIcon, LinkedInIcon, XIcon } from "@/components/icons";
 
 interface ContactSectionProps {
   title?: string;
@@ -46,7 +46,7 @@ export function ContactSection({
             rel="noopener noreferrer"
             target="_blank"
           >
-            <LinkedinIcon className="h-3.5 w-3.5" />
+            <LinkedInIcon className="h-3.5 w-3.5" />
             LinkedIn
           </a>
         )}
@@ -58,7 +58,7 @@ export function ContactSection({
             rel="noopener noreferrer"
             target="_blank"
           >
-            <XTwitterIcon className="h-3.5 w-3.5" />X
+            <XIcon className="h-3.5 w-3.5" />X
           </a>
         )}
       </div>
