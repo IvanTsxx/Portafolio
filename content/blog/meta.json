@@ -1,0 +1,5 @@
+{
+  "title": "Blog",
+  "description": "Artículos sobre desarrollo y mejores prácticas",
+  "pages": ["index", "nextjs-renders"]
+}

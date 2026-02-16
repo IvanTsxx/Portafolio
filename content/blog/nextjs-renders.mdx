@@ -1,0 +1,99 @@
+---
+title: SSR, SSG, ISR y PPR en Next.js - cuándo usar cada uno
+description: Guía para entender los distintos tipos de renderizado en Next.js y elegir el correcto según performance, SEO y necesidades del producto.
+---
+
+Elegir mal el tipo de renderizado impacta directamente en **performance**, **SEO** y **costos de infraestructura**. Esta guía resume cuándo conviene usar cada estrategia.
+
+---
+
+## SSR (Server-Side Rendering)
+
+El HTML se genera en cada request en el servidor.
+
+**Cuándo usarlo:**
+
+* Contenido dependiente del usuario (dashboards, cuentas, permisos)
+* Datos altamente dinámicos
+* Necesidad de SEO con información siempre fresca
+
+**Trade-offs:**
+
+* Mayor latencia que contenido estático
+* Mayor costo de servidor
+
+---
+
+## SSG (Static Site Generation)
+
+El HTML se genera en build time y se sirve desde CDN.
+
+**Cuándo usarlo:**
+
+* Landing pages
+* Blogs
+* Documentación
+* Marketing
+
+**Ventajas:**
+
+* Máxima performance
+* Costos mínimos
+* Excelente SEO
+
+---
+
+## ISR (Incremental Static Regeneration)
+
+Permite contenido estático con revalidación periódica sin rebuild completo.
+
+**Cuándo usarlo:**
+
+* E-commerce
+* Catálogos
+* Contenido que cambia cada cierto tiempo
+* SEO importante con datos relativamente frescos
+
+**Ventaja principal:** equilibrio entre performance y frescura.
+
+---
+
+## PPR (Partial Prerendering)
+
+Combina partes estáticas con partes dinámicas usando streaming y Suspense.
+
+**Cuándo usarlo:**
+
+* Interfaces complejas
+* Páginas con zonas críticas que deben cargar rápido
+* Mezcla de contenido público + personalizado
+
+**Beneficio:** prioriza el Time to First Byte y el Time to Interactive en secciones clave.
+
+---
+
+## Comparación rápida
+
+| Estrategia | Performance | SEO  | Dinamismo | Costos |
+| ---------- | ----------- | ---- | --------- | ------ |
+| SSG        | ⭐⭐⭐⭐        | ⭐⭐⭐⭐ | ⭐         | ⭐      |
+| ISR        | ⭐⭐⭐⭐        | ⭐⭐⭐⭐ | ⭐⭐⭐       | ⭐⭐     |
+| SSR        | ⭐⭐          | ⭐⭐⭐⭐ | ⭐⭐⭐⭐      | ⭐⭐⭐    |
+| PPR        | ⭐⭐⭐⭐        | ⭐⭐⭐⭐ | ⭐⭐⭐⭐      | ⭐⭐     |
+
+---
+
+## Regla práctica
+
+No existe un default correcto.
+
+Existe **el renderizado correcto para cada tipo de contenido**.
+
+La decisión debe basarse en:
+
+* Frecuencia de cambio de datos
+* Necesidad de SEO
+* Personalización por usuario
+* Presupuesto de infraestructura
+
+Si eliges bien el renderizado, optimizas producto, costos y experiencia de usuario al mismo tiempo.
