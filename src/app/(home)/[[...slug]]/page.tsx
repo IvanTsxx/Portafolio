@@ -7,7 +7,7 @@ import {
   DocsPage,
   PageLastUpdate,
 } from "@/components/layout/notebook/page";
-import { gitConfig } from "@/lib/layout.shared";
+
 import { getPageImage, source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 
@@ -24,10 +24,7 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
       <div className="flex flex-row gap-2 items-center border-b pb-6">
         {lastModified && <PageLastUpdate date={lastModified} />}
         <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-        <ViewOptions
-          markdownUrl={`${page.url}.mdx`}
-          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
-        />
+        <ViewOptions markdownUrl={`${page.url}.mdx`} />
       </div>
       <DocsBody>
         <MDX
@@ -57,6 +54,28 @@ export async function generateMetadata(
     description: page.data.description,
     openGraph: {
       images: getPageImage(page).url,
+      title: page.data.title,
+      description: page.data.description,
+      url: page.url,
+      siteName: "Ivan Bongiovanni",
+      locale: "es_AR",
+      type: "website",
+      countryName: "Argentina",
+    },
+    keywords: page.data.keywords,
+    authors: [{ name: "Ivan Bongiovanni" }],
+    creator: "Ivan Bongiovanni",
+    metadataBase: new URL("https://ivantsx.dev"),
+
+    twitter: {
+      card: "summary_large_image",
+      title: page.data.title,
+      description: page.data.description,
+      creator: "@IvanTsxx",
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }

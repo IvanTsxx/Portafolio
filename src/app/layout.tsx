@@ -1,10 +1,50 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import "@/styles/global.css";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 const inter = Inter({
   subsets: ["latin"],
 });
+
+export const metadata: Metadata = {
+  title: {
+    default: "Ivan Bongiovanni | Full-Stack Developer",
+    template: "%s | Ivan Bongiovanni",
+  },
+  description:
+    "Full-Stack Developer especializado en Next.js y React. Construyo aplicaciones web rápidas, escalables y orientadas al negocio.",
+  keywords: [
+    "Full-Stack Developer",
+    "Next.js",
+    "React",
+    "TypeScript",
+    "Node.js",
+    "Argentina",
+  ],
+  authors: [{ name: "Ivan Bongiovanni" }],
+  creator: "Ivan Bongiovanni",
+  metadataBase: new URL("https://ivantsx.dev"),
+  openGraph: {
+    title: "Ivan Bongiovanni | Full-Stack Developer",
+    description:
+      "Full-Stack Developer especializado en Next.js y React. Construyo aplicaciones web rápidas, escalables y orientadas al negocio.",
+    url: "https://ivantsx.dev",
+    siteName: "Ivan Bongiovanni",
+    locale: "es_AR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ivan Bongiovanni | Full-Stack Developer",
+    description: "Full-Stack Developer especializado en Next.js y React.",
+    creator: "@IvanTsxx",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 export default function Layout({ children }: LayoutProps<"/">) {
   return (
