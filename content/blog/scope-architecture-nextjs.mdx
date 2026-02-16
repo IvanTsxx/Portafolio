@@ -1,0 +1,95 @@
+---
+title: Dominando la Arquitectura en Next.js 15 - La Regla del Scope
+description: Aprende a estructurar tus proyectos Next.js 15+ para escalar sin caos usando la Regla del Scope y Server Components.
+keywords: ["Next.js", "Arquitectura", "React", "Clean Code", "Scope Rule"]
+---
+
+¿Alguna vez te has sentido perdido navegando en un proyecto de Next.js donde todo está mezclado en carpetas genéricas como `components`, `hooks` y `utils`?
+
+Es un problema común. A medida que la aplicación crece, encontrar *dónde* vive cada pieza de código se vuelve una pesadilla.
+
+La solución no es más carpetas genéricas. La solución es **La Regla del Scope**.
+
+## ¿Qué es la Regla del Scope?
+
+Es un principio arquitectónico simple pero poderoso:
+
+> **"El alcance de uso determina la ubicación del archivo."**
+
+Olvídate de agrupar por *tIPO* de archivo (todos los componentes juntos, todos los hooks juntos). Empieza a agrupar por *POBLACIÓN* de uso:
+
+1.  **Uso Local (1 Feature)**: Si un componente solo se usa en el Dashboard, debe vivir **DENTRO** de la carpeta del Dashboard.
+2.  **Uso Compartido (2+ Features)**: Solo si un componente se usa en el Dashboard Y en el Perfil, entonces (y solo entonces) se promueve a una carpeta `shared`.
+
+---
+
+## Screaming Architecture en Next.js 15
+
+Tu estructura de carpetas debe "Gritar" (Scream) de qué trata tu aplicación, no qué framework usas.
+
+**❌ Estructura Silenciosa (El viejo modo):**
+```text
+src/
+  components/    # ¿Qué hay aquí? ¿Botones? ¿Formularios de login?
+  hooks/         # ¿Hooks de qué?
+  pages/         # Rutas mezcladas
+```
+
+**✅ Estructura que Grita (Scope Rule):**
+```text
+src/
+  app/
+    (auth)/           # ¡Ah! Aquí está la autenticación
+      login/
+      _components/    # Componentes exclusivos del login
+    (dashboard)/      # Aquí está el panel de control
+      ventas/
+      _components/    # Gráficos exclusivos de ventas
+  shared/             # Solo lo verdaderamente reutilizable
+```
+
+Al abrir el proyecto, un desarrollador nuevo sabe exactamente qué *hace* la aplicación sin leer una sola línea de código.
+
+---
+
+## Server Components por Defecto
+
+En Next.js 15, la arquitectura también es rendimiento.
+
+*   **Server First**: Todo componente es de Servidor por defecto.
+*   **Cliente Táctico**: Solo añade `'use client'` cuando necesites interactividad real (`useState`, `useEffect`, `onClick`).
+*   **Colocación**: Pon tus Server Actions (`_actions.ts`) justo al lado del formulario que los usa.
+
+### Ejemplo Práctico
+
+Imagina un **Widget de Precios** que solo se usa en la página de **Checkout**.
+
+**Antipatrón**:
+Crear `src/components/PriceWidget.tsx`.
+*Problema*: Contaminas la carpeta global con algo que nadie más usa.
+
+**Patrón Scope Rule**:
+Crear `src/app/(shop)/checkout/_components/price-widget.tsx`.
+*Ventaja*: Está encapsulado. Si borras la ruta de checkout, borras el widget automáticamente. Limpieza garantizada.
+
+---
+
+## Tu Checklist de Arquitectura
+
+Antes de crear un nuevo archivo, pregúntate:
+
+1.  🛑 **¿Cuántas features usarán esto?**
+    *   Si es 1 → **Mantenlo Local** (`_components`, `_hooks`).
+    *   Si son 2+ → **Promuévelo a Shared** (`shared/components`).
+
+2.  ⚡ **¿Necesita ser del Cliente?**
+    *   Intenta mantenerlo como Server Component para mejor SEO y carga inicial.
+
+3.  📢 **¿El nombre comunica funcionalidad?**
+    *   Prefiere `(auth)` y `(shop)` sobre nombres técnicos.
+
+---
+
+La arquitectura no se trata de reglas rígidas, se trata de **intención**. Al usar la Regla del Scope, tu código cuenta una historia clara, escalable y mantenible.
+
+**¿Listo para refactorizar? Empieza moviendo lo local a donde pertenece.**
