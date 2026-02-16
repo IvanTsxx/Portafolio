@@ -1,17 +1,17 @@
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import { GithubIcon, LinkedinIcon, XTwitterIcon } from "@/components/icons";
 
 interface ContactSectionProps {
-  email?: string;
-  github?: string;
-  linkedin?: string;
   title?: string;
   subtitle?: string;
 }
 
+const email = "bongiovannidev@gmail.com";
+const github = "https://github.com/IvanTsxx";
+const linkedin = "https://www.linkedin.com/in/bongiovanni-ivan45";
+const x = "https://x.com/ivantsxx";
+
 export function ContactSection({
-  email = "contacto@ivanbongiovanni.com",
-  github = "https://github.com/IvanTsxx",
-  linkedin,
   title = "¿Trabajamos juntos?",
   subtitle = "Estoy disponible para proyectos freelance y oportunidades full-time. Si buscás un developer que entregue valor desde el día uno, hablemos.",
 }: ContactSectionProps) {
@@ -35,7 +35,7 @@ export function ContactSection({
           rel="noopener noreferrer"
           target="_blank"
         >
-          <Github className="h-3.5 w-3.5" />
+          <GithubIcon className="h-3.5 w-3.5" />
           GitHub
         </a>
 
@@ -46,8 +46,19 @@ export function ContactSection({
             rel="noopener noreferrer"
             target="_blank"
           >
-            <Linkedin className="h-3.5 w-3.5" />
+            <LinkedinIcon className="h-3.5 w-3.5" />
             LinkedIn
+          </a>
+        )}
+
+        {x && (
+          <a
+            className="inline-flex items-center gap-1.5 rounded-lg border border-fd-border px-4 py-2 font-medium text-fd-muted-foreground text-sm transition-colors hover:bg-fd-secondary hover:text-fd-foreground"
+            href={x}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <XTwitterIcon className="h-3.5 w-3.5" />X
           </a>
         )}
       </div>

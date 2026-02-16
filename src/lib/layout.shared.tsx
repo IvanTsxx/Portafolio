@@ -1,5 +1,6 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { FileDown } from "lucide-react";
+import { ArgIcon } from "@/components/icons";
 import { buttonVariants } from "@/components/ui/button";
 
 // fill this with your actual GitHub info, for example:
@@ -13,21 +14,6 @@ export function baseOptions(): BaseLayoutProps {
       {
         type: "custom",
         children: (
-          /*  <button
-      type="button"
-      disabled={isLoading}
-      className={cn(
-        buttonVariants({
-          color: "secondary",
-          size: "sm",
-          className: "gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground",
-        }),
-      )}
-      onClick={onClick}
-    >
-      {checked ? <Check /> : <Copy />}
-      Copy Markdown
-    </button> */
           <button
             type="button"
             className={buttonVariants({
@@ -54,7 +40,7 @@ export function baseOptions(): BaseLayoutProps {
     ],
     nav: {
       title: (
-        <span className="inline-flex items-center gap-2">
+        <span className="flex items-start gap-2">
           <img
             alt="IB"
             className="h-7 w-7 rounded-lg object-cover ring-1 ring-brand/20"
@@ -62,7 +48,13 @@ export function baseOptions(): BaseLayoutProps {
             src="/avatar.webp"
             width={28}
           />
-          <span className="font-semibold">Iván Bongiovanni</span>
+          <div className="flex flex-col">
+            <span className="font-semibold">Iván Bongiovanni</span>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <ArgIcon className="h-4 w-4" />
+              Argentina, Tucumán
+            </div>
+          </div>
         </span>
       ),
     },

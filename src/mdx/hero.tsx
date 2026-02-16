@@ -1,10 +1,15 @@
-import { Github, Mail, MapPin } from "lucide-react";
 import NextImage from "next/image";
+import {
+  GithubIcon,
+  GmailIcon,
+  LinkedinIcon,
+  XTwitterIcon,
+} from "@/components/icons";
 
 interface HeroProps {
   name?: string;
   role?: string;
-  location?: string;
+
   description?: string;
   available?: boolean;
 }
@@ -12,7 +17,7 @@ interface HeroProps {
 export function Hero({
   name = "Ivan Bongiovanni",
   role = "Full Stack Developer",
-  location = "Argentina",
+
   description = "Especializado en Next.js y React. Construyo aplicaciones web rápidas, escalables y orientadas al negocio.",
   available = true,
 }: HeroProps) {
@@ -54,15 +59,11 @@ export function Hero({
         </p>
 
         <div className="fade-in slide-in-from-bottom-4 flex animate-in flex-wrap items-center gap-x-6 gap-y-3 text-fd-muted-foreground text-sm delay-500 duration-700">
-          <span className="inline-flex items-center gap-1.5">
-            <MapPin className="h-4 w-4" />
-            {location}
-          </span>
           <a
             className="inline-flex items-center gap-1.5 underline-offset-4 transition-colors hover:text-brand hover:underline"
             href="mailto:contacto@ivanbongiovanni.com"
           >
-            <Mail className="h-4 w-4" />
+            <GmailIcon className="h-4 w-4" />
             Contactar
           </a>
           <a
@@ -71,8 +72,26 @@ export function Hero({
             rel="noopener noreferrer"
             target="_blank"
           >
-            <Github className="h-4 w-4" />
+            <GithubIcon className="h-4 w-4" />
             GitHub
+          </a>
+          <a
+            className="inline-flex items-center gap-1.5 underline-offset-4 transition-colors hover:text-brand hover:underline"
+            href="https://www.linkedin.com/in/bongiovanni-ivan45"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <LinkedinIcon className="h-4 w-4" />
+            LinkedIn
+          </a>
+          <a
+            className="inline-flex items-center gap-1.5 underline-offset-4 transition-colors hover:text-brand hover:underline"
+            href="https://x.com/IvanTsxx"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <XTwitterIcon className="h-4 w-4" />
+            Twitter
           </a>
         </div>
       </div>
