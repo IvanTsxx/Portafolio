@@ -58,7 +58,7 @@ export function LayoutContextProvider({
           navMode,
           tabMode,
         }),
-        [isNavTransparent, navMode, tabMode],
+        [isNavTransparent, navMode, tabMode]
       )}
     >
       {children}
@@ -90,11 +90,11 @@ export function LayoutBody({
 
   return (
     <div
-      id="nd-notebook-layout"
       className={cn(
-        "grid overflow-x-clip min-h-(--fd-docs-height) transition-[grid-template-columns] auto-cols-auto auto-rows-auto [--fd-docs-height:100dvh] [--fd-header-height:0px] [--fd-toc-popover-height:0px] [--fd-sidebar-width:0px] [--fd-toc-width:0px]",
-        className,
+        "grid min-h-(--fd-docs-height) auto-cols-auto auto-rows-auto overflow-x-clip transition-[grid-template-columns] [--fd-docs-height:100dvh] [--fd-header-height:0px] [--fd-sidebar-width:0px] [--fd-toc-popover-height:0px] [--fd-toc-width:0px]",
+        className
       )}
+      id="nd-notebook-layout"
       style={
         {
           gridTemplate:
@@ -146,14 +146,14 @@ export function LayoutHeaderTabs({
 
         return (
           <Link
-            key={i}
-            href={url}
             className={cn(
-              "inline-flex border-b-2 border-transparent transition-colors items-center pb-1.5 font-medium gap-2 text-fd-muted-foreground text-sm text-nowrap hover:text-fd-accent-foreground",
+              "inline-flex items-center gap-2 text-nowrap border-transparent border-b-2 pb-1.5 font-medium text-fd-muted-foreground text-sm transition-colors hover:text-fd-accent-foreground",
               unlisted && !isSelected && "hidden",
               isSelected && "border-fd-primary text-fd-primary",
-              className,
+              className
             )}
+            href={url}
+            key={i}
             {...rest}
           >
             {title}
@@ -169,19 +169,21 @@ export function NavbarLinkItem({
   className,
   ...props
 }: { item: LinkItemType } & HTMLAttributes<HTMLElement>) {
-  if (item.type === "custom") return item.children;
+  if (item.type === "custom") {
+    return item.children;
+  }
 
   if (item.type === "menu") {
-    return <NavbarLinkItemMenu item={item} className={className} {...props} />;
+    return <NavbarLinkItemMenu className={className} item={item} {...props} />;
   }
 
   return (
     <LinkItem
-      item={item}
       className={cn(
-        "text-sm text-fd-muted-foreground transition-colors hover:text-fd-accent-foreground data-[active=true]:text-fd-primary",
-        className,
+        "text-fd-muted-foreground text-sm transition-colors hover:text-fd-accent-foreground data-[active=true]:text-fd-primary",
+        className
       )}
+      item={item}
       {...props}
     >
       {item.text}
@@ -211,11 +213,15 @@ function NavbarLinkItemMenu({
     }, hoverDelay);
   };
   const onPointerEnter = (e: PointerEvent) => {
-    if (e.pointerType === "touch") return;
+    if (e.pointerType === "touch") {
+      return;
+    }
     delaySetOpen(true);
   };
   const onPointerLeave = (e: PointerEvent) => {
-    if (e.pointerType === "touch") return;
+    if (e.pointerType === "touch") {
+      return;
+    }
     delaySetOpen(false);
   };
   function isTouchDevice() {
@@ -224,16 +230,17 @@ function NavbarLinkItemMenu({
 
   return (
     <Popover
-      open={open}
       onOpenChange={(value) => {
-        if (freezeUntil.current === null || Date.now() >= freezeUntil.current)
+        if (freezeUntil.current === null || Date.now() >= freezeUntil.current) {
           setOpen(value);
+        }
       }}
+      open={open}
     >
       <PopoverTrigger
         className={cn(
-          "inline-flex items-center gap-1.5 p-1 text-sm text-fd-muted-foreground transition-colors has-data-[active=true]:text-fd-primary data-[state=open]:text-fd-accent-foreground focus-visible:outline-none",
-          className,
+          "inline-flex items-center gap-1.5 p-1 text-fd-muted-foreground text-sm transition-colors focus-visible:outline-none has-data-[active=true]:text-fd-primary data-[state=open]:text-fd-accent-foreground",
+          className
         )}
         onPointerEnter={onPointerEnter}
         onPointerLeave={onPointerLeave}
@@ -247,21 +254,24 @@ function NavbarLinkItemMenu({
         <ChevronDown className="size-3" />
       </PopoverTrigger>
       <PopoverContent
-        className="flex flex-col p-1 text-fd-muted-foreground text-start"
+        className="flex flex-col p-1 text-start text-fd-muted-foreground"
         onPointerEnter={onPointerEnter}
         onPointerLeave={onPointerLeave}
       >
         {item.items.map((child, i) => {
-          if (child.type === "custom")
+          if (child.type === "custom") {
             return <Fragment key={i}>{child.children}</Fragment>;
+          }
 
           return (
             <LinkItem
-              key={i}
-              item={child}
               className="inline-flex items-center gap-2 rounded-md p-2 transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground data-[active=true]:text-fd-primary [&_svg]:size-4"
+              item={child}
+              key={i}
               onClick={() => {
-                if (isTouchDevice()) setOpen(false);
+                if (isTouchDevice()) {
+                  setOpen(false);
+                }
               }}
             >
               {child.icon}

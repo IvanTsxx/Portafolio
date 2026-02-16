@@ -1,7 +1,7 @@
-'use client';
-import { Collapsible as Primitive } from '@base-ui/react/collapsible';
-import type { ComponentProps } from 'react';
-import { cn } from '../../lib/cn';
+"use client";
+import { Collapsible as Primitive } from "@base-ui/react/collapsible";
+import type { ComponentProps } from "react";
+import { cn } from "../../lib/cn";
 
 export const Collapsible = Primitive.Root;
 
@@ -17,8 +17,8 @@ export function CollapsibleContent({
       {...props}
       className={(s) =>
         cn(
-          "overflow-hidden [&[hidden]:not([hidden='until-found'])]:hidden h-(--collapsible-panel-height) transition-[height] data-[starting-style]:h-0 data-[ending-style]:h-0",
-          typeof className === 'function' ? className(s) : className,
+          "h-(--collapsible-panel-height) overflow-hidden transition-[height] data-[ending-style]:h-0 data-[starting-style]:h-0 [&[hidden]:not([hidden='until-found'])]:hidden",
+          typeof className === "function" ? className(s) : className
         )
       }
     >

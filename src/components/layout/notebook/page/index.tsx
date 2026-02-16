@@ -2,11 +2,11 @@ import type { AnchorProviderProps, TOCItemType } from "fumadocs-core/toc";
 import { I18nLabel } from "fumadocs-ui/contexts/i18n";
 import { Edit, Text } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
-import { cn } from "../../../../lib/cn";
-import { TOCProvider, TOCScrollArea } from "../../../toc";
-import * as TocClerk from "../../../toc/clerk";
-import * as TocDefault from "../../../toc/default";
-import { buttonVariants } from "../../../ui/button";
+import { TOCProvider, TOCScrollArea } from "@/components/toc";
+import { TOCItems as TOCItemsClerk } from "@/components/toc/clerk";
+import { TOCItems as TOCItemsDefault } from "@/components/toc/default";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 import {
   type BreadcrumbProps,
   type FooterProps,
@@ -139,9 +139,9 @@ export function DocsPage({
               {tocPopoverOptions.header}
               <TOCScrollArea>
                 {tocPopoverOptions.style === "clerk" ? (
-                  <TocClerk.TOCItems />
+                  <TOCItemsClerk />
                 ) : (
-                  <TocDefault.TOCItems />
+                  <TOCItemsDefault />
                 )}
               </TOCScrollArea>
               {tocPopoverOptions.footer}
@@ -149,13 +149,13 @@ export function DocsPage({
           </PageTOCPopover>
         ))}
       <article
-        id="nd-page"
-        data-full={full}
         className={cn(
-          "flex flex-col [grid-area:main] px-4 py-6 gap-4 md:px-6 md:pt-8 xl:px-8 xl:pt-14 *:max-w-[900px]",
+          "flex flex-col gap-4 px-4 py-6 [grid-area:main] *:max-w-[900px] md:px-6 md:pt-8 xl:px-8 xl:pt-14",
           full && "*:max-w-[1285px]",
-          className,
+          className
         )}
+        data-full={full}
+        id="nd-page"
       >
         {breadcrumbEnabled &&
           (breadcrumb ?? <PageBreadcrumb {...breadcrumbProps} />)}
@@ -166,44 +166,44 @@ export function DocsPage({
       {tocEnabled &&
         (tocReplace ?? (
           <div
+            className="sticky top-(--fd-docs-row-3) flex h-[calc(var(--fd-docs-height)-var(--fd-docs-row-3))] w-(--fd-toc-width) flex-col pe-4 pt-12 pb-2 [grid-area:toc] max-xl:hidden xl:layout:[--fd-toc-width:268px]"
             id="nd-toc"
-            className="sticky top-(--fd-docs-row-3) [grid-area:toc] h-[calc(var(--fd-docs-height)-var(--fd-docs-row-3))] flex flex-col w-(--fd-toc-width) pt-12 pe-4 pb-2 xl:layout:[--fd-toc-width:268px] max-xl:hidden"
           >
             {tocOptions.header}
             <h3
+              className="inline-flex items-center gap-1.5 text-fd-muted-foreground text-sm"
               id="toc-title"
-              className="inline-flex items-center gap-1.5 text-sm text-fd-muted-foreground"
             >
               <Text className="size-4" />
               <I18nLabel label="toc" />
             </h3>
             <TOCScrollArea>
               {tocOptions.style === "clerk" ? (
-                <TocClerk.TOCItems />
+                <TOCItemsClerk />
               ) : (
-                <TocDefault.TOCItems />
+                <TOCItemsDefault />
               )}
             </TOCScrollArea>
             {tocOptions.footer}
           </div>
         ))}
-    </>,
+    </>
   );
 }
 
 export function EditOnGitHub(props: ComponentProps<"a">) {
   return (
     <a
-      target="_blank"
       rel="noreferrer noopener"
+      target="_blank"
       {...props}
       className={cn(
         buttonVariants({
           color: "secondary",
           size: "sm",
-          className: "gap-1.5 not-prose",
+          className: "not-prose gap-1.5",
         }),
-        props.className,
+        props.className
       )}
     >
       {props.children ?? (
@@ -237,12 +237,14 @@ export function DocsDescription({
   ...props
 }: ComponentProps<"p">) {
   // Don't render if no description provided
-  if (children === undefined) return null;
+  if (children === undefined) {
+    return null;
+  }
 
   return (
     <p
       {...props}
-      className={cn("mb-8 text-lg text-fd-muted-foreground", className)}
+      className={cn("mb-8 text-fd-muted-foreground text-lg", className)}
     >
       {children}
     </p>
@@ -255,10 +257,8 @@ export function DocsTitle({
   ...props
 }: ComponentProps<"h1">) {
   return (
-    <h1 {...props} className={cn("text-[1.75em] font-semibold", className)}>
+    <h1 {...props} className={cn("font-semibold text-[1.75em]", className)}>
       {children}
     </h1>
   );
 }
-
-export { PageBreadcrumb, PageLastUpdate } from "./client";

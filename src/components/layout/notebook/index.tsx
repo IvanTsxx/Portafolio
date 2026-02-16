@@ -123,7 +123,7 @@ export function DocsLayout(props: DocsLayoutProps) {
             <div
               className={cn(
                 "flex flex-col gap-3 p-4 pb-2 empty:hidden",
-                className,
+                className
               )}
               {...props}
             >
@@ -137,9 +137,9 @@ export function DocsLayout(props: DocsLayoutProps) {
         : ({ className, ...props }: ComponentProps<"div">) => (
             <div
               className={cn(
-                "hidden flex-row text-fd-muted-foreground items-center border-t p-4 pt-2",
+                "hidden flex-row items-center border-t p-4 pt-2 text-fd-muted-foreground",
                 iconLinks.length > 0 && "max-lg:flex",
-                className,
+                className
               )}
               {...props}
             >
@@ -153,9 +153,9 @@ export function DocsLayout(props: DocsLayoutProps) {
           .filter((item) => item.type !== "icon")
           .map((item, i, arr) => (
             <SidebarLinkItem
-              key={i}
-              item={item}
               className={cn("lg:hidden", i === arr.length - 1 && "mb-4")}
+              item={item}
+              key={i}
             />
           ))}
 
@@ -179,7 +179,7 @@ export function DocsLayout(props: DocsLayoutProps) {
                         color: "ghost",
                         size: "icon-sm",
                         className: "mt-px mb-auto text-fd-muted-foreground",
-                      }),
+                      })
                     )}
                   >
                     <SidebarIcon />
@@ -189,8 +189,8 @@ export function DocsLayout(props: DocsLayoutProps) {
             )}
             {tabs.length > 0 && (
               <SidebarTabsDropdown
-                options={tabs}
                 className={cn(tabMode === "navbar" && "lg:hidden")}
+                options={tabs}
               />
             )}
           </Header>
@@ -198,16 +198,16 @@ export function DocsLayout(props: DocsLayoutProps) {
           <Footer>
             {iconLinks.map((item, i) => (
               <LinkItem
-                key={i}
-                item={item}
+                aria-label={item.label}
                 className={cn(
                   buttonVariants({
                     size: "icon-sm",
                     color: "ghost",
                     className: "lg:hidden",
-                  }),
+                  })
                 )}
-                aria-label={item.label}
+                item={item}
+                key={i}
               >
                 {item.icon}
               </LinkItem>
@@ -222,7 +222,7 @@ export function DocsLayout(props: DocsLayoutProps) {
                   size: "icon-sm",
                   color: "ghost",
                   className: "ms-auto text-fd-muted-foreground",
-                }),
+                })
               )}
             >
               <X />
@@ -234,22 +234,22 @@ export function DocsLayout(props: DocsLayoutProps) {
             className={cn(
               "hidden flex-row items-center justify-end",
               (i18n || themeSwitch.enabled !== false) && "flex",
-              iconLinks.length > 0 && "max-lg:flex",
+              iconLinks.length > 0 && "max-lg:flex"
             )}
           >
             {iconLinks.map((item, i) => (
               <LinkItem
-                key={i}
-                item={item}
+                aria-label={item.label}
                 className={cn(
                   buttonVariants({
                     size: "icon-sm",
                     color: "ghost",
                   }),
                   "text-fd-muted-foreground lg:hidden",
-                  i === iconLinks.length - 1 && "me-auto",
+                  i === iconLinks.length - 1 && "me-auto"
                 )}
-                aria-label={item.label}
+                item={item}
+                key={i}
               >
                 {item.icon}
               </LinkItem>
@@ -273,8 +273,8 @@ export function DocsLayout(props: DocsLayoutProps) {
     <TreeContextProvider tree={tree}>
       <LayoutContextProvider
         navMode={nav.mode ?? "auto"}
-        tabMode={tabMode}
         navTransparentMode={nav.transparentMode}
+        tabMode={tabMode}
       >
         <Sidebar defaultOpenLevel={defaultOpenLevel} prefetch={prefetch}>
           <LayoutBody {...props.containerProps}>
@@ -306,22 +306,22 @@ function DocsNavbar({
 
   return (
     <LayoutHeader
-      id="nd-subnav"
       className={cn(
-        "sticky [grid-area:header] flex flex-col top-(--fd-docs-row-1) z-10 backdrop-blur-sm transition-colors data-[transparent=false]:bg-fd-background/80 layout:[--fd-header-height:--spacing(14)]",
-        showLayoutTabs && "lg:layout:[--fd-header-height:--spacing(24)]",
+        "sticky top-(--fd-docs-row-1) z-10 flex flex-col backdrop-blur-sm transition-colors [grid-area:header] layout:[--fd-header-height:--spacing(14)] data-[transparent=false]:bg-fd-background/80",
+        showLayoutTabs && "lg:layout:[--fd-header-height:--spacing(24)]"
       )}
+      id="nd-subnav"
     >
       <div
+        className="flex h-14 gap-2 border-b px-4 md:px-6"
         data-header-body=""
-        className="flex border-b px-4 gap-2 h-14 md:px-6"
       >
         <div
           className={cn(
             "items-center",
             navMode === "top" && "flex flex-1",
             navMode === "auto" &&
-              "hidden has-data-[collapsed=true]:md:flex max-md:flex",
+              "hidden max-md:flex has-data-[collapsed=true]:md:flex"
           )}
         >
           {sidebarCollapsible && navMode === "auto" && (
@@ -331,7 +331,7 @@ function DocsNavbar({
                   color: "ghost",
                   size: "icon-sm",
                 }),
-                "text-fd-muted-foreground data-[collapsed=false]:hidden max-md:hidden",
+                "text-fd-muted-foreground data-[collapsed=false]:hidden max-md:hidden"
               )}
             >
               <SidebarIcon />
@@ -340,7 +340,7 @@ function DocsNavbar({
           {renderTitleNav(nav, {
             className: cn(
               "inline-flex items-center gap-2.5 font-semibold",
-              navMode === "auto" && "md:hidden",
+              navMode === "auto" && "md:hidden"
             ),
           })}
           {nav.children}
@@ -349,21 +349,21 @@ function DocsNavbar({
           (searchToggle.components?.lg ? (
             <div
               className={cn(
-                "w-full my-auto max-md:hidden",
-                navMode === "top" ? "rounded-xl max-w-sm" : "max-w-[240px]",
+                "my-auto w-full max-md:hidden",
+                navMode === "top" ? "max-w-sm rounded-xl" : "max-w-[240px]"
               )}
             >
               {searchToggle.components.lg}
             </div>
           ) : (
             <LargeSearchToggle
-              hideIfDisabled
               className={cn(
-                "w-full my-auto max-md:hidden",
+                "my-auto w-full max-md:hidden",
                 navMode === "top"
-                  ? "rounded-xl max-w-sm ps-2.5"
-                  : "max-w-[240px]",
+                  ? "max-w-sm rounded-xl ps-2.5"
+                  : "max-w-[240px]"
               )}
+              hideIfDisabled
             />
           ))}
         <div className="flex flex-1 items-center justify-end md:gap-2">
@@ -371,20 +371,20 @@ function DocsNavbar({
             {links
               .filter((item) => item.type !== "icon")
               .map((item, i) => (
-                <NavbarLinkItem key={i} item={item} />
+                <NavbarLinkItem item={item} key={i} />
               ))}
           </div>
           {links
             .filter((item) => item.type === "icon")
             .map((item, i) => (
               <LinkItem
-                key={i}
-                item={item}
+                aria-label={item.label}
                 className={cn(
                   buttonVariants({ size: "icon-sm", color: "ghost" }),
-                  "text-fd-muted-foreground max-lg:hidden",
+                  "text-fd-muted-foreground max-lg:hidden"
                 )}
-                aria-label={item.label}
+                item={item}
+                key={i}
               >
                 {item.icon}
               </LinkItem>
@@ -393,15 +393,15 @@ function DocsNavbar({
           <div className="flex items-center md:hidden">
             {searchToggle.enabled !== false &&
               (searchToggle.components?.sm ?? (
-                <SearchToggle hideIfDisabled className="p-2" />
+                <SearchToggle className="p-2" hideIfDisabled />
               ))}
             <SidebarTrigger
               className={cn(
                 buttonVariants({
                   color: "ghost",
                   size: "icon-sm",
-                  className: "p-2 -me-1.5",
-                }),
+                  className: "-me-1.5 p-2",
+                })
               )}
             >
               <SidebarIcon />
@@ -425,7 +425,7 @@ function DocsNavbar({
                     color: "secondary",
                     size: "icon-sm",
                   }),
-                  "text-fd-muted-foreground rounded-full -me-1.5",
+                  "-me-1.5 rounded-full text-fd-muted-foreground"
                 )}
               >
                 <SidebarIcon />
@@ -436,8 +436,8 @@ function DocsNavbar({
       </div>
       {showLayoutTabs && (
         <LayoutHeaderTabs
+          className="h-10 overflow-x-auto border-b px-6 max-lg:hidden"
           data-header-tabs=""
-          className="overflow-x-auto border-b px-6 h-10 max-lg:hidden"
           options={tabs}
         />
       )}

@@ -1,15 +1,15 @@
 "use client";
 import { cva } from "class-variance-authority";
 import { type ComponentProps, use, useRef } from "react";
-import { cn } from "../../../lib/cn";
-import { mergeRefs } from "../../../lib/merge-refs";
-import * as Base from "../sidebar/base";
-import { createLinkItemRenderer } from "../sidebar/link-item";
-import { createPageTreeRenderer } from "../sidebar/page-tree";
+import * as Base from "@/components/layout/sidebar/base";
+import { createLinkItemRenderer } from "@/components/layout/sidebar/link-item";
+import { createPageTreeRenderer } from "@/components/layout/sidebar/page-tree";
+import { cn } from "@/lib/cn";
+import { mergeRefs } from "@/lib/merge-refs";
 import { LayoutContext } from "./client";
 
 const itemVariants = cva(
-  "relative flex flex-row items-center gap-2 rounded-lg p-2 text-start text-fd-muted-foreground wrap-anywhere [&_svg]:size-4 [&_svg]:shrink-0",
+  "wrap-anywhere relative flex flex-row items-center gap-2 rounded-lg p-2 text-start text-fd-muted-foreground [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -18,10 +18,10 @@ const itemVariants = cva(
           "transition-colors hover:bg-fd-accent/50 hover:text-fd-accent-foreground/80 hover:transition-none",
       },
       highlight: {
-        true: "data-[active=true]:before:content-[''] data-[active=true]:before:bg-fd-primary data-[active=true]:before:absolute data-[active=true]:before:w-px data-[active=true]:before:inset-y-2.5 data-[active=true]:before:start-2.5",
+        true: "data-[active=true]:before:absolute data-[active=true]:before:inset-y-2.5 data-[active=true]:before:start-2.5 data-[active=true]:before:w-px data-[active=true]:before:bg-fd-primary data-[active=true]:before:content-['']",
       },
     },
-  },
+  }
 );
 
 function getItemOffset(depth: number) {
@@ -49,37 +49,37 @@ export function SidebarContent({
     <Base.SidebarContent>
       {({ collapsed, hovered, ref: asideRef, ...rest }) => (
         <div
-          data-sidebar-placeholder=""
           className={cn(
-            "sticky z-20 [grid-area:sidebar] pointer-events-none *:pointer-events-auto md:layout:[--fd-sidebar-width:268px] max-md:hidden",
+            "pointer-events-none sticky z-20 [grid-area:sidebar] *:pointer-events-auto max-md:hidden md:layout:[--fd-sidebar-width:268px]",
             navMode === "auto"
               ? "top-(--fd-docs-row-1) h-[calc(var(--fd-docs-height)-var(--fd-docs-row-1))]"
-              : "top-(--fd-docs-row-2) h-[calc(var(--fd-docs-height)-var(--fd-docs-row-2))]",
+              : "top-(--fd-docs-row-2) h-[calc(var(--fd-docs-height)-var(--fd-docs-row-2))]"
           )}
+          data-sidebar-placeholder=""
         >
           {collapsed && (
-            <div className="absolute start-0 inset-y-0 w-4" {...rest} />
+            <div className="absolute inset-y-0 start-0 w-4" {...rest} />
           )}
           <aside
-            id="nd-sidebar"
-            ref={mergeRefs(ref, refProp, asideRef)}
-            data-collapsed={collapsed}
-            data-hovered={collapsed && hovered}
             className={cn(
-              "absolute flex flex-col w-full start-0 inset-y-0 items-end text-sm duration-250 *:w-(--fd-sidebar-width)",
-              navMode === "auto" && "bg-fd-card border-e",
+              "absolute inset-y-0 start-0 flex w-full flex-col items-end text-sm duration-250 *:w-(--fd-sidebar-width)",
+              navMode === "auto" && "border-e bg-fd-card",
               collapsed && [
-                "inset-y-2 rounded-xl bg-fd-card transition-transform border w-(--fd-sidebar-width)",
+                "inset-y-2 w-(--fd-sidebar-width) rounded-xl border bg-fd-card transition-transform",
                 hovered
-                  ? "shadow-lg translate-x-2 rtl:-translate-x-2"
+                  ? "translate-x-2 shadow-lg rtl:-translate-x-2"
                   : "-translate-x-(--fd-sidebar-width) rtl:translate-x-full",
               ],
               ref.current &&
                 (ref.current.getAttribute("data-collapsed") === "true") !==
                   collapsed &&
                 "transition-[width,inset-block,translate,background-color]",
-              className,
+              className
             )}
+            data-collapsed={collapsed}
+            data-hovered={collapsed && hovered}
+            id="nd-sidebar"
+            ref={mergeRefs(ref, refProp, asideRef)}
             {...props}
             {...rest}
           >
@@ -98,11 +98,11 @@ export function SidebarDrawer({
 }: ComponentProps<typeof Base.SidebarDrawerContent>) {
   return (
     <>
-      <Base.SidebarDrawerOverlay className="fixed z-40 inset-0 backdrop-blur-xs data-[state=open]:animate-fd-fade-in data-[state=closed]:animate-fd-fade-out" />
+      <Base.SidebarDrawerOverlay className="fixed inset-0 z-40 backdrop-blur-xs data-[state=closed]:animate-fd-fade-out data-[state=open]:animate-fd-fade-in" />
       <Base.SidebarDrawerContent
         className={cn(
-          "fixed text-[0.9375rem] flex flex-col shadow-lg border-s end-0 inset-y-0 w-[85%] max-w-[380px] z-40 bg-fd-background data-[state=open]:animate-fd-sidebar-in data-[state=closed]:animate-fd-sidebar-out",
-          className,
+          "fixed inset-y-0 end-0 z-40 flex w-[85%] max-w-[380px] flex-col border-s bg-fd-background text-[0.9375rem] shadow-lg data-[state=closed]:animate-fd-sidebar-out data-[state=open]:animate-fd-sidebar-in",
+          className
         )}
         {...props}
       >
@@ -146,7 +146,7 @@ export function SidebarItem({
     <Base.SidebarItem
       className={cn(
         itemVariants({ variant: "link", highlight: depth >= 1 }),
-        className,
+        className
       )}
       style={{
         paddingInlineStart: getItemOffset(depth),
@@ -172,7 +172,7 @@ export function SidebarFolderTrigger({
         cn(
           itemVariants({ variant: collapsible ? "button" : null }),
           "w-full",
-          typeof className === "function" ? className(s) : className,
+          typeof className === "function" ? className(s) : className
         )
       }
       style={{
@@ -198,7 +198,7 @@ export function SidebarFolderLink({
       className={cn(
         itemVariants({ variant: "link", highlight: depth > 1 }),
         "w-full",
-        className,
+        className
       )}
       style={{
         paddingInlineStart: getItemOffset(depth - 1),
@@ -224,8 +224,8 @@ export function SidebarFolderContent({
         cn(
           "relative",
           depth === 1 &&
-            "before:content-[''] before:absolute before:w-px before:inset-y-1 before:bg-fd-border before:start-2.5",
-          typeof className === "function" ? className(s) : className,
+            "before:absolute before:inset-y-1 before:start-2.5 before:w-px before:bg-fd-border before:content-['']",
+          typeof className === "function" ? className(s) : className
         )
       }
       {...props}

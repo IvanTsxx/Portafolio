@@ -226,12 +226,10 @@ function TechIcon({
   setHover: (tech: { name: string; role: string } | null) => void;
 }) {
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: <nowarn>
-    // biome-ignore lint/a11y/noNoninteractiveElementInteractions: <nowarn>
     <div
       className={cn(
         "group relative flex cursor-pointer items-center justify-center",
-        colorClass,
+        colorClass
       )}
       onMouseEnter={() => setHover({ name, role })}
       onMouseLeave={() => setHover(null)}

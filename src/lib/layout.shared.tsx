@@ -15,13 +15,13 @@ export function baseOptions(): BaseLayoutProps {
         type: "custom",
         children: (
           <button
-            type="button"
             className={buttonVariants({
               color: "outline",
               size: "sm",
               className:
                 "gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground",
             })}
+            type="button"
           >
             <a
               aria-label="Descargar CV"
@@ -50,7 +50,7 @@ export function baseOptions(): BaseLayoutProps {
           />
           <div className="flex flex-col">
             <span className="font-semibold">Iván Bongiovanni</span>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 text-muted-foreground text-xs">
               <ArgIcon className="h-4 w-4" />
               Argentina, Tucumán
             </div>

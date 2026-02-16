@@ -48,10 +48,13 @@ export function PageTOCPopover({
   const { isNavTransparent } = use(LayoutContext)!;
 
   const onClick = useEffectEvent((e: Event) => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
-    if (ref.current && !ref.current.contains(e.target as HTMLElement))
+    if (ref.current && !ref.current.contains(e.target as HTMLElement)) {
       setOpen(false);
+    }
   });
 
   useEffect(() => {
@@ -69,26 +72,26 @@ export function PageTOCPopover({
           open,
           setOpen,
         }),
-        [setOpen, open],
+        [open]
       )}
     >
       <Collapsible
-        open={open}
-        onOpenChange={setOpen}
-        data-toc-popover=""
         className={cn(
-          "sticky top-(--fd-docs-row-2) z-10 [grid-area:toc-popover] h-(--fd-toc-popover-height) xl:hidden max-xl:layout:[--fd-toc-popover-height:--spacing(10)]",
-          className,
+          "sticky top-(--fd-docs-row-2) z-10 h-(--fd-toc-popover-height) [grid-area:toc-popover] xl:hidden max-xl:layout:[--fd-toc-popover-height:--spacing(10)]",
+          className
         )}
+        data-toc-popover=""
+        onOpenChange={setOpen}
+        open={open}
         {...rest}
       >
         <header
-          ref={ref}
           className={cn(
             "border-b backdrop-blur-sm transition-colors",
             (!isNavTransparent || open) && "bg-fd-background/80",
-            open && "shadow-lg",
+            open && "shadow-lg"
           )}
+          ref={ref}
         >
           {children}
         </header>
@@ -107,7 +110,7 @@ export function PageTOCPopoverTrigger({
   const active = useActiveAnchor();
   const selected = useMemo(
     () => items.findIndex((item) => active === item.url.slice(1)),
-    [items, active],
+    [items, active]
   );
   const path = useTreePath().at(-1);
   const showItem = selected !== -1 && !open;
@@ -115,23 +118,23 @@ export function PageTOCPopoverTrigger({
   return (
     <CollapsibleTrigger
       className={cn(
-        "flex w-full h-10 items-center text-sm text-fd-muted-foreground gap-2.5 px-4 py-2.5 text-start focus-visible:outline-none [&_svg]:size-4 md:px-6",
-        className,
+        "flex h-10 w-full items-center gap-2.5 px-4 py-2.5 text-start text-fd-muted-foreground text-sm focus-visible:outline-none md:px-6 [&_svg]:size-4",
+        className
       )}
       data-toc-popover-trigger=""
       {...props}
     >
       <ProgressCircle
-        value={(selected + 1) / Math.max(1, items.length)}
-        max={1}
         className={cn("shrink-0", open && "text-fd-primary")}
+        max={1}
+        value={(selected + 1) / Math.max(1, items.length)}
       />
-      <span className="grid flex-1 *:my-auto *:row-start-1 *:col-start-1">
+      <span className="grid flex-1 *:col-start-1 *:row-start-1 *:my-auto">
         <span
           className={cn(
             "truncate transition-all",
             open && "text-fd-foreground",
-            showItem && "opacity-0 -translate-y-full pointer-events-none",
+            showItem && "pointer-events-none -translate-y-full opacity-0"
           )}
         >
           {path?.name ?? text.toc}
@@ -139,7 +142,7 @@ export function PageTOCPopoverTrigger({
         <span
           className={cn(
             "truncate transition-all",
-            !showItem && "opacity-0 translate-y-full pointer-events-none",
+            !showItem && "pointer-events-none translate-y-full opacity-0"
           )}
         >
           {items[selected]?.title}
@@ -147,8 +150,8 @@ export function PageTOCPopoverTrigger({
       </span>
       <ChevronDown
         className={cn(
-          "shrink-0 transition-transform mx-0.5",
-          open && "rotate-180",
+          "mx-0.5 shrink-0 transition-transform",
+          open && "rotate-180"
         )}
       />
     </CollapsibleTrigger>
@@ -165,8 +168,12 @@ interface ProgressCircleProps
 }
 
 function clamp(input: number, min: number, max: number): number {
-  if (input < min) return min;
-  if (input > max) return max;
+  if (input < min) {
+    return min;
+  }
+  if (input > max) {
+    return max;
+  }
   return input;
 }
 
@@ -192,22 +199,22 @@ function ProgressCircle({
 
   return (
     <svg
+      aria-valuemax={max}
+      aria-valuemin={min}
+      aria-valuenow={normalizedValue}
       role="progressbar"
       viewBox={`0 0 ${size} ${size}`}
-      aria-valuenow={normalizedValue}
-      aria-valuemin={min}
-      aria-valuemax={max}
       {...restSvgProps}
     >
       <circle {...circleProps} className="stroke-current/25" />
       <circle
         {...circleProps}
+        className="transition-all"
         stroke="currentColor"
         strokeDasharray={circumference}
         strokeDashoffset={circumference - progress}
         strokeLinecap="round"
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        className="transition-all"
       />
     </svg>
   );
@@ -218,7 +225,7 @@ export function PageTOCPopoverContent(props: ComponentProps<"div">) {
     <CollapsibleContent
       data-toc-popover-content=""
       {...props}
-      className={cn("flex flex-col px-4 max-h-[50vh] md:px-6", props.className)}
+      className={cn("flex max-h-[50vh] flex-col px-4 md:px-6", props.className)}
     >
       {props.children}
     </CollapsibleContent>
@@ -240,7 +247,7 @@ export function PageLastUpdate({
   return (
     <p
       {...props}
-      className={cn("text-sm text-fd-muted-foreground", props.className)}
+      className={cn("text-fd-muted-foreground text-sm", props.className)}
     >
       {text.lastUpdate} {date}
     </p>
@@ -267,11 +274,15 @@ export function PageFooter({
   const footerList = useFooterItems();
   const pathname = usePathname();
   const { previous, next } = useMemo(() => {
-    if (items) return items;
+    if (items) {
+      return items;
+    }
 
     const idx = footerList.findIndex((item) => isActive(item.url, pathname));
 
-    if (idx === -1) return {};
+    if (idx === -1) {
+      return {};
+    }
     return {
       previous: footerList[idx - 1],
       next: footerList[idx + 1],
@@ -284,12 +295,12 @@ export function PageFooter({
         className={cn(
           "@container grid gap-4",
           previous && next ? "grid-cols-2" : "grid-cols-1",
-          className,
+          className
         )}
         {...props}
       >
-        {previous && <FooterItem item={previous} index={0} />}
-        {next && <FooterItem item={next} index={1} />}
+        {previous && <FooterItem index={0} item={previous} />}
+        {next && <FooterItem index={1} item={next} />}
       </div>
       {children}
     </>
@@ -302,22 +313,22 @@ function FooterItem({ item, index }: { item: Item; index: 0 | 1 }) {
 
   return (
     <Link
-      href={item.url}
       className={cn(
-        "flex flex-col gap-2 rounded-lg border p-4 text-sm transition-colors hover:bg-fd-accent/80 hover:text-fd-accent-foreground @max-lg:col-span-full",
-        index === 1 && "text-end",
+        "@max-lg:col-span-full flex flex-col gap-2 rounded-lg border p-4 text-sm transition-colors hover:bg-fd-accent/80 hover:text-fd-accent-foreground",
+        index === 1 && "text-end"
       )}
+      href={item.url}
     >
       <div
         className={cn(
           "inline-flex items-center gap-1.5 font-medium",
-          index === 1 && "flex-row-reverse",
+          index === 1 && "flex-row-reverse"
         )}
       >
         <Icon className="-mx-1 size-4 shrink-0 rtl:rotate-180" />
         <p>{item.name}</p>
       </div>
-      <p className="text-fd-muted-foreground truncate">
+      <p className="truncate text-fd-muted-foreground">
         {item.description ?? (index === 0 ? text.previousPage : text.nextPage)}
       </p>
     </Link>
@@ -342,20 +353,22 @@ export function PageBreadcrumb({
     });
   }, [includePage, includeRoot, includeSeparator, path, root]);
 
-  if (items.length === 0) return null;
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <div
       {...props}
       className={cn(
-        "flex items-center gap-1.5 text-sm text-fd-muted-foreground",
-        props.className,
+        "flex items-center gap-1.5 text-fd-muted-foreground text-sm",
+        props.className
       )}
     >
       {items.map((item, i) => {
         const className = cn(
           "truncate",
-          i === items.length - 1 && "text-fd-primary font-medium",
+          i === items.length - 1 && "font-medium text-fd-primary"
         );
 
         return (
@@ -363,8 +376,8 @@ export function PageBreadcrumb({
             {i !== 0 && <ChevronRight className="size-3.5 shrink-0" />}
             {item.url ? (
               <Link
-                href={item.url}
                 className={cn(className, "transition-opacity hover:opacity-80")}
+                href={item.url}
               >
                 {item.name}
               </Link>

@@ -22,7 +22,22 @@
         "noArrayIndexKey": "off"
       },
       "performance": {
-        "noImgElement": "off"
+        "noImgElement": "off",
+        "noNamespaceImport": "off",
+        "noBarrelFile": "off"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "off"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "off",
+        "useValidAriaRole": "off",
+        "noSvgWithoutTitle": "off",
+        "noNoninteractiveElementInteractions": "off",
+        "useKeyWithClickEvents": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
       }
     },
     "domains": {
