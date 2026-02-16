@@ -1,6 +1,11 @@
-import { HomeLayout } from "@/components/layout/home";
+import { DocsLayout } from "@/components/layout/notebook";
 import { baseOptions } from "@/lib/layout.shared";
+import { source } from "@/lib/source";
 
 export default function Layout({ children }: LayoutProps<"/">) {
-  return <HomeLayout {...baseOptions()}>{children}</HomeLayout>;
+  return (
+    <DocsLayout tree={source.getPageTree()} {...baseOptions()}>
+      {children}
+    </DocsLayout>
+  );
 }
