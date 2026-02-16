@@ -1,5 +1,6 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import "@/styles/global.css";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
@@ -44,6 +45,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: "WQnMOB9c2UaSmdLlqYeyZ9DXKUgqnxjMcidTtyAjWxM",
+  },
 };
 
 export default function Layout({ children }: LayoutProps<"/">) {
@@ -51,6 +55,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
     <html className={inter.className} lang="en" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
         <RootProvider>{children}</RootProvider>
+        <Analytics />
       </body>
     </html>
   );
