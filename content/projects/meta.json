@@ -1,5 +1,12 @@
 {
   "title": "Proyectos",
   "description": "Mis proyectos open-source y personales",
-  "pages": ["index", "lules-market", "memes-dev", "better-auth-mp-plugin"]
+  "pages": [
+    "index",
+    "lules-market",
+    "memes-dev",
+    "better-auth-mp-plugin",
+    "cache-components-demo",
+    "pikuu"
+  ]
 }

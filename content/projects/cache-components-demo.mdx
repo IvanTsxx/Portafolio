@@ -1,0 +1,54 @@
+---
+title: "Next.js 16: Cache Components Demo"
+description: "Implementación de referencia de cacheo granular con Next.js 16. Patrones avanzados de 'use cache', 'cacheTag' y PPR."
+keywords: ["Next.js 16", "React Server Components", "Cache Strategies", "Web Performance", "Granular Caching", "React 19"]
+---
+
+<DetailHeader
+  title="Cache Components Demo"
+  subtitle="Exploración técnica de las nuevas capacidades de cacheo en Next.js 16. Demostración práctica de cómo gestionar datos estáticos y dinámicos en la misma vista con granularidad a nivel de componente."
+  backHref="/projects"
+  backLabel="Proyectos"
+  technologies={["Next.js 16 (Canary)", "React 19", "TypeScript", "Tailwind CSS", "Zod", "Server Actions"]}
+  links={[
+    { label: "Repositorio", url: "https://github.com/IvanTsxx/cache-components-demo" }
+  ]}
+/>
+
+## ¿Por qué Cache Components?
+
+En el desarrollo web moderno, raramente una página es 100% estática o 100% dinámica. Lo real es una mezcla compleja:
+*   **Nombre del Producto**: Cambia casi nunca (Estático).
+*   **Precio**: Cambia ocasionalmente (Revalidable).
+*   **Stock**: Cambia en tiempo real (Dinámico).
+
+Hasta ahora, manejar esto requería estrategias complejas de segmentación o sacrificar rendimiento. **Next.js 16** introduce primitivas para resolver esto elegantemente.
+
+## Arquitectura de la Solución
+
+Este proyecto implementa una arquitectura de **Componentes Async Desacoplados**, donde cada componente es dueño de su propia estrategia de obtención y cacheo de datos.
+
+```tsx
+// ❌ Monolito de datos (Todo o nada)
+const product = await db.getProduct(id); 
+
+// ✅ Cache Components (Granularidad)
+<ProductText id={id} />      // 'use cache' + cacheLife('weeks')
+<ProductPrice id={id} />     // 'use cache' + cacheTag('price')
+<Suspense>
+  <ProductStock id={id} />   // Dinámico + Streaming
+</Suspense>
+```
+
+## Features Implementadas
+
+1.  **Cacheo Granular**: Control independiente por componente usando la directiva `'use cache'`.
+2.  **Revalidación por Tags**: Sistema de invalidación precisa. Un cambio de precio no obliga a re-renderizar la descripción del producto.
+3.  **Static Shell + Streaming**: El HTML base se sirve instantáneamente (como SSG), mientras que los datos vivos (Stock) entran vía streaming (PPR).
+4.  **Optimización Automática**: Next.js paraleliza las promesas automáticamente sin necesidad de `Promise.all` manual.
+
+## Valor Educativo
+
+Este repositorio sirve como un **campo de pruebas** para entender el futuro del data-fetching en React. Demuestra patrones correctos de `Suspense`, manejo de errores en Server Components y la integración de Zod para validar inputs en Server Actions.
+
+Es una referencia viva para equipos que planean migrar a Next.js 16 y adoptar PPR (Partial Prerendering).

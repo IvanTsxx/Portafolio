@@ -1,100 +1,93 @@
 ---
-title: SSR, SSG, ISR y PPR en Next.js - cuándo usar cada uno
-description: Guía para entender los distintos tipos de renderizado en Next.js y elegir el correcto según performance, SEO y necesidades del producto.
-keywords: ["Next.js", "React", "TypeScript", "Node.js", "Argentina"]
+title: "Guía de Renderizado en Next.js: SSR, SSG, ISR y PPR"
+description: "Domina las estrategias de renderizado en Next.js. Aprende cuándo usar Server-Side Rendering, Static Generation, Incremental Regeneration y Partial Prerendering para optimizar performance y SEO."
+keywords: ["Next.js Rendering", "Web Performance", "Core Web Vitals", "React Server Components", "SSR vs SSG", "Partial Prerendering"]
 ---
 
-Elegir mal el tipo de renderizado impacta directamente en **performance**, **SEO** y **costos de infraestructura**. Esta guía resume cuándo conviene usar cada estrategia.
+La elección de la estrategia de renderizado no es solo una decisión técnica; define la **Experiencia de Usuario (UX)**, el **SEO** y los **costos de infraestructura** de tu aplicación. 
+
+Esta guía técnica desglosa cuándo y por qué utilizar cada modelo en el ecosistema actual de Next.js.
 
 ---
 
 ## SSR (Server-Side Rendering)
+*Dynamic Rendering at Request Time*
 
-El HTML se genera en cada request en el servidor.
+El HTML se genera en el servidor **en cada petición**.
 
-**Cuándo usarlo:**
+**Ideal para:**
+*   **Datos en tiempo real**: Dashboards financieros, feeds de redes sociales.
+*   **Personalización crítica**: Páginas que dependen de cookies o headers del request.
+*   **SEO dinámico**: Contenido que cambia cada segundo y debe ser indexado.
 
-* Contenido dependiente del usuario (dashboards, cuentas, permisos)
-* Datos altamente dinámicos
-* Necesidad de SEO con información siempre fresca
-
-**Trade-offs:**
-
-* Mayor latencia que contenido estático
-* Mayor costo de servidor
+**Trade-offs Técnicos:**
+*   ⚠️ **Mayor TTFB (Time to First Byte)**: El usuario espera a que el servidor procese la página.
+*   💸 **Costo Computacional**: Requiere ejecución de servidor (Serverless/Node) por cada visita.
 
 ---
 
 ## SSG (Static Site Generation)
+*Build Once, Cache Forever*
 
-El HTML se genera en build time y se sirve desde CDN.
+El HTML se genera durante el **build time** y se distribuye globalmente vía CDN.
 
-**Cuándo usarlo:**
-
-* Landing pages
-* Blogs
-* Documentación
-* Marketing
+**Ideal para:**
+*   **Marketing Pages**: Landings, "About Us", Contacto.
+*   **Documentación**: Contenido que no cambia frecuentemente.
+*   **Blogs**: Artículos históricos.
 
 **Ventajas:**
-
-* Máxima performance
-* Costos mínimos
-* Excelente SEO
+*   🚀 **Performance Extrema**: El TTFB es insignificante (servido desde el Edge).
+*   ✅ **Estabilidad**: Si la API de datos falla, la página sigue funcionando (es un archivo estático).
 
 ---
 
 ## ISR (Incremental Static Regeneration)
+*Static Content with Dynamic Updates*
 
-Permite contenido estático con revalidación periódica sin rebuild completo.
+Combina la velocidad de SSG con la frescura de SSR. Permite regenerar páginas estáticas en el fondo tras un intervalo de tiempo (`revalidate`).
 
-**Cuándo usarlo:**
+**Ideal para:**
+*   **E-commerce**: Fichas de producto (precios/stock pueden tener un lag de minutos).
+*   **Sitios de Noticias**: Contenido que puede tolerar un retraso de 60 segundos.
 
-* E-commerce
-* Catálogos
-* Contenido que cambia cada cierto tiempo
-* SEO importante con datos relativamente frescos
-
-**Ventaja principal:** equilibrio entre performance y frescura.
+**Mecanismo:**
+1.  Usuario A visita la página → Recibe versión v1 (rápida desde caché).
+2.  Next.js detecta que el caché expiró → Inicia regeneración en background.
+3.  Usuario B visita la página → Recibe v2 actualizada.
 
 ---
 
 ## PPR (Partial Prerendering)
+*The Future of Hybrid Rendering*
 
-Combina partes estáticas con partes dinámicas usando streaming y Suspense.
+La "bala de plata" de Next.js. Permite que una misma ruta tenga un **shell estático** (SSG) de carga instantánea, mientras partes dinámicas (como un carrito de compras) se cargan vía **Streaming**.
 
-**Cuándo usarlo:**
+**Ideal para:**
+*   **Aplicaciones Modernas**: Donde el layout es estático pero el contenido es dinámico.
+*   **Optimización de Core Web Vitals**: Mejora drástica de LCP (Largest Contentful Paint) y reducce el CLS.
 
-* Interfaces complejas
-* Páginas con zonas críticas que deben cargar rápido
-* Mezcla de contenido público + personalizado
-
-**Beneficio:** prioriza el Time to First Byte y el Time to Interactive en secciones clave.
-
----
-
-## Comparación rápida
-
-| Estrategia | Performance | SEO  | Dinamismo | Costos |
-| ---------- | ----------- | ---- | --------- | ------ |
-| SSG        | ⭐⭐⭐⭐        | ⭐⭐⭐⭐ | ⭐         | ⭐      |
-| ISR        | ⭐⭐⭐⭐        | ⭐⭐⭐⭐ | ⭐⭐⭐       | ⭐⭐     |
-| SSR        | ⭐⭐          | ⭐⭐⭐⭐ | ⭐⭐⭐⭐      | ⭐⭐⭐    |
-| PPR        | ⭐⭐⭐⭐        | ⭐⭐⭐⭐ | ⭐⭐⭐⭐      | ⭐⭐     |
+**Beneficio:** Elimina el "waterfall" de datos. El usuario ve la estructura inmediatamente mientras los datos llegan.
 
 ---
 
-## Regla práctica
+## Matriz de Decisión
 
-No existe un default correcto.
+| Estrategia | Escenario Típico | Performance (LCP) | Costo Server |
+| :--- | :--- | :--- | :--- |
+| **SSG** | Blog, Landing | ⭐⭐⭐⭐⭐ (Instantáneo) | 📉 Bajo |
+| **ISR** | Catálogo Productos | ⭐⭐⭐⭐⭐ (Cache Hit) | 📉 Bajo-Medio |
+| **SSR** | Admin Panel, Feed | ⭐⭐ (Depende de DB) | 📈 Alto |
+| **PPR** | App Compleja | ⭐⭐⭐⭐ (Hybrid) | ⚖️ Balanceado |
 
-Existe **el renderizado correcto para cada tipo de contenido**.
+---
 
-La decisión debe basarse en:
+## Conclusión
 
-* Frecuencia de cambio de datos
-* Necesidad de SEO
-* Personalización por usuario
-* Presupuesto de infraestructura
+No existe un "mejor renderizado" universal.
 
-Si eliges bien el renderizado, optimizas producto, costos y experiencia de usuario al mismo tiempo.
+*   Si puedes hacerlo estático (**SSG**), hazlo estático.
+*   Si necesitas frescura pero puedes tolerar latencia, usa **SSR**.
+*   Si quieres lo mejor de ambos mundos para apps complejas, apuesta por **PPR**.
+
+Como ingenieros, nuestro trabajo es alinear la tecnología con los requerimientos del producto. Elige la estrategia que maximice el valor para el usuario final.

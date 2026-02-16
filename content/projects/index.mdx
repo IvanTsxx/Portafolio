@@ -1,18 +1,37 @@
 ---
-title: Index
-description: Mis proyectos open-source y personales - Aplicaciones web modernas con Next.js, React y TypeScript
-keywords: ["Next.js", "React", "TypeScript", "Node.js", "Argentina"]
+title: "Proyectos e Ingeniería de Software"
+description: "Showcase de aplicaciones web full-stack, librerías open-source y soluciones de arquitectura moderna."
+keywords: ["Next.js Projects", "Open Source", "Software Portfolio", "Full Stack Showcase", "React Architecture"]
 ---
 
-## Proyectos Destacados
+## Ingeniería Aplicada
 
-Mis proyectos open-source y personales. Aplicaciones web modernas construidas con Next.js, React y TypeScript.
+Colección de desarrollos donde exploro patrones de arquitectura avanzados, seguridad y performance a escala.
 
 <ProjectGrid>
   <ProjectCard
+    title="Pikuu"
+    description="Generador de Backend & UI con AI."
+    longDescription="Asistente técnico 'Schema-First' que genera código de producción real (Zod, Server Actions, Forms) a partir de ideas. Flujo iterativo, seguro y sin alucinaciones."
+    technologies={["Next.js", "AI SDK v6", "Prisma", "Zod", "Generative UI"]}
+    repoUrl="https://github.com/IvanTsxx/pikuu"
+    demoUrl={null}
+    internalRoute="/projects/pikuu"
+  />
+
+  <ProjectCard
+    title="Cache Components Demo"
+    description="Next.js 16 Granular Caching."
+    longDescription="Implementación técnica de referencia para cacheo granular utilizando las APIs 'use cache' y 'cacheTag' de Next.js 16. Optimización extrema de revalidación."
+    technologies={["Next.js 16", "React 19", "Granular Caching", "Server Actions"]}
+    repoUrl="https://github.com/IvanTsxx/cache-components-demo"
+    demoUrl={null}
+    internalRoute="/projects/cache-components-demo"
+  />
+  <ProjectCard
     title="Lules Market"
-    description="Plataforma web para comercios locales con gestión de productos, suscripciones y pagos integrados."
-    longDescription="Desarrollada con arquitectura simple, escalable y orientada a crecimiento. Backend liviano con ElysiaJS, PostgreSQL con Drizzle ORM, y pagos integrados mediante MercadoPago."
+    description="Ecosystema SaaS Hiperlocal."
+    longDescription="Plataforma de comercio electrónico diseñada para potenciar la economía local. Arquitectura multi-tenant escalable con Next.js y ElysiaJS, capaz de manejar miles de productos y transacciones seguras."
     technologies={["Next.js", "TypeScript", "ElysiaJS", "Drizzle ORM", "PostgreSQL", "MercadoPago"]}
     repoUrl="https://github.com/IvanTsxx/lules-market"
     demoUrl="https://lulesmarket.vercel.app"
@@ -21,8 +40,8 @@ Mis proyectos open-source y personales. Aplicaciones web modernas construidas co
 
   <ProjectCard
     title="MemesDev"
-    description="Plataforma open-source para compartir memes de programación."
-    longDescription="Autenticación moderna con Better Auth, arquitectura sólida con Next.js App Router, y base de datos PostgreSQL con Prisma."
+    description="Red Social Full-Stack."
+    longDescription="Implementación de referencia de una red social moderna. Combina autenticación segura (Better Auth), modelado de datos complejo (Prisma) y actualizaciones optimistas para una UX fluida."
     technologies={["Next.js", "TypeScript", "Prisma", "Better Auth", "PostgreSQL"]}
     repoUrl="https://github.com/IvanTsxx/MemesDev"
     demoUrl="https://memes-dev.vercel.app"
@@ -31,9 +50,9 @@ Mis proyectos open-source y personales. Aplicaciones web modernas construidas co
 
   <ProjectCard
     title="Better Auth + MercadoPago"
-    description="Plugin type-safe para pagos, suscripciones y webhooks de MercadoPago."
-    longDescription="Integración completa dentro del ecosistema Better Auth. Manejo de webhooks seguros y desacoplamiento de la lógica de pagos."
-    technologies={["TypeScript", "Better Auth", "MercadoPago"]}
+    description="Infraestructura de Pagos."
+    longDescription="Plugin de misión crítica que resuelve la integración de facturación en aplicaciones Next.js. Provee una API 100% type-safe para manejar suscripciones y webhooks sin errores en runtime."
+    technologies={["TypeScript", "Better Auth", "MercadoPago", "NPM Package"]}
     repoUrl="https://github.com/IvanTsxx/better-auth-mercadopago"
     npmUrl="https://www.npmjs.com/package/better-auth-mercadopago"
     internalRoute="/projects/better-auth-mp-plugin"
@@ -41,7 +60,7 @@ Mis proyectos open-source y personales. Aplicaciones web modernas construidas co
 </ProjectGrid>
 
 <ContactSection
-  title="¿Te interesa colaborar?"
-  subtitle="Siempre estoy abierto a nuevos proyectos y colaboraciones open-source."
+  title="Colaboración Open Source"
+  subtitle="¿Tenés una idea ambiciosa? Contribuyo activamente en proyectos que desafían el status quo tecnológico."
   
 />

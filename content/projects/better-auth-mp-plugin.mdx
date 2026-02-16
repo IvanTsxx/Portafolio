@@ -1,46 +1,44 @@
 ---
-title: Integración Better Auth + MercadoPago
-description: Plugin type-safe para pagos, suscripciones y webhooks de MercadoPago dentro del ecosistema Better Auth.
-keywords: ["TypeScript", "Zod", "BiomeJS", "Better Auth", "MercadoPago", "Tsup", "Argentina"]
+title: "Better Auth + MercadoPago: Pagos Type-Safe"
+description: "Plugin de infraestructura para integrar pagos recurrentes y únicos de MercadoPago en el ecosistema Better Auth con tipado estricto end-to-end."
+keywords: ["TypeScript", "Zod", "Better Auth", "MercadoPago Integration", "Payment Infrastructure", "Backend Development"]
 ---
 
 <DetailHeader
   title="Better Auth + MercadoPago"
-  subtitle="Plugin que integra pagos, suscripciones y webhooks de MercadoPago dentro del ecosistema Better Auth, manteniendo una arquitectura desacoplada y completamente type-safe."
+  subtitle="Plugin que resuelve la fricción entre autenticación y facturación, proporcionando una capa de abstracción type-safe para MercadoPago dentro de Better Auth."
   backHref="/projects"
   backLabel="Proyectos"
   technologies={["TypeScript", "Zod", "BiomeJS", "Better Auth", "MercadoPago", "Tsup"]}
   links={[
-    { label: "NPM", url: "https://www.npmjs.com/package/better-auth-mercadopago" },
-    { label: "Código", url: "https://github.com/IvanTsxx/better-auth-mercadopago" }
+    { label: "NPM Package", url: "https://www.npmjs.com/package/better-auth-mercadopago" },
+    { label: "Código Fuente", url: "https://github.com/IvanTsxx/better-auth-mercadopago" }
   ]}
 />
 
-## Problema
+## El Problema de la Integración de Pagos
 
-Integrar pagos en aplicaciones modernas suele **degradar arquitecturas bien diseñadas**:
+Integrar pasarelas de pago suele introducir **deuda técnica inmediata**:
+*   **Webhooks "Caja Negra"**: Payloads sin tipar que rompen en runtime.
+*   **Lógica Dispersa**: Controladores de pago mezclados con lógica de negocio.
+*   **Desincronización**: El estado del usuario en la DB no coincide con el estado en la pasarela.
 
-- Lógica duplicada
-- Webhooks acoplados a la aplicación
-- Pérdida de tipado end-to-end
-- Sistema de autenticación fragmentado
+## La Solución: Infraestructura como Código
 
-## Solución
+Este plugin no es solo un wrapper; es una pieza de **infraestructura** que estandariza cómo tu aplicación maneja el dinero.
 
-Este plugin integra pagos, suscripciones y webhooks de **MercadoPago** directamente dentro del ecosistema Better Auth, permitiendo mantener **coherencia arquitectónica** sin sacrificar tipado ni mantenibilidad.
+### Arquitectura Type-Safe
+Utilizando **Zod** y **TypeScript**, cada interacción con la API de MercadoPago está validada. Si el esquema de pago cambia, tu build falla antes de llegar a producción.
 
-El objetivo es que billing y autenticación convivan de forma **predecible, extensible** y fácil de integrar.
+### Principios de Diseño
+1.  **Desacoplamiento Estricto**: La lógica de facturación vive aislada de la lógica de producto.
+2.  **Developer Experience (DX)**: Autocompletado inteligente para planes, suscripciones y eventos.
+3.  **Webhook Handler Unificado**: Un solo endpoint para gobernar todos los eventos de pago, con validación de firmas criptográficas automática.
 
-## Principios de diseño
+## Impacto Técnico
 
-- API completamente **type-safe**
-- Separación clara entre **auth y billing**
-- Integración simple en **proyectos existentes**
-- Arquitectura preparada para **escalar sin fricción**
-- Webhooks **desacoplados y tipados**
+*   **Reducción de Boilerplate**: Elimina +200 líneas de código repetitivo de integración.
+*   **Seguridad**: Validación automática de firmas y payloads.
+*   **Mantenibilidad**: Actualizaciones centralizadas al sdk de MercadoPago sin tocar el código de producto.
 
-## Resultado
-
-Menos complejidad operativa, reducción de bugs relacionados con pagos y una integración consistente dentro del flujo de autenticación.
-
-El plugin funciona tanto como **solución productiva** como referencia técnica para integrar sistemas de billing en aplicaciones modernas.
+Diseñado para equipos que valoran la robustez y la seguridad en sus flujos de ingresos.

@@ -1,0 +1,55 @@
+---
+title: "Pikuu: Generador de Backend & UI con AI"
+description: "Herramienta de desarrollo 'Schema-First' que genera código de producción (Zod, Server Actions, UI) a partir de ideas o esquemas de base de datos."
+keywords: ["AI Developer Tool", "Next.js Generator", "Prisma Schema", "Vercel AI SDK", "TanStack Form", "Generative UI"]
+---
+
+<DetailHeader
+  title="Pikuu"
+  subtitle="Asistente técnico iterativo que transforma esquemas de datos en aplicaciones Next.js completas. Genera código de producción real, no placeholders."
+  backHref="/projects"
+  backLabel="Proyectos"
+  technologies={["Next.js", "TypeScript (Strict)", "Prisma", "Zod", "AI SDK v6", "TanStack Form", "shadcn/ui"]}
+  links={[
+    { label: "Solicitar Acceso", url: "mailto:ivanbongiovanni@hotmail.com" }
+  ]}
+/>
+
+## La Evolución del Code Gen
+
+Pikuu no es otro generador de código genérico que escupe archivos sin contexto. Es un **asistente técnico** diseñado para integrarse en el flujo de trabajo de un desarrollador senior.
+
+A diferencia de herramientas que intentan "hacer todo" de una vez, Pikuu adopta un enfoque **iterativo y granular**:
+*   Entiende el contexto global del proyecto.
+*   Modifica solo lo que le pides.
+*   Mantiene el estado entre iteraciones.
+
+## Features de Ingeniería
+
+El núcleo de Pikuu está construido para respetar las buenas prácticas de arquitectura moderna en Next.js:
+
+*   **Schema-First Design**: Genera `schema.prisma` optimizados desde una idea abstracta o consume esquemas existentes.
+*   **Seguridad de Tipado**: Crea esquemas de validación **Zod** sincronizados con tu base de datos.
+*   **Backend Robusto**: Escribe **Server Actions** o Route Handlers puros, asegurando que nunca se mezcle lógica de servidor y cliente.
+*   **Forms de Producción**: Genera formularios complejos usando **shadcn/ui** integrados con **TanStack Form** para manejo de estado y validación.
+
+## Filosofía: No Placeholders
+
+La regla de oro de Pikuu es: **"Si no corre en producción, no sirve"**.
+
+1.  **Iteración Controlada**: Nada de regenerar todo el proyecto por un cambio pequeño.
+2.  **Streaming UI**: Visualiza los cambios en tiempo real mediante artefactos de UI generados al vuelo (Generative UI).
+3.  **Strict TypeScript**: Todo el código generado pasa los chequeos más estrictos de TypeScript.
+
+## Stack Tecnológico
+
+La herramienta utiliza lo último del ecosistema de Vercel y React:
+*   **Motor AI**: Vercel AI SDK v6 + AI Elements para streaming de componentes.
+*   **Base de Datos**: PostgreSQL + Prisma ORM.
+*   **Interfaz**: Framer Motion para transiciones fluidas y shadcn/ui.
+
+## Licencia
+
+Este es un proyecto **Source-Available**. El código fuente está disponible para fines educativos y de auditoría, pero su uso comercial, redistribución o modificación para servicios derivados está restringida sin permiso explícito.
+
+¿Te interesa implementar Pikuu en tu equipo? [Hablemos](/).

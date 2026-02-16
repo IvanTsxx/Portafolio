@@ -1,53 +1,47 @@
 ---
-title: Lules Market
-description: Plataforma web para comercios locales con gestión de productos, suscripciones y pagos integrados.
-keywords: ["Next.js", "TypeScript", "Zod", "shadcn/ui", "TanStack Form", "BiomeJS", "Drizzle ORM", "PostgreSQL", "MercadoPago", "ElysiaJS", "Vercel", "Argentina"]
+title: "Lules Market: E-commerce Hiperlocal"
+description: "Plataforma de comercio electrónico diseñada para potenciar la economía local. Arquitectura escalable con Next.js, pagos integrados y gestión de suscripciones."
+keywords: ["Next.js E-commerce", "Marketplace Development", "SaaS Architecture", "Local Economy", "Scalable Web App", "Fintech Integration"]
 ---
 
 <DetailHeader
   title="Lules Market"
-  subtitle="Plataforma web para comercios locales que permite gestionar productos, suscripciones y pagos mediante MercadoPago, con una arquitectura simple, escalable y orientada a crecimiento."
+  subtitle="Marketplace hiperlocal que digitaliza el comercio de barrio. Conecta vecinos con negocios mediante una plataforma robusta, rápida y fácil de usar."
   backHref="/projects"
   backLabel="Proyectos"
   technologies={["Next.js", "TypeScript", "Zod", "shadcn/ui", "TanStack Form", "BiomeJS", "Drizzle ORM", "PostgreSQL", "MercadoPago", "ElysiaJS", "Vercel"]}
   links={[
-    { label: "Demo", url: "https://lulesmarket.vercel.app" },
-    { label: "Código", url: "https://github.com/IvanTsxx/lules-market" }
+    { label: "Visitar Demo", url: "https://lulesmarket.vercel.app" },
+    { label: "Código Fuente", url: "https://github.com/IvanTsxx/lules-market" }
   ]}
 />
 
-## Visión del producto
+## Visión del Producto: Digitalizando el Barrio
 
-Lules Market es una plataforma web pensada para **comercios locales** que necesitan presencia digital sin intermediarios complejos ni costos innecesarios.
+Lules Market nace con una misión clara: **democratizar el acceso al e-commerce** para pequeños comerciantes que no pueden costear desarrollos a medida.
 
-El objetivo fue construir un sistema **simple para el usuario final**, pero sólido a nivel técnico, permitiendo evolucionar el producto sin deuda técnica temprana.
+No es solo una tienda, es un **ecosistema SaaS** donde cada comercio gestiona su inventario, ventas y suscripciones de forma autónoma.
 
-## Funcionalidad principal
+## Arquitectura para Escalar
 
-- Publicación de **productos y servicios**
-- Sistema de **suscripciones** para comercios
-- Contacto directo entre **cliente y negocio**
-- Gestión de archivos y **recursos multimedia**
-- Pagos integrados con **MercadoPago**
+El desafío técnico fue construir un sistema que se sienta simple para el usuario ("Abuela-proof") pero que sea tecnológicamente avanzado bajo el capó.
 
-## Decisiones técnicas clave
+### Backend & Datos
+*   **ElysiaJS (Bun)**: Elegido por su performance superior y baja latencia en el manejo de API REST.
+*   **SQL-First con Drizzle**: Consultas a base de datos eficientes, type-safe y sin la overhead de ORMs tradicionales. PostgreSQL asegura la integridad referencial de miles de productos y transacciones.
 
-El proyecto prioriza claridad arquitectónica y control sobre la infraestructura:
+### Frontend & UX
+*   **Optimizistic UI**: Las interacciones (likes, carrito, suscripción) se sienten instantáneas.
+*   **Accesibilidad**: Componentes de `shadcn/ui` garantizan que la plataforma sea usable por todos.
 
-- Backend liviano con **ElysiaJS**
-- **PostgreSQL** como base de datos principal
-- **Drizzle ORM** con enfoque SQL-first
-- Validación estricta con **Zod**
-- Infraestructura serverless desplegada en **Vercel**
+## Infraestructura de Pagos
 
-## Pagos y suscripciones
+Integración profunda con **MercadoPago** para manejar el ciclo de vida financiero del comercio:
 
-La integración con **MercadoPago** fue diseñada para:
+1.  **Onboarding Automatizado**: Suscripción de comercios al plan mensual.
+2.  **Webhooks Resilientes**: Sistema a prueba de fallos para procesar confirmaciones de pago incluso con intermitencias de red.
+3.  **Seguridad**: Validación de firmas y tokens para prevenir fraudes.
 
-- Manejar **webhooks de forma segura**
-- Desacoplar la lógica de pagos del resto del sistema
-- Permitir escalar el modelo de suscripción **sin reescribir el core**
+## Impacto
 
-## Resultado
-
-Una plataforma lista para crecer, con arquitectura clara, mantenible y preparada para evolucionar sin fricción técnica.
+Lules Market demuestra que la tecnología de punta no es solo para startups de Silicon Valley; es una herramienta poderosa para **reactivar economías locales** con software de calidad global.
