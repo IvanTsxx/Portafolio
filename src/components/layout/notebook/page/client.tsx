@@ -114,7 +114,7 @@ export function PageTOCPopoverTrigger({ className, ...props }: ComponentProps<'b
       <span className="grid flex-1 *:my-auto *:row-start-1 *:col-start-1">
         <span
           className={cn(
-            'truncate transition-[opacity,translate,color]',
+            'truncate transition-all',
             open && 'text-fd-foreground',
             showItem && 'opacity-0 -translate-y-full pointer-events-none',
           )}
@@ -123,7 +123,7 @@ export function PageTOCPopoverTrigger({ className, ...props }: ComponentProps<'b
         </span>
         <span
           className={cn(
-            'truncate transition-[opacity,translate]',
+            'truncate transition-all',
             !showItem && 'opacity-0 translate-y-full pointer-events-none',
           )}
         >

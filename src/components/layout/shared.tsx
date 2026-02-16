@@ -106,7 +106,7 @@ export function useLinkItems({ githubUrl, links }: Pick<BaseLayoutProps, 'links'
     const menuItems: LinkItemType[] = [];
 
     for (const item of all) {
-      switch (item.on) {
+      switch (item.on ?? 'all') {
         case 'menu':
           menuItems.push(item);
           break;

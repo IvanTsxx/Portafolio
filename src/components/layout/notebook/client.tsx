@@ -16,10 +16,10 @@ import { useSidebar } from '../sidebar/base';
 import { ChevronDown } from 'lucide-react';
 import Link from 'fumadocs-core/link';
 import { usePathname } from 'fumadocs-core/framework';
+import { isTabActive, type SidebarTabWithProps } from '../sidebar/tabs/dropdown';
 import { useIsScrollTop } from 'fumadocs-ui/utils/use-is-scroll-top';
 import { LinkItem, type LinkItemType, type MenuItemType } from '../link-item';
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover';
-import { isTabActive, type SidebarTabWithProps } from '../sidebar/tabs/dropdown';
 
 export const LayoutContext = createContext<
   | (LayoutInfo & {

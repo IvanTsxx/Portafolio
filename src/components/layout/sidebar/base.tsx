@@ -24,9 +24,9 @@ import {
   type CollapsibleTriggerProps,
 } from '../../ui/collapsible';
 import { useMediaQuery } from 'fumadocs-core/utils/use-media-query';
-import { Presence } from '@radix-ui/react-presence';
 import scrollIntoView from 'scroll-into-view-if-needed';
 import { usePathname } from 'fumadocs-core/framework';
+import ReactDOM from 'react-dom';
 
 interface SidebarContext {
   open: boolean;
@@ -129,10 +129,8 @@ export function useFolderDepth() {
 }
 
 export function SidebarContent({
-  mode: allowedMode = 'full',
   children,
 }: {
-  mode?: Mode | true;
   children: (state: {
     ref: RefObject<HTMLElement | null>;
     collapsed: boolean;
@@ -150,7 +148,7 @@ export function SidebarContent({
     if (collapsed) setHover(false);
   });
 
-  if (allowedMode !== true && allowedMode !== mode) return;
+  if (mode !== 'full') return;
 
   function shouldIgnoreHover(e: PointerEvent): boolean {
     const element = ref.current;
@@ -183,39 +181,51 @@ export function SidebarContent({
 
 export function SidebarDrawerOverlay(props: ComponentProps<'div'>) {
   const { open, setOpen, mode } = useSidebar();
+  const [hidden, setHidden] = useState(!open);
 
-  if (mode !== 'drawer') return;
+  if (open && hidden) setHidden(false);
+  if (mode !== 'drawer' || hidden) return;
   return (
-    <Presence present={open}>
-      <div data-state={open ? 'open' : 'closed'} onClick={() => setOpen(false)} {...props} />
-    </Presence>
+    <div
+      data-state={open ? 'open' : 'closed'}
+      onClick={() => setOpen(false)}
+      onAnimationEnd={() => {
+        if (!open) ReactDOM.flushSync(() => setHidden(true));
+      }}
+      {...props}
+    />
   );
 }
 
 export function SidebarDrawerContent({ className, children, ...props }: ComponentProps<'aside'>) {
   const { open, mode } = useSidebar();
-  const state = open ? 'open' : 'closed';
+  const [hidden, setHidden] = useState(!open);
 
+  if (open && hidden) setHidden(false);
   if (mode !== 'drawer') return;
   return (
-    <Presence present={open}>
-      {({ present }) => (
-        <aside
-          id="nd-sidebar-mobile"
-          data-state={state}
-          className={cn(!present && 'invisible', className)}
-          {...props}
-        >
-          {children}
-        </aside>
-      )}
-    </Presence>
+    <aside
+      id="nd-sidebar-mobile"
+      data-state={open ? 'open' : 'closed'}
+      className={cn(hidden && 'invisible', className)}
+      onAnimationEnd={() => {
+        if (!open) ReactDOM.flushSync(() => setHidden(true));
+      }}
+      {...props}
+    >
+      {children}
+    </aside>
   );
 }
 
-export function SidebarViewport(props: ScrollAreaProps) {
+export function SidebarViewport({ className, ...props }: ScrollAreaProps) {
   return (
-    <ScrollArea {...props} className={cn('min-h-0 flex-1', props.className)}>
+    <ScrollArea
+      className={(s) =>
+        cn('min-h-0 flex-1', typeof className === 'function' ? className(s) : className)
+      }
+      {...props}
+    >
       <ScrollViewport
         className="p-4 overscroll-contain"
         style={

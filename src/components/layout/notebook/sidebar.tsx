@@ -28,25 +28,13 @@ function getItemOffset(depth: number) {
   return `calc(${2 + 3 * depth} * var(--spacing))`;
 }
 
-export function Sidebar(props: ComponentProps<typeof Base.SidebarProvider>) {
-  return <Base.SidebarProvider {...props} />;
-}
-
-export function SidebarFolder(props: ComponentProps<typeof Base.SidebarFolder>) {
-  return <Base.SidebarFolder {...props} />;
-}
-
-export function SidebarCollapseTrigger(props: ComponentProps<typeof Base.SidebarCollapseTrigger>) {
-  return <Base.SidebarCollapseTrigger {...props} />;
-}
-
-export function SidebarViewport(props: ComponentProps<typeof Base.SidebarViewport>) {
-  return <Base.SidebarViewport {...props} />;
-}
-
-export function SidebarTrigger(props: ComponentProps<typeof Base.SidebarTrigger>) {
-  return <Base.SidebarTrigger {...props} />;
-}
+export const {
+  SidebarProvider: Sidebar,
+  SidebarFolder,
+  SidebarCollapseTrigger,
+  SidebarViewport,
+  SidebarTrigger,
+} = Base;
 
 export function SidebarContent({
   ref: refProp,
@@ -169,7 +157,13 @@ export function SidebarFolderTrigger({
 
   return (
     <Base.SidebarFolderTrigger
-      className={cn(itemVariants({ variant: collapsible ? 'button' : null }), 'w-full', className)}
+      className={(s) =>
+        cn(
+          itemVariants({ variant: collapsible ? 'button' : null }),
+          'w-full',
+          typeof className === 'function' ? className(s) : className,
+        )
+      }
       style={{
         paddingInlineStart: getItemOffset(depth - 1),
         ...style,
@@ -211,12 +205,14 @@ export function SidebarFolderContent({
 
   return (
     <Base.SidebarFolderContent
-      className={cn(
-        'relative',
-        depth === 1 &&
-          "before:content-[''] before:absolute before:w-px before:inset-y-1 before:bg-fd-border before:start-2.5",
-        className,
-      )}
+      className={(s) =>
+        cn(
+          'relative',
+          depth === 1 &&
+            "before:content-[''] before:absolute before:w-px before:inset-y-1 before:bg-fd-border before:start-2.5",
+          typeof className === 'function' ? className(s) : className,
+        )
+      }
       {...props}
     >
       {children}

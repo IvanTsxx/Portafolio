@@ -4,7 +4,7 @@ import { type ComponentProps, type ReactNode, useMemo, useState } from 'react';
 import Link from 'fumadocs-core/link';
 import { usePathname } from 'fumadocs-core/framework';
 import { cn } from '../../../../lib/cn';
-import { isActive, normalize } from '../../../../lib/urls';
+import { normalize, isActive } from '../../../../lib/urls';
 import { useSidebar } from '../base';
 import { Popover, PopoverContent, PopoverTrigger } from '../../../ui/popover';
 import type { SidebarTab } from './index';
@@ -54,7 +54,7 @@ export function SidebarTabsDropdown({
         <PopoverTrigger
           {...props}
           className={cn(
-            'flex items-center gap-2 rounded-lg p-2 border bg-fd-secondary/50 text-start text-fd-secondary-foreground transition-colors hover:bg-fd-accent data-[state=open]:bg-fd-accent data-[state=open]:text-fd-accent-foreground',
+            'flex items-center gap-2 rounded-lg p-2 border bg-fd-secondary/50 text-start text-fd-secondary-foreground transition-colors hover:bg-fd-accent data-open:bg-fd-accent data-open:text-fd-accent-foreground',
             props.className,
           )}
         >
@@ -62,7 +62,7 @@ export function SidebarTabsDropdown({
           <ChevronsUpDown className="shrink-0 ms-auto size-4 text-fd-muted-foreground" />
         </PopoverTrigger>
       )}
-      <PopoverContent className="flex flex-col gap-1 w-(--radix-popover-trigger-width) p-1 fd-scroll-container">
+      <PopoverContent className="flex flex-col gap-1 w-(--anchor-width) p-1 fd-scroll-container">
         {options.map((item) => {
           const isActive = selected && item.url === selected.url;
           if (!isActive && item.unlisted) return;
