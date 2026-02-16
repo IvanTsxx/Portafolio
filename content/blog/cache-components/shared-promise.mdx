@@ -1,0 +1,92 @@
+---
+title: Caso - Promise compartida
+description: Una query, una promesa y Suspense por bloque
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+# Caso alternativo: Promise compartida por campo
+
+1. Crear una sola promesa en el padre con `db.getProduct(id)` (sin `await`)
+2. Pasar esa promesa a cada componente de campo
+3. Envolver cada campo en su propio `<Suspense>`
+4. Deconstruir adentro de cada componente: `const { stock } = await productPromise`
+
+## Ruta del demo
+
+- `/product/[id]/shared-promise`
+- Ejemplo directo: `/product/1/shared-promise`
+
+## Implementación
+
+```tsx title="app/product/[id]/shared-promise/_components/product-content-shared-promise.tsx"
+export async function ProductContentSharedPromise({ params }) {
+  const { id } = await params
+  const safeProductId = parseProductId(id)
+
+  // Una sola llamada / una sola promesa
+  const productPromise = db.getProduct(safeProductId)
+
+  return (
+    <>
+      <Suspense fallback={<ProductTextFromPromiseSkeleton />}>
+        <ProductTextFromPromise productPromise={productPromise} />
+      </Suspense>
+
+      <Suspense fallback={<ProductPriceFromPromiseSkeleton />}>
+        <ProductPriceFromPromise productPromise={productPromise} />
+      </Suspense>
+
+      <Suspense fallback={<ProductStockFromPromiseSkeleton />}>
+        <ProductStockFromPromise productPromise={productPromise} />
+      </Suspense>
+    </>
+  )
+}
+```
+
+Cada bloque consume la misma promesa:
+
+```tsx title="Ejemplo de bloque"
+export async function ProductStockFromPromise({ productPromise }) {
+  const { stock, lastChecked } = await productPromise
+  return <div>{stock} - {lastChecked}</div>
+}
+```
+
+## Qué ganas y qué pierdes
+
+<Tabs items={['Ventajas', 'Trade-offs']}>
+  <Tab value="Ventajas">
+
+  - ✅ Una sola query por request para el payload completo
+  - ✅ Menos duplicación de lógica de acceso a datos
+  - ✅ Granularidad visual: cada bloque mantiene su `Suspense`
+  - ✅ Útil cuando los campos cambian juntos o el registro es pequeño
+
+  </Tab>
+  <Tab value="Trade-offs">
+
+  - ⚠️ Si invalidas ese recurso, se recalcula todo el payload
+  - ⚠️ Pierdes invalidación fina por campo (texto/precio separado)
+  - ⚠️ El costo de query puede subir si solo necesitabas un campo
+
+  </Tab>
+</Tabs>
+
+<Callout type="info">
+No hay una opción universalmente mejor. Este patrón prioriza simplicidad de acceso a datos + una sola query, mientras que el enfoque multi-query prioriza invalidación por campo.
+</Callout>
+
+## Cuándo usar cada patrón
+
+- **Shared promise (`getProduct`)**: cuando quieres una sola query y datos que suelen viajar juntos.
+- **Multi-query granular**: cuando texto/precio/stock tienen ciclos de vida distintos y necesitas tags por campo.
+
+## Cómo validarlo en la demo
+
+1. Abre `/product/1/shared-promise`
+2. Mira la consola del server
+3. Deberías ver `getProduct (all fields)` una vez por request en esa ruta
+4. Compara con `/product/1`, donde verás queries separadas por campo

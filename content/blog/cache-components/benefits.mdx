@@ -1,0 +1,158 @@
+---
+title: Beneficios y costes
+description: Cómo estimar ahorro real con Cache Components granulares
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+# Beneficios y Costes de Cache Components
+
+Cache Components no solo mejora UX; también puede bajar costes operativos cuando reduces trabajo en request time.
+
+## Qué se ahorra realmente
+
+En arquitectura granular, el ahorro principal suele venir de:
+
+- Menos queries en request time
+- Menos CPU de render por request
+- Menor presión sobre picos de tráfico
+- Mejor cache hit ratio en contenido estable
+
+<Callout type="info">
+El objetivo no es "cero queries", sino mover trabajo repetitivo de request time hacia contenido cacheado y controlado por `cacheLife` + tags.
+</Callout>
+
+## Modelo mental simple
+
+Piensa en dos capas:
+
+1. **Trabajo en build/revalidación**: costo amortizado
+2. **Trabajo por request**: costo variable (escala con tráfico)
+
+Cuando el tráfico crece, el costo variable domina. Por eso reducir trabajo por request suele impactar más en coste final.
+
+## Comparación rápida
+
+<Tabs items={['Tradicional', 'Granular con Cache Components']}>
+  <Tab value="Tradicional">
+    ```tsx
+    async function ProductPage({ id }) {
+      const product = await db.query('SELECT * FROM products WHERE id = ?', [id])
+      return <UI product={product} />
+    }
+    ```
+
+    - 1 query grande por request
+    - Render completo por request
+    - Menor complejidad inicial
+  </Tab>
+
+  <Tab value="Granular con Cache Components">
+    ```tsx
+    export default function ProductPage({ params }) {
+      return (
+        <Suspense fallback={<PageSkeleton />}>
+          <ProductContent params={params} />
+        </Suspense>
+      )
+    }
+
+    async function ProductText({ id }) {
+      'use cache'
+      cacheTag(`product-text-${id}`)
+      cacheLife('weeks')
+      return db.getProductText(id)
+    }
+
+    async function ProductPrice({ id }) {
+      'use cache'
+      cacheTag(`product-price-${id}`)
+      cacheLife('hours')
+      return db.getProductPrice(id)
+    }
+
+    async function ProductStock({ id }) {
+      return db.getProductStock(id)
+    }
+    ```
+
+    - Texto y precio cacheados
+    - Solo stock queda siempre fresh
+    - Más control sobre qué invalida y cuándo
+  </Tab>
+</Tabs>
+
+## Fórmulas útiles para estimar ahorro
+
+Si defines:
+
+- `R` = requests por día
+- `Q_all` = queries/request en enfoque tradicional
+- `Q_rt` = queries/request que quedan sin cache (request time)
+
+Entonces:
+
+- **Queries request-time tradicionales** = `R * Q_all`
+- **Queries request-time granulares** = `R * Q_rt`
+- **Ahorro request-time** = `R * (Q_all - Q_rt)`
+
+### Ejemplo numérico
+
+- `R = 1,000,000`
+- Tradicional: `Q_all = 1` (query completa)
+- Granular: `Q_rt = 1` (solo stock)
+
+En este ejemplo no bajas cantidad de queries/request, pero sí:
+
+- Bajas tamaño y costo de la query request-time
+- Sirves parte del HTML ya resuelto
+- Mejoras TTFB percibido por static shell + streaming
+
+Si en tu caso tradicional tenía varias queries request-time y en granular dejas solo una pequeña, el ahorro crece de forma significativa.
+
+## Beneficio de negocio (educativo)
+
+Para explicar ahorro en una demo, habla en términos de:
+
+1. **Costo variable por request** (DB + CPU)
+2. **Costo amortizado por revalidación**
+3. **Latencia percibida** (usuario ve contenido útil antes)
+
+<Callout type="success">
+En productos con alto tráfico y contenido mayormente estable, el patrón granular suele reducir costo variable y mejorar experiencia al mismo tiempo.
+</Callout>
+
+## Dónde puede salir más caro
+
+No todo debe cachearse granularmente. Puede empeorar si:
+
+- Fragmentas en demasiados componentes sin necesidad
+- Diseñas tags ambiguos o difíciles de invalidar
+- Revalidas en exceso por eventos muy frecuentes
+
+### Regla práctica
+
+- Cachea granular solo campos con volatilidad distinta
+- Usa el perfil de `cacheLife` más largo aceptable
+- Prefiere invalidación por tags específicos
+
+## Checklist de implementación
+
+- [ ] `cacheComponents: true` habilitado
+- [ ] Componentes cacheados con `'use cache'`
+- [ ] `cacheTag` por unidad funcional (ej. `product-price-${id}`)
+- [ ] `revalidateTag` / `updateTag` según consistencia requerida
+- [ ] Runtime data dentro de `Suspense`
+- [ ] Medición con logs y headers (`x-nextjs-cache`)
+
+## Qué medir en producción
+
+Métricas mínimas recomendadas:
+
+- P95/P99 de latencia en páginas críticas
+- Ratio HIT/MISS/STALE por ruta
+- Queries por request (promedio y percentiles)
+- CPU por request en SSR
+
+Con esas 4 métricas puedes justificar ahorro de costos con datos, no solo con teoría.
