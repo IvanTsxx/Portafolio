@@ -1,6 +1,7 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { FileDown } from "lucide-react";
 import { ArgIcon } from "@/components/icons";
+import { DownloadCVButton } from "@/components/mdx/download-cv";
 import { buttonVariants } from "@/components/ui/button-variants";
 
 // fill this with your actual GitHub info, for example:
@@ -14,26 +15,20 @@ export function baseOptions(): BaseLayoutProps {
       {
         type: "custom",
         children: (
-          <button
-            className={buttonVariants({
-              variant: "outline",
-              size: "sm",
-              className:
-                "gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground",
-            })}
-            type="button"
-          >
-            <a
-              aria-label="Descargar CV"
-              className="flex items-center gap-2"
-              download
-              href="/cv.pdf"
-              title="Descargar CV"
+          <DownloadCVButton>
+            <button
+              className={buttonVariants({
+                variant: "outline",
+                size: "sm",
+                className:
+                  "gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground",
+              })}
+              type="button"
             >
               <FileDown className="h-4 w-4" />
               Descargar CV
-            </a>
-          </button>
+            </button>
+          </DownloadCVButton>
         ),
         secondary: true,
       },
