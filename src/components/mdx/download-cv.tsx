@@ -1,4 +1,4 @@
-import { Download, FileText } from "lucide-react";
+import { Download } from "lucide-react";
 
 interface DownloadCVButtonProps {
   cvUrl?: string;
@@ -6,8 +6,8 @@ interface DownloadCVButtonProps {
 }
 
 export function DownloadCVButton({
-  cvUrl = "/cv-ivan-bongiovanni.pdf",
-  fileName = "CV-Ivan-Bongiovanni.pdf",
+  cvUrl = "/CV.pdf",
+  fileName = "CV.pdf",
 }: DownloadCVButtonProps) {
   return (
     <a
@@ -22,25 +22,14 @@ export function DownloadCVButton({
 }
 
 interface CVSectionProps {
-  title?: string;
-  description?: string;
   cvUrl?: string;
 }
 
-export function CVSection({
-  title = "¿Querés mi CV?",
-  description = "Descargá mi curriculum completo en PDF con toda mi experiencia, proyectos y stack tecnológico detallado.",
-  cvUrl,
-}: CVSectionProps) {
+export function CVSection({ cvUrl }: CVSectionProps) {
   return (
     <div className="not-prose flex items-start gap-3 rounded-xl border border-fd-border bg-fd-card p-5">
-      <FileText className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
       <div className="flex-1">
-        <h3 className="font-semibold text-fd-foreground">{title}</h3>
-        <p className="mt-1 text-fd-muted-foreground text-sm">{description}</p>
-        <div className="mt-3">
-          <DownloadCVButton cvUrl={cvUrl} />
-        </div>
+        <DownloadCVButton cvUrl={cvUrl} />
       </div>
     </div>
   );

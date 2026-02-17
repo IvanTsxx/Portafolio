@@ -14,10 +14,10 @@ export function StatsCard({ label, value, className }: StatsCardProps) {
         className
       )}
     >
-      <span className="font-bold text-3xl text-fd-foreground tracking-tight md:text-4xl">
+      <span className="font-bold text-fd-foreground tracking-tight md:text-2xl">
         {value}
       </span>
-      <span className="mt-2 font-medium text-fd-muted-foreground text-sm uppercase tracking-wider">
+      <span className="mt-1 font-medium text-fd-muted-foreground text-sm uppercase tracking-wider">
         {label}
       </span>
     </div>

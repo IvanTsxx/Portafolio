@@ -3,6 +3,7 @@ import { getNowPlaying } from "@/lib/spotify";
 
 export async function SpotifyWidget() {
   const track = await getNowPlaying();
+  console.log("TRACK:", track);
 
   return (
     <a
@@ -16,7 +17,7 @@ export async function SpotifyWidget() {
       target="_blank"
     >
       {/* Album Art */}
-      {track.isPlaying && "albumImageUrl" in track && track.albumImageUrl ? (
+      {track.albumImageUrl ? (
         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
           <img
             alt={`${track.album} cover`}
@@ -36,24 +37,10 @@ export async function SpotifyWidget() {
       {/* Track Info */}
       <div className="min-w-0 flex-1">
         <div className="mb-0.5 flex items-center gap-1.5">
-          {track.isPlaying ? (
-            <div className="flex items-end gap-[2px]">
-              <span
-                className="w-[3px] rounded-full bg-[#1DB954]"
-                style={{ animation: "eq-bar-1 0.8s ease-in-out infinite" }}
-              />
-              <span
-                className="w-[3px] rounded-full bg-[#1DB954]"
-                style={{ animation: "eq-bar-2 0.6s ease-in-out infinite 0.2s" }}
-              />
-              <span
-                className="w-[3px] rounded-full bg-[#1DB954]"
-                style={{ animation: "eq-bar-3 0.7s ease-in-out infinite 0.1s" }}
-              />
-            </div>
-          ) : (
-            <span className="h-1.5 w-1.5 rounded-full bg-fd-muted-foreground/50" />
-          )}
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand" />
+          </span>
           <span className="font-medium text-[11px] text-fd-muted-foreground uppercase tracking-wider">
             {track.isPlaying ? "Escuchando" : "Última escuchada"}
           </span>

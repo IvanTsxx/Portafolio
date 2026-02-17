@@ -60,7 +60,7 @@ export function PitchCard({
   const content = (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-fd-border bg-fd-card p-6 transition-all duration-300 hover:border-brand/50 hover:shadow-brand/5 hover:shadow-lg dark:hover:shadow-brand/10",
+        "group relative h-full overflow-hidden rounded-xl border border-fd-border bg-fd-card p-6 transition-all duration-300 hover:border-brand/50 hover:shadow-brand/5 hover:shadow-lg dark:hover:shadow-brand/10",
         className
       )}
     >
@@ -104,7 +104,7 @@ export function PitchCard({
 
 export function PitchGrid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="not-prose my-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="not-prose my-8 grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4">
       {children}
     </div>
   );

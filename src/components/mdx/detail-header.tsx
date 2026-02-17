@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, ExternalLink } from "lucide-react";
+import { ArrowLeft, Building, Calendar, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { TechStack } from "./tech-badge";
 
@@ -11,6 +11,7 @@ interface DetailHeaderProps {
   technologies?: string[];
   links?: { label: string; url: string }[];
   current?: boolean;
+  company: string;
 }
 
 export function DetailHeader({
@@ -22,6 +23,7 @@ export function DetailHeader({
   technologies = [],
   links = [],
   current = false,
+  company,
 }: DetailHeaderProps) {
   return (
     <div className="not-prose mb-8 border-fd-border border-b pb-8">
@@ -36,15 +38,21 @@ export function DetailHeader({
       )}
 
       <div className="flex flex-col gap-3">
-        <div className="flex items-start gap-3">
-          <h1 className="font-bold text-2xl text-fd-foreground tracking-tight sm:text-3xl">
-            {title}
-          </h1>
-          {current && (
-            <span className="mt-1 shrink-0 rounded-md border border-brand/30 bg-brand/10 px-2 py-0.5 font-medium text-brand text-xs">
-              Actual
-            </span>
-          )}
+        <div className="flex items-center justify-between">
+          <div className="flex items-start gap-3">
+            <h1 className="font-bold text-2xl text-fd-foreground tracking-tight sm:text-3xl">
+              {title}
+            </h1>
+            {current && (
+              <span className="mt-1 shrink-0 rounded-md border border-brand/30 bg-brand/10 px-2 py-0.5 font-medium text-brand text-xs">
+                Actual
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Building className="h-3.5 w-3.5" />
+            <span className="text-fd-muted-foreground text-sm">{company}</span>
+          </div>
         </div>
 
         {subtitle && (

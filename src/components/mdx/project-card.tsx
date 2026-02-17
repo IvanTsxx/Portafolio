@@ -5,7 +5,6 @@ import { TechStack } from "./tech-badge";
 interface ProjectCardProps {
   title: string;
   description: string;
-  longDescription?: string;
   technologies?: string[];
   repoUrl?: string;
   demoUrl?: string;
@@ -16,7 +15,7 @@ interface ProjectCardProps {
 export function ProjectCard({
   title,
   description,
-  longDescription,
+
   technologies = [],
   repoUrl,
   demoUrl,
@@ -24,21 +23,17 @@ export function ProjectCard({
   internalRoute,
 }: ProjectCardProps) {
   return (
-    <div className="not-prose group rounded-xl border border-fd-border bg-fd-card p-5 transition-all duration-300 hover:border-brand/40 hover:shadow-brand/5 hover:shadow-lg">
+    <div className="not-prose group flex flex-col justify-between rounded-xl border border-fd-border bg-fd-card p-5 transition-all duration-300 hover:border-brand/40 hover:shadow-brand/5 hover:shadow-lg">
       <Link className="flex items-center gap-2" href={internalRoute}>
         <Link2 className="h-3.5 w-3.5" />
-        <h3 className="font-semibold text-fd-foreground text-lg transition-colors group-hover:text-brand">
+        <h3 className="font-bold text-fd-foreground text-lg transition-colors group-hover:text-brand">
           {title}
         </h3>
       </Link>
 
-      <p className="mt-1.5 text-fd-muted-foreground text-sm">{description}</p>
-
-      {longDescription && (
-        <p className="mt-1 text-fd-muted-foreground/70 text-sm leading-relaxed">
-          {longDescription}
-        </p>
-      )}
+      <p className="mt-1 text-fd-muted-foreground/70 text-sm leading-relaxed">
+        {description}
+      </p>
 
       {technologies.length > 0 && (
         <div className="mt-3">

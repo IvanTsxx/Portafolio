@@ -1,5 +1,5 @@
-import { GitCommit } from "lucide-react";
 import { getRecentActivity } from "@/lib/github";
+import { GitIcon } from "../icons";
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -34,7 +34,7 @@ export async function GithubWidget() {
     >
       {/* Icon */}
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-brand-muted">
-        <GitCommit className="h-5 w-5 text-brand" />
+        <GitIcon className="h-5 w-5 text-brand" />
       </div>
 
       {/* Info */}
