@@ -66,7 +66,10 @@ export async function generateMetadata(
     title: page.data.title,
     description: page.data.description,
     openGraph: {
-      images: getPageImage(page).url,
+      images:
+        !params.slug || params.slug.length === 0
+          ? "/og-image.webp"
+          : getPageImage(page).url,
       title: page.data.title,
       description: page.data.description,
       url: page.url,
@@ -78,7 +81,9 @@ export async function generateMetadata(
     keywords: page.data.keywords,
     authors: [{ name: "Ivan Bongiovanni" }],
     creator: "Ivan Bongiovanni",
-    metadataBase: new URL("https://ivantsx.vercel.app"),
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_APP_URL || "https://ivantsx.vercel.app"
+    ),
 
     twitter: {
       card: "summary_large_image",

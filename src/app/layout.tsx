@@ -25,7 +25,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Ivan Bongiovanni" }],
   creator: "Ivan Bongiovanni",
-  metadataBase: new URL("https://ivantsx.vercel.app"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://ivantsx.vercel.app"
+  ),
   openGraph: {
     title: "Ivan Bongiovanni | Full-Stack Developer",
     description:
