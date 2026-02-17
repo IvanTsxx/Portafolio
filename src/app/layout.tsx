@@ -3,6 +3,7 @@ import "@/styles/global.css";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { GlobalClickSound } from "@/components/layout/global-click-sound";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,6 +59,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-screen flex-col">
         <RootProvider>{children}</RootProvider>
         <Analytics />
+        <GlobalClickSound />
       </body>
     </html>
   );

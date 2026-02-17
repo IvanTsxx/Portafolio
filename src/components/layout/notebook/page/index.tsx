@@ -1,11 +1,10 @@
 import type { AnchorProviderProps, TOCItemType } from "fumadocs-core/toc";
 import { I18nLabel } from "fumadocs-ui/contexts/i18n";
-import { Edit, Text } from "lucide-react";
+import { Text } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import { TOCProvider, TOCScrollArea } from "@/components/toc";
 import { TOCItems as TOCItemsClerk } from "@/components/toc/clerk";
 import { TOCItems as TOCItemsDefault } from "@/components/toc/default";
-import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import {
   type BreadcrumbProps,
@@ -188,31 +187,6 @@ export function DocsPage({
           </div>
         ))}
     </>
-  );
-}
-
-export function EditOnGitHub(props: ComponentProps<"a">) {
-  return (
-    <a
-      rel="noreferrer noopener"
-      target="_blank"
-      {...props}
-      className={cn(
-        buttonVariants({
-          color: "secondary",
-          size: "sm",
-          className: "not-prose gap-1.5",
-        }),
-        props.className
-      )}
-    >
-      {props.children ?? (
-        <>
-          <Edit className="size-3.5" />
-          <I18nLabel label="editOnGithub" />
-        </>
-      )}
-    </a>
   );
 }
 

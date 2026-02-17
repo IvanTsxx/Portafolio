@@ -3,7 +3,6 @@ import { getNowPlaying } from "@/lib/spotify";
 
 export async function SpotifyWidget() {
   const track = await getNowPlaying();
-  console.log("TRACK:", track);
 
   return (
     <a

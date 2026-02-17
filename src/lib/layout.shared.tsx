@@ -1,7 +1,7 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { FileDown } from "lucide-react";
 import { ArgIcon } from "@/components/icons";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 
 // fill this with your actual GitHub info, for example:
 export const gitConfig = {
@@ -16,7 +16,7 @@ export function baseOptions(): BaseLayoutProps {
         children: (
           <button
             className={buttonVariants({
-              color: "outline",
+              variant: "outline",
               size: "sm",
               className:
                 "gap-2 [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground",
