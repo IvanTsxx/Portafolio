@@ -20,10 +20,11 @@ export default function BlogPostTemplate({
         flexDirection: "column",
         width: "100%",
         height: "100%",
-        backgroundColor: "#09090b",
+        backgroundColor: "#0a0a0a",
         color: "white",
         backgroundImage:
-          "radial-gradient(circle at 100% 0%, rgba(96, 148, 110, 0.2) 0%, transparent 40%), radial-gradient(circle at 0% 100%, rgba(96, 148, 110, 0.1) 0%, transparent 40%)",
+          "radial-gradient(circle at 50% -10%, rgba(96, 148, 110, 0.35) 0%, transparent 50%), linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)",
+        backgroundSize: "100% 100%, 50px 50px, 50px 50px",
         padding: "80px",
         justifyContent: "space-between",
         fontFamily: 'Inter, "Material Icons", sans-serif',
