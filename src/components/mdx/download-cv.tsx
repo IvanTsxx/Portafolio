@@ -1,7 +1,7 @@
 "use client";
 
 import { Download, Eye } from "lucide-react";
-import type { ReactElement } from "react";
+import { type ReactElement, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,16 +11,15 @@ import {
 } from "@/components/ui/dialog";
 
 interface DownloadCVButtonProps {
-  cvUrl?: string;
-  fileName?: string;
   children?: ReactElement;
 }
 
-export function DownloadCVButton({
-  cvUrl = "/CV.pdf",
-  fileName = "CV.pdf",
-  children,
-}: DownloadCVButtonProps) {
+export function DownloadCVButton({ children }: DownloadCVButtonProps) {
+  const [lang, setLang] = useState<"es" | "en">("es");
+
+  const cvUrl = lang === "es" ? "/CV-ES.pdf" : "/CV-EN.pdf";
+  const fileName = lang === "es" ? "CV-ES.pdf" : "CV-EN.pdf";
+
   const handleDownload = () => {
     const link = document.createElement("a");
     link.href = cvUrl;
@@ -49,14 +48,40 @@ export function DownloadCVButton({
         <DialogHeader className="border-fd-border border-b bg-fd-card p-4">
           <div className="mr-8 flex items-center justify-between">
             <DialogTitle>Vista Previa del CV</DialogTitle>
-            <button
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-fd-primary px-3 py-1.5 font-medium text-fd-primary-foreground text-sm transition-colors hover:bg-fd-primary/90"
-              onClick={handleDownload}
-              type="button"
-            >
-              <Download className="h-3.5 w-3.5" />
-              Descargar
-            </button>
+            <div className="flex items-center gap-4">
+              <div className="flex rounded-lg bg-fd-secondary/50 p-1">
+                <button
+                  className={`cursor-pointer rounded-md px-3 py-1 font-medium text-xs transition-colors ${
+                    lang === "es"
+                      ? "bg-fd-background text-fd-foreground shadow-sm"
+                      : "text-fd-muted-foreground hover:text-fd-foreground"
+                  }`}
+                  onClick={() => setLang("es")}
+                  type="button"
+                >
+                  Español
+                </button>
+                <button
+                  className={`cursor-pointer rounded-md px-3 py-1 font-medium text-xs transition-colors ${
+                    lang === "en"
+                      ? "bg-fd-background text-fd-foreground shadow-sm"
+                      : "text-fd-muted-foreground hover:text-fd-foreground"
+                  }`}
+                  onClick={() => setLang("en")}
+                  type="button"
+                >
+                  English
+                </button>
+              </div>
+              <button
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-fd-primary px-3 py-1.5 font-medium text-fd-primary-foreground text-sm transition-colors hover:bg-fd-primary/90"
+                onClick={handleDownload}
+                type="button"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Descargar
+              </button>
+            </div>
           </div>
         </DialogHeader>
         <div className="h-full flex-1 overflow-hidden bg-fd-secondary/20 p-4">
@@ -71,15 +96,11 @@ export function DownloadCVButton({
   );
 }
 
-interface CVSectionProps {
-  cvUrl?: string;
-}
-
-export function CVSection({ cvUrl }: CVSectionProps) {
+export function CVSection() {
   return (
     <div className="not-prose flex items-start gap-3 rounded-xl border border-fd-border bg-fd-card p-5">
       <div className="flex-1">
-        <DownloadCVButton cvUrl={cvUrl} />
+        <DownloadCVButton />
       </div>
     </div>
   );
