@@ -94,7 +94,7 @@ async function scanNestedDirectory(
 
     // Extract author from directory name (e.g., "ivantsx/hero-01" -> author: "ivantsx", name: "hero-01")
     const [author, ...rest] = name.split("-");
-    const displayName = rest.join("-");
+
     const isNamespaced = rest.length > 0 && entry.name.includes("-");
 
     // Determine target path based on type
