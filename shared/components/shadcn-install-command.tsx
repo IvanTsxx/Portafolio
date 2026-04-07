@@ -11,7 +11,7 @@ interface ShadcnInstallCommandProps {
 }
 
 export function ShadcnInstallCommand({ name }: ShadcnInstallCommandProps) {
-  const command = `npx shadcn@latest add @ivantsx/${name}`;
+  const command = `npx shadcn@latest add https://ibong.vercel.app/r/${name}.json`;
 
   return <CodeBlockCommand {...convertNpmCommand(command)} />;
 }
