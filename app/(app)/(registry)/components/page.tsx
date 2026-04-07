@@ -29,9 +29,9 @@ export default function ComponentsPage() {
               CLI.
             </p>
           </div>
-          <div className="flex items-center w-auto gap-2">
+          <div className="flex w-full items-center gap-2">
             <ShadcnInstallCommandFlip
-              names={components.map((component) => component.name)}
+              names={components.map((component) => `${component.name}.json`)}
             />
           </div>
         </div>

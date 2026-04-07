@@ -1,6 +1,6 @@
 "use client";
 
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { TerminalIcon, TextAlignStartIcon } from "lucide-react";
 import { useMemo } from "react";
@@ -14,7 +14,7 @@ import {
 } from "@/shared/components/base/ui/tabs";
 import { CopyButton } from "@/shared/components/copy-button";
 
-import { TextFlip } from "../text-flip";
+import { flipIndexAtom, TextFlip } from "../text-flip";
 
 export type PackageManager = "prompt" | "pnpm" | "yarn" | "npm" | "bun";
 
@@ -113,6 +113,8 @@ export function CodeBlockCommand({
   isFlip,
   names,
 }: CodeBlockCommandProps) {
+  const currentFlipIndex = useAtomValue(flipIndexAtom);
+
   const [packageManager, setPackageManager] = usePackageManager();
 
   const tabs = useMemo(
@@ -130,6 +132,11 @@ export function CodeBlockCommand({
     () => Object.entries(tabs).filter(([, value]) => !!value),
     [tabs]
   );
+
+  const baseCommand = tabs[packageManager] || "";
+
+  const commandWithName =
+    isFlip && names ? `${baseCommand}${names[currentFlipIndex]}` : baseCommand;
 
   return (
     <div className="relative overflow-hidden rounded-none dark:bg-transparent">
@@ -168,12 +175,7 @@ export function CodeBlockCommand({
               >
                 {key !== "prompt" && <span className="select-none">$ </span>}
                 {value}
-                {isFlip && names && (
-                  <>
-                    {" "}
-                    <TextFlip>{names}</TextFlip>
-                  </>
-                )}
+                {isFlip && names && <TextFlip>{names}</TextFlip>}
               </code>
             </pre>
           </TabsContent>
@@ -184,7 +186,7 @@ export function CodeBlockCommand({
         className="absolute top-2 right-2 z-10 rounded-md border-none"
         variant="secondary"
         size="icon-xs"
-        text={tabs[packageManager] || ""}
+        text={commandWithName}
         onCopySuccess={(copiedCommand) => {
           onCopySuccess?.({
             command: copiedCommand,

@@ -1,8 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-import { InstallCommand } from "./install-command";
-
 export interface RegistryCardEntry {
   name: string;
   title: string;
@@ -22,15 +20,7 @@ export function RegistryCard({ entry, basePath }: RegistryCardProps) {
 
   return (
     <div className="flex flex-col border border-border">
-      {/* Preview */}
-      <div className="flex items-center justify-center border-b border-border bg-secondary/40">
-        {preview ?? (
-          <span className="text-[11px] text-muted-foreground">No preview</span>
-        )}
-      </div>
-
-      {/* Meta row */}
-      <div className="flex flex-col gap-3 p-3">
+      <div className="flex items-center justify-between gap-3 p-3">
         <div>
           <p className="text-[14px] font-semibold leading-none text-foreground">
             {title}
@@ -40,9 +30,6 @@ export function RegistryCard({ entry, basePath }: RegistryCardProps) {
           </p>
         </div>
 
-        {/* Install command */}
-        <InstallCommand name={name} />
-
         {/* View link */}
         <Link
           prefetch={false}
@@ -51,6 +38,13 @@ export function RegistryCard({ entry, basePath }: RegistryCardProps) {
         >
           View <ArrowRight className="size-3" />
         </Link>
+      </div>
+
+      {/* Preview */}
+      <div className="flex items-center justify-center border-b border-border bg-secondary/40">
+        {preview ?? (
+          <span className="text-[11px] text-muted-foreground">No preview</span>
+        )}
       </div>
     </div>
   );

@@ -1,10 +1,13 @@
 "use client";
 
+import { atom, useAtom } from "jotai";
 import type { Transition, Variants } from "motion/react";
 import { AnimatePresence, motion } from "motion/react";
-import { Children, useEffect, useState } from "react";
+import { Children, useEffect } from "react";
 
 import { cn } from "@/shared/lib/utils";
+
+export const flipIndexAtom = atom(0);
 
 const defaultVariants: Variants = {
   animate: { opacity: 1, y: 0 },
@@ -15,58 +18,33 @@ const defaultVariants: Variants = {
 type MotionElement = typeof motion.p | typeof motion.span | typeof motion.code;
 
 export interface TextFlipProps {
-  /**
-   * Motion element to render.
-   * @defaultValue motion.p
-   * */
   as?: MotionElement;
   className?: string;
-  /** Array of children to cycle through. */
   children: React.ReactNode[];
-
-  /**
-   * Time in seconds between each flip.
-   * @defaultValue 2
-   * */
   interval?: number;
-  /**
-   * Motion transition configuration.
-   * @defaultValue { duration: 0.3 }
-   * */
   transition?: Transition;
-  /** Motion variants for enter/exit animations. */
   variants?: Variants;
-
-  /** Called with the new index after each flip. */
-  onIndexChange?: (index: number) => void;
 }
 
 export function TextFlip({
   as: Component = motion.p,
   className,
   children,
-
   interval = 2,
   transition = { duration: 0.3 },
   variants = defaultVariants,
-
-  onIndexChange,
 }: TextFlipProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useAtom(flipIndexAtom);
 
   const items = Children.toArray(children);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => {
-        const next = (prev + 1) % items.length;
-        onIndexChange?.(next);
-        return next;
-      });
+      setCurrentIndex((prev) => (prev + 1) % items.length);
     }, interval * 1000);
 
     return () => clearInterval(timer);
-  }, [items.length, interval, onIndexChange]);
+  }, [items.length, interval, setCurrentIndex]);
 
   return (
     <AnimatePresence mode="wait" initial={false}>

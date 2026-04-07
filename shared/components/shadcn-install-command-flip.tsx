@@ -14,8 +14,9 @@ export function ShadcnInstallCommandFlip({
 }: ShadcnInstallCommandFlipProps) {
   /*  interval = 2,
   transition = { duration: 0.3 }, */
-  const [currentComponentFlip] = names;
-  const command = `npx shadcn@latest add @ivantsx/${currentComponentFlip}`;
+
+  const command = `npx shadcn@latest add https://ibong.vercel.app/r/`;
+
   return (
     <div className="w-full">
       <CodeBlockCommand {...convertNpmCommand(command)} isFlip names={names} />
