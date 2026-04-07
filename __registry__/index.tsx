@@ -14,7 +14,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "registry/blocks/hero-01/index.tsx",
       type: "registry:block",
-      target: "",
+      target: "blocks/hero/hero-01/index.tsx",
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/hero-01/index.tsx")
@@ -31,7 +31,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "registry/blocks/hero-02/index.tsx",
       type: "registry:block",
-      target: "",
+      target: "blocks/hero/hero-02/index.tsx",
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/hero-02/index.tsx")
@@ -48,7 +48,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "registry/app/page-blog/page.tsx",
       type: "registry:page",
-      target: "",
+      target: "app/page-blog/page.tsx",
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/app/page-blog/page.tsx")
@@ -65,7 +65,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "registry/app/page-home/page.tsx",
       type: "registry:page",
-      target: "",
+      target: "app/page-home/page.tsx",
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/app/page-home/page.tsx")

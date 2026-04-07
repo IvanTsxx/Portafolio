@@ -5,6 +5,51 @@ import path from "node:path";
 
 const dir = path.join(process.cwd(), "public", "r");
 
+/**
+ * Derive target path based on file type and source path
+ */
+function deriveTarget(filePath: string, fileType: string): string {
+  // Only derive target for blocks and pages
+  if (fileType !== "registry:block" && fileType !== "registry:page") {
+    return "";
+  }
+
+  // Extract the registry path (e.g., "blocks/ivantsx/hero-01/index.tsx")
+  const match = filePath.match(/^(registry\/)?(blocks|app)\/(.+?)(\/index|\/page)?\.tsx?$/);
+  if (!match) return "";
+
+  const [, , dirName, rest] = match;
+  const parts = rest.split("/");
+
+  if (dirName === "blocks") {
+    // Check if namespaced (e.g., "ivantsx/hero-01")
+    if (parts.length >= 2) {
+      const author = parts[0];
+      const name = parts.slice(1).join("/");
+      if (filePath.includes("/_components/")) {
+        const componentFile = filePath.split("/_components/")[1];
+        return `blocks/${author}/${name}/_components/${componentFile}`;
+      }
+      if (filePath.includes("/_actions.")) {
+        return `blocks/${author}/${name}/_actions.${filePath.endsWith(".tsx") ? "tsx" : "ts"}`;
+      }
+      if (filePath.includes("/_validations.")) {
+        return `blocks/${author}/${name}/_validations.tsx`;
+      }
+      return `blocks/${author}/${name}/index.tsx`;
+    }
+    // Non-namespaced block
+    return filePath.replace(/^registry\//, "");
+  }
+
+  if (dirName === "app") {
+    // Pages go to app/{name}/page.tsx
+    return `app/${rest}/page.tsx`;
+  }
+
+  return "";
+}
+
 async function run() {
   const files = await fs.readdir(dir);
 
@@ -18,6 +63,11 @@ async function run() {
 
         if (item.files && Array.isArray(item.files)) {
           for (const f of item.files) {
+            // Derive target if not present
+            if (!f.target && f.path) {
+              f.target = deriveTarget(f.path, f.type);
+            }
+
             if (typeof f.content === "string") {
               // Normalizamos rutas personalizadas al estándar esperado por shadcn CLI
               f.content = f.content.replaceAll("@/shared/lib", "@/lib");

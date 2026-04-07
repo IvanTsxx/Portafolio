@@ -15,7 +15,7 @@
         {
           "path": "registry/blocks/hero-01/index.tsx",
           "type": "registry:block",
-          "target": ""
+          "target": "blocks/hero/hero-01/index.tsx"
         }
       ],
       "type": "registry:block",
@@ -34,7 +34,7 @@
         {
           "path": "registry/blocks/hero-02/index.tsx",
           "type": "registry:block",
-          "target": ""
+          "target": "blocks/hero/hero-02/index.tsx"
         }
       ],
       "type": "registry:block",
@@ -53,7 +53,7 @@
         {
           "path": "registry/app/page-blog/page.tsx",
           "type": "registry:page",
-          "target": ""
+          "target": "app/page-blog/page.tsx"
         }
       ],
       "type": "registry:page",
@@ -72,7 +72,7 @@
         {
           "path": "registry/app/page-home/page.tsx",
           "type": "registry:page",
-          "target": ""
+          "target": "app/page-home/page.tsx"
         }
       ],
       "type": "registry:page",
