@@ -28,5 +28,6 @@
     "__registry__/**",
     "public/r**",
     "registry/**",
+    "env/*",
   ],
 }
