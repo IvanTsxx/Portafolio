@@ -15,19 +15,21 @@ function deriveTarget(filePath: string, fileType: string): string {
   }
 
   // Extract the registry path (e.g., "blocks/ivantsx/hero-01/index.tsx")
-  const match = filePath.match(/^(registry\/)?(blocks|app)\/(.+?)(\/index|\/page)?\.tsx?$/);
+  const match = filePath.match(
+    /^(registry\/)?(blocks|app)\/(.+?)(\/index|\/page)?\.tsx?$/
+  );
   if (!match) return "";
 
-  const [, , dirName, rest] = match;
+  const [_, __, dirName, rest] = match;
   const parts = rest.split("/");
 
   if (dirName === "blocks") {
     // Check if namespaced (e.g., "ivantsx/hero-01")
     if (parts.length >= 2) {
-      const author = parts[0];
+      const [___, author] = parts;
       const name = parts.slice(1).join("/");
       if (filePath.includes("/_components/")) {
-        const componentFile = filePath.split("/_components/")[1];
+        const [____, componentFile] = filePath.split("/_components/");
         return `blocks/${author}/${name}/_components/${componentFile}`;
       }
       if (filePath.includes("/_actions.")) {
@@ -69,16 +71,21 @@ async function run() {
             }
 
             if (typeof f.content === "string") {
-              // Normalizamos rutas personalizadas al estándar esperado por shadcn CLI
-              f.content = f.content.replaceAll("@/shared/lib", "@/lib");
-              f.content = f.content.replaceAll(
-                "@/shared/components/ui",
-                "@/components/ui"
-              );
+              // shadcn CLI transforms @/components/* to the user's configured alias automatically
+              // based on their components.json. For distribution, we convert user's custom aliases
+              // (@/shared/components, @/shared/lib, etc.) to standard @/components so shadcn can
+              // transform them to the installer's configured aliases on install.
+
+              // Convert user's custom aliases to standard shadcn aliases
               f.content = f.content.replaceAll(
                 "@/shared/components",
                 "@/components"
               );
+              f.content = f.content.replaceAll(
+                "@/shared/components/ui",
+                "@/components/ui"
+              );
+              f.content = f.content.replaceAll("@/shared/lib", "@/lib");
               f.content = f.content.replaceAll("@/shared/hooks", "@/hooks");
 
               // Auto-fix imports relativos entre componentes registry (e.g. from "../components/theme-switcher")

@@ -92,18 +92,13 @@ async function scanNestedDirectory(
     const content = await fs.readFile(mainFilePath, "utf-8");
     const dependencies = extractDependencies(content);
 
-    // Extract author from directory name (e.g., "ivantsx/hero-01" -> author: "ivantsx", name: "hero-01")
-    const [author, ...rest] = name.split("-");
-
-    const isNamespaced = rest.length > 0 && entry.name.includes("-");
-
     // Determine target path based on type
+    // Always use the registry author (ivantsx) as the block author for distribution
+    const registryAuthor = "ivantsx";
     let targetPath = "";
     if (registryType === "registry:block") {
       // Blocks: blocks/ivantsx/hero-01/index.tsx
-      targetPath = isNamespaced
-        ? `blocks/${author}/${entry.name}/index.tsx`
-        : `blocks/${entry.name}/index.tsx`;
+      targetPath = `blocks/${registryAuthor}/${entry.name}/index.tsx`;
     } else if (registryType === "registry:page") {
       // Pages: app/page-blog/page.tsx
       targetPath = `app/${entry.name}/page.tsx`;
@@ -127,9 +122,7 @@ async function scanNestedDirectory(
         if (cf.endsWith(".ts") || cf.endsWith(".tsx")) {
           files.push({
             path: `${dirName}/${name}/_components/${cf}`,
-            target: isNamespaced
-              ? `blocks/${author}/${entry.name}/_components/${cf}`
-              : `blocks/${entry.name}/_components/${cf}`,
+            target: `blocks/${registryAuthor}/${entry.name}/_components/${cf}`,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             type: "registry:component",
           });
@@ -141,18 +134,14 @@ async function scanNestedDirectory(
     if (itemFiles.includes("_actions.ts")) {
       files.push({
         path: `${dirName}/${name}/_actions.ts`,
-        target: isNamespaced
-          ? `blocks/${author}/${entry.name}/_actions.ts`
-          : `blocks/${entry.name}/_actions.ts`,
+        target: `blocks/${registryAuthor}/${entry.name}/_actions.ts`,
         type: "registry:file",
       });
     }
     if (itemFiles.includes("_actions.tsx")) {
       files.push({
         path: `${dirName}/${name}/_actions.tsx`,
-        target: isNamespaced
-          ? `blocks/${author}/${entry.name}/_actions.tsx`
-          : `blocks/${entry.name}/_actions.tsx`,
+        target: `blocks/${registryAuthor}/${entry.name}/_actions.tsx`,
         type: "registry:file",
       });
     }
@@ -161,9 +150,7 @@ async function scanNestedDirectory(
     if (itemFiles.includes("_validations.tsx")) {
       files.push({
         path: `${dirName}/${name}/_validations.tsx`,
-        target: isNamespaced
-          ? `blocks/${author}/${entry.name}/_validations.tsx`
-          : `blocks/${entry.name}/_validations.tsx`,
+        target: `blocks/${registryAuthor}/${entry.name}/_validations.tsx`,
         type: "registry:file",
       });
     }

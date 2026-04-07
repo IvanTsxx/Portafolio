@@ -15,7 +15,7 @@
         {
           "path": "registry/blocks/hero-01/index.tsx",
           "type": "registry:block",
-          "target": "blocks/hero/hero-01/index.tsx"
+          "target": "blocks/ivantsx/hero-01/index.tsx"
         }
       ],
       "type": "registry:block",
@@ -34,7 +34,7 @@
         {
           "path": "registry/blocks/hero-02/index.tsx",
           "type": "registry:block",
-          "target": "blocks/hero/hero-02/index.tsx"
+          "target": "blocks/ivantsx/hero-02/index.tsx"
         }
       ],
       "type": "registry:block",
