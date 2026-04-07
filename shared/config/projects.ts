@@ -14,7 +14,7 @@ export const PROJECTS: Project[] = [
       "Personal portfolio and component registry built with Next.js 16, TypeScript, Tailwind CSS v4, and motion/react. Features a GitHub contributions graph, blog, and component showcase.",
     github: "https://github.com/IvanTsxx/ivantsx",
     id: "ivantsx",
-    link: "https://ivantsx.vercel.app",
+    link: "https://ibong.vercel.app",
     period: { start: "2025" },
     skills: [
       "Next.js",
@@ -29,7 +29,7 @@ export const PROJECTS: Project[] = [
     description:
       "Full-stack e-commerce platform with product catalog, cart, checkout, and admin dashboard. Built with Next.js App Router, Supabase, and Stripe.",
     id: "ecommerce-platform",
-    link: "https://ivantsx.vercel.app",
+    link: "https://ibong.vercel.app",
     period: { end: "2024", start: "2024" },
     skills: ["Next.js", "Supabase", "Stripe", "TypeScript", "Tailwind CSS"],
     title: "E-Commerce Platform",

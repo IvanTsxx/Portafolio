@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "portless portafolio next dev --turbopack",
-    "build": "next build && bun run registry:build",
+    "dev": "next dev --turbopack",
+    "dev:portless": "portless portafolio next dev --turbopack",
+    "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "check": "ultracite check",

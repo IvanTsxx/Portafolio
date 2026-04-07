@@ -1,5 +1,3 @@
-"use client";
-
 import { Markdown } from "@/shared/components/markdown";
 
 import { SectionHeader } from "./section-header";
