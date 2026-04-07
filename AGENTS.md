@@ -1,8 +1,8 @@
 # AGENTS.md — Portafolio
 
-## Installed Skills
+## Installed Skills (.agents/skills/)
 
-Load these BEFORE writing code when context matches:
+Load these skills BEFORE writing code when the context matches:
 
 | Skill                         | When to use                                                  |
 | ----------------------------- | ------------------------------------------------------------ |
@@ -25,16 +25,6 @@ Load these BEFORE writing code when context matches:
 | `theme-factory`               | Styling artifacts with pre-set themes or generating new ones |
 | `brand-guidelines`            | Applying Anthropic brand colors and typography               |
 | `find-skills`                 | Discovering and installing additional agent skills           |
-| `threejs-fundamentals`        | Three.js scene setup, cameras, renderer                      |
-| `threejs-geometry`            | Three.js geometry creation, BufferGeometry                   |
-| `threejs-materials`           | Three.js materials, PBR, shader materials                    |
-| `threejs-lighting`            | Three.js lighting, shadows, environment                      |
-| `threejs-animation`           | Three.js keyframe, skeletal, morph target animation          |
-| `threejs-loaders`             | Three.js asset loading, GLTF, textures                       |
-| `threejs-interaction`         | Three.js raycasting, controls, user input                    |
-| `threejs-shaders`             | Three.js GLSL, custom shaders                                |
-| `threejs-textures`            | Three.js textures, UV mapping, environment maps              |
-| `threejs-postprocessing`      | Three.js post-processing, bloom, DOF                         |
 
 ## Commands
 
