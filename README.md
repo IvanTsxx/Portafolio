@@ -1,22 +1,42 @@
-# Next.js template
+# Portafolio
 
-This is a Next.js template with shadcn/ui.
+Personal portfolio and blog built with Next.js 16, Tailwind CSS v4, and shadcn/ui.
 
-## Adding components
+## Stack
 
-To add components to your app, run the following command:
+- **Next.js 16** — App Router + React 19
+- **Tailwind CSS v4** — styling
+- **shadcn/ui** — components
+- **better-auth** — GitHub OAuth
+- **Three.js** — 3D visuals
+
+## Quick Start
 
 ```bash
-npx shadcn@latest add button
+# Install dependencies
+bun install
+
+# Start dev server
+bun run dev
 ```
 
-This will place the ui components in the `components` directory.
+## Commands
 
-## Using components
+| Command             | Description      |
+| ------------------- | ---------------- |
+| `bun run dev`       | Dev server       |
+| `bun run build`     | Production build |
+| `bun run typecheck` | Type check       |
+| `bun run fix`       | Auto-fix lint    |
 
-To use the components in your app, import them as follows:
+## Contributing
 
-```tsx
-import { Button } from "@/components/ui/button";
-```
-# Portafolio
+Found a bug or want to add a feature? Contributions are welcome!
+
+1. Fork the repo
+2. Create your branch (`git checkout -b feature/awesome`)
+3. Commit your changes
+4. Push to the branch
+5. Open a PR
+
+If this project helps you, consider giving it a ⭐ on GitHub — it keeps me motivated to keep building.
