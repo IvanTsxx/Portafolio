@@ -5,16 +5,15 @@ import { atomWithStorage } from "jotai/utils";
 import { TerminalIcon, TextAlignStartIcon } from "lucide-react";
 import { useMemo } from "react";
 
+import { CopyButton } from "@/shared/components/copy-button";
+import { flipIndexAtom, TextFlip } from "@/shared/components/text-flip";
 import {
   Tabs,
   TabsContent,
   TabsIndicator,
   TabsList,
   TabsTrigger,
-} from "@/shared/components/base/ui/tabs";
-import { CopyButton } from "@/shared/components/copy-button";
-
-import { flipIndexAtom, TextFlip } from "../text-flip";
+} from "@/shared/components/ui/tabs";
 
 export type PackageManager = "prompt" | "pnpm" | "yarn" | "npm" | "bun";
 
