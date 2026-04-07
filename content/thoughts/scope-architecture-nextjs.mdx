@@ -1,0 +1,103 @@
+---
+title: "Scalable Architecture in Next.js 15: The Scope Rule"
+description: "Discover how to structure Next.js 15 projects for maximum scalability and maintainability using the Scope Rule and 'Screaming Architecture' patterns."
+keywords:
+  [
+    "Next.js Architecture",
+    "React Patterns",
+    "Clean Code",
+    "Scalability",
+    "Software Design",
+    "Folder Structure",
+  ]
+date: "2026-04-06"
+tags: ["Next.js", "React", "Performance"]
+published: true
+---
+
+Have you ever entered a project and felt lost in a sea of generic folders like `components`, `hooks`, and `utils`?
+
+It's a common symptom of technical debt. As an application scales, the **location** of the code becomes as critical as the quality of the code itself. When everything is "global," nothing has a **clear domain**.
+
+The solution isn't to create more folders. The solution is **intentional architecture** applied through **The Scope Rule**.
+
+## The Scope Rule: Context is King
+
+This architectural principle redefines how we organize code based on its **scope of use**, not on its technical type:
+
+> **"The location of a file is determined by who consumes it."**
+
+Instead of grouping files by their extension or "type" (all buttons together, all hooks together), we group by **business functionality** (Feature Slicing).
+
+1.  **Local Scope (1 Feature)**: If a component is exclusive to the Dashboard, it lives **INSIDE** the `dashboard` directory.
+2.  **Shared Scope (2+ Features)**: Only if a component is used in multiple domains (e.g., Dashboard and Profile) is it promoted to `shared`.
+
+---
+
+## Screaming Architecture in the Next.js Era
+
+Your folder structure should "scream" the business intent, not the framework you use. This drastically facilitates the **onboarding** of new developers.
+
+**❌ Silent Structure (Legacy Pattern):**
+
+```txt
+src/
+  components/    # Buttons? Modals? Product cards?
+  hooks/         # Vault logic? Auth?
+  pages/         # Routes disconnected from their logic
+```
+
+**✅ Screaming Structure (Scope Rule):**
+
+```txt
+src/
+  app/
+    (auth)/           # Domain: Authentication
+      login/
+      _components/    # Exclusive UI for login (LoginForm)
+    (dashboard)/      # Domain: Control Panel
+      analytics/
+      _components/    # Sales charts (KPIChart)
+  shared/             # Base UI Kit, reusable primitives
+```
+
+**Impact for the team:** A new developer can open the repo and understand **what the application does** in seconds, without navigating complex dependency graphs.
+
+---
+
+## Optimization and Server Components
+
+In Next.js 15, this architecture boosts performance and the separation of responsibilities.
+
+- **Server First Mentality**: By keeping components close to their routes (`app/dashboard/_components`), it's natural to write them as Server Components, reducing the JS bundle sent to the client.
+- **Actions Placement**: Your `_actions.ts` live next to the form that invokes them. High cohesion, low coupling.
+
+### Case Study: Pricing Widget
+
+Imagine a complex `PriceWidget` that only exists in the Checkout.
+
+- **Traditional Approach**: You put it in `src/components/PriceWidget.tsx`. You contaminate the global scope with specific business logic.
+- **Scope Rule Approach**: It lives in `src/app/(shop)/checkout/_components/price-widget.tsx`.
+
+**Result**: Modular code. If tomorrow you remove the checkout feature, you remove its folder and the dead code automatically disappears. **Guaranteed maintainability.**
+
+---
+
+## Checklist for a Robust Architecture
+
+Before creating a file, apply this decision filter:
+
+1.  🛑 **Scope?**
+    - 1 Feature → **Local** (`_components`, `_hooks`).
+    - 2+ Features → **Shared** (`shared/ui`).
+
+2.  ⚡ **Environment?**
+    - Prioritize **Server Components** by default.
+    - Use `'use client'` only at the leaves of the component tree (specific interactivity).
+
+3.  📢 **Semantics?**
+    - Use Route Groups `(auth)`, `(shop)` to organize domains without affecting the URL.
+
+---
+
+Architecture isn't rigid rules; it's **communication**. By adopting the Scope Rule, you write code that explains its own purpose, making life easier for your current team and future developers.

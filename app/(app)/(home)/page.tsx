@@ -1,0 +1,28 @@
+import { AboutSection } from "./_components/about-section";
+import { BookmarksSection } from "./_components/bookmarks-section";
+import { CoverHero } from "./_components/cover-hero";
+import { ExperienceSection } from "./_components/experience-section";
+import { FeedbacksSection } from "./_components/feedbacks-section";
+import { GitHubContributions } from "./_components/github-contributions";
+import { GitHubOpenSource } from "./_components/github-opensource";
+import { Hero } from "./_components/hero";
+import { ProjectsSection } from "./_components/projects-section";
+import { ThoughtsPreviewSection } from "./_components/thoughts-preview-section";
+
+export default function HomePage() {
+  return (
+    <main className="mx-auto max-w-3xl bg-background/95 dark:bg-transparent">
+      <CoverHero />
+      <Hero />
+      <ExperienceSection />
+      <AboutSection />
+      <GitHubContributions />
+      <ProjectsSection />
+      <FeedbacksSection />
+      <ThoughtsPreviewSection />
+
+      <GitHubOpenSource />
+      <BookmarksSection />
+    </main>
+  );
+}

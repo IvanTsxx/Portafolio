@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "animated-counter",
+  "title": "Animated Counter",
+  "author": "ivantsx",
+  "description": "animated-counter component.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/components/animated-counter.tsx",
+      "content": "\"use client\";\n\nimport { motion, useMotionValue, useSpring, useTransform } from \"motion/react\";\nimport { useEffect, useState } from \"react\";\n\nexport default function AnimatedCounter({\n  value = 0,\n  suffix = \"\",\n  prefix = \"\",\n}: {\n  value?: number;\n  suffix?: string;\n  prefix?: string;\n}) {\n  const motionValue = useMotionValue(value);\n  const springValue = useSpring(motionValue, { stiffness: 75, damping: 15 });\n  const [display, setDisplay] = useState(value);\n\n  useEffect(() => {\n    const unsubscribe = springValue.on(\"change\", (latest) => {\n      setDisplay(Math.round(latest));\n    });\n    return unsubscribe;\n  }, [springValue]);\n\n  return (\n    <motion.div\n      initial={{ scale: 0.9, opacity: 0 }}\n      animate={{ scale: 1, opacity: 1 }}\n      transition={{ duration: 0.5 }}\n      className=\"inline-flex items-center justify-center tabular-nums\"\n    >\n      <span className=\"text-4xl font-bold tracking-tight text-zinc-900 dark:text-white\">\n        {prefix}\n      </span>\n      <span className=\"text-4xl font-bold tracking-tight text-zinc-900 dark:text-white\">\n        {display.toLocaleString()}\n      </span>\n      <span className=\"text-4xl font-bold tracking-tight text-zinc-900 dark:text-white\">\n        {suffix}\n      </span>\n    </motion.div>\n  );\n}",
+      "type": "registry:component",
+      "target": ""
+    }
+  ],
+  "type": "registry:component"
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hero-02",
+  "title": "Hero 02",
+  "author": "ivantsx",
+  "description": "hero-02 block.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/blocks/hero-02/index.tsx",
+      "content": "\"use client\";\n\nimport { motion } from \"motion/react\";\nimport { ArrowRight } from \"lucide-react\";\n\nimport { Button } from \"@/components/ui/button\";\n\nexport default function Hero02() {\n  return (\n    <section className=\"relative flex min-h-[500px] w-full flex-col items-center justify-center overflow-hidden bg-zinc-950 py-24\">\n      {/* Subtle grid pattern */}\n      <div className=\"absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]\" />\n\n      {/* Gradient orbs */}\n      <div className=\"absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl\" />\n      <div className=\"absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl\" />\n\n      <div className=\"container relative mx-auto px-4 text-center\">\n        {/* Headline */}\n        <motion.h1\n          initial={{ opacity: 0, y: 30 }}\n          animate={{ opacity: 1, y: 0 }}\n          transition={{ duration: 0.8, ease: \"easeOut\" }}\n          className=\"mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl\"\n        >\n          The future of\n          <br />\n          <span className=\"bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent\">\n            web development\n          </span>\n        </motion.h1>\n\n        {/* Description */}\n        <motion.p\n          initial={{ opacity: 0, y: 30 }}\n          animate={{ opacity: 1, y: 0 }}\n          transition={{ duration: 0.8, delay: 0.1, ease: \"easeOut\" }}\n          className=\"mx-auto mb-8 max-w-xl text-lg text-zinc-400\"\n        >\n          Production-ready components crafted with care. Focus on building\n          your product, not the UI.\n        </motion.p>\n\n        {/* CTA */}\n        <motion.div\n          initial={{ opacity: 0, y: 30 }}\n          animate={{ opacity: 1, y: 0 }}\n          transition={{ duration: 0.8, delay: 0.2, ease: \"easeOut\" }}\n          className=\"flex flex-col items-center justify-center gap-4 sm:flex-row\"\n        >\n          <Button size=\"lg\" className=\"rounded-full bg-white text-zinc-900 hover:bg-zinc-100\">\n            Start Building\n            <ArrowRight className=\"ml-2 h-4 w-4\" />\n          </Button>\n          <Button size=\"lg\" variant=\"ghost\" className=\"rounded-full text-white hover:bg-white/10\">\n            Browse Library\n          </Button>\n        </motion.div>\n\n        {/* Code snippet */}\n        <motion.div\n          initial={{ opacity: 0, y: 30 }}\n          animate={{ opacity: 1, y: 0 }}\n          transition={{ duration: 0.8, delay: 0.3, ease: \"easeOut\" }}\n          className=\"mt-12 rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 backdrop-blur-sm\"\n        >\n          <code className=\"text-sm text-zinc-400\">\n            <span className=\"text-blue-400\">npx</span>{\" \"}\n            <span className=\"text-green-400\">shadcn@latest</span>{\" \"}\n            <span className=\"text-white\">add</span>{\" \"}\n            <span className=\"text-yellow-400\">@ivantsx/hero-01</span>\n          </code>\n        </motion.div>\n      </div>\n    </section>\n  );\n}",
+      "type": "registry:block",
+      "target": ""
+    }
+  ],
+  "type": "registry:block"
+}

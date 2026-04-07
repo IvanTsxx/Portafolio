@@ -1,0 +1,137 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "homepage": "https://ivantsx.vercel.app",
+  "items": [
+    {
+      "name": "hero-01",
+      "title": "Hero 01",
+      "description": "hero-01 block.",
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/blocks/hero-01/index.tsx",
+          "type": "registry:block",
+          "target": ""
+        }
+      ],
+      "type": "registry:block",
+      "author": "ivantsx"
+    },
+    {
+      "name": "hero-02",
+      "title": "Hero 02",
+      "description": "hero-02 block.",
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/blocks/hero-02/index.tsx",
+          "type": "registry:block",
+          "target": ""
+        }
+      ],
+      "type": "registry:block",
+      "author": "ivantsx"
+    },
+    {
+      "name": "page-blog",
+      "title": "Page Blog",
+      "description": "page-blog page.",
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/app/page-blog/page.tsx",
+          "type": "registry:page",
+          "target": ""
+        }
+      ],
+      "type": "registry:page",
+      "author": "ivantsx"
+    },
+    {
+      "name": "page-home",
+      "title": "Page Home",
+      "description": "page-home page.",
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/app/page-home/page.tsx",
+          "type": "registry:page",
+          "target": ""
+        }
+      ],
+      "type": "registry:page",
+      "author": "ivantsx"
+    },
+    {
+      "name": "animated-counter",
+      "title": "Animated Counter",
+      "description": "animated-counter component.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/animated-counter.tsx",
+          "type": "registry:component",
+          "target": ""
+        }
+      ],
+      "type": "registry:component",
+      "author": "ivantsx"
+    },
+    {
+      "name": "theme-switcher",
+      "title": "Theme Switcher",
+      "description": "theme-switcher component.",
+      "dependencies": [
+        "lucide-react",
+        "motion",
+        "next-themes"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/theme-switcher.tsx",
+          "type": "registry:component",
+          "target": ""
+        }
+      ],
+      "type": "registry:component",
+      "author": "ivantsx"
+    },
+    {
+      "name": "trigger-them-transition",
+      "title": "Trigger Them Transition",
+      "description": "trigger-them-transition lib.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/utils/trigger-them-transition.ts",
+          "type": "registry:lib",
+          "target": ""
+        }
+      ],
+      "type": "registry:lib",
+      "author": "ivantsx"
+    }
+  ],
+  "name": "ivantsx"
+}

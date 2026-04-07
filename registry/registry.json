@@ -1,0 +1,90 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "local",
+  "homepage": "https://juanb.dev",
+  "items": [
+    {
+      "name": "hero-01",
+      "type": "registry:block",
+      "title": "Hero 01",
+      "description": "Hero section with call-to-action buttons",
+      "registryDependencies": ["button"],
+      "dependencies": ["motion"],
+      "files": [
+        {
+          "path": "registry/blocks/hero-01/index.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "hero-02",
+      "type": "registry:block",
+      "title": "Hero 02",
+      "description": "Minimalist hero section",
+      "registryDependencies": ["button"],
+      "dependencies": ["motion"],
+      "files": [
+        {
+          "path": "registry/blocks/hero-02/index.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "theme-provider",
+      "type": "registry:component",
+      "title": "Theme Provider",
+      "description": "Next-themes provider with keyboard shortcut",
+      "dependencies": ["next-themes"],
+      "files": [
+        {
+          "path": "registry/components/theme-provider/index.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "theme-switcher",
+      "type": "registry:component",
+      "title": "Theme Switcher",
+      "description": "Theme toggle with animation",
+      "registryDependencies": ["theme-provider"],
+      "dependencies": ["lucide-react", "motion", "next-themes"],
+      "files": [
+        {
+          "path": "registry/components/theme-switcher/index.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "component-example",
+      "type": "registry:block",
+      "title": "Component Example",
+      "description": "Feature cards block showcasing multiple UI components",
+      "registryDependencies": ["button"],
+      "dependencies": ["motion", "lucide-react"],
+      "files": [
+        {
+          "path": "registry/blocks/component-example/index.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "page-home",
+      "type": "registry:block",
+      "title": "Home Page",
+      "description": "Complete home page with nav, hero, features, CTA and footer",
+      "registryDependencies": ["button"],
+      "dependencies": ["motion", "lucide-react"],
+      "files": [
+        {
+          "path": "registry/blocks/page-home/index.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

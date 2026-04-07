@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider     = "postgresql"
+  relationMode = "foreignKeys"
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  isAnonymous   Boolean   @default(false)
+  sessions      Session[]
+  accounts      Account[]
+  comments      Comment[]
+  reactions     Reaction[]
+  postReactions PostReaction[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+enum ReactionType {
+  HEART_BLACK
+  HEART_RED
+  FIRE
+  ROCKET
+  THUMBS_UP
+
+  @@map("reaction_type")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  slug      String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  replies   Comment[] @relation("CommentReplies")
+  reactions Reaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([authorId])
+  @@index([parentId])
+  @@map("comment")
+}
+
+model Reaction {
+  id        String       @id @default(cuid())
+  type      ReactionType
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  commentId String
+  comment   Comment      @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, commentId, type])
+  @@index([commentId])
+  @@index([userId])
+  @@map("reaction")
+}
+
+model PostReaction {
+  id        String       @id @default(cuid())
+  type      ReactionType
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  slug      String
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, slug, type])
+  @@index([slug])
+  @@index([userId])
+  @@map("post_reaction")
+}
