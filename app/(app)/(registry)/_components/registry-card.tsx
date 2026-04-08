@@ -5,7 +5,7 @@ export interface RegistryCardEntry {
   name: string;
   title: string;
   description: string;
-  type: "component" | "block";
+  type: "component" | "block" | "page";
   /** Optional JSX to render as a live preview */
   preview?: React.ReactNode;
 }
@@ -41,7 +41,7 @@ export function RegistryCard({ entry, basePath }: RegistryCardProps) {
       </div>
 
       {/* Preview */}
-      <div className="flex items-center justify-center border-b border-border bg-secondary/40">
+      <div className="flex items-center justify-center border-b border-border">
         {preview ?? (
           <span className="text-[11px] text-muted-foreground">No preview</span>
         )}

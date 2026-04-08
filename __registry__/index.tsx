@@ -7,86 +7,18 @@
 import * as React from "react"
 
 export const Index: Record<string, any> = {
-  "hero-01": {
-    name: "hero-01",
-    description: "hero-01 block.",
-    type: "registry:block",
-    files: [{
-      path: "registry/blocks/hero-01/index.tsx",
-      type: "registry:block",
-      target: "blocks/ivantsx/hero-01/index.tsx",
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/blocks/hero-01/index.tsx")
-      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "hero-01"
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: [],
-    meta: {},
-  },
-  "hero-02": {
-    name: "hero-02",
-    description: "hero-02 block.",
-    type: "registry:block",
-    files: [{
-      path: "registry/blocks/hero-02/index.tsx",
-      type: "registry:block",
-      target: "blocks/ivantsx/hero-02/index.tsx",
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/blocks/hero-02/index.tsx")
-      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "hero-02"
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: [],
-    meta: {},
-  },
-  "page-blog": {
-    name: "page-blog",
-    description: "page-blog page.",
-    type: "registry:page",
-    files: [{
-      path: "registry/app/page-blog/page.tsx",
-      type: "registry:page",
-      target: "app/page-blog/page.tsx",
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/app/page-blog/page.tsx")
-      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "page-blog"
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: [],
-    meta: {},
-  },
-  "page-home": {
-    name: "page-home",
-    description: "page-home page.",
-    type: "registry:page",
-    files: [{
-      path: "registry/app/page-home/page.tsx",
-      type: "registry:page",
-      target: "app/page-home/page.tsx",
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/app/page-home/page.tsx")
-      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "page-home"
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: [],
-    meta: {},
-  },
-  "animated-counter": {
-    name: "animated-counter",
-    description: "animated-counter component.",
+  "contribution-card": {
+    name: "contribution-card",
+    description: "contribution-card component.",
     type: "registry:component",
     files: [{
-      path: "registry/components/animated-counter.tsx",
+      path: "registry/components/contribution-card.tsx",
       type: "registry:component",
       target: "",
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/components/animated-counter.tsx")
-      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "animated-counter"
+      const mod = await import("@/registry/components/contribution-card.tsx")
+      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "contribution-card"
       return { default: mod.default || mod[exportName] }
     }),
     categories: [],

@@ -26,7 +26,6 @@
     ".agents/**",
     ".claude/**",
     "__registry__/**",
-    "public/r**",
-    "registry/**"
+    "public/r**"
   ]
 }

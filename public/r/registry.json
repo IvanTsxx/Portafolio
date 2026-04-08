@@ -3,92 +3,17 @@
   "homepage": "https://ibong.vercel.app",
   "items": [
     {
-      "name": "hero-01",
-      "title": "Hero 01",
-      "description": "hero-01 block.",
+      "name": "contribution-card",
+      "title": "Contribution Card",
+      "description": "contribution-card component.",
       "dependencies": [
-        "lucide-react",
-        "motion"
+        "framer-motion",
+        "lucide-react"
       ],
       "registryDependencies": [],
       "files": [
         {
-          "path": "registry/blocks/hero-01/index.tsx",
-          "type": "registry:block",
-          "target": "blocks/ivantsx/hero-01/index.tsx"
-        }
-      ],
-      "type": "registry:block",
-      "author": "ivantsx"
-    },
-    {
-      "name": "hero-02",
-      "title": "Hero 02",
-      "description": "hero-02 block.",
-      "dependencies": [
-        "lucide-react",
-        "motion"
-      ],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/blocks/hero-02/index.tsx",
-          "type": "registry:block",
-          "target": "blocks/ivantsx/hero-02/index.tsx"
-        }
-      ],
-      "type": "registry:block",
-      "author": "ivantsx"
-    },
-    {
-      "name": "page-blog",
-      "title": "Page Blog",
-      "description": "page-blog page.",
-      "dependencies": [
-        "lucide-react",
-        "motion"
-      ],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/app/page-blog/page.tsx",
-          "type": "registry:page",
-          "target": "app/page-blog/page.tsx"
-        }
-      ],
-      "type": "registry:page",
-      "author": "ivantsx"
-    },
-    {
-      "name": "page-home",
-      "title": "Page Home",
-      "description": "page-home page.",
-      "dependencies": [
-        "lucide-react",
-        "motion"
-      ],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/app/page-home/page.tsx",
-          "type": "registry:page",
-          "target": "app/page-home/page.tsx"
-        }
-      ],
-      "type": "registry:page",
-      "author": "ivantsx"
-    },
-    {
-      "name": "animated-counter",
-      "title": "Animated Counter",
-      "description": "animated-counter component.",
-      "dependencies": [
-        "motion"
-      ],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/components/animated-counter.tsx",
+          "path": "registry/components/contribution-card.tsx",
           "type": "registry:component",
           "target": ""
         }
