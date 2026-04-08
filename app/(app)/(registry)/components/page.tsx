@@ -19,7 +19,7 @@ export default async function ComponentsPage() {
   const components = await getComponents();
 
   return (
-    <div className="mx-auto max-w-3xl bg-background dark:bg-transparent px-4 py-16">
+    <section className="py-10">
       {/* Page header */}
       <div className="mb-10 border-t bg-background border-border pt-4">
         <div className="flex flex-col items-start gap-3 w-full">
@@ -67,6 +67,6 @@ export default async function ComponentsPage() {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

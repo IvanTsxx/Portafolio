@@ -40,7 +40,7 @@ export default async function ComponentPage({ params }: Props) {
   if (!entry) notFound();
 
   return (
-    <div className="mx-auto bg-background max-w-3xl px-4 py-16">
+    <section className="py-10">
       {/* Back */}
       <Link
         prefetch={false}
@@ -88,6 +88,6 @@ export default async function ComponentPage({ params }: Props) {
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 }

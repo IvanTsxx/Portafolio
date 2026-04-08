@@ -50,7 +50,7 @@ export default async function ThoughtPostPage({ params }: Props) {
   const { comments } = await getCommentsBySlug(slug);
 
   return (
-    <div className="max-w-3xl bg-background/85 dark:bg-transparent mx-auto px-4 py-10">
+    <section className="py-10">
       {/* Back link */}
       <Link
         prefetch={false}
@@ -140,6 +140,6 @@ export default async function ThoughtPostPage({ params }: Props) {
 
       {/* Comments */}
       <CommentsSection slug={slug} initialComments={comments} />
-    </div>
+    </section>
   );
 }

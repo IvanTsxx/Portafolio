@@ -20,7 +20,7 @@ export default async function ThoughtsPage() {
   const allTags = await getAllTags();
 
   return (
-    <div className="max-w-3xl bg-background/85 dark:bg-transparent mx-auto px-4 py-10">
+    <section className="py-10">
       {/* Page header */}
       <div className="mb-8">
         <h1 className="text-2xl font-medium tracking-tight">Thoughts</h1>
@@ -34,6 +34,6 @@ export default async function ThoughtsPage() {
       <Suspense fallback={<Spinner />}>
         <ThoughtsFilter thoughts={thoughts} allTags={allTags} />
       </Suspense>
-    </div>
+    </section>
   );
 }

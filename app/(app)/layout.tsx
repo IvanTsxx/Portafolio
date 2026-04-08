@@ -9,7 +9,9 @@ export default function AppLayout({
   return (
     <main>
       <Header />
-      <main>{children}</main>
+      <section className="mx-auto max-w-3xl bg-background/95 dark:bg-transparent flex flex-col gap-y-2 flex-1 lg:p-0 px-6">
+        {children}
+      </section>
       <Footer />
     </main>
   );

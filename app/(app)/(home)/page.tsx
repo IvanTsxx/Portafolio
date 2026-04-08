@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   return (
-    <main className="mx-auto max-w-3xl bg-background/95 dark:bg-transparent flex flex-col gap-y-2 flex-1">
+    <section>
       <Suspense fallback={<Skeleton className="h-40 w-full" />}>
         <CoverHero />
       </Suspense>
@@ -38,6 +38,6 @@ export default async function HomePage() {
       <ThoughtsPreviewSection />
       <GitHubOpenSource />
       <BookmarksSection />
-    </main>
+    </section>
   );
 }
