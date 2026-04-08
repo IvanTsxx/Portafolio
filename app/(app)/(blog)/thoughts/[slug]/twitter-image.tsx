@@ -2,5 +2,7 @@
 export const size = { height: 630, width: 1200 };
 export const contentType = "image/png";
 
+export const dynamic = "force-dynamic";
+
 // Re-export the same OG component for Twitter
 export { default } from "./opengraph-image";

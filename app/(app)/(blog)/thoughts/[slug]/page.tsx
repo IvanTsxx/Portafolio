@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { Icons } from "@/shared/components/icons";
 import { Markdown } from "@/shared/components/markdown";
 import { SITE } from "@/shared/config/site";
-import { getCommentsBySlug } from "@/shared/lib/actions/comments";
+import { getCommentsBySlug } from "@/shared/lib/data";
 import { getAllThoughts, getThoughtBySlug } from "@/shared/lib/thoughts";
 
 import { CommentsSection } from "./_components/comments-section";
@@ -16,14 +16,14 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// oxlint-disable-next-line require-await
 export async function generateStaticParams() {
-  return getAllThoughts().map((t) => ({ slug: t.slug }));
+  const thoughts = await getAllThoughts();
+  return thoughts.map((t) => ({ slug: t.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const thought = getThoughtBySlug(slug);
+  const thought = await getThoughtBySlug(slug);
   if (!thought) return {};
   return {
     description: thought.description,
@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ThoughtPostPage({ params }: Props) {
   const { slug } = await params;
-  const thought = getThoughtBySlug(slug);
+  const thought = await getThoughtBySlug(slug);
   if (!thought) notFound();
 
   const { comments } = await getCommentsBySlug(slug);

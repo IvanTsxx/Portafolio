@@ -5,6 +5,8 @@ import { ImageResponse } from "next/og";
 import { SITE } from "@/shared/config/site";
 import { USER } from "@/shared/config/user";
 
+export const dynamic = "force-dynamic";
+
 // ── OG Image dimensions ───────────────────────────────────────────────────────
 
 export const size = { height: 630, width: 1200 };

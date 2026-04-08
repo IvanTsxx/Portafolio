@@ -7,6 +7,8 @@ import { SITE } from "@/shared/config/site";
 import { USER } from "@/shared/config/user";
 import { getComponent } from "@/shared/lib/registry";
 
+export const dynamic = "force-dynamic";
+
 // ── OG Image dimensions ───────────────────────────────────────────────────────
 
 export const size = { height: 630, width: 1200 };
@@ -36,7 +38,7 @@ export default async function Image({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const entry = getComponent(slug);
+  const entry = await getComponent(slug);
 
   if (!entry) {
     return new ImageResponse(

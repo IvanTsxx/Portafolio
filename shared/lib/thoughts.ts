@@ -3,7 +3,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 import matter from "gray-matter";
+import { cacheLife, cacheTag } from "next/cache";
 
+import { CACHE_LIFE, CACHE_TAGS } from "@/shared/lib/cache";
 import type { Thought } from "@/shared/types/thought";
 
 interface ReadingTimeOptions {
@@ -71,7 +73,11 @@ export function estimateReadingTime(
 
 const THOUGHTS_DIR = path.join(process.cwd(), "content", "thoughts");
 
-export function getAllThoughts(): Thought[] {
+export async function getAllThoughts(): Promise<Thought[]> {
+  "use cache";
+  cacheLife(CACHE_LIFE.GET_ALL_THOUGHTS);
+  cacheTag(CACHE_TAGS.GET_ALL_THOUGHTS);
+
   if (!fs.existsSync(THOUGHTS_DIR)) return [];
 
   const files = fs
@@ -106,43 +112,32 @@ export function getAllThoughts(): Thought[] {
   );
 }
 
-export function getThoughtBySlug(slug: string): Thought | undefined {
-  return getAllThoughts().find((t) => t.slug === slug);
+export async function getThoughtBySlug(
+  slug: string
+): Promise<Thought | undefined> {
+  "use cache";
+  cacheLife(CACHE_LIFE.GET_THOUGHT_BY_ID);
+  cacheTag(CACHE_TAGS.GET_THOUGHT_BY_ID(slug), CACHE_TAGS.GET_ALL_THOUGHTS);
+
+  // oxlint-disable-next-line unicorn/no-await-expression-member
+  return (await getAllThoughts()).find((t) => t.slug === slug);
 }
 
-export function getAllTags(): string[] {
-  const all = getAllThoughts().flatMap((t) => t.tags);
+export async function getAllTags(): Promise<string[]> {
+  "use cache";
+  cacheLife(CACHE_LIFE.GET_ALL_TAGS);
+  cacheTag(CACHE_TAGS.GET_ALL_TAGS);
+
+  // oxlint-disable-next-line unicorn/no-await-expression-member
+  const all = (await getAllThoughts()).flatMap((t) => t.tags);
   return [...new Set(all)].toSorted();
 }
 
-export function getRecentThoughts(): Thought[] {
-  const dir = path.join(process.cwd(), "content", "thoughts");
-  if (!fs.existsSync(dir)) return [];
+export async function getRecentThoughts(): Promise<Thought[]> {
+  "use cache";
+  cacheLife(CACHE_LIFE.GET_RECENT_THOUGHTS);
+  cacheTag(CACHE_TAGS.GET_RECENT_THOUGHTS);
 
-  const files = fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
-  const thoughts: Thought[] = [];
-
-  for (const file of files) {
-    const raw = fs.readFileSync(path.join(dir, file), "utf-8");
-    const { data, content } = matter(raw);
-    if (data.published === false) continue;
-
-    thoughts.push({
-      content,
-      date: data.date ?? "2025-01-01",
-      description: data.description ?? "",
-      published: data.published !== false,
-      readingTime: estimateReadingTime(content),
-      slug: file.replace(/\.(mdx|md)$/, ""),
-      tags: data.tags ?? [],
-      title: data.title ?? "Untitled",
-    });
-  }
-
-  // Sort newest first, take top 3
-  return thoughts.toSorted(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const allThoughts = await getAllThoughts();
+  return allThoughts.slice(0, 3);
 }

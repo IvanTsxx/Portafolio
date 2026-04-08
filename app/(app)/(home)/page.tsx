@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
-import { getVisitorData } from "./_actions";
+import { Skeleton } from "@/shared/components/ui/skeleton";
+
 import { AboutSection } from "./_components/about-section";
 import { BookmarksSection } from "./_components/bookmarks-section";
 import { CoverHero } from "./_components/cover-hero";
@@ -22,12 +24,12 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const { visitorNumber, totalVisits } = await getVisitorData();
-
   return (
     <main className="mx-auto max-w-3xl bg-background/95 dark:bg-transparent flex flex-col gap-y-2 flex-1">
-      <CoverHero />
-      <Hero totalVisits={totalVisits ?? 0} visitorNumber={visitorNumber} />
+      <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+        <CoverHero />
+      </Suspense>
+      <Hero />
       <ExperienceSection />
       <AboutSection />
       <GitHubContributions />

@@ -5,8 +5,8 @@ import { getRecentThoughts } from "@/shared/lib/thoughts";
 
 import { SectionHeader } from "./section-header";
 
-export function ThoughtsPreviewSection() {
-  const thoughts = getRecentThoughts();
+export async function ThoughtsPreviewSection() {
+  const thoughts = await getRecentThoughts();
 
   return (
     <section>

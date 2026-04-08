@@ -6,6 +6,8 @@ import { SITE } from "@/shared/config/site";
 import { USER } from "@/shared/config/user";
 import { getComponents } from "@/shared/lib/registry";
 
+export const dynamic = "force-dynamic";
+
 // ── OG Image dimensions ───────────────────────────────────────────────────────
 
 export const size = { height: 630, width: 1200 };
@@ -26,7 +28,7 @@ const avatarSrc = `data:image/jpeg;base64,${ogImageBuffer.toString("base64")}`;
 // ── Main OG Image Component ───────────────────────────────────────────────────
 
 export default async function Image() {
-  const components = getComponents();
+  const components = await getComponents();
   const totalCount = components.length;
   const authorName = USER.displayName;
 

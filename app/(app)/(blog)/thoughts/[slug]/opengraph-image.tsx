@@ -6,6 +6,8 @@ import { SITE } from "@/shared/config/site";
 import { USER } from "@/shared/config/user";
 import { getThoughtBySlug } from "@/shared/lib/thoughts";
 
+export const dynamic = "force-dynamic";
+
 // ── OG Image dimensions (1200x630 = 1.91:1 standard) ─────────────────────────
 
 export const size = { height: 630, width: 1200 };
@@ -38,7 +40,7 @@ export default async function Image({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const thought = getThoughtBySlug(slug);
+  const thought = await getThoughtBySlug(slug);
 
   if (!thought) {
     return new ImageResponse(
