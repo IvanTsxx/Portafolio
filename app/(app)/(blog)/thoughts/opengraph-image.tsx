@@ -25,7 +25,7 @@ const avatarSrc = `data:image/jpeg;base64,${ogImageBuffer.toString("base64")}`;
 // ── Main OG Image Component ───────────────────────────────────────────────────
 
 export default async function Image() {
-  const thoughts = getAllThoughts();
+  const thoughts = await getAllThoughts();
   const totalCount = thoughts.length;
   const authorName = USER.displayName;
 
