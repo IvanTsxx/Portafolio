@@ -323,7 +323,6 @@ export function CommentsSection({
   const { data: session } = useSession();
   const router = useRouter();
   const currentUserId = session?.user?.email;
-  const isAnonymous = session?.user?.name === "Guest" || !session?.user?.email;
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

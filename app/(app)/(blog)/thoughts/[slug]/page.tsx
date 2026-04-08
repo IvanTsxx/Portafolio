@@ -6,10 +6,7 @@ import { notFound } from "next/navigation";
 import { Icons } from "@/shared/components/icons";
 import { Markdown } from "@/shared/components/markdown";
 import { SITE } from "@/shared/config/site";
-import {
-  getCommentsBySlug,
-  getPostReactions,
-} from "@/shared/lib/actions/comments";
+import { getCommentsBySlug } from "@/shared/lib/actions/comments";
 import { getAllThoughts, getThoughtBySlug } from "@/shared/lib/thoughts";
 
 import { CommentsSection } from "./_components/comments-section";
@@ -50,7 +47,7 @@ export default async function ThoughtPostPage({ params }: Props) {
   const thought = getThoughtBySlug(slug);
   if (!thought) notFound();
 
-  const [{ comments }] = await Promise.all([getCommentsBySlug(slug)]);
+  const { comments } = await getCommentsBySlug(slug);
 
   return (
     <div className="max-w-3xl bg-background/85 dark:bg-transparent mx-auto px-4 py-10">

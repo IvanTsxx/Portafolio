@@ -225,8 +225,8 @@ export async function toggleReaction(data: z.infer<typeof reactionSchema>) {
   } finally {
     // Get the comment to find its slug for proper path revalidation
     const comment = await prisma.comment.findUnique({
-      where: { id: commentId },
       select: { slug: true },
+      where: { id: commentId },
     });
     if (comment) {
       revalidatePath(`/thoughts/${comment.slug}`);
