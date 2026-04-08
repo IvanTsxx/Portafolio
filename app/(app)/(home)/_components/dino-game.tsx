@@ -4,8 +4,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { TECH_STACK } from "@/shared/config/tech-stack";
-
 // ─── Constants ────────────────────────────────────────────────
 const CANVAS_W = 800;
 const CANVAS_H = 200;
@@ -18,7 +16,18 @@ const DINO_X = 80;
 const MIN_OBSTACLE_GAP = 320;
 const BASE_SPEED = 5;
 const SPEED_INCREMENT = 0.0008;
-const ICON_SIZE = 40;
+
+// Obstacle colors for random generation
+const OBSTACLE_COLORS = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#06b6d4",
+  "#3b82f6",
+  "#8b5cf6",
+  "#ec4899",
+];
 
 // ─── Types ─────────────────────────────────────────────────────
 interface Obstacle {
@@ -26,8 +35,8 @@ interface Obstacle {
   y: number;
   w: number;
   h: number;
-  img: HTMLImageElement;
-  label: string;
+  color: string;
+  shape: "rect" | "cactus";
 }
 
 interface GameState {
@@ -93,23 +102,27 @@ function drawDino(
   }
 }
 
-// ─── Load tech stack images ────────────────────────────────────
-function loadImages(): Promise<HTMLImageElement[]> {
-  return Promise.all(
-    TECH_STACK.filter((t) => t.iconUrl).map(
-      (t) =>
-        // oxlint-disable-next-line promise/avoid-new
-        new Promise<HTMLImageElement>((resolve) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          // oxlint-disable-next-line unicorn/prefer-add-event-listener
-          img.onload = () => resolve(img);
-          // oxlint-disable-next-line unicorn/prefer-add-event-listener
-          img.onerror = () => resolve(img);
-          img.src = t.iconUrl as string;
-        })
-    )
-  );
+// ─── Draw procedural obstacles ────────────────────────────────
+function drawObstacle(ctx: CanvasRenderingContext2D, ob: Obstacle) {
+  ctx.fillStyle = ob.color;
+  if (ob.shape === "cactus") {
+    // Draw cactus-like shape
+    const { w } = ob;
+    const { h } = ob;
+    const { x } = ob;
+    const { y } = ob;
+    // Main stem
+    ctx.fillRect(x + w * 0.3, y, w * 0.4, h);
+    // Left arm
+    ctx.fillRect(x, y + h * 0.3, w * 0.3, h * 0.2);
+    ctx.fillRect(x, y + h * 0.15, w * 0.15, h * 0.35);
+    // Right arm
+    ctx.fillRect(x + w * 0.7, y + h * 0.4, w * 0.3, h * 0.2);
+    ctx.fillRect(x + w * 0.85, y + h * 0.2, w * 0.15, h * 0.4);
+  } else {
+    // Simple rect with rounded effect
+    ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
+  }
 }
 
 // ─── Component ─────────────────────────────────────────────────
@@ -127,7 +140,6 @@ export function DinoGame() {
     started: false,
     velY: 0,
   });
-  const imagesRef = useRef<HTMLImageElement[]>([]);
   const rafRef = useRef<number | null>(null);
   const frameRef = useRef(0);
   const nextObstacleRef = useRef(
@@ -217,14 +229,8 @@ export function DinoGame() {
     };
   }, [jump]);
 
-  // Load images once
+  // Read colors once on mount
   useEffect(() => {
-    loadImages().then((imgs) => {
-      imagesRef.current = imgs.filter(
-        (img) => img.complete && img.naturalWidth > 0
-      );
-    });
-
     readColors();
   }, [readColors]);
 
@@ -246,14 +252,23 @@ export function DinoGame() {
     if (!ctx) return;
 
     const getRandomObstacle = (startX: number): Obstacle => {
-      const imgs = imagesRef.current;
-      const img = imgs[Math.floor(Math.random() * imgs.length)];
+      const colors = OBSTACLE_COLORS;
+      const color = colors[Math.floor(Math.random() * colors.length)];
       // Random height variation (low / high obstacle)
-      const tall = Math.random() > 0.6;
-      const w = tall ? ICON_SIZE * 0.8 : ICON_SIZE;
-      const h = tall ? ICON_SIZE * 1.4 : ICON_SIZE;
-      const y = tall ? GROUND_Y - h - ICON_SIZE * 0.5 : GROUND_Y - h;
-      return { h, img, label: "", w, x: startX, y };
+      const isCactus = Math.random() > 0.5;
+      const baseSize = 30 + Math.random() * 15;
+      const w = isCactus ? baseSize : baseSize * 0.8;
+      const h = isCactus ? baseSize * 1.5 : baseSize;
+      const tall = Math.random() > 0.65;
+      const y = tall ? GROUND_Y - h - 25 : GROUND_Y - h;
+      return {
+        color,
+        h,
+        shape: isCactus ? "cactus" : "rect",
+        w,
+        x: startX,
+        y,
+      };
     };
 
     const loop = () => {
@@ -310,7 +325,7 @@ export function DinoGame() {
         // ── Obstacles ────────────────────────────────────────
         nextObstacleRef.current -= s.speed;
         if (nextObstacleRef.current <= 0) {
-          s.obstacles.push(getRandomObstacle(CANVAS_W + ICON_SIZE));
+          s.obstacles.push(getRandomObstacle(CANVAS_W + 50));
           nextObstacleRef.current =
             MIN_OBSTACLE_GAP + Math.random() * MIN_OBSTACLE_GAP;
         }
@@ -359,17 +374,7 @@ export function DinoGame() {
 
       // ── Draw Obstacles ────────────────────────────────────
       for (const ob of s.obstacles) {
-        if (ob.img?.complete && ob.img.naturalWidth > 0) {
-          ctx.save();
-          ctx.globalAlpha = 0.95;
-          ctx.drawImage(ob.img, ob.x, ob.y, ob.w, ob.h);
-          ctx.globalAlpha = 1;
-          ctx.restore();
-        } else {
-          // Fallback rect if image not loaded
-          ctx.fillStyle = fg;
-          ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
-        }
+        drawObstacle(ctx, ob);
       }
 
       // ── Game Over overlay ─────────────────────────────────
@@ -377,6 +382,7 @@ export function DinoGame() {
         const show = Math.floor(s.blink / 20) % 2 === 0;
         ctx.fillStyle = fg;
         ctx.font = "bold 20px monospace";
+
         ctx.textAlign = "center";
         ctx.fillText("GAME OVER", CANVAS_W / 2, GROUND_Y / 2 - 10);
         if (show) {
@@ -400,16 +406,16 @@ export function DinoGame() {
   }, []);
 
   return (
-    <div className="flex w-full relative flex-col items-center gap-4  border border-t-0 border-border">
+    <div className="flex w-full relative h-full flex-col items-center gap-4  border border-t-0 border-border bg-background">
       {/* Score */}
       <div className="flex w-full max-w-[800px] justify-end py-2 px-4">
-        <span className="  text-sm tabular-nums text-muted-foreground">
+        <span className="text-sm tabular-nums">
           {String(displayScore).padStart(5, "0")}
         </span>
       </div>
       {/* Canvas */}
       <div
-        className="relative w-full cursor-pointer overflow-hidden"
+        className="relative w-full border-none select-none h-full bg-background cursor-pointer overflow-hidden"
         onClick={jump}
         onTouchStart={(e) => {
           e.preventDefault();
@@ -426,14 +432,18 @@ export function DinoGame() {
           ref={canvasRef}
           width={CANVAS_W}
           height={CANVAS_H}
-          className="h-auto w-full"
-          style={{ display: "block", imageRendering: "pixelated" }}
+          className="h-auto w-full border-none select-none"
+          style={{
+            border: "none",
+            display: "block",
+            imageRendering: "pixelated",
+          }}
         />
       </div>
 
       {/* Hidden state indicators for a11y */}
       {isGameOver && (
-        <span className="sr-only">
+        <span className="sr-only z-10">
           Game over. Score: {displayScore}. Press space to restart.
         </span>
       )}
