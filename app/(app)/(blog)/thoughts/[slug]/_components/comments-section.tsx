@@ -426,15 +426,15 @@ export function CommentsSection({
 
   return (
     <div className="flex flex-col gap-4">
-      <span className="  text-[11px] uppercase tracking-widest text-muted-foreground">
+      <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
         Comments
       </span>
 
       {/* Auth / input - auto sign in as anonymous if no session */}
       {!session?.user ? (
         <AuthModal
-          message="Sign in to comment with your GitHub profile — your avatar and name
-          will be visible."
+          message="Sign in to comment with your GitHub profile (your avatar and name
+          will be visible) or Sign in as guest"
           callbackUrl={`/thoughts/${slug}`}
         />
       ) : (
