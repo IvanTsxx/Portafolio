@@ -1,29 +1,29 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { ReactionType } from "@/app/generated/prisma/enums";
 import { togglePostReaction } from "@/shared/lib/actions/comments";
-import { useSession } from "@/shared/lib/auth-client";
+import { signIn, useSession } from "@/shared/lib/auth-client";
 import { cn } from "@/shared/lib/utils";
 
-const REACTION_EMOJIS: Record<string, string> = {
-  fire: "🔥",
-  heart_black: "🖤",
-  heart_red: "❤️",
-  rocket: "🚀",
-  thumbs_up: "👍",
+const REACTION_EMOJIS: Record<ReactionType, string> = {
+  [ReactionType.FIRE]: "🔥",
+  [ReactionType.HEART_BLACK]: "🖤",
+  [ReactionType.HEART_RED]: "❤️",
+  [ReactionType.ROCKET]: "🚀",
+  [ReactionType.THUMBS_UP]: "👍",
 };
 
-const REACTION_ORDER = [
-  "fire",
-  "heart_black",
-  "heart_red",
-  "rocket",
-  "thumbs_up",
-] as const;
-type ReactionType = (typeof REACTION_ORDER)[number];
+const REACTION_ORDER: ReactionType[] = [
+  ReactionType.FIRE,
+  ReactionType.HEART_BLACK,
+  ReactionType.HEART_RED,
+  ReactionType.ROCKET,
+  ReactionType.THUMBS_UP,
+];
 
 interface ReactionState {
   counts: Record<ReactionType, number>;
@@ -48,7 +48,14 @@ function initState(): ReactionState {
 }
 
 export function Reactions({ slug, initialReactions }: ReactionsProps) {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
+
+  // Auto sign in as anonymous on mount if no session
+  useEffect(() => {
+    if (!session?.user) {
+      signIn.anonymous();
+    }
+  }, [session?.user]);
   const currentUserId = session?.user?.email ?? session?.user?.id ?? "";
 
   // Initial state comes from server via props — no client-side fetch needed.
@@ -61,12 +68,12 @@ export function Reactions({ slug, initialReactions }: ReactionsProps) {
   const [isReacting, setIsReacting] = useState(false);
 
   async function handleReaction(type: ReactionType) {
-    if (isReacting) return;
+    console.log("handleReaction", type);
+    if (isReacting) {
+      console.log("Please wait for the previous reaction to complete");
+      return;
+    }
     setIsReacting(true);
-
-    const formData = new FormData();
-    formData.set("slug", slug);
-    formData.set("type", type.toUpperCase());
 
     try {
       const result: {
@@ -74,7 +81,10 @@ export function Reactions({ slug, initialReactions }: ReactionsProps) {
         removed?: boolean;
         added?: boolean;
         type?: string;
-      } = await togglePostReaction(formData);
+      } = await togglePostReaction({
+        slug,
+        type,
+      });
 
       if (!result.error) {
         const newType = (result.type ?? type).toLowerCase() as ReactionType;
@@ -152,7 +162,7 @@ export function Reactions({ slug, initialReactions }: ReactionsProps) {
               )}
               aria-label={`React with ${REACTION_EMOJIS[type]}`}
               aria-pressed={isActive}
-              disabled={isReacting}
+              disabled={isReacting || !isPending}
             >
               <span>{REACTION_EMOJIS[type]}</span>
               <AnimatePresence mode="popLayout">

@@ -22,7 +22,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!entry) return { title: "Not Found" };
   return {
     description: entry.description,
+    openGraph: {
+      description: entry.description,
+      title: entry.title,
+      type: "website",
+    },
     title: entry.title,
+    twitter: {
+      card: "summary_large_image",
+    },
   };
 }
 

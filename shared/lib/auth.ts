@@ -35,7 +35,9 @@ export const auth = betterAuth({
   plugins: [
     nextCookies(),
     anonymous({
-      generateName: generateAnonymousName,
+      generateName() {
+        return generateAnonymousName();
+      },
     }),
   ],
   secret: env.BETTER_AUTH_SECRET!,

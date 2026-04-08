@@ -32,12 +32,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: thought.description,
     openGraph: {
       description: thought.description,
+
       publishedTime: thought.date,
       tags: thought.tags,
       title: thought.title,
       type: "article",
     },
     title: thought.title,
+    twitter: {
+      card: "summary_large_image",
+    },
   };
 }
 
@@ -105,7 +109,7 @@ export default async function ThoughtPostPage({ params }: Props) {
       </header>
 
       {/* MDX content */}
-      <article className="my-12 prose prose-neutral dark:prose-invert">
+      <article className="my-12 prose w-full max-w-full prose-neutral dark:prose-invert">
         <Markdown content={thought.content} />
       </article>
 

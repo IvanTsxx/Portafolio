@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
 
+import { ReactionType } from "@/app/generated/prisma/enums";
 import { auth } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
 
@@ -89,12 +90,12 @@ export async function createComment(values: z.infer<typeof commentSchema>) {
       },
     });
 
-    revalidatePath(`/thoughts/${slug}`);
-
     return { comment: formatComment(comment) };
   } catch (error) {
     console.error("Error creating comment:", error);
     return { error: "Failed to create comment" };
+  } finally {
+    revalidatePath(`/thoughts/${slug}`);
   }
 }
 
@@ -141,10 +142,10 @@ export async function getCommentsBySlug(slug: string) {
 
 const reactionSchema = z.object({
   commentId: z.string().min(1, "Comment ID is required"),
-  type: z.enum(["HEART_BLACK", "HEART_RED", "FIRE", "ROCKET", "THUMBS_UP"]),
+  type: z.enum(ReactionType),
 });
 
-export async function toggleReaction(formData: FormData) {
+export async function toggleReaction(data: z.infer<typeof reactionSchema>) {
   const headersList = await headers();
   const session = await auth.api.getSession({ headers: headersList });
   if (!session?.user) {
@@ -184,12 +185,7 @@ export async function toggleReaction(formData: FormData) {
     return { error: "User not found" };
   }
 
-  const rawData = {
-    commentId: formData.get("commentId") as string,
-    type: formData.get("type") as string,
-  };
-
-  const validated = reactionSchema.safeParse(rawData);
+  const validated = reactionSchema.safeParse(data);
 
   if (!validated.success) {
     return { error: validated.error.issues[0].message };
@@ -210,7 +206,7 @@ export async function toggleReaction(formData: FormData) {
       await prisma.reaction.delete({
         where: { id: existing.id },
       });
-      revalidatePath(`/thoughts`);
+
       return { removed: true, type };
     }
 
@@ -222,11 +218,12 @@ export async function toggleReaction(formData: FormData) {
       },
     });
 
-    revalidatePath(`/thoughts`);
     return { added: true, type };
   } catch (error) {
     console.error("Error toggling reaction:", error);
     return { error: "Failed to toggle reaction" };
+  } finally {
+    revalidatePath(`/thoughts`);
   }
 }
 
@@ -257,10 +254,10 @@ function formatComment(comment: {
       image: string | null;
       isAnonymous: boolean;
     };
-    reactions: { type: string; userId: string }[];
+    reactions: { type: ReactionType; userId: string }[];
     createdAt: Date;
   }[];
-  reactions: { type: string; userId: string }[];
+  reactions: { type: ReactionType; userId: string }[];
 }) {
   return {
     authorId: comment.authorId,
@@ -288,21 +285,20 @@ function formatComment(comment: {
   };
 }
 
-function formatReactions(reactions: { type: string; userId: string }[]) {
-  const counts: Record<string, number> = {};
-  const users: Record<string, string[]> = {};
+function formatReactions(reactions: { type: ReactionType; userId: string }[]) {
+  const counts: Record<ReactionType, number> = {} as Record<ReactionType, number>;
+  const users: Record<ReactionType, string[]> = {} as Record<ReactionType, string[]>;
 
   for (const r of reactions) {
-    const type = r.type.toLowerCase();
-    counts[type] = (counts[type] ?? 0) + 1;
-    if (!users[type]) users[type] = [];
-    users[type].push(r.userId);
+    counts[r.type] = (counts[r.type] ?? 0) + 1;
+    if (!users[r.type]) users[r.type] = [];
+    users[r.type].push(r.userId);
   }
 
   return Object.entries(counts).map(([type, count]) => ({
     count,
-    type,
-    users: users[type] ?? [],
+    type: type as ReactionType,
+    users: users[type as ReactionType] ?? [],
   }));
 }
 
@@ -320,13 +316,23 @@ export async function getPostReactions(slug: string) {
 
 const postReactionSchema = z.object({
   slug: z.string().min(1, "Slug is required"),
-  type: z.enum(["HEART_BLACK", "HEART_RED", "FIRE", "ROCKET", "THUMBS_UP"]),
+  type: z.enum([
+    ReactionType.HEART_BLACK,
+    ReactionType.HEART_RED,
+    ReactionType.FIRE,
+    ReactionType.ROCKET,
+    ReactionType.THUMBS_UP,
+  ]),
 });
 
-export async function togglePostReaction(formData: FormData) {
+export async function togglePostReaction(
+  data: z.infer<typeof postReactionSchema>
+) {
+  console.log("togglePostReaction", data);
   const headersList = await headers();
   const session = await auth.api.getSession({ headers: headersList });
   if (!session?.user) {
+    console.log("You must be signed in to react");
     return { error: "You must be signed in to react" };
   }
 
@@ -363,12 +369,7 @@ export async function togglePostReaction(formData: FormData) {
     return { error: "User not found" };
   }
 
-  const rawData = {
-    slug: formData.get("slug") as string,
-    type: formData.get("type") as string,
-  };
-
-  const validated = postReactionSchema.safeParse(rawData);
+  const validated = postReactionSchema.safeParse(data);
 
   if (!validated.success) {
     return { error: validated.error.issues[0].message };
@@ -389,7 +390,7 @@ export async function togglePostReaction(formData: FormData) {
       await prisma.postReaction.delete({
         where: { id: existing.id },
       });
-      revalidatePath(`/thoughts/${slug}`);
+
       return { removed: true, type };
     }
 
@@ -401,11 +402,12 @@ export async function togglePostReaction(formData: FormData) {
       },
     });
 
-    revalidatePath(`/thoughts/${slug}`);
     return { added: true, type };
   } catch (error) {
     console.error("Error toggling post reaction:", error);
     return { error: "Failed to toggle reaction" };
+  } finally {
+    revalidatePath(`/thoughts/${slug}`);
   }
 }
 

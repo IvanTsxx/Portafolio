@@ -9,13 +9,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { ReactionType } from "@/app/generated/prisma/enums";
 import { Icons } from "@/shared/components/icons";
 import { createComment, toggleReaction } from "@/shared/lib/actions/comments";
 import { signIn, useSession } from "@/shared/lib/auth-client";
 import { cn } from "@/shared/lib/utils";
 
 interface Reaction {
-  type: string;
+  type: ReactionType;
   count: number;
   users: string[];
 }
@@ -31,12 +32,12 @@ interface Comment {
   replies: Comment[];
 }
 
-const REACTION_EMOJIS: Record<string, string> = {
-  fire: "🔥",
-  heart_black: "🖤",
-  heart_red: "❤️",
-  rocket: "🚀",
-  thumbs_up: "👍",
+const REACTION_EMOJIS: Record<ReactionType, string> = {
+  [ReactionType.FIRE]: "🔥",
+  [ReactionType.HEART_BLACK]: "🖤",
+  [ReactionType.HEART_RED]: "❤️",
+  [ReactionType.ROCKET]: "🚀",
+  [ReactionType.THUMBS_UP]: "👍",
 };
 
 const commentSchema = z.object({
@@ -62,8 +63,8 @@ function CommentItem({
   slug,
 }: CommentItemProps) {
   const [showReactions, setShowReactions] = useState(false);
-  const [localCount, setLocalCount] = useState<Record<string, number>>(() => {
-    const counts: Record<string, number> = {};
+  const [localCount, setLocalCount] = useState<Record<ReactionType, number>>(() => {
+    const counts: Record<ReactionType, number> = {} as Record<ReactionType, number>;
     for (const r of comment.reactions) {
       counts[r.type] = r.count;
     }
@@ -71,22 +72,22 @@ function CommentItem({
   });
   const [isReacting, setIsReacting] = useState(false);
 
-  const handleReaction = async (type: string) => {
+  const handleReaction = async (type: ReactionType) => {
     setIsReacting(true);
-    const formData = new FormData();
-    formData.set("commentId", comment.id);
-    formData.set("type", type.toUpperCase());
 
     try {
       const response: {
         error?: string;
         removed?: boolean;
         added?: boolean;
-        type?: string;
-      } = await toggleReaction(formData);
+        type?: ReactionType;
+      } = await toggleReaction({
+        commentId: comment.id,
+        type,
+      });
 
       if (!response.error) {
-        const newType = (response.type ?? type).toLowerCase();
+        const newType = response.type ?? type;
         setLocalCount((prev) => {
           const current = prev[newType] ?? 0;
           if (response.removed) {
@@ -174,7 +175,7 @@ function CommentItem({
             >
               {totalReactions > 0 && (
                 <span className="flex gap-0.5">
-                  {Object.entries(localCount)
+                  {(Object.entries(localCount) as [ReactionType, number][])
                     .filter(([, count]) => count > 0)
                     .map(([type]) => (
                       <span key={type} className="text-[11px]">
@@ -198,7 +199,7 @@ function CommentItem({
                   exit={{ opacity: 0, y: 4 }}
                   className="absolute top-full left-0 mt-1 flex gap-1 bg-background border border-border rounded-md p-1 shadow-lg z-10"
                 >
-                  {Object.entries(REACTION_EMOJIS).map(([type, emoji]) => (
+                  {(Object.entries(REACTION_EMOJIS) as [ReactionType, string][]).map(([type, emoji]) => (
                     <button
                       key={type}
                       type="button"

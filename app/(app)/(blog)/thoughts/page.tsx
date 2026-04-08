@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description:
     "Writing about Next.js, architecture, and building things on the web.",
   title: "Thoughts",
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function ThoughtsPage() {

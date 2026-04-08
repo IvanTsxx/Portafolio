@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description:
     "Reusable components built for the modern web. Install via shadcn CLI.",
   title: "Components",
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function ComponentsPage() {

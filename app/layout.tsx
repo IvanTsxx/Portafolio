@@ -32,9 +32,10 @@ export const metadata: Metadata = {
     template: `%s — ${SITE.name}`,
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     creator: "@ivantsx",
     description: SITE.description,
+    images: ["/opengraph-image.png"],
     title: SITE.name,
   },
 };
@@ -59,6 +60,14 @@ export default function RootLayout({
       className={`${GeistPixelTriangle.variable}`}
       suppressHydrationWarning
     >
+      {/* preload avatar imgage */}
+      <link
+        rel="preload"
+        href="/images/avatar.jpeg"
+        as="image"
+        type="image/jpeg"
+      />
+
       <body className="relative pixel-grid">
         <NuqsAdapter>
           <ThemeProvider

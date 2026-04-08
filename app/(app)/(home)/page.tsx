@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   description:
     "Full Stack Developer specializing in Next.js. Building fast, typesafe, and beautiful web experiences.",
   title: "Ivan Bongiovanni",
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function HomePage() {
