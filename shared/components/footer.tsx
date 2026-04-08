@@ -80,7 +80,7 @@ export function Footer() {
           </Link>
           . The source code is available on{" "}
           <Link
-            href="https://github.com/IvanTsxx/portfolio"
+            href="https://github.com/ivantsxx/portafolio"
             target="_blank"
             rel="noopener"
             className="font-medium underline underline-offset-4 hover:text-foreground"
