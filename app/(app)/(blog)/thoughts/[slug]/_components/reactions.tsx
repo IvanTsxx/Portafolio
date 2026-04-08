@@ -92,7 +92,7 @@ export function Reactions({ slug, initialReactions }: ReactionsProps) {
           } else if (result.added) {
             // Remove from previous reaction type if user had one
             for (const t of REACTION_ORDER) {
-              if (t !== newType && next.users[t].includes(currentUserId)) {
+              if (t !== newType && next.users[t]?.includes(currentUserId)) {
                 next.counts[t] = Math.max(0, (next.counts[t] ?? 0) - 1);
                 next.users[t] = next.users[t].filter(
                   (id) => id !== currentUserId

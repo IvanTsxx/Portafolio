@@ -105,7 +105,7 @@ export default async function ThoughtPostPage({ params }: Props) {
       </header>
 
       {/* MDX content */}
-      <article className="my-12 prose dark:prose-invert">
+      <article className="my-12 prose prose-neutral dark:prose-invert">
         <Markdown content={thought.content} />
       </article>
 
