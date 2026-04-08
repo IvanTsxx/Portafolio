@@ -40,7 +40,7 @@ export default async function ComponentPage({ params }: Props) {
   if (!entry) notFound();
 
   return (
-    <section className="py-10">
+    <section className="py-10 bg-background px-1">
       {/* Back */}
       <Link
         prefetch={false}
@@ -61,9 +61,7 @@ export default async function ComponentPage({ params }: Props) {
         </p>
       </div>
 
-      {/* MDX Content rendered securely on the server with custom wrappers */}
-      {/* MDX content */}
-      <article className="my-12 prose dark:prose-invert">
+      <article className="my-12 prose w-full max-w-full prose-neutral dark:prose-invert">
         <Markdown content={entry.content} />
       </article>
 

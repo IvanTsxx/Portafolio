@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ExternalLink, GitPullRequest } from "lucide-react";
+import { motion } from "motion/react";
 import type { Route } from "next";
 import Link from "next/link";
 

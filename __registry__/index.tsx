@@ -24,21 +24,4 @@ export const Index: Record<string, any> = {
     categories: [],
     meta: {},
   },
-  "trigger-them-transition": {
-    name: "trigger-them-transition",
-    description: "trigger-them-transition lib.",
-    type: "registry:lib",
-    files: [{
-      path: "registry/utils/trigger-them-transition.ts",
-      type: "registry:lib",
-      target: "",
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/utils/trigger-them-transition.ts")
-      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "trigger-them-transition"
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: [],
-    meta: {},
-  },
 }

@@ -7,8 +7,8 @@
       "title": "Contribution Card",
       "description": "contribution-card component.",
       "dependencies": [
-        "framer-motion",
-        "lucide-react"
+        "lucide-react",
+        "motion"
       ],
       "registryDependencies": [],
       "files": [
@@ -19,22 +19,6 @@
         }
       ],
       "type": "registry:component",
-      "author": "ivantsx"
-    },
-    {
-      "name": "trigger-them-transition",
-      "title": "Trigger Them Transition",
-      "description": "trigger-them-transition lib.",
-      "dependencies": [],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/utils/trigger-them-transition.ts",
-          "type": "registry:lib",
-          "target": ""
-        }
-      ],
-      "type": "registry:lib",
       "author": "ivantsx"
     }
   ],
