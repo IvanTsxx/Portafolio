@@ -18,7 +18,8 @@
     "no-eq-null": "off",
     "eqeqeq": "off",
     "jsdoc/check-tag-names": "off",
-    "unicorn/no-array-for-each": "off"
+    "unicorn/no-array-for-each": "off",
+    "require-await": "off"
   },
   "ignorePatterns": [
     ".next/**",

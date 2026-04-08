@@ -16,7 +16,7 @@ export const USER: User = {
   handle: "ivantsx",
   heroClass: "text-sm font-medium max-w-xs lg:max-w-none",
   jobTitle: "Full Stack Developer",
-  location: "Italy",
+  location: "Tucumán, Argentina",
   name: "Ivan Bongiovanni",
 
   timeZone: "America/Argentina/Tucuman",

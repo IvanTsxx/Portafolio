@@ -6,7 +6,7 @@
  * This script:
  * 1. Launches a headless browser
  * 2. Takes a screenshot of the home page
- * 3. Saves it as the home OG image
+ * 3. Saves it as the home OG image (WebP format)
  *
  * Usage:
  *   bun run scripts/generate-home-og.ts
@@ -73,7 +73,7 @@ async function main() {
 
     writeFileSync(OUTPUT_FILE, screenshot);
     console.log(`✅ Screenshot saved to: ${OUTPUT_FILE}`);
-    console.log(`   Dimensions: 1200x630`);
+    console.log(`   Dimensions: 1200x630 (PNG)`);
     console.log(`\n✨ Home OG image generated successfully!`);
     console.log(
       `   This is optional - the programmatic OG image is already configured.`
