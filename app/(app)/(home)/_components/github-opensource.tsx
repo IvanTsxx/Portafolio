@@ -36,7 +36,7 @@ export const GitHubOpenSource = async () => {
       });
 
   return (
-    <section className="max-w-3xl mx-auto px-4 py-6">
+    <section>
       <SectionHeader label="Open Source Contributions" />
       <LoadMoreItemsWrapper max={3}>
         {data.contributions.map((contribution, index) => (

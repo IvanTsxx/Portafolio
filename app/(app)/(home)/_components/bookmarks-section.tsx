@@ -8,7 +8,7 @@ import { SectionHeader } from "./section-header";
 
 export function BookmarksSection() {
   return (
-    <section className="max-w-3xl mx-auto px-4 py-6">
+    <section>
       <SectionHeader label="Bookmarks" />
       <LoadMoreItemsWrapper max={3}>
         {BOOKMARKS.map((bookmark, i) => (

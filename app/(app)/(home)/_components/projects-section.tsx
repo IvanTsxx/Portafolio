@@ -6,7 +6,7 @@ import { SectionHeader } from "./section-header";
 
 export function ProjectsSection() {
   return (
-    <section className="max-w-3xl mx-auto px-4 py-6">
+    <section>
       <SectionHeader label="Projects" />
       <LoadMoreItemsWrapper max={3}>
         {PROJECTS.map((project) => (

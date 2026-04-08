@@ -12,7 +12,7 @@ const ABOUT_CONTENT = `
 
 export function AboutSection() {
   return (
-    <section className="max-w-3xl mx-auto px-4 py-6">
+    <section>
       <SectionHeader label="About" />
       <div className="prose dark:prose-invert">
         <Markdown content={ABOUT_CONTENT} />

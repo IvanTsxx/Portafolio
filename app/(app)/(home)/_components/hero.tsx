@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Eye, Users, VerifiedIcon } from "lucide-react";
+import { ExternalLink, VerifiedIcon } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,8 +12,7 @@ import { TextFlip } from "@/shared/components/text-flip";
 import { SITE } from "@/shared/config/site";
 import { USER } from "@/shared/config/user";
 
-import { TotalVisitors } from "./total-visitors";
-import { VisitorCounter } from "./visit-counter";
+import { VisitTracker } from "./visit-tracker";
 
 // ─── Avatar with shimmer border on hover ──────────────────────────────────────
 function Avatar() {
@@ -62,12 +61,12 @@ export function Hero({
   visitorNumber,
 }: {
   totalVisits: number;
-  visitorNumber: number;
+  visitorNumber: number | null;
 }) {
   return (
-    <section className="mx-auto max-w-3xl px-4 pt-8">
+    <section>
       {/* Top section */}
-      <div className="flex  gap-6 border-b border-line pb-6 md:flex-row md:gap-8">
+      <div className="flex  gap-6 pb-6 md:flex-row md:gap-8">
         {/* Avatar */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -136,17 +135,10 @@ export function Hero({
               ))}
             </TextFlip>
           </motion.div>
-          <section className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Users className="size-4" />
-              <TotalVisitors totalVisits={totalVisits} />
-            </div>
-
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Eye className="size-4" />
-              <VisitorCounter visitorNumber={visitorNumber} />
-            </div>
-          </section>
+          <VisitTracker
+            totalVisits={totalVisits}
+            visitorNumber={visitorNumber}
+          />
         </div>
       </div>
 
@@ -155,7 +147,7 @@ export function Hero({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.4 }}
-        className="grid grid-cols-1 gap-px border-t border-boder sm:grid-cols-3"
+        className="grid grid-cols-1 gap-px sm:grid-cols-3 items-center h-full"
       >
         {[
           {
@@ -180,7 +172,7 @@ export function Hero({
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between gap-3 bg-background p-4 hover:bg-muted/50"
+            className="flex items-center justify-between gap-3 bg-background border border-border h-full p-4 hover:bg-muted/50"
           >
             <div className="flex items-center gap-3">
               <Icon className="size-5" />
