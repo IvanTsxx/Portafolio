@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
-import InlineCode from "@/shared/components/code-block/blocks/inline-cod";
+import InlineCode from "@/shared/components/code-block/blocks/inline-code";
 import {
   Tabs,
   TabsContent,

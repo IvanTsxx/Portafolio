@@ -59,25 +59,11 @@ const DocCard = ({
   </div>
 );
 
-const ShowSource = ({ component }: { component: string }) => (
-  <div className="my-4 border-l-2 border-brand-green pl-4">
-    <p className="text-[12px] text-muted-foreground mb-2">
-      View complete source for{" "}
-      <span className="font-mono text-foreground">{component}</span>
-    </p>
-
-    <div className="text-[11px] bg-secondary px-2 py-1 inline-block rounded text-muted-foreground">
-      Source mapping available via CLI
-    </div>
-  </div>
-);
-
 export const mdxComponents: MDXComponentsType = {
   DocCard,
   InstallCommand,
   RegistryPreview,
   ShadcnInstallCommand,
-  ShowSource,
   Showcase,
   Tabs,
   TabsContent,
