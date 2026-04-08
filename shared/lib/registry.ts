@@ -77,27 +77,20 @@ export interface RawEntry {
   type: string;
 }
 
-/**
- * Find the main content file for an item.
- * Priority: registry:component > registry:block > registry:page > first file
- */
-function findMainFile(files: (RegistryFile & { content?: string })[]): string {
-  // Try to find a component file first
-  const componentFile = files.find((f) => f.type === "registry:component");
-  if (componentFile?.content) return componentFile.content;
+const getContentFromMdx = (name: string) => {
+  const filePath = path.join(process.cwd(), `content/components/${name}.mdx`);
+  if (!fs.existsSync(filePath)) return "// Source not available";
 
-  // Try block type
-  const blockFile = files.find((f) => f.type === "registry:block");
-  if (blockFile?.content) return blockFile.content;
+  const raw = fs.readFileSync(filePath, "utf-8");
 
-  // Try page type
-  const pageFile = files.find((f) => f.type === "registry:page");
-  if (pageFile?.content) return pageFile.content;
+  const parts = raw.split("---");
 
-  // Fallback to first file with content
-  const firstWithContent = files.find((f) => f.content);
-  return firstWithContent?.content ?? "// Source not available";
-}
+  if (parts.length < 3) return raw;
+
+  const content = parts[2].trim();
+
+  return content;
+};
 
 function toEntry(item: PublicRegistryItem): RegistryEntry {
   const filePath = path.join(process.cwd(), `public/r/${item.name}.json`);
@@ -115,11 +108,8 @@ function toEntry(item: PublicRegistryItem): RegistryEntry {
     };
   }
 
-  const raw = fs.readFileSync(filePath, "utf-8");
-  const contentRaw = JSON.parse(raw) as RawEntry;
-
   return {
-    content: findMainFile(contentRaw.files),
+    content: getContentFromMdx(item.name),
     dependencies: item.dependencies ?? [],
     description: item.description ?? "",
     files: item.files ?? [],

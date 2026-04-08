@@ -1,6 +1,3 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
-
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -21,6 +18,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const entry = getComponent(slug);
+
   if (!entry) return { title: "Not Found" };
   return {
     description: entry.description,
@@ -32,20 +30,6 @@ export default async function ComponentPage({ params }: Props) {
   const { slug } = await params;
   const entry = getComponent(slug);
   if (!entry) notFound();
-
-  let mdxContent = "";
-  try {
-    const filename = path.join(
-      process.cwd(),
-      "content",
-      "components",
-      `${slug}.mdx`
-    );
-    mdxContent = await fs.readFile(filename, "utf-8");
-  } catch {
-    // If the MDX file doesn't exist yet, we will just show a placeholder message.
-    mdxContent = `> No MDX documentation found for \`${slug}\` yet. Create \`content/components/${slug}.mdx\` to add documentation.`;
-  }
 
   return (
     <div className="mx-auto bg-background max-w-3xl px-4 py-16">
@@ -70,7 +54,10 @@ export default async function ComponentPage({ params }: Props) {
       </div>
 
       {/* MDX Content rendered securely on the server with custom wrappers */}
-      <Markdown content={mdxContent} />
+      {/* MDX content */}
+      <article className="my-12 prose dark:prose-invert">
+        <Markdown content={entry.content} />
+      </article>
 
       {/* Dependencies components (Can be placed at the bottom or inside MDX, keeping here for now just in case) */}
       {entry.registryDependencies.length > 0 && (

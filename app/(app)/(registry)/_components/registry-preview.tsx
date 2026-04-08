@@ -1,6 +1,5 @@
 "use client";
 
-import { Monitor, Smartphone } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
@@ -13,13 +12,6 @@ import {
 } from "@/shared/components/ui/tabs";
 import { cn } from "@/shared/lib/utils";
 
-const VIEWPORTS = [
-  { icon: Monitor, label: "Desktop", width: "100%" },
-  { icon: Smartphone, label: "Mobile", width: "375px" },
-] as const;
-
-type ViewportLabel = (typeof VIEWPORTS)[number]["label"];
-
 interface RegistryPreviewProps {
   source: string;
   componentName: string;
@@ -31,12 +23,8 @@ export function RegistryPreview({
   componentName,
   type,
 }: RegistryPreviewProps) {
-  const [viewport, setViewport] = useState<ViewportLabel>("Desktop");
   const [iframeHeight, setIframeHeight] = useState(300);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  const currentWidth =
-    VIEWPORTS.find((v) => v.label === viewport)?.width ?? "100%";
 
   const previewUrl = `/preview/${componentName}?type=${type}`;
 
@@ -60,29 +48,6 @@ export function RegistryPreview({
             <TabsTrigger value="preview">Preview</TabsTrigger>
             <TabsTrigger value="code">Code</TabsTrigger>
           </div>
-
-          <div className="flex items-center gap-2">
-            {VIEWPORTS.map((v) => (
-              <button
-                key={v.label}
-                onClick={() => setViewport(v.label)}
-                className={cn(
-                  "flex items-center gap-1",
-                  "rounded-md px-2 py-1 text-xs",
-                  "border border-border",
-                  "text-muted-foreground",
-                  "hover:bg-secondary/50",
-                  "hover:text-foreground",
-                  "transition-colors",
-                  viewport === v.label &&
-                    "bg-secondary text-secondary-foreground"
-                )}
-              >
-                <v.icon className="size-3" />
-                {v.label}
-              </button>
-            ))}
-          </div>
         </TabsList>
 
         {/* Preview */}
@@ -96,13 +61,16 @@ export function RegistryPreview({
             )}
           >
             <motion.iframe
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
               ref={iframeRef}
               src={previewUrl}
               title={`Preview of ${componentName}`}
-              animate={{ maxWidth: currentWidth }}
               style={{
                 height: iframeHeight,
-                maxWidth: type === "component" ? "fit-content" : currentWidth,
+                maxWidth: type === "component" ? "fit-content" : "100%",
               }}
               className={cn(
                 "block",
