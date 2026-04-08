@@ -406,16 +406,10 @@ export function DinoGame() {
   }, []);
 
   return (
-    <div className="flex w-full relative h-full flex-col items-center gap-4  border border-t-0 border-border bg-background">
-      {/* Score */}
-      <div className="flex w-full max-w-[800px] justify-end py-2 px-4">
-        <span className="text-sm tabular-nums">
-          {String(displayScore).padStart(5, "0")}
-        </span>
-      </div>
+    <div className="w-full h-full border border-t-0 border-border overflow-hidden bg-background">
       {/* Canvas */}
       <div
-        className="relative w-full border-none select-none h-full bg-background cursor-pointer overflow-hidden"
+        className="relative w-full border-none select-none h-full bg-transparent cursor-pointer overflow-hidden focus-visible:outline-none"
         onClick={jump}
         onTouchStart={(e) => {
           e.preventDefault();
@@ -428,6 +422,13 @@ export function DinoGame() {
           if (e.code === "Space") jump();
         }}
       >
+        {/* Score */}
+        <div className="w-full max-w-[800px] absolute top-0 right-0 z-10 py-2 px-4 flex justify-end">
+          <span className="text-sm tabular-nums text-[var(--foreground)]">
+            {String(displayScore).padStart(5, "0")}
+          </span>
+        </div>
+
         <canvas
           ref={canvasRef}
           width={CANVAS_W}

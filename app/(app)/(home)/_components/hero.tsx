@@ -80,13 +80,13 @@ export function Hero() {
             transition={{ delay: 0.1, duration: 0.4 }}
             className="flex flex-col"
           >
-            <div className="flex grow items-end pb-1">
-              <div
+            <div className=" grow items-end pb-1 hidden lg:flex">
+              <p
                 className="line-clamp-1 font-light text-xs text-zinc-300 select-none dark:text-zinc-700"
                 aria-hidden="true"
               >
                 {USER.heroClass}
-              </div>
+              </p>
             </div>
             <ShimmeringText
               text={USER.bio}
