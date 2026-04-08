@@ -32,8 +32,10 @@ export async function createOgImage(
   for (const file of candidates) {
     try {
       const buf = await readFile(path.join(process.cwd(), "public", file));
+      // oxlint-disable-next-line typescript/no-non-null-assertion
       const ext = file.split(".").pop()!;
-      const mime = ext === "jpg" || ext === "jpeg" ? "image/jpeg" : `image/${ext}`;
+      const mime =
+        ext === "jpg" || ext === "jpeg" ? "image/jpeg" : `image/${ext}`;
       avatarSrc = `data:${mime};base64,${buf.toString("base64")}`;
       break;
     } catch {
