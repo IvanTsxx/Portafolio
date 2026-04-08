@@ -138,7 +138,7 @@ export function CodeBlockCommand({
     isFlip && names ? `${baseCommand}${names[currentFlipIndex]}` : baseCommand;
 
   return (
-    <div className="relative overflow-hidden rounded-none dark:bg-transparent">
+    <div className="relative overflow-hidden rounded-none">
       <Tabs
         className="gap-0"
         value={packageManager}
@@ -146,8 +146,8 @@ export function CodeBlockCommand({
           setPackageManager(value as PackageManager);
         }}
       >
-        <div className="px-4 shadow-[inset_0_-1px_0_0] shadow-border">
-          <TabsList className="h-10 rounded-none bg-transparent p-0 dark:bg-transparent [&_svg]:me-2 [&_svg]:size-4 [&_svg]:text-muted-foreground">
+        <div className="px-4">
+          <TabsList className="[&_svg]:me-2 [&_svg]:size-4 [&_svg]:text-muted-foreground">
             {getIconForPackageManager(packageManager)}
 
             {tabsFiltered.map(([key]) => (
