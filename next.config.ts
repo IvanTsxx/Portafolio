@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       { destination: "/", permanent: false, source: "/blocks" },
     ];
   },
+  serverExternalPackages: ["@takumi-rs/core"],
 };
 
 export default nextConfig;
