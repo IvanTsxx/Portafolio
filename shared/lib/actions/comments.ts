@@ -223,7 +223,14 @@ export async function toggleReaction(data: z.infer<typeof reactionSchema>) {
     console.error("Error toggling reaction:", error);
     return { error: "Failed to toggle reaction" };
   } finally {
-    revalidatePath(`/thoughts`);
+    // Get the comment to find its slug for proper path revalidation
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { slug: true },
+    });
+    if (comment) {
+      revalidatePath(`/thoughts/${comment.slug}`);
+    }
   }
 }
 

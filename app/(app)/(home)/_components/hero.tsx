@@ -57,7 +57,13 @@ function Avatar() {
   );
 }
 
-export function Hero() {
+export function Hero({
+  totalVisits,
+  visitorNumber,
+}: {
+  totalVisits: number;
+  visitorNumber: number;
+}) {
   return (
     <section className="mx-auto max-w-3xl px-4 pt-8">
       {/* Top section */}
@@ -91,8 +97,7 @@ export function Hero() {
 
             <ShimmeringText
               text={USER.bio}
-              className="text-sm font-medium max-w-xs lg:max-w-none"
-              duration={2}
+              className="text-xs lg:text-sm font-medium max-w-full"
             />
           </motion.div>
 
@@ -134,12 +139,12 @@ export function Hero() {
           <section className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Users className="size-4" />
-              <TotalVisitors />
+              <TotalVisitors totalVisits={totalVisits} />
             </div>
 
             <div className="flex items-center gap-2 text-muted-foreground">
               <Eye className="size-4" />
-              <VisitorCounter />
+              <VisitorCounter visitorNumber={visitorNumber} />
             </div>
           </section>
         </div>

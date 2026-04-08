@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { formatDate } from "date-fns";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -54,6 +55,7 @@ interface CommentItemProps {
   onReply: (commentId: string) => void;
   replyingTo: string | null;
   slug: string;
+  router: ReturnType<typeof useRouter>;
 }
 
 function CommentItem({
@@ -62,52 +64,16 @@ function CommentItem({
   onReply,
   replyingTo,
   slug,
+  router,
 }: CommentItemProps) {
   const [showReactions, setShowReactions] = useState(false);
-  const [localCount, setLocalCount] = useState<Record<ReactionType, number>>(
-    () => {
-      const counts: Record<ReactionType, number> = {} as Record<
-        ReactionType,
-        number
-      >;
-      for (const r of comment.reactions) {
-        counts[r.type] = r.count;
-      }
-      return counts;
-    }
-  );
-  const [isReacting, setIsReacting] = useState(false);
 
   const handleReaction = async (type: ReactionType) => {
-    setIsReacting(true);
-
-    try {
-      const response: {
-        error?: string;
-        removed?: boolean;
-        added?: boolean;
-        type?: ReactionType;
-      } = await toggleReaction({
-        commentId: comment.id,
-        type,
-      });
-
-      if (!response.error) {
-        const newType = response.type ?? type;
-        setLocalCount((prev) => {
-          const current = prev[newType] ?? 0;
-          if (response.removed) {
-            return { ...prev, [newType]: Math.max(0, current - 1) };
-          }
-          return { ...prev, [newType]: current + 1 };
-        });
-      }
-    } finally {
-      setIsReacting(false);
-    }
+    await toggleReaction({ commentId: comment.id, type });
+    router.refresh();
   };
 
-  const totalReactions = Object.values(localCount).reduce((a, b) => a + b, 0);
+  const totalReactions = comment.reactions.reduce((sum, r) => sum + r.count, 0);
   const userReactedTypes = new Set(
     comment.reactions
       .filter((r) => r.users.includes(currentUserId ?? ""))
@@ -157,6 +123,7 @@ function CommentItem({
             repliedToName={comment.authorName}
             repliedToContent={comment.content}
             onCancel={() => onReply("")}
+            router={router}
           />
         ) : (
           <p className="text-[14px] text-foreground leading-relaxed wrap-break-word">
@@ -177,15 +144,14 @@ function CommentItem({
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               )}
-              disabled={isReacting}
             >
               {totalReactions > 0 && (
                 <span className="flex gap-0.5">
-                  {(Object.entries(localCount) as [ReactionType, number][])
-                    .filter(([, count]) => count > 0)
-                    .map(([type]) => (
-                      <span key={type} className="text-[11px]">
-                        {REACTION_EMOJIS[type]}
+                  {comment.reactions
+                    .filter((r) => r.count > 0)
+                    .map((r) => (
+                      <span key={r.type} className="text-[11px]">
+                        {REACTION_EMOJIS[r.type]}
                       </span>
                     ))}
                 </span>
@@ -219,7 +185,6 @@ function CommentItem({
                         "w-7 h-7 flex items-center justify-center text-lg rounded hover:bg-secondary transition-colors",
                         userReactedTypes.has(type) && "bg-secondary"
                       )}
-                      disabled={isReacting}
                     >
                       {emoji}
                     </button>
@@ -250,6 +215,7 @@ function CommentItem({
                 onReply={onReply}
                 replyingTo={replyingTo}
                 slug={slug}
+                router={router}
               />
             ))}
           </div>
@@ -265,6 +231,7 @@ interface ReplyFormProps {
   repliedToName: string;
   repliedToContent: string;
   onCancel: () => void;
+  router: ReturnType<typeof useRouter>;
 }
 
 function ReplyForm({
@@ -273,6 +240,7 @@ function ReplyForm({
   repliedToName,
   repliedToContent,
   onCancel,
+  router,
 }: ReplyFormProps) {
   const [text, setText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -287,13 +255,14 @@ function ReplyForm({
       parentId: commentId,
       slug,
     });
+    setIsSubmitting(false);
     if (error) {
       toast.error(error);
       return;
     }
 
     setText("");
-    setIsSubmitting(false);
+    router.refresh();
     onCancel();
   };
 
@@ -352,63 +321,27 @@ export function CommentsSection({
   initialComments = [],
 }: CommentsSectionProps) {
   const { data: session } = useSession();
+  const router = useRouter();
   const currentUserId = session?.user?.email;
   const isAnonymous = session?.user?.name === "Guest" || !session?.user?.email;
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [localComments, setLocalComments] =
-    useState<Comment[]>(initialComments);
-  const [optimisticIds, setOptimisticIds] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm({
     defaultValues: { content: "" },
     onSubmit: async ({ value }) => {
-      const optimisticId = `optimistic-${Date.now()}`;
-      const optimisticComment: Comment = {
-        authorImage: session?.user?.image ?? null,
-        authorIsAnonymous: isAnonymous,
-        authorName: session?.user?.name ?? "Guest",
-        content: value.content,
-        createdAt: new Date().toISOString(),
-        id: optimisticId,
-        reactions: [],
-        replies: [],
-      };
-
-      setLocalComments((prev) => [optimisticComment, ...prev]);
-      setOptimisticIds((prev) => new Set(prev).add(optimisticId));
-      form.reset();
       setIsSubmitting(true);
-
-      try {
-        const { comment, error } = await createComment({
-          content: value.content,
-          slug,
-        });
-
-        if (error) {
-          toast.error(error);
-          return;
-        }
-
-        if (comment) {
-          const newComment = comment;
-          setLocalComments((prev) =>
-            prev.map((c) => (c.id === optimisticId ? newComment : c))
-          );
-        } else {
-          setLocalComments((prev) => prev.filter((c) => c.id !== optimisticId));
-        }
-      } catch {
-        setLocalComments((prev) => prev.filter((c) => c.id !== optimisticId));
-      } finally {
-        setOptimisticIds((prev) => {
-          const next = new Set(prev);
-          next.delete(optimisticId);
-          return next;
-        });
-        setIsSubmitting(false);
+      const { error } = await createComment({
+        content: value.content,
+        slug,
+      });
+      setIsSubmitting(false);
+      if (error) {
+        toast.error(error);
+        return;
       }
+      router.refresh();
+      form.reset();
     },
     validators: {
       onSubmit: commentSchema,
@@ -418,11 +351,6 @@ export function CommentsSection({
   const handleReply = (commentId: string) => {
     setReplyingTo(commentId === replyingTo ? null : commentId);
   };
-
-  // Filter out optimistic comments that were replaced by real ones
-  const displayComments = localComments.filter(
-    (c) => !c.id.startsWith("optimistic-") || optimisticIds.has(c.id)
-  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -500,13 +428,13 @@ export function CommentsSection({
       )}
 
       {/* Comment list */}
-      {displayComments.length === 0 ? (
+      {initialComments.length === 0 ? (
         <p className="  text-[12px] text-muted-foreground">
           No comments yet. Be the first.
         </p>
       ) : (
         <AnimatePresence initial={false}>
-          {displayComments.map((comment) => (
+          {initialComments.map((comment) => (
             <CommentItem
               key={comment.id}
               comment={comment}
@@ -514,6 +442,7 @@ export function CommentsSection({
               onReply={handleReply}
               replyingTo={replyingTo}
               slug={slug}
+              router={router}
             />
           ))}
         </AnimatePresence>
