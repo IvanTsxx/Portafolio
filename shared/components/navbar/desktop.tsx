@@ -13,7 +13,7 @@ export const DesktopNavbar = () => {
 
   return (
     <nav
-      className="hidden lg:flex items-center gap-6"
+      className="hidden lg:flex items-center gap-x-3"
       aria-label="Main navigation"
     >
       {NAV_LINKS.map(({ href, label }, index) => {

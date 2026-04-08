@@ -34,7 +34,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
       rel="noopener noreferrer"
       whileHover={{ scale: 1.015 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      className="group flex w-[240px] shrink-0 flex-col gap-3 border border-border p-4 transition-colors hover:border-brand-green no-underline"
+      className="group flex w-[240px] shrink-0 flex-col gap-3 border border-border p-4 transition-colors hover:border-brand-green no-underline bg-background"
     >
       {/* Header: avatar + name + verified */}
       <div className="flex items-center gap-2">

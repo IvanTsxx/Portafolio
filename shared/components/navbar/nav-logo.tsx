@@ -15,7 +15,7 @@ export const NavLogo = () => (
     <Link
       prefetch={false}
       href="/"
-      className="flex items-center gap-2 text-sm font-medium tracking-tight hover:text-brand-green transition-colors duration-150"
+      className="flex items-center gap-x-2 text-sm tracking-tight hover:text-brand-green transition-colors duration-150"
     >
       <Image
         src="/images/avatar.jpeg"

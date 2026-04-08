@@ -24,23 +24,6 @@ export const Index: Record<string, any> = {
     categories: [],
     meta: {},
   },
-  "theme-switcher": {
-    name: "theme-switcher",
-    description: "theme-switcher component.",
-    type: "registry:component",
-    files: [{
-      path: "registry/components/theme-switcher.tsx",
-      type: "registry:component",
-      target: "",
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/components/theme-switcher.tsx")
-      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "theme-switcher"
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: [],
-    meta: {},
-  },
   "trigger-them-transition": {
     name: "trigger-them-transition",
     description: "trigger-them-transition lib.",

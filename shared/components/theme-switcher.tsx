@@ -1,6 +1,6 @@
 "use client";
 
-import { MonitorIcon, MoonStarIcon, SunIcon } from "lucide-react";
+import { MoonStarIcon, SunIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import type { JSX } from "react";
@@ -24,7 +24,7 @@ function ThemeOption({
   return (
     <button
       className={cn(
-        "relative flex size-8 cursor-default items-center justify-center rounded-full transition-[color] [&_svg]:size-4",
+        "relative flex size-6 cursor-default items-center justify-center rounded-full transition-[color] [&_svg]:size-4",
         isActive
           ? "text-zinc-950 dark:text-zinc-50"
           : "text-zinc-400 hover:text-zinc-950 dark:text-zinc-500 dark:hover:text-zinc-50"
@@ -48,7 +48,6 @@ function ThemeOption({
 }
 
 const THEME_OPTIONS = [
-  { icon: <MonitorIcon />, value: "system" },
   { icon: <MoonStarIcon />, value: "dark" },
   { icon: <SunIcon />, value: "light" },
 ];
@@ -80,7 +79,7 @@ function ThemeSwitcher() {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 5 * 0.1, duration: 0.5 }}
-      className="inline-flex items-center overflow-hidden rounded-full bg-white ring-1 ring-zinc-200 ring-inset dark:bg-zinc-950 dark:ring-zinc-700"
+      className="inline-flex items-center overflow-hidden"
       role="radiogroup"
     >
       {THEME_OPTIONS.map((option) => (

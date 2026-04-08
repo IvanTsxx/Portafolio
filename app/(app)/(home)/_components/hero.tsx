@@ -42,7 +42,7 @@ function Avatar() {
         }
         transition={{ duration: 1.2, ease: "linear", repeat: Infinity }}
       />
-      <div className="relative z-10 bg-background h-16 w-16 lg:h-24 lg:w-24 p-[2px]">
+      <div className="relative z-10  h-16 w-16 lg:h-24 lg:w-24 p-[2px]">
         <Image
           src="/images/avatar.jpeg"
           alt="Iván Bongiovanni"

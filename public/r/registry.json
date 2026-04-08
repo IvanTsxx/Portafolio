@@ -22,26 +22,6 @@
       "author": "ivantsx"
     },
     {
-      "name": "theme-switcher",
-      "title": "Theme Switcher",
-      "description": "theme-switcher component.",
-      "dependencies": [
-        "lucide-react",
-        "motion",
-        "next-themes"
-      ],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/components/theme-switcher.tsx",
-          "type": "registry:component",
-          "target": ""
-        }
-      ],
-      "type": "registry:component",
-      "author": "ivantsx"
-    },
-    {
       "name": "trigger-them-transition",
       "title": "Trigger Them Transition",
       "description": "trigger-them-transition lib.",
