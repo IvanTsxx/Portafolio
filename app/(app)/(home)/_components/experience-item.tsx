@@ -1,6 +1,3 @@
-// oxlint-disable no-empty-function
-"use client";
-
 import Image from "next/image";
 
 import { Markdown } from "@/shared/components/markdown";
@@ -17,21 +14,6 @@ function SkillBadge({ skill }: { skill: string }) {
     <span className="  text-[11px] border border-border px-2 py-0.5 text-muted-foreground transition-colors hover:border-brand-green hover:text-brand-green cursor-default">
       {skill}
     </span>
-  );
-}
-
-function CompanyLogo({ src, name }: { src: string; name: string }) {
-  return (
-    <div className="relative h-6 w-6 shrink-0 overflow-hidden border border-border bg-background">
-      <Image
-        src={src}
-        alt={name}
-        fill
-        className="object-contain"
-        onError={() => {}}
-        sizes="24px"
-      />
-    </div>
   );
 }
 
@@ -63,10 +45,15 @@ export function ExperienceItem({ experience }: ExperienceItemProps) {
         <AccordionTrigger className="py-3 hover:no-underline">
           <div className="flex flex-1 items-center gap-3 min-w-0">
             {experience.companyLogo ? (
-              <CompanyLogo
-                src={experience.companyLogo}
-                name={experience.companyName}
-              />
+              <div className="relative h-6 w-6 shrink-0 overflow-hidden border border-border bg-background">
+                <Image
+                  src={experience.companyLogo}
+                  alt={experience.companyName}
+                  fill
+                  className="object-contain"
+                  sizes="24px"
+                />
+              </div>
             ) : (
               <Initials name={experience.companyName} />
             )}
