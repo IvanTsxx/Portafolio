@@ -5,14 +5,15 @@ import { useForm } from "@tanstack/react-form";
 import { formatDate } from "date-fns";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { ReactionType } from "@/app/generated/prisma/enums";
+import { AuthModal } from "@/shared/components/auth-modal";
 import { Icons } from "@/shared/components/icons";
 import { createComment, toggleReaction } from "@/shared/lib/actions/comments";
-import { signIn, useSession } from "@/shared/lib/auth-client";
+import { useSession } from "@/shared/lib/auth-client";
 import { cn } from "@/shared/lib/utils";
 
 interface Reaction {
@@ -63,13 +64,18 @@ function CommentItem({
   slug,
 }: CommentItemProps) {
   const [showReactions, setShowReactions] = useState(false);
-  const [localCount, setLocalCount] = useState<Record<ReactionType, number>>(() => {
-    const counts: Record<ReactionType, number> = {} as Record<ReactionType, number>;
-    for (const r of comment.reactions) {
-      counts[r.type] = r.count;
+  const [localCount, setLocalCount] = useState<Record<ReactionType, number>>(
+    () => {
+      const counts: Record<ReactionType, number> = {} as Record<
+        ReactionType,
+        number
+      >;
+      for (const r of comment.reactions) {
+        counts[r.type] = r.count;
+      }
+      return counts;
     }
-    return counts;
-  });
+  );
   const [isReacting, setIsReacting] = useState(false);
 
   const handleReaction = async (type: ReactionType) => {
@@ -199,7 +205,9 @@ function CommentItem({
                   exit={{ opacity: 0, y: 4 }}
                   className="absolute top-full left-0 mt-1 flex gap-1 bg-background border border-border rounded-md p-1 shadow-lg z-10"
                 >
-                  {(Object.entries(REACTION_EMOJIS) as [ReactionType, string][]).map(([type, emoji]) => (
+                  {(
+                    Object.entries(REACTION_EMOJIS) as [ReactionType, string][]
+                  ).map(([type, emoji]) => (
                     <button
                       key={type}
                       type="button"
@@ -424,7 +432,11 @@ export function CommentsSection({
 
       {/* Auth / input - auto sign in as anonymous if no session */}
       {!session?.user ? (
-        <AutoAnonymousSignIn />
+        <AuthModal
+          message="Sign in to comment with your GitHub profile — your avatar and name
+          will be visible."
+          callbackUrl={`/thoughts/${slug}`}
+        />
       ) : (
         <form
           onSubmit={(e) => {
@@ -506,63 +518,6 @@ export function CommentsSection({
           ))}
         </AnimatePresence>
       )}
-    </div>
-  );
-}
-
-function AutoAnonymousSignIn() {
-  const { data: session } = useSession();
-  const [isAutoSigningIn, setIsAutoSigningIn] = useState(false);
-
-  // Auto sign in as anonymous on mount if no session
-  useEffect(() => {
-    if (!session?.user) {
-      setIsAutoSigningIn(true);
-      signIn.anonymous().finally(() => {
-        setIsAutoSigningIn(false);
-      });
-    }
-  }, [session?.user]);
-
-  return (
-    <div className="flex flex-col gap-3">
-      {/* Auth options prompt */}
-      <div className="border border-border rounded-md p-4 bg-secondary/20">
-        <p className="text-[13px] text-muted-foreground mb-3">
-          Sign in to comment with your GitHub profile — your avatar and name
-          will be visible.
-        </p>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => signIn.social({ provider: "github" })}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 text-[13px] font-sans border transition-colors duration-150",
-              "border-foreground text-foreground hover:bg-foreground hover:text-background"
-            )}
-          >
-            <Icons.Github className="size-4" strokeWidth={1.5} />
-            Sign in with GitHub
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIsAutoSigningIn(true);
-              signIn.anonymous().finally(() => {
-                setIsAutoSigningIn(false);
-              });
-            }}
-            disabled={isAutoSigningIn}
-            className={cn(
-              "px-3 py-1.5 text-[13px] font-sans border border-border text-muted-foreground",
-              "hover:border-foreground hover:text-foreground transition-colors duration-150",
-              isAutoSigningIn && "opacity-50"
-            )}
-          >
-            {isAutoSigningIn ? "Signing in..." : "Continue as Guest"}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

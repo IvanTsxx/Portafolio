@@ -19,11 +19,11 @@ import { Button } from "./ui/button";
 import { Spinner } from "./ui/spinner";
 
 interface AuthModalProps {
-  onAnonymous?: () => void;
   message?: string;
+  callbackUrl: string;
 }
 
-export function AuthModal({ onAnonymous, message }: AuthModalProps) {
+export function AuthModal({ message, callbackUrl }: AuthModalProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
@@ -35,6 +35,7 @@ export function AuthModal({ onAnonymous, message }: AuthModalProps) {
   const handleSignIn = () => {
     startTransition(async () => {
       const { data, error } = await signIn.social({
+        callbackURL: callbackUrl,
         provider: "github",
       });
       if (error) toast.error(error.message);
@@ -56,7 +57,7 @@ export function AuthModal({ onAnonymous, message }: AuthModalProps) {
       if (!error) {
         console.log("Anonymous user:", data);
         setOpen(false);
-        if (onAnonymous) onAnonymous();
+
         router.refresh();
       }
     });

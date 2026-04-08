@@ -30,16 +30,16 @@ export async function createComment(values: z.infer<typeof commentSchema>) {
   // with anonymous sign-in), create it on the fly.
   let userId: string | null = null;
 
-  if (session.user.email) {
+  if (session?.user.email) {
     // Regular user - find by email
     const existingUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session?.user.email },
     });
     userId = existingUser?.id ?? null;
   } else {
     // Anonymous user - try to find by id first, create if missing
     const existingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session?.user.id },
     });
     if (existingUser) {
       userId = existingUser.id;
@@ -47,10 +47,10 @@ export async function createComment(values: z.infer<typeof commentSchema>) {
       // User session exists but not in DB yet — create it with placeholder email
       const created = await prisma.user.create({
         data: {
-          email: `anonymous-${session.user.id}@localhost`,
-          id: session.user.id,
+          email: `anonymous-${session?.user.id}@localhost`,
+          id: session?.user.id,
           isAnonymous: true,
-          name: session.user.name ?? "Guest",
+          name: session?.user.name ?? "Guest",
         },
       });
       userId = created.id;
@@ -156,25 +156,25 @@ export async function toggleReaction(data: z.infer<typeof reactionSchema>) {
   // or try to find/create for anonymous users.
   let userId: string | null = null;
 
-  if (session.user.email) {
+  if (session?.user.email) {
     const existingUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session?.user.email },
     });
     userId = existingUser?.id ?? null;
   } else {
     // Anonymous user - try to find by id first, create if missing
     const existingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session?.user.id },
     });
     if (existingUser) {
       userId = existingUser.id;
     } else {
       const created = await prisma.user.create({
         data: {
-          email: `anonymous-${session.user.id}@localhost`,
-          id: session.user.id,
+          email: `anonymous-${session?.user.id}@localhost`,
+          id: session?.user.id,
           isAnonymous: true,
-          name: session.user.name ?? "Guest",
+          name: session?.user.name ?? "Guest",
         },
       });
       userId = created.id;
@@ -286,8 +286,14 @@ function formatComment(comment: {
 }
 
 function formatReactions(reactions: { type: ReactionType; userId: string }[]) {
-  const counts: Record<ReactionType, number> = {} as Record<ReactionType, number>;
-  const users: Record<ReactionType, string[]> = {} as Record<ReactionType, string[]>;
+  const counts: Record<ReactionType, number> = {} as Record<
+    ReactionType,
+    number
+  >;
+  const users: Record<ReactionType, string[]> = {} as Record<
+    ReactionType,
+    string[]
+  >;
 
   for (const r of reactions) {
     counts[r.type] = (counts[r.type] ?? 0) + 1;
@@ -328,42 +334,21 @@ const postReactionSchema = z.object({
 export async function togglePostReaction(
   data: z.infer<typeof postReactionSchema>
 ) {
-  console.log("togglePostReaction", data);
   const headersList = await headers();
-  const session = await auth.api.getSession({ headers: headersList });
-  if (!session?.user) {
-    console.log("You must be signed in to react");
-    return { error: "You must be signed in to react" };
+  const currentSession = await auth.api.getSession({ headers: headersList });
+
+  let userId: string | null = currentSession?.user.id ?? null;
+
+  if (!userId) {
+    const { user } = await auth.api.signInAnonymous();
+    if (!user) {
+      return { error: "Failed to sign in anonymously" };
+    }
+    userId = user.id;
   }
 
   // Resolve userId: look up by email for regular users,
   // or try to find/create for anonymous users.
-  let userId: string | null = null;
-
-  if (session.user.email) {
-    const existingUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-    userId = existingUser?.id ?? null;
-  } else {
-    // Anonymous user - try to find by id first, create if missing
-    const existingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
-    });
-    if (existingUser) {
-      userId = existingUser.id;
-    } else {
-      const created = await prisma.user.create({
-        data: {
-          email: `anonymous-${session.user.id}@localhost`,
-          id: session.user.id,
-          isAnonymous: true,
-          name: session.user.name ?? "Guest",
-        },
-      });
-      userId = created.id;
-    }
-  }
 
   if (!userId) {
     return { error: "User not found" };
@@ -411,12 +396,26 @@ export async function togglePostReaction(
   }
 }
 
-function formatPostReactions(reactions: { type: string; userId: string }[]) {
-  const counts: Record<string, number> = {};
-  const users: Record<string, string[]> = {};
+function formatPostReactions(
+  reactions: { type: ReactionType; userId: string }[]
+) {
+  const counts: Record<ReactionType, number> = {
+    [ReactionType.FIRE]: 0,
+    [ReactionType.HEART_BLACK]: 0,
+    [ReactionType.HEART_RED]: 0,
+    [ReactionType.ROCKET]: 0,
+    [ReactionType.THUMBS_UP]: 0,
+  };
+  const users: Record<ReactionType, string[]> = {
+    [ReactionType.FIRE]: [],
+    [ReactionType.HEART_BLACK]: [],
+    [ReactionType.HEART_RED]: [],
+    [ReactionType.ROCKET]: [],
+    [ReactionType.THUMBS_UP]: [],
+  };
 
   for (const r of reactions) {
-    const type = r.type.toLowerCase();
+    const type = r.type as ReactionType;
     counts[type] = (counts[type] ?? 0) + 1;
     if (!users[type]) users[type] = [];
     users[type].push(r.userId);
@@ -425,6 +424,6 @@ function formatPostReactions(reactions: { type: string; userId: string }[]) {
   return Object.entries(counts).map(([type, count]) => ({
     count,
     type,
-    users: users[type] ?? [],
+    users: users[type as ReactionType] ?? [],
   }));
 }

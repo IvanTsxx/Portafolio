@@ -50,20 +50,7 @@ export default async function ThoughtPostPage({ params }: Props) {
   const thought = getThoughtBySlug(slug);
   if (!thought) notFound();
 
-  const [{ comments }, postReactions] = await Promise.all([
-    getCommentsBySlug(slug),
-    getPostReactions(slug),
-  ]);
-
-  // Format for Reactions component
-  const initialReactions = {
-    counts: {} as Record<string, number>,
-    users: {} as Record<string, string[]>,
-  };
-  for (const r of postReactions) {
-    initialReactions.counts[r.type] = r.count;
-    initialReactions.users[r.type] = r.users;
-  }
+  const [{ comments }] = await Promise.all([getCommentsBySlug(slug)]);
 
   return (
     <div className="max-w-3xl bg-background/85 dark:bg-transparent mx-auto px-4 py-10">
@@ -103,7 +90,7 @@ export default async function ThoughtPostPage({ params }: Props) {
           ))}
         </div>
 
-        <Reactions slug={slug} initialReactions={initialReactions} />
+        <Reactions slug={slug} />
 
         <hr className="border-border mt-4 pb-2" />
       </header>

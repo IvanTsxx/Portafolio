@@ -80,7 +80,7 @@ export function Hero() {
             transition={{ delay: 0.1, duration: 0.4 }}
             className="flex flex-col"
           >
-            <div className=" grow items-end pb-1 hidden lg:flex">
+            <div className="grow items-end pb-1 hidden lg:flex">
               <p
                 className="line-clamp-1 font-light text-xs text-zinc-300 select-none dark:text-zinc-700"
                 aria-hidden="true"
@@ -88,6 +88,7 @@ export function Hero() {
                 {USER.heroClass}
               </p>
             </div>
+
             <ShimmeringText
               text={USER.bio}
               className="text-sm font-medium max-w-xs lg:max-w-none"
@@ -118,7 +119,7 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.4 }}
-            className="text-muted-foreground"
+            className="min-h-16 max-w-full lg:max-w-none"
           >
             <TextFlip
               as={motion.span}
