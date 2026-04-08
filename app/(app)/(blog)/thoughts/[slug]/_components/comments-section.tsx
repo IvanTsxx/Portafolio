@@ -360,8 +360,7 @@ export function CommentsSection({
       {/* Auth / input - auto sign in as anonymous if no session */}
       {!session?.user ? (
         <AuthModal
-          message="Sign in to comment with your GitHub profile (your avatar and name
-          will be visible) or Sign in as guest"
+          message="Sign in to comment with your GitHub profile or Sign in as guest"
           callbackUrl={`/thoughts/${slug}`}
         />
       ) : (
