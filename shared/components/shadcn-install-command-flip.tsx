@@ -1,5 +1,6 @@
 "use client";
 
+import { env } from "@/env/client";
 import {
   CodeBlockCommand,
   convertNpmCommand,
@@ -12,10 +13,7 @@ interface ShadcnInstallCommandFlipProps {
 export function ShadcnInstallCommandFlip({
   names,
 }: ShadcnInstallCommandFlipProps) {
-  /*  interval = 2,
-  transition = { duration: 0.3 }, */
-
-  const command = `npx shadcn@latest add https://ibong.vercel.app/r/`;
+  const command = `npx shadcn@latest add ${env.NEXT_PUBLIC_APP_URL}/r/`;
 
   return (
     <div className="w-full">

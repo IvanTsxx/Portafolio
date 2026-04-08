@@ -16,7 +16,7 @@
     "db:push": "bun x prisma db push",
     "db:migrate": "bun x prisma migrate dev",
     "db:studio": "bun x prisma studio",
-    "registry:build": "bun run ./scripts/build-registry.mts && shadcn build ./public/r/registry.json && bun run ./scripts/fix-registry-imports.mts",
+    "registry:build": "bun run ./scripts/build-registry.mts && shadcn build ./public/r/registry.json",
     "postinstall": "prisma generate"
   },
   "dependencies": {

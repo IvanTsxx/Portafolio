@@ -1,5 +1,6 @@
 "use client";
 
+import { env } from "@/env/client";
 import {
   CodeBlockCommand,
   convertNpmCommand,
@@ -11,7 +12,7 @@ interface ShadcnInstallCommandProps {
 }
 
 export function ShadcnInstallCommand({ name }: ShadcnInstallCommandProps) {
-  const command = `npx shadcn@latest add https://ibong.vercel.app/r/${name}.json`;
+  const command = `npx shadcn@latest add ${env.NEXT_PUBLIC_APP_URL}/r/${name}.json`;
 
   return <CodeBlockCommand {...convertNpmCommand(command)} />;
 }

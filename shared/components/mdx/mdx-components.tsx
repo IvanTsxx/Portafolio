@@ -2,9 +2,9 @@ import type { MDXComponents as MDXComponentsType } from "mdx/types";
 import Link from "next/link";
 import * as React from "react";
 
-import { InstallCommand } from "@/app/(app)/(registry)/_components/install-command";
 import { RegistryPreview } from "@/app/(app)/(registry)/_components/registry-preview";
 import { PreShikiComponent } from "@/shared/components/code-block/mdx/pre-shiki";
+import { InstallCommand } from "@/shared/components/install-command";
 import { ShadcnInstallCommand } from "@/shared/components/shadcn-install-command";
 import {
   Tabs,
