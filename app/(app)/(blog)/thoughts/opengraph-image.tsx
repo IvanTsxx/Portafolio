@@ -11,6 +11,8 @@ import { getAllThoughts } from "@/shared/lib/thoughts";
 export const size = { height: 630, width: 1200 };
 export const contentType = "image/png";
 
+export const dynamic = "force-dynamic";
+
 // ── Brand colors ───────────────────────────────────────────────────────────────
 
 const BRAND_GREEN = "#00d26a";

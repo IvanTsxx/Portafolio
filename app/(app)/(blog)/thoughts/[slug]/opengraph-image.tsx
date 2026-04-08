@@ -6,6 +6,8 @@ import { SITE } from "@/shared/config/site";
 import { USER } from "@/shared/config/user";
 import { getThoughtBySlug } from "@/shared/lib/thoughts";
 
+export const dynamic = "force-dynamic";
+
 // ── OG Image dimensions (1200x630 = 1.91:1 standard) ─────────────────────────
 
 export const size = { height: 630, width: 1200 };

@@ -6,6 +6,8 @@ import { SITE } from "@/shared/config/site";
 import { USER } from "@/shared/config/user";
 import { getComponents } from "@/shared/lib/registry";
 
+export const dynamic = "force-dynamic";
+
 // ── OG Image dimensions ───────────────────────────────────────────────────────
 
 export const size = { height: 630, width: 1200 };
