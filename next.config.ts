@@ -5,10 +5,7 @@ import "./env/client";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
-  experimental: {
-    turbopackFileSystemCacheForBuild: true,
-    turbopackFileSystemCacheForDev: true,
-  },
+
   images: {
     unoptimized: true,
   },
