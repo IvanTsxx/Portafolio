@@ -13,7 +13,7 @@ export const GitHubOpenSource = async () => {
     fromYear: 2025,
     includeOwnRepos: false,
     limit,
-    toYear: new Date().getFullYear(),
+    toYear: 2026,
   });
 
   let data: {

@@ -15,9 +15,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ThoughtsPage() {
-  const thoughts = getAllThoughts();
-  const allTags = getAllTags();
+export default async function ThoughtsPage() {
+  const thoughts = await getAllThoughts();
+  const allTags = await getAllTags();
 
   return (
     <div className="max-w-3xl bg-background/85 dark:bg-transparent mx-auto px-4 py-10">

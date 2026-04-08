@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ComponentsPage() {
-  const components = getComponents();
+export default async function ComponentsPage() {
+  const components = await getComponents();
 
   return (
     <div className="mx-auto max-w-3xl bg-background dark:bg-transparent px-4 py-16">

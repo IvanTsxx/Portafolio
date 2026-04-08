@@ -1,5 +1,5 @@
 import { ReactionType } from "@/app/generated/prisma/enums";
-import { getPostReactions } from "@/shared/lib/actions/comments";
+import { getPostReactions } from "@/shared/lib/data";
 
 import { ReactionButton } from "./reaction-button";
 

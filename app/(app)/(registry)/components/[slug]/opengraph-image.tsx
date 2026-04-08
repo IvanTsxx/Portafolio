@@ -36,7 +36,7 @@ export default async function Image({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const entry = getComponent(slug);
+  const entry = await getComponent(slug);
 
   if (!entry) {
     return new ImageResponse(

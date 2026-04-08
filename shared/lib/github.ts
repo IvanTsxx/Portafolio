@@ -1,10 +1,11 @@
 import { Octokit } from "@octokit/rest";
 import { formatDate } from "date-fns";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { env } from "@/env/server";
 import type { Activity } from "@/shared/components/kibo-ui/contribution-graph";
 import { GITHUB_USERNAME } from "@/shared/config/site";
+import { CACHE_LIFE, CACHE_TAGS } from "@/shared/lib/cache";
 
 export const octokit = new Octokit({
   auth: env.GITHUB_TOKEN,
@@ -128,127 +129,116 @@ async function fetchAllPages(
   return results;
 }
 
-export const fetchUserPullRequests = unstable_cache(
-  async (
-    username: string,
-    {
-      limit = 50,
-      includeOwnRepos = true,
-      fromYear,
-      toYear,
-    }: {
-      limit?: number;
-      includeOwnRepos?: boolean;
-      fromYear?: number;
-      toYear?: number;
-    } = {}
-  ): Promise<ProcessedContribution[]> => {
-    const token = env.GITHUB_TOKEN;
+export async function fetchUserPullRequests(
+  username: string,
+  {
+    limit = 50,
+    includeOwnRepos = true,
+    fromYear,
+    toYear,
+  }: {
+    limit?: number;
+    includeOwnRepos?: boolean;
+    fromYear?: number;
+    toYear?: number;
+  } = {}
+): Promise<ProcessedContribution[]> {
+  "use cache";
+  cacheLife(CACHE_LIFE.GITHUB_PULL_REQUESTS);
+  cacheTag(CACHE_TAGS.GITHUB_PULL_REQUESTS);
 
-    if (!token) {
-      console.warn("No GitHub token found.");
-      return [];
-    }
+  const token = env.GITHUB_TOKEN;
 
-    try {
-      const currentYear = new Date().getFullYear();
-      const from = fromYear ?? currentYear;
-      const to = toYear ?? currentYear;
-      const dateFilter =
-        fromYear || toYear ? `created:${from}-01-01..${to}-12-31` : "";
+  if (!token) {
+    console.warn("No GitHub token found.");
+    return [];
+  }
 
-      const [openPRs, closedPRs, openIssues, closedIssues] = await Promise.all([
-        fetchAllPages(`is:pr author:${username} is:open ${dateFilter}`, limit),
-        fetchAllPages(
-          `is:pr author:${username} is:closed ${dateFilter}`,
-          limit
-        ),
-        fetchAllPages(
-          `is:issue author:${username} is:open ${dateFilter}`,
-          limit
-        ),
-        fetchAllPages(
-          `is:issue author:${username} is:closed ${dateFilter}`,
-          limit
-        ),
-      ]);
+  try {
+    const currentYear = new Date().getFullYear();
+    const from = fromYear ?? currentYear;
+    const to = toYear ?? currentYear;
+    const dateFilter =
+      fromYear || toYear ? `created:${from}-01-01..${to}-12-31` : "";
 
-      const allItems = [
-        ...openPRs,
-        ...closedPRs,
-        ...openIssues,
-        ...closedIssues,
-      ];
+    const [openPRs, closedPRs, openIssues, closedIssues] = await Promise.all([
+      fetchAllPages(`is:pr author:${username} is:open ${dateFilter}`, limit),
+      fetchAllPages(`is:pr author:${username} is:closed ${dateFilter}`, limit),
+      fetchAllPages(`is:issue author:${username} is:open ${dateFilter}`, limit),
+      fetchAllPages(
+        `is:issue author:${username} is:closed ${dateFilter}`,
+        limit
+      ),
+    ]);
 
-      const seen = new Set<number>();
-      const unique = allItems.filter((item) => {
-        if (seen.has(item.id)) return false;
-        seen.add(item.id);
-        return true;
+    const allItems = [...openPRs, ...closedPRs, ...openIssues, ...closedIssues];
+
+    const seen = new Set<number>();
+    const unique = allItems.filter((item) => {
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    });
+
+    const contributions: ProcessedContribution[] = unique
+      .filter((item) => {
+        if (includeOwnRepos) return true;
+        return extractRepoOwnerFromUrl(item.html_url) !== username;
+      })
+      .toSorted((a, b) => {
+        const dateA =
+          a.pull_request?.merged_at ||
+          a.closed_at ||
+          a.updated_at ||
+          a.created_at;
+        const dateB =
+          b.pull_request?.merged_at ||
+          b.closed_at ||
+          b.updated_at ||
+          b.created_at;
+        return new Date(dateB).getTime() - new Date(dateA).getTime();
+      })
+      .map((item) => {
+        const isPR = !!item.pull_request;
+        const repository = extractRepoFromUrl(item.html_url);
+        const state = resolveState(item);
+        const relevantDate =
+          item.pull_request?.merged_at ||
+          item.closed_at ||
+          item.updated_at ||
+          item.created_at;
+
+        return {
+          date: formatDate(relevantDate, "dd/MM/yyyy"),
+          description: `${isPR ? "PR" : "Issue"} in ${repository}`,
+          kind: isPR ? "pr" : "issue",
+          link: item.html_url,
+          repository,
+          state,
+          title: item.title,
+          type: extractPRType(item.title),
+        };
       });
 
-      const contributions: ProcessedContribution[] = unique
-        .filter((item) => {
-          if (includeOwnRepos) return true;
-          return extractRepoOwnerFromUrl(item.html_url) !== username;
-        })
-        .toSorted((a, b) => {
-          const dateA =
-            a.pull_request?.merged_at ||
-            a.closed_at ||
-            a.updated_at ||
-            a.created_at;
-          const dateB =
-            b.pull_request?.merged_at ||
-            b.closed_at ||
-            b.updated_at ||
-            b.created_at;
-          return new Date(dateB).getTime() - new Date(dateA).getTime();
-        })
-        .map((item) => {
-          const isPR = !!item.pull_request;
-          const repository = extractRepoFromUrl(item.html_url);
-          const state = resolveState(item);
-          const relevantDate =
-            item.pull_request?.merged_at ||
-            item.closed_at ||
-            item.updated_at ||
-            item.created_at;
-
-          return {
-            date: formatDate(relevantDate, "dd/MM/yyyy"),
-            description: `${isPR ? "PR" : "Issue"} in ${repository}`,
-            kind: isPR ? "pr" : "issue",
-            link: item.html_url,
-            repository,
-            state,
-            title: item.title,
-            type: extractPRType(item.title),
-          };
-        });
-
-      return contributions;
-    } catch (error) {
-      console.error("Error fetching GitHub contributions:", error);
-      return [];
-    }
-  },
-  ["github-contributions"],
-  { revalidate: 86_400 }
-);
+    return contributions;
+  } catch (error) {
+    console.error("Error fetching GitHub contributions:", error);
+    return [];
+  }
+}
 
 interface GitHubContributionsResponse {
   contributions: Activity[];
 }
 
-export const getGitHubContributions = unstable_cache(
-  async () => {
-    const res = await fetch(
-      `${env.GITHUB_CONTRIBUTIONS_API_URL}/v4/${GITHUB_USERNAME}?y=last`
-    );
-    const data = (await res.json()) as GitHubContributionsResponse;
-    return data.contributions;
-  },
-  ["github-contributions"],
-  { revalidate: 86_400 }
-);
+export async function getGitHubContributions(): Promise<Activity[]> {
+  "use cache";
+  cacheLife(CACHE_LIFE.GITHUB_CONTRIBUTIONS);
+  cacheTag(CACHE_TAGS.GITHUB_CONTRIBUTIONS);
+
+  const res = await fetch(
+    `${env.GITHUB_CONTRIBUTIONS_API_URL}/v4/${GITHUB_USERNAME}?y=last`
+  );
+  const data = (await res.json()) as GitHubContributionsResponse;
+  return data.contributions;
+}

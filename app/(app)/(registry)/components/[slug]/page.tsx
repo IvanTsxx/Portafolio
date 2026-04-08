@@ -10,9 +10,9 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// oxlint-disable-next-line require-await
 export async function generateStaticParams() {
-  return getComponents().map((c) => ({ slug: c.name }));
+  const components = getComponents();
+  return components.map((c) => ({ slug: c.name }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

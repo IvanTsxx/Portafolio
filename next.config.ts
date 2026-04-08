@@ -4,6 +4,7 @@ import "./env/server";
 import "./env/client";
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
   devIndicators: false,
 
   images: {
