@@ -1,6 +1,4 @@
-import fs from "node:fs";
 import { readFile } from "node:fs/promises";
-import path from "node:path";
 
 import { ImageResponse } from "next/og";
 
@@ -19,11 +17,6 @@ const BG_DARK = "#0a0a0a";
 const TEXT_MUTED = "#737373";
 const TEXT_LIGHT = "#fafafa";
 
-// ── Screenshot path ────────────────────────────────────────────────────────────
-
-const SCREENSHOT_PATH = path.join(process.cwd(), "public", "og", "home.png");
-const SCREENSHOT_EXISTS = fs.existsSync(SCREENSHOT_PATH);
-
 // ── Avatar ─────────────────────────────────────────────────────────────────────
 
 const ogImagePath = `${process.cwd()}/public/avatar.jpeg`;
@@ -34,32 +27,6 @@ const avatarSrc = `data:image/jpeg;base64,${ogImageBuffer.toString("base64")}`;
 
 export default async function Image() {
   const authorName = USER.displayName;
-
-  // If screenshot exists, return it directly (most performant)
-  if (SCREENSHOT_EXISTS) {
-    const screenshotBuffer = fs.readFileSync(SCREENSHOT_PATH);
-
-    return new ImageResponse(
-      <div
-        style={{
-          height: "100%",
-          position: "relative",
-          width: "100%",
-        }}
-      >
-        <img
-          alt="IvanTsx - Home"
-          height={630}
-          src={`data:image/png;base64,${screenshotBuffer.toString("base64")}`}
-          style={{
-            objectFit: "cover",
-          }}
-          width={1200}
-        />
-      </div>,
-      { height: 630, width: 1200 }
-    );
-  }
 
   // Fallback programmatic OG image
   return new ImageResponse(
