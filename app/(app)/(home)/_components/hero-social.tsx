@@ -12,7 +12,7 @@ export const HeroSocial = () => (
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.3, duration: 0.4 }}
-    className="grid grid-cols-1 gap-px sm:grid-cols-3 items-center h-full"
+    className="grid grid-cols-1 gap-px sm:grid-cols-3 items-center w-full"
   >
     {[
       {
@@ -37,7 +37,7 @@ export const HeroSocial = () => (
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-between gap-3 bg-background border border-border h-full p-4 hover:bg-muted/50"
+        className="flex items-center justify-between gap-3 border-border border h-full p-4 hover:bg-muted/50"
       >
         <div className="flex items-center gap-3">
           <Icon className="size-5" />

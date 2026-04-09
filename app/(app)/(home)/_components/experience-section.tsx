@@ -7,7 +7,7 @@ import { SectionHeader } from "./section-header";
 export function ExperienceSection() {
   return (
     <section>
-      <SectionHeader label="Experience" />
+      <SectionHeader label="Experience" className="border-none" />
       <LoadMoreItemsWrapper max={3}>
         {EXPERIENCES.map((exp) => (
           <ExperienceItem key={exp.id} experience={exp} />

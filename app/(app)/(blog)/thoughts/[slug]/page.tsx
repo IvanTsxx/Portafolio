@@ -50,7 +50,7 @@ export default async function ThoughtPostPage({ params }: Props) {
   const { comments } = await getCommentsBySlug(slug);
 
   return (
-    <section className="py-10">
+    <section className="py-10 w-full max-w-3xl mx-auto">
       {/* Back link */}
       <Link
         prefetch={false}
@@ -93,7 +93,13 @@ export default async function ThoughtPostPage({ params }: Props) {
       </header>
 
       {/* MDX content */}
-      <article className="my-12 prose w-full max-w-full prose-neutral dark:prose-invert">
+      <article
+        className="my-12 prose w-full max-w-full prose-neutral dark:prose-invert
+  prose-pre:overflow-x-auto
+  prose-pre:max-w-full
+  prose-code:wrap-break-word
+"
+      >
         <Markdown content={thought.content} />
       </article>
 

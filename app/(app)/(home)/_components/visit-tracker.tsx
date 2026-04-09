@@ -1,6 +1,7 @@
 // oxlint-disable promise/prefer-await-to-then
 "use client";
 
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { registerNewVisitor } from "../_actions";
@@ -27,14 +28,17 @@ export function VisitTracker({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
-      <div className="flex items-center gap-2 text-muted-foreground">
+    <motion.section
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.2, duration: 0.4 }}
+      className="w-full md:w-auto"
+    >
+      <section className="flex w-full md:w-auto flex-row items-center justify-between">
         <span>{totalVisits?.toLocaleString("en-US")} visitors</span>
-      </div>
 
-      <div className="flex items-center gap-2 text-muted-foreground">
         <span>You are visitor #{visitorNumber.toLocaleString("en-US")}</span>
-      </div>
-    </div>
+      </section>
+    </motion.section>
   );
 }

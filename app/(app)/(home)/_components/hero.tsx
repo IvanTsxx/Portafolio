@@ -3,9 +3,6 @@ import { Suspense } from "react";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 import { getVisitorData } from "../_actions";
-import { Avatar } from "./avatar";
-import { HeroInfoFlip } from "./hero-info-flip";
-import { HeroInfoTop } from "./hero-info-header";
 import { HeroInfoMiddle } from "./hero-info-middle";
 import { HeroSocial } from "./hero-social";
 import { VisitTracker } from "./visit-tracker";
@@ -14,40 +11,29 @@ import { VisitTracker } from "./visit-tracker";
 
 export function Hero() {
   return (
-    <section>
-      {/* Top section */}
-      <div className="flex  gap-6 pb-6 md:flex-row md:gap-8">
-        {/* Avatar */}
+    <section className="flex flex-col flex-1 items-start gap-y-4">
+      <section className="flex flex-col w-full justify-center gap-y-2">
+        <HeroInfoMiddle />
 
-        <Avatar />
-
-        {/* Info */}
-        <div className="flex flex-col justify-center gap-2">
-          <HeroInfoTop />
-
-          <HeroInfoMiddle />
-
-          <HeroInfoFlip />
-
-          <Suspense
-            fallback={
-              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between">
+        <Suspense
+          fallback={
+            <section className="w-full md:w-auto">
+              <section className="flex w-full md:w-auto flex-row items-center justify-between">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-5 rounded-full w-5" /> Visitors
                 </div>
 
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Skeleton className="h-6 w-24" />
+                  You are visitor #<Skeleton className="h-5 rounded-full w-5" />
                 </div>
-              </div>
-            }
-          >
-            <VisitTrackerContent />
-          </Suspense>
-        </div>
-      </div>
+              </section>
+            </section>
+          }
+        >
+          <VisitTrackerContent />
+        </Suspense>
+      </section>
 
-      {/* Social */}
       <HeroSocial />
     </section>
   );

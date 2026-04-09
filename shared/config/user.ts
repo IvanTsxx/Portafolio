@@ -1,10 +1,8 @@
 import type { User } from "@/shared/types/user";
 
 export const USER: User = {
-  address: "Tucumán, Argentina",
   available: true,
   avatar: "https://github.com/IvanTsxx.png",
-  bio: "Specializing in Next.js. Building fast, typesafe, and beautiful web experiences.",
   displayName: "Iván Bongiovanni",
   email: "bongiovannidev@gmail.com",
   flipSentences: [

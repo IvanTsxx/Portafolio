@@ -1,7 +1,6 @@
 export interface User {
   name: string;
   handle: string;
-  bio: string;
   location: string;
   email: string;
   avatar: string;
@@ -13,6 +12,5 @@ export interface User {
   displayName: string;
   flipSentences: string[];
   jobTitle: string;
-  address: string;
   timeZone: string;
 }

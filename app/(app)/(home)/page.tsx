@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   return (
-    <section>
+    <section className="flex flex-col gap-1 w-full">
       <Suspense fallback={<Skeleton className="h-40 w-full" />}>
         <CoverHero />
       </Suspense>
