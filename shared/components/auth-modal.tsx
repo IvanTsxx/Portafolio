@@ -34,13 +34,12 @@ export function AuthModal({ message, callbackUrl }: AuthModalProps) {
 
   const handleSignIn = () => {
     startTransition(async () => {
-      const { data, error } = await signIn.social({
+      const { error } = await signIn.social({
         callbackURL: callbackUrl,
         provider: "github",
       });
       if (error) toast.error(error.message);
       if (!error) {
-        console.log(data);
         setOpen(false);
         router.refresh();
       }
@@ -49,13 +48,12 @@ export function AuthModal({ message, callbackUrl }: AuthModalProps) {
 
   const handleAnonymous = () => {
     startTransition(async () => {
-      const { data, error } = await signIn.anonymous();
+      const { error } = await signIn.anonymous();
       if (error) {
         toast.error(error.message);
         return;
       }
       if (!error) {
-        console.log("Anonymous user:", data);
         setOpen(false);
 
         router.refresh();

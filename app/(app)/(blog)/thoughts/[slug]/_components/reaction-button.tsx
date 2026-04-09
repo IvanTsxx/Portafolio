@@ -23,29 +23,15 @@ export function ReactionButton({
   return (
     <form
       action={async () => {
-        console.log("TOGGLING REACTION");
+        const { error } = await togglePostReaction({ slug, type });
 
-        console.log("type", type);
-
-        const res = await togglePostReaction({ slug, type });
-
-        toast.info("Reaction toggled", {
-          description() {
-            if (res.error) {
-              return res.error;
-            }
-
-            if (res.added) {
-              return "Reaction added";
-            }
-
-            if (res.removed) {
-              return "Reaction removed";
-            }
-          },
-        });
-
-        console.log("res", res);
+        if (error) {
+          toast.error(
+            process.env.NODE_ENV === "development"
+              ? error
+              : "Something went wrong"
+          );
+        }
       }}
     >
       <ReactionButtonClient
