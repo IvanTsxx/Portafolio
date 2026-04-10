@@ -21,5 +21,5 @@ export const USER: User = {
   timeZone: "America/Argentina/Tucuman",
   twitter: "https://x.com/ivantsx",
 
-  website: "https://ibong.vercel.app",
+  website: "https://ibong.bongi.dev",
 };

@@ -270,7 +270,7 @@ export const Index: Record<string, any> = {`;
   const registryJSON = JSON.stringify(
     {
       $schema: "https://ui.shadcn.com/schema/registry.json",
-      homepage: "https://ibong.vercel.app",
+      homepage: "https://ibong.bongi.dev",
       items: registry.items.map((item) => ({
         ...item,
         author: item.author ?? "ivantsx",
@@ -347,7 +347,7 @@ try {
   }
 
   const registry: Registry = {
-    homepage: "https://ibong.vercel.app",
+    homepage: "https://ibong.bongi.dev",
     items: [...itemsMap.values()],
     name: "ivantsx",
   };

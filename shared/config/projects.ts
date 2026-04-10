@@ -21,7 +21,7 @@ export const PROJECTS: Project[] = [
       `,
     github: "https://github.com/IvanTsxx/better-auth-mp",
     id: "better-auth-mp",
-    link: "https://better-auth-mp-docs.vercel.app/",
+    link: "https://better-auth-mp-docs.bongi.dev/",
     period: { start: "2026" },
     skills: [
       "TypeScript",
@@ -45,7 +45,7 @@ export const PROJECTS: Project[] = [
       `,
     github: "https://github.com/IvanTsxx/portafolio",
     id: "ivantsx",
-    link: "https://ibong.vercel.app",
+    link: "https://ibong.bongi.dev",
     period: { start: "2025" },
     skills: [
       "Next.js",
@@ -115,7 +115,7 @@ export const PROJECTS: Project[] = [
     `,
     github: "https://github.com/IvanTsxx/cache-components-granular",
     id: "cache-components-granular",
-    link: "https://cache-components-granular.vercel.app/es",
+    link: "https://cache-components-granular.bongi.dev/es",
     period: { start: "2026" },
     skills: [
       "Next.js",
@@ -139,7 +139,7 @@ export const PROJECTS: Project[] = [
     `,
     github: "https://github.com/IvanTsxx/AI-CV-Recomendations",
     id: "ai-cv-recommendations",
-    link: "https://ai-cv-recomendations.vercel.app/",
+    link: "https://ai-cv-recomendations.bongi.dev/",
     period: { start: "2025" },
     skills: [
       "Next.js",
@@ -163,7 +163,7 @@ export const PROJECTS: Project[] = [
     `,
     github: "https://github.com/IvanTsxx/MemesDev",
     id: "memesdev",
-    link: "https://memes-dev.vercel.app/",
+    link: "https://memes-dev.bongi.dev/",
     period: { start: "2025" },
     skills: [
       "Next.js",
