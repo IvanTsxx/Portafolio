@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-import { ThemeSwitcher } from "../theme-switcher";
+import { ThemeToggle } from "../theme-toggle";
 import { DesktopNavbar } from "./desktop";
 import { NavItemGitHub } from "./nav-item-github";
 import { NavLogo } from "./nav-logo";
@@ -21,7 +21,7 @@ export function Header() {
         <DesktopNavbar />
 
         <section className="flex items-center">
-          <ThemeSwitcher />
+          <ThemeToggle />
           <NavItemGitHub />
           <MobileNav />
         </section>
