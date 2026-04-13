@@ -32,9 +32,12 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+
   plugins: [
     nextCookies(),
     anonymous({
+      disableDeleteAnonymousUser: true,
+
       generateName() {
         return generateAnonymousName();
       },
