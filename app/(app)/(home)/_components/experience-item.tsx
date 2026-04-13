@@ -81,9 +81,11 @@ export function ExperienceItem({ experience }: ExperienceItemProps) {
             </p>
 
             {/* Description */}
-            <div className="prose-sm prose dark:prose-invert">
-              <Markdown content={position.description} />
-            </div>
+            {position.description && (
+              <div className="prose-sm prose dark:prose-invert">
+                <Markdown content={position.description} />
+              </div>
+            )}
 
             {/* Skills */}
             <div className="flex flex-wrap gap-1.5">

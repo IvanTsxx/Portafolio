@@ -1,19 +1,11 @@
-"use client";
-
 import { ExternalLink } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 
 import { Icons } from "@/shared/components/icons";
 import { SITE } from "@/shared/config/site";
 
 export const HeroSocial = () => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.3, duration: 0.4 }}
-    className="grid grid-cols-1 gap-px sm:grid-cols-3 items-center w-full"
-  >
+  <div className="grid grid-cols-1 gap-px sm:grid-cols-3 items-center w-full">
     {[
       {
         href: SITE.twitter,
@@ -46,5 +38,5 @@ export const HeroSocial = () => (
         <ExternalLink className="size-4 text-muted-foreground" />
       </Link>
     ))}
-  </motion.div>
+  </div>
 );

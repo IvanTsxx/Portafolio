@@ -424,7 +424,7 @@ export function DinoGame() {
       >
         {/* Score */}
         <div className="w-full max-w-[800px] absolute top-0 right-0 z-10 py-2 px-4 flex justify-end">
-          <span className="text-sm tabular-nums text-[var(--foreground)]">
+          <span className="text-sm tabular-nums text-foreground">
             {String(displayScore).padStart(5, "0")}
           </span>
         </div>

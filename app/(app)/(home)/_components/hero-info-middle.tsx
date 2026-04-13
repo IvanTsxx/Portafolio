@@ -1,7 +1,4 @@
-"use client";
-
 import { VerifiedIcon } from "lucide-react";
-import { motion } from "motion/react";
 
 import { TextFlip } from "@/shared/components/text-flip";
 import { USER } from "@/shared/config/user";
@@ -16,38 +13,20 @@ export const HeroInfoMiddle = () => (
       <Avatar />
       <div className="flex flex-col gap-y-1">
         <div className="flex items-center gap-2">
-          <motion.h2
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.4 }}
-            className="text-xl font-bold tracking-tight md:text-2xl"
-          >
+          <h2 className="text-xl font-bold tracking-tight md:text-2xl">
             {USER.displayName}
-          </motion.h2>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-          >
+          </h2>
+          <div>
             <VerifiedIcon className="size-4.5 text-brand-green" />
-          </motion.div>
+          </div>
         </div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-          className="min-h-6"
-        >
-          <TextFlip
-            as={motion.span}
-            className="text-muted-foreground text-sm"
-            interval={2.5}
-          >
+        <div className="min-h-6">
+          <TextFlip className="text-muted-foreground text-sm" interval={2.5}>
             {USER.flipSentences.map((text) => (
               <span key={text}>{text}</span>
             ))}
           </TextFlip>
-        </motion.div>
+        </div>
       </div>
     </div>
   </section>

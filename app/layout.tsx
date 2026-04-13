@@ -35,7 +35,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     creator: "@ivantsx",
     description: SITE.description,
-    images: ["/opengraph-image.png"],
     title: SITE.name,
   },
 };

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { SITE } from "@/shared/config/site";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/shared/components/json-ld";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { SITE } from "@/shared/config/site";
 
 import { AboutSection } from "./_components/about-section";
 import { BookmarksSection } from "./_components/bookmarks-section";
@@ -34,11 +35,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
   },
 };
-
-import {
-  OrganizationJsonLd,
-  WebSiteJsonLd,
-} from "@/shared/components/json-ld";
 
 export default async function HomePage() {
   return (
