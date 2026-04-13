@@ -37,9 +37,22 @@ export const auth = betterAuth({
     nextCookies(),
     anonymous({
       disableDeleteAnonymousUser: true,
-
       generateName() {
         return generateAnonymousName();
+      },
+      async onLinkAccount({ anonymousUser, newUser }) {
+        await prisma.reaction.updateMany({
+          data: { userId: newUser.user.id },
+          where: { userId: anonymousUser.user.id },
+        });
+        await prisma.postReaction.updateMany({
+          data: { userId: newUser.user.id },
+          where: { userId: anonymousUser.user.id },
+        });
+        await prisma.comment.updateMany({
+          data: { authorId: newUser.user.id },
+          where: { authorId: anonymousUser.user.id },
+        });
       },
     }),
   ],
