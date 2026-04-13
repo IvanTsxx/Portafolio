@@ -19,22 +19,26 @@ import {
 } from "@/shared/lib/thoughts";
 
 import { CommentsSection } from "./_components/comments-section";
+import { LanguageSwitcherWrapper } from "./_components/language-switcher-wrapper";
 import { Reactions } from "./_components/reactions";
 import { ReadingProgress } from "./_components/reading-progress";
 import { TableOfContents } from "./_components/table-of-contents";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ lang?: string }>;
 }
 
 export async function generateStaticParams() {
   const thoughts = await getAllThoughts();
-  return thoughts.map((t) => ({ slug: t.slug }));
+  // Generate params for each unique slug (not per language)
+  const uniqueSlugs = [...new Set(thoughts.map((t) => t.slug))];
+  return uniqueSlugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const thought = await getThoughtBySlug(slug);
+  const thought = await getThoughtBySlug(slug, "en");
   if (!thought) return {};
   return {
     alternates: {
@@ -57,9 +61,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ThoughtPostPage({ params }: Props) {
+export default async function ThoughtPostPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const thought = await getThoughtBySlug(slug);
+  const { lang } = await searchParams;
+  const thought = await getThoughtBySlug(slug, lang);
   if (!thought) notFound();
 
   const [{ comments }, relatedThoughts] = await Promise.all([
@@ -94,6 +99,15 @@ export default async function ThoughtPostPage({ params }: Props) {
           ← Thoughts
         </Link>
 
+        {/* Language switcher - above title */}
+        <div className="mb-4">
+          <LanguageSwitcherWrapper
+            currentLang={thought.lang}
+            availableLangs={thought.availableLangs}
+            slug={slug}
+          />
+        </div>
+
         {/* Post header */}
         <header className="grid grid-cols-1 gap-2">
           <h1 className="text-[28px] font-medium leading-tight mb-3 text-balance">
@@ -121,7 +135,7 @@ export default async function ThoughtPostPage({ params }: Props) {
               >
                 {tag}
               </Link>
-            ))}
+              ))}
           </div>
 
           <Reactions slug={slug} />

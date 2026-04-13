@@ -73,6 +73,71 @@ export function estimateReadingTime(
 
 const THOUGHTS_DIR = path.join(process.cwd(), "content", "thoughts");
 
+/**
+ * Get all available language directories in the thoughts folder.
+ * Each subdirectory represents a language (en, es, pt, etc.)
+ */
+function getAvailableLangs(): string[] {
+  if (!fs.existsSync(THOUGHTS_DIR)) return ["en"];
+
+  const entries = fs.readdirSync(THOUGHTS_DIR, { withFileTypes: true });
+  const langs = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((name) => /^[a-z]{2}$/.test(name));
+
+  return langs.length > 0 ? langs : ["en"];
+}
+
+/**
+ * Get all MDX/MD files from all language directories.
+ * Returns array of { lang, fileName, filePath }
+ */
+function getAllLangFiles(): {
+  lang: string;
+  fileName: string;
+  filePath: string;
+}[] {
+  const langs = getAvailableLangs();
+  const files: { lang: string; fileName: string; filePath: string }[] = [];
+
+  for (const lang of langs) {
+    const langDir = path.join(THOUGHTS_DIR, lang);
+    if (!fs.existsSync(langDir)) continue;
+
+    const langFiles = fs
+      .readdirSync(langDir)
+      .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+
+    for (const fileName of langFiles) {
+      files.push({
+        fileName,
+        filePath: path.join(langDir, fileName),
+        lang,
+      });
+    }
+  }
+
+  return files;
+}
+
+/**
+ * Build a map of slug -> available languages.
+ * This groups files by their base name (without extension).
+ */
+function getSlugToLangsMap(): Map<string, string[]> {
+  const files = getAllLangFiles();
+  const slugMap = new Map<string, string[]>();
+
+  for (const { lang, fileName } of files) {
+    const slug = fileName.replace(/\.(mdx|md)$/, "");
+    const existing = slugMap.get(slug) || [];
+    slugMap.set(slug, [...existing, lang]);
+  }
+
+  return slugMap;
+}
+
 export async function getAllThoughts(): Promise<Thought[]> {
   "use cache";
   cacheLife(CACHE_LIFE.GET_ALL_THOUGHTS);
@@ -80,28 +145,47 @@ export async function getAllThoughts(): Promise<Thought[]> {
 
   if (!fs.existsSync(THOUGHTS_DIR)) return [];
 
-  const files = fs
-    .readdirSync(THOUGHTS_DIR)
-    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+  const files = getAllLangFiles();
+  const slugMap = getSlugToLangsMap();
+  const defaultLang = "en";
 
   const thoughts: Thought[] = [];
 
+  // Group files by slug
+  const slugGroups = new Map<string, typeof files>();
+
   for (const file of files) {
-    const raw = fs.readFileSync(path.join(THOUGHTS_DIR, file), "utf-8");
+    const slug = file.fileName.replace(/\.(mdx|md)$/, "");
+    const group = slugGroups.get(slug) || [];
+    group.push(file);
+    slugGroups.set(slug, group);
+  }
+
+  // For each slug, load the default lang version
+  for (const [slug, group] of slugGroups) {
+    // Find the default lang version, fallback to first available
+    const targetFile =
+      group.find((f) => f.lang === defaultLang) || group[0];
+
+    const raw = fs.readFileSync(targetFile.filePath, "utf-8");
     const { data, content } = matter(raw);
 
     if (data.published === false) continue;
 
+    const availableLangs = slugMap.get(slug) || [];
+
     thoughts.push({
+      availableLangs,
       content,
       date: data.date ?? "2025-01-01",
       description: data.description ?? "",
+      lang: targetFile.lang,
       published: data.published !== false,
       readingTime:
         typeof data.readingTime === "number"
           ? data.readingTime
           : estimateReadingTime(content),
-      slug: file.replace(/\.(mdx|md)$/, ""),
+      slug,
       tags: Array.isArray(data.tags) ? data.tags : [],
       title: data.title ?? "Untitled",
     });
@@ -113,14 +197,72 @@ export async function getAllThoughts(): Promise<Thought[]> {
 }
 
 export async function getThoughtBySlug(
-  slug: string
+  slug: string,
+  lang?: string
 ): Promise<Thought | undefined> {
   "use cache";
   cacheLife(CACHE_LIFE.GET_THOUGHT_BY_ID);
   cacheTag(CACHE_TAGS.GET_THOUGHT_BY_ID(slug), CACHE_TAGS.GET_ALL_THOUGHTS);
 
-  // oxlint-disable-next-line unicorn/no-await-expression-member
-  return (await getAllThoughts()).find((t) => t.slug === slug);
+  const files = getAllLangFiles();
+  const slugMap = getSlugToLangsMap();
+  const targetLang = lang || "en";
+
+  // Find the file for this slug + lang
+  const match = files.find(
+    (f) =>
+      f.fileName.replace(/\.(mdx|md)$/, "") === slug && f.lang === targetLang
+  );
+
+  if (!match) {
+    // Fallback: try default lang if target not found
+    const fallback = files.find(
+      (f) => f.fileName.replace(/\.(mdx|md)$/, "") === slug && f.lang === "en"
+    );
+    if (!fallback) return undefined;
+
+    const raw = fs.readFileSync(fallback.filePath, "utf-8");
+    const { data, content } = matter(raw);
+
+    if (data.published === false) return undefined;
+
+    return {
+      availableLangs: slugMap.get(slug) || [],
+      content,
+      date: data.date ?? "2025-01-01",
+      description: data.description ?? "",
+      lang: fallback.lang,
+      published: data.published !== false,
+      readingTime:
+        typeof data.readingTime === "number"
+          ? data.readingTime
+          : estimateReadingTime(content),
+      slug,
+      tags: Array.isArray(data.tags) ? data.tags : [],
+      title: data.title ?? "Untitled",
+    };
+  }
+
+  const raw = fs.readFileSync(match.filePath, "utf-8");
+  const { data, content } = matter(raw);
+
+  if (data.published === false) return undefined;
+
+  return {
+    availableLangs: slugMap.get(slug) || [],
+    content,
+    date: data.date ?? "2025-01-01",
+    description: data.description ?? "",
+    lang: match.lang,
+    published: data.published !== false,
+    readingTime:
+      typeof data.readingTime === "number"
+        ? data.readingTime
+        : estimateReadingTime(content),
+    slug,
+    tags: Array.isArray(data.tags) ? data.tags : [],
+    title: data.title ?? "Untitled",
+  };
 }
 
 export async function getAllTags(): Promise<string[]> {
@@ -169,10 +311,21 @@ export async function getRelatedThoughts(
       const sharedTags = t.tags.filter((tag) =>
         currentThought.tags.includes(tag)
       );
-      return { thought: t, score: sharedTags.length };
+      return { score: sharedTags.length, thought: t };
     })
     .filter((item) => item.score > 0)
     .toSorted((a, b) => b.score - a.score);
 
   return scored.slice(0, limit).map((item) => item.thought);
+}
+
+/**
+ * Get available languages for a specific slug.
+ * Useful for showing language switcher in the post detail.
+ */
+export async function getAvailableLangsForSlug(
+  slug: string
+): Promise<string[]> {
+  const slugMap = getSlugToLangsMap();
+  return slugMap.get(slug) || [];
 }

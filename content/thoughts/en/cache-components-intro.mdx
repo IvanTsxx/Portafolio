@@ -1,0 +1,217 @@
+---
+title: "Cache Components in Next.js: Introduction"
+description: "What Cache Components are, how to enable the feature, the three types of content, and how automatic cache key generation works in Next.js 16."
+keywords:
+  [
+    "Next.js",
+    "Cache Components",
+    "use cache",
+    "Partial Prerendering",
+    "PPR",
+    "React Server Components",
+    "cacheLife",
+    "cacheTag",
+    "Next.js 16",
+  ]
+date: "2026-04-13"
+published: true
+tags:
+  [
+    "Next.js",
+    "Cache Components",
+    "use cache",
+    "Partial Prerendering",
+    "React Server Components",
+  ]
+series: "cache-components"
+seriesOrder: 1
+---
+
+## What are Cache Components?
+
+Cache Components is the new caching model in Next.js 16. It is built on top of Partial Prerendering (PPR) and replaces the old `experimental.ppr` flag, implicit static routes, and `unstable_cache`.
+
+The fundamental difference from the previous model is that you explicitly declare what is cached and what is not, instead of relying on framework heuristics. This makes the behavior predictable and makes it evident just by reading the code what is cached, for how long, and with what invalidation granularity.
+
+## Enabling the feature
+
+The first step is to enable `cacheComponents` in your `next.config.ts`:
+
+```ts title="next.config.ts"
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  cacheComponents: true,
+};
+
+export default nextConfig;
+```
+
+That is all you need at the configuration level to get started. The flag replaces the old `experimental.ppr: true`.
+
+> **Note:** Cache Components requires the Node.js runtime. It does not work with the Edge runtime or with `output: 'export'`.
+
+## The three types of content
+
+With `cacheComponents: true`, each route can mix three types of content. The granularity is per component or function, not per full route.
+
+<ContentTypesTable />
+
+The key is that you can have all three types on the same page. The static shell is served instantly from the CDN, the cached content appears almost immediately, and the dynamic content streams to the client.
+
+## An example with the three types
+
+```tsx title="app/dashboard/page.tsx"
+import { Suspense } from "react";
+import { cookies } from "next/headers";
+import { cacheLife, cacheTag } from "next/cache";
+
+// 1. STATIC — pre-rendered shell at build time
+export default function DashboardPage() {
+  return (
+    <>
+      <header>
+        <h1>Dashboard</h1>
+        <nav>...</nav>
+      </header>
+
+      {/* 2. CACHED — data that does not need to be fresh on every request */}
+      <GlobalStats />
+
+      {/* 3. DYNAMIC — must be inside Suspense, it streams */}
+      <Suspense fallback={<p>Loading notifications...</p>}>
+        <UserNotifications />
+      </Suspense>
+    </>
+  );
+}
+
+// Cached component: computed once and reused
+async function GlobalStats() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("dashboard-stats");
+
+  const stats = await db.stats.aggregate();
+  return <StatsDisplay stats={stats} />;
+}
+
+// Dynamic component: accesses cookies(), cannot be cached directly
+async function UserNotifications() {
+  const userId = (await cookies()).get("userId")?.value;
+  const items = await db.notifications.findMany({
+    where: { userId, read: false },
+  });
+  return <NotificationList items={items} />;
+}
+```
+
+## The `'use cache'` directive
+
+`'use cache'` is a React directive (like `'use client'` or `'use server'`) that tells Next.js that the result of that function or component should be cached. You can apply it at three levels:
+
+### File level
+
+Caches all exports in the file. All must be async functions.
+
+```tsx title="app/posts/page.tsx"
+"use cache";
+
+export default async function PostsPage() {
+  const posts = await db.posts.findMany();
+  return <PostList posts={posts} />;
+}
+```
+
+### Component level
+
+```tsx title="components/featured-posts.tsx"
+export async function FeaturedPosts() {
+  "use cache";
+  const posts = await db.posts.findMany({
+    where: { featured: true },
+    take: 3,
+  });
+  return <PostGrid posts={posts} />;
+}
+```
+
+### Function level
+
+You are not limited to components. You can cache any async function, including database queries or fetches to external APIs.
+
+```tsx title="lib/data/posts.ts"
+export async function getTopPosts() {
+  "use cache";
+  return db.posts.findMany({
+    orderBy: { views: "desc" },
+    take: 5,
+  });
+}
+```
+
+## How cache keys are generated
+
+You do not need to define keys manually like with `unstable_cache`. Next.js generates them automatically based on:
+
+- **Build ID** — invalidates the entire cache on a new deploy
+- **Function ID** — hash of the file location and the function in the code
+- **Serializable arguments** — component props or function parameters
+- **Closure variables** — variables from the outer scope captured by the function
+
+```tsx
+async function Component({ userId }: { userId: string }) {
+  const getData = async (filter: string) => {
+    "use cache";
+    // Cache key = userId (closure) + filter (argument)
+    // userId comes from the outer scope → captured automatically
+    // filter is an argument → also part of the key
+    // Each combination has its own cache entry
+    return fetch(`/api/users/${userId}/data?filter=${filter}`);
+  };
+
+  return getData("active");
+}
+```
+
+In practice, this means that if you call the same component with different props, each combination has its own cache entry. There is no need to think about naming keys.
+
+## The lifecycle of an entry
+
+Each cache entry has three time parameters that determine its behavior:
+
+- **`stale`** — during this time, the client serves the cached value without checking anything
+- **`revalidate`** — after `stale`, the server triggers a background fetch and updates the entry. The client keeps seeing the old value until the new one is ready
+- **`expire`** — hard expiration. The next request after this time blocks until a new value is available
+
+<CacheFlowDiagram />
+
+By default (without specifying anything), the `'default'` profile is used: 5 minutes of stale and 15 minutes of revalidate. In the next post we will cover all available profiles and how to configure custom timings.
+
+## `cacheLife` and `cacheTag` in one line
+
+Inside any function with `'use cache'` you can use two complementary functions:
+
+```tsx
+import { cacheLife, cacheTag } from "next/cache";
+
+async function getProduct(id: string) {
+  "use cache";
+  cacheLife("hours"); // how long it lives
+  cacheTag("products", `product-${id}`); // tag for on-demand invalidation
+
+  return db.products.findUnique({ where: { id } });
+}
+```
+
+`cacheLife` controls the lifetime of the entry. `cacheTag` assigns one or more tags that you can later use to invalidate at any time from a Server Action.
+
+In the next posts of the series we will cover advanced patterns for both functions, best practices to scale without the code becoming chaotic, and the most common errors along with their solutions.
+
+## Quick summary
+
+- Enable with `cacheComponents: true` in `next.config.ts`
+- Three types of content: static (build time), cached (`'use cache'`), dynamic (`<Suspense>`)
+- Cache keys are generated automatically from arguments and closures
+- `cacheLife()` controls lifetime, `cacheTag()` enables on-demand invalidation
+- Dynamic components (that access `cookies()`, `headers()` or `searchParams`) must always be inside `<Suspense>`

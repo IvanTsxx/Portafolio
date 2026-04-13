@@ -57,7 +57,8 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${GeistPixelTriangle.variable}`}
-      suppressHydrationWarning
+      suppressHydrationWarning={true}
+      
     >
       {/* preload avatar imgage */}
       <link

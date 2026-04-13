@@ -1,5 +1,7 @@
 export interface ThoughtMeta {
   slug: string;
+  lang: string;
+  availableLangs: string[];
   title: string;
   date: string;
   description: string;
