@@ -28,7 +28,7 @@ function generateAnonymousName(): string {
 }
 
 export const auth = betterAuth({
-  baseURL: env.BETTER_AUTH_URL ?? "https://portafolio.localhost",
+  baseURL: env.BETTER_AUTH_URL ?? "http://localhost:3000",
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -53,8 +53,7 @@ export const auth = betterAuth({
       clientSecret: env.GITHUB_CLIENT_SECRET!,
     },
   },
-  trustedOrigins: [
-    env.BETTER_AUTH_URL ?? "",
-    "https://portafolio.localhost",
-  ].filter(Boolean),
+  trustedOrigins: [env.BETTER_AUTH_URL ?? "", "http://localhost:3000"].filter(
+    Boolean
+  ),
 });

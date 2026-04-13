@@ -4,7 +4,7 @@ export const SITE = {
   linkedin: "https://www.linkedin.com/in/bongiovanni-ivan45",
   name: "IvanTsx",
   twitter: "https://x.com/IvanTsxx",
-  url: "https://ibong.bongi.dev",
+  url: "https://bongi.dev",
 } as const;
 
 export const GITHUB_USERNAME = "IvanTsxx";

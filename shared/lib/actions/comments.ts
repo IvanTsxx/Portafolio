@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { headers } from "next/headers";
 import { z } from "zod";
 
@@ -311,6 +311,7 @@ export async function togglePostReaction(
       return { error: "Failed to sign in anonymously" };
     }
     userId = user.id;
+    revalidatePath(`/thoughts/${data.slug}`);
   }
 
   // Resolve userId: look up by email for regular users,

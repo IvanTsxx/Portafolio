@@ -13,6 +13,7 @@ import * as z from "zod";
 import { ReactionType } from "@/app/generated/prisma/enums";
 import { AuthModal } from "@/shared/components/auth-modal";
 import { Icons } from "@/shared/components/icons";
+import { Spinner } from "@/shared/components/ui/spinner";
 import { createComment, toggleReaction } from "@/shared/lib/actions/comments";
 import { useSession } from "@/shared/lib/auth-client";
 import { cn } from "@/shared/lib/utils";
@@ -320,9 +321,10 @@ export function CommentsSection({
   slug,
   initialComments = [],
 }: CommentsSectionProps) {
-  const { data: session } = useSession();
+  const { data, isPending } = useSession();
   const router = useRouter();
-  const currentUserId = session?.user?.email;
+  const isAnonymous = data?.user.isAnonymous;
+  const user = data?.user;
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -358,9 +360,11 @@ export function CommentsSection({
       </span>
 
       {/* Auth / input - auto sign in as anonymous if no session */}
-      {!session?.user ? (
+      {isPending ? (
+        <Spinner />
+      ) : !user?.id || isAnonymous ? (
         <AuthModal
-          message="Sign in to comment with your GitHub profile or Sign in as guest"
+          message="Sign in to comment with your GitHub profile"
           callbackUrl={`/thoughts/${slug}`}
         />
       ) : (
@@ -406,7 +410,7 @@ export function CommentsSection({
           <div className="flex items-center justify-between">
             <span className="  text-[11px] text-muted-foreground">
               Signed in as{" "}
-              {session.user.isAnonymous ? "Anonymous" : session.user.name}
+              {data?.user.isAnonymous ? "Anonymous" : data?.user.name}
             </span>
             <button
               type="submit"
@@ -436,7 +440,7 @@ export function CommentsSection({
             <CommentItem
               key={comment.id}
               comment={comment}
-              currentUserId={currentUserId ?? undefined}
+              currentUserId={user?.id ?? undefined}
               onReply={handleReply}
               replyingTo={replyingTo}
               slug={slug}

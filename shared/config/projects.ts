@@ -45,7 +45,7 @@ export const PROJECTS: Project[] = [
       `,
     github: "https://github.com/IvanTsxx/portafolio",
     id: "ivantsx",
-    link: "https://ibong.bongi.dev",
+    link: "https://bongi.dev",
     period: { start: "2025" },
     skills: [
       "Next.js",

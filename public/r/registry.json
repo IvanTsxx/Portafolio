@@ -1,6 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "homepage": "https://ibong.bongi.dev",
+  "homepage": "https://bongi.dev",
   "items": [
     {
       "name": "contribution-card",

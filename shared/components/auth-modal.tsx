@@ -46,21 +46,6 @@ export function AuthModal({ message, callbackUrl }: AuthModalProps) {
     });
   };
 
-  const handleAnonymous = () => {
-    startTransition(async () => {
-      const { error } = await signIn.anonymous();
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-      if (!error) {
-        setOpen(false);
-
-        router.refresh();
-      }
-    });
-  };
-
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
@@ -88,19 +73,11 @@ export function AuthModal({ message, callbackUrl }: AuthModalProps) {
         <DialogDescription>
           Sign in or continue as guest to participate.
         </DialogDescription>
-        <div className="flex flex-col gap-3">
-          <Button onClick={handleSignIn} disabled={pending}>
-            {!pending ? <Icons.Github className="mr-2 h-4 w-4" /> : <Spinner />}
-            {!pending ? "Sign in with GitHub" : "Signing in..."}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleAnonymous}
-            disabled={pending}
-          >
-            {!pending ? "Continue as Guest" : "Loading..."}
-          </Button>
-        </div>
+
+        <Button onClick={handleSignIn} disabled={pending}>
+          {!pending ? <Icons.Github className="mr-2 h-4 w-4" /> : <Spinner />}
+          {!pending ? "Sign in with GitHub" : "Signing in..."}
+        </Button>
       </DialogContent>
     </Dialog>
   );
