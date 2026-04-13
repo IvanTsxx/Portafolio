@@ -39,3 +39,6 @@ next-env.d.ts
 
 # agent teams lite
 .atl/
+
+.vercel
+.env*.local
