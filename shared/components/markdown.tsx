@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import remarkGfm from "remark-gfm";
 
 import { mdxComponents } from "@/shared/components/mdx/mdx-components";
+import { rehypeHeadingId } from "@/shared/utils/rehype-heading-id";
 import { highlight } from "@/shared/utils/shiki/highlight";
 import { rehypeShikiOptions } from "@/shared/utils/shiki/rehype-shiki-options";
 
@@ -39,6 +40,7 @@ const MarkdownContent = async ({ content }: { content: string }) => {
       options={{
         mdxOptions: {
           rehypePlugins: [
+            rehypeHeadingId,
             rehypeCodeLanguage,
             [rehypeShiki, highlighter, rehypeShikiOptions],
           ],

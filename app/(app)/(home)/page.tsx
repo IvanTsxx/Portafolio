@@ -33,6 +33,10 @@ export const metadata: Metadata = {
   title: "Ivan Bongiovanni",
   twitter: {
     card: "summary_large_image",
+    creator: "@IvanTsxx",
+    description: SITE.description,
+    site: SITE.twitter,
+    title: SITE.name,
   },
 };
 
