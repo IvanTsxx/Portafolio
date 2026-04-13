@@ -65,6 +65,7 @@ export const EXPERIENCES: Experience[] = [
   {
     companyLogo: "/logos/tensolite.webp",
     companyName: "Tensolite SA",
+    companyWebsite: "https://tensolite.com",
     id: "tensolite",
     positions: [
       {
