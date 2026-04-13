@@ -135,7 +135,7 @@ export default async function ThoughtPostPage({ params, searchParams }: Props) {
               >
                 {tag}
               </Link>
-              ))}
+            ))}
           </div>
 
           <Reactions slug={slug} />

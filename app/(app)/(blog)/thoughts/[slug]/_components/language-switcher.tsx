@@ -7,19 +7,19 @@ import { ChevronDown, Languages } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 const LANG_LABELS: Record<string, string> = {
+  de: "Deutsch",
   en: "English",
   es: "Español",
-  pt: "Português",
   fr: "Français",
-  de: "Deutsch",
+  pt: "Português",
 };
 
 const LANG_FLAGS: Record<string, string> = {
+  de: "🇩🇪",
   en: "🇺🇸",
   es: "🇪🇸",
-  pt: "🇧🇷",
   fr: "🇫🇷",
-  de: "🇩🇪",
+  pt: "🇧🇷",
 };
 
 interface LanguageSwitcherProps {
