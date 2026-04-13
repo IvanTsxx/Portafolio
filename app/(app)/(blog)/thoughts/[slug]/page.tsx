@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { RelatedThoughts } from "@/shared/components/blog/related-thoughts";
 import { Icons } from "@/shared/components/icons";
 import {
   BreadcrumbJsonLd,
@@ -11,7 +12,11 @@ import {
 import { Markdown } from "@/shared/components/markdown";
 import { SITE } from "@/shared/config/site";
 import { getCommentsBySlug } from "@/shared/lib/data";
-import { getAllThoughts, getThoughtBySlug } from "@/shared/lib/thoughts";
+import {
+  getAllThoughts,
+  getThoughtBySlug,
+  getRelatedThoughts,
+} from "@/shared/lib/thoughts";
 
 import { CommentsSection } from "./_components/comments-section";
 import { Reactions } from "./_components/reactions";
@@ -55,7 +60,10 @@ export default async function ThoughtPostPage({ params }: Props) {
   const thought = await getThoughtBySlug(slug);
   if (!thought) notFound();
 
-  const { comments } = await getCommentsBySlug(slug);
+  const [{ comments }, relatedThoughts] = await Promise.all([
+    getCommentsBySlug(slug),
+    getRelatedThoughts(slug),
+  ]);
 
   return (
     <section className="py-10 w-full max-w-3xl mx-auto">
@@ -170,6 +178,9 @@ export default async function ThoughtPostPage({ params }: Props) {
 
       {/* Comments */}
       <CommentsSection slug={slug} initialComments={comments} />
+
+      {/* Related thoughts */}
+      <RelatedThoughts thoughts={relatedThoughts} />
     </section>
   );
 }

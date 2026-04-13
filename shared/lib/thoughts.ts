@@ -141,3 +141,38 @@ export async function getRecentThoughts(): Promise<Thought[]> {
   const allThoughts = await getAllThoughts();
   return allThoughts.slice(0, 3);
 }
+
+/**
+ * Get related thoughts based on shared tags with the current post.
+ * Returns up to 3 posts that share at least one tag, excluding the current post.
+ * Prioritizes posts with more tag matches.
+ */
+export async function getRelatedThoughts(
+  currentSlug: string,
+  limit = 3
+): Promise<Thought[]> {
+  "use cache";
+  cacheLife(CACHE_LIFE.GET_RECENT_THOUGHTS);
+  cacheTag(CACHE_TAGS.GET_ALL_THOUGHTS);
+
+  const allThoughts = await getAllThoughts();
+  const currentThought = allThoughts.find((t) => t.slug === currentSlug);
+
+  if (!currentThought || currentThought.tags.length === 0) {
+    return [];
+  }
+
+  // Score each post by number of matching tags
+  const scored = allThoughts
+    .filter((t) => t.slug !== currentSlug)
+    .map((t) => {
+      const sharedTags = t.tags.filter((tag) =>
+        currentThought.tags.includes(tag)
+      );
+      return { thought: t, score: sharedTags.length };
+    })
+    .filter((item) => item.score > 0)
+    .toSorted((a, b) => b.score - a.score);
+
+  return scored.slice(0, limit).map((item) => item.thought);
+}
