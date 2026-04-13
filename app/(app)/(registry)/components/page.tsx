@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { SITE } from "@/shared/config/site";
+import { BreadcrumbJsonLd } from "@/shared/components/json-ld";
 import { ShadcnInstallCommandFlip } from "@/shared/components/shadcn-install-command-flip";
 import { getComponents } from "@/shared/lib/registry";
 
@@ -7,8 +9,19 @@ import { RegistryCard } from "../_components/registry-card";
 import { RegistryPreview } from "../_components/registry-preview";
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: "/components",
+  },
   description:
     "Reusable components built for the modern web. Install via shadcn CLI.",
+  openGraph: {
+    description:
+      "Reusable components built for the modern web. Install via shadcn CLI.",
+    siteName: SITE.name,
+    title: "Components",
+    type: "website",
+    url: `${SITE.url}/components`,
+  },
   title: "Components",
   twitter: {
     card: "summary_large_image",
@@ -20,6 +33,12 @@ export default async function ComponentsPage() {
 
   return (
     <section className="py-10">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: SITE.url },
+          { name: "Components", url: `${SITE.url}/components` },
+        ]}
+      />
       {/* Page header */}
       <div className="mb-10 border-t bg-background border-border pt-4">
         <div className="flex flex-col items-start gap-3 w-full">

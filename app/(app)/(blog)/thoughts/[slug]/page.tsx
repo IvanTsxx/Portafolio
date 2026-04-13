@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Icons } from "@/shared/components/icons";
+import { BreadcrumbJsonLd, BlogPostingJsonLd } from "@/shared/components/json-ld";
 import { Markdown } from "@/shared/components/markdown";
 import { SITE } from "@/shared/config/site";
 import { getCommentsBySlug } from "@/shared/lib/data";
@@ -26,14 +27,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const thought = await getThoughtBySlug(slug);
   if (!thought) return {};
   return {
+    alternates: {
+      canonical: `/thoughts/${slug}`,
+    },
     description: thought.description,
     openGraph: {
       description: thought.description,
-
       publishedTime: thought.date,
+      siteName: SITE.name,
       tags: thought.tags,
       title: thought.title,
       type: "article",
+      url: `${SITE.url}/thoughts/${slug}`,
     },
     title: thought.title,
     twitter: {
@@ -51,6 +56,19 @@ export default async function ThoughtPostPage({ params }: Props) {
 
   return (
     <section className="py-10 w-full max-w-3xl mx-auto">
+      <BlogPostingJsonLd
+        date={thought.date}
+        description={thought.description}
+        slug={slug}
+        title={thought.title}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: SITE.url },
+          { name: "Thoughts", url: `${SITE.url}/thoughts` },
+          { name: thought.title, url: `${SITE.url}/thoughts/${slug}` },
+        ]}
+      />
       {/* Back link */}
       <Link
         prefetch={false}

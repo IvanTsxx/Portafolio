@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BreadcrumbJsonLd } from "@/shared/components/json-ld";
 import { Markdown } from "@/shared/components/markdown";
+import { SITE } from "@/shared/config/site";
 import { getComponent, getComponents } from "@/shared/lib/registry";
 
 interface Props {
@@ -21,11 +23,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!entry) return { title: "Not Found" };
   return {
+    alternates: {
+      canonical: `/components/${slug}`,
+    },
     description: entry.description,
     openGraph: {
       description: entry.description,
+      siteName: SITE.name,
       title: entry.title,
       type: "website",
+      url: `${SITE.url}/components/${slug}`,
     },
     title: entry.title,
     twitter: {
@@ -41,6 +48,13 @@ export default async function ComponentPage({ params }: Props) {
 
   return (
     <section className="py-10 bg-background px-1">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: SITE.url },
+          { name: "Components", url: `${SITE.url}/components` },
+          { name: entry.title, url: `${SITE.url}/components/${slug}` },
+        ]}
+      />
       {/* Back */}
       <Link
         prefetch={false}

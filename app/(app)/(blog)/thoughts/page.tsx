@@ -1,14 +1,27 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { SITE } from "@/shared/config/site";
+import { BreadcrumbJsonLd } from "@/shared/components/json-ld";
 import { Spinner } from "@/shared/components/ui/spinner";
 import { getAllThoughts, getAllTags } from "@/shared/lib/thoughts";
 
 import { ThoughtsFilter } from "./_components/thoughts-filter";
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: "/thoughts",
+  },
   description:
     "Writing about Next.js, architecture, and building things on the web.",
+  openGraph: {
+    description:
+      "Writing about Next.js, architecture, and building things on the web.",
+    siteName: SITE.name,
+    title: "Thoughts",
+    type: "website",
+    url: `${SITE.url}/thoughts`,
+  },
   title: "Thoughts",
   twitter: {
     card: "summary_large_image",
@@ -21,6 +34,12 @@ export default async function ThoughtsPage() {
 
   return (
     <section className="py-10">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: SITE.url },
+          { name: "Thoughts", url: `${SITE.url}/thoughts` },
+        ]}
+      />
       {/* Page header */}
       <div className="mb-8">
         <h1 className="text-2xl font-medium tracking-tight">Thoughts</h1>
