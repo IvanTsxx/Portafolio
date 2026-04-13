@@ -10,6 +10,16 @@ const rehypeShikiOptions: RehypeShikiCoreOptions = {
       pre(node) {
         // 'this.options.lang' is the language Shiki detected
         node.properties["data-language"] = this.options.lang;
+
+        // Extract title from fence meta (e.g., title="next.config.ts")
+        const meta = this.options?.meta;
+        if (meta?.__raw) {
+          const titleMatch = meta.__raw.match(/title="([^"]+)"/);
+          if (titleMatch) {
+            const [_, title] = titleMatch;
+            node.properties["data-title"] = title;
+          }
+        }
       },
     },
   ],

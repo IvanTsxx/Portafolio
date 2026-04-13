@@ -37,7 +37,7 @@ La diferencia fundamental con el modelo anterior es que vos declarás explícita
 
 Lo primero es activar `cacheComponents` en tu `next.config.ts`:
 
-```ts filename="next.config.ts"
+```ts title="next.config.ts"
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -61,7 +61,7 @@ La clave está en que podés tener los tres tipos en la misma página. El shell 
 
 ## Un ejemplo con los tres tipos
 
-```tsx filename="app/dashboard/page.tsx"
+```tsx title="app/dashboard/page.tsx"
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { cacheLife, cacheTag } from "next/cache";
@@ -114,7 +114,7 @@ async function UserNotifications() {
 
 Cachea todos los exports del archivo. Todos deben ser funciones async.
 
-```tsx filename="app/posts/page.tsx"
+```tsx title="app/posts/page.tsx"
 "use cache";
 
 export default async function PostsPage() {
@@ -125,7 +125,7 @@ export default async function PostsPage() {
 
 ### A nivel de componente
 
-```tsx filename="components/featured-posts.tsx"
+```tsx title="components/featured-posts.tsx"
 export async function FeaturedPosts() {
   "use cache";
   const posts = await db.posts.findMany({
@@ -140,7 +140,7 @@ export async function FeaturedPosts() {
 
 No estás limitado a componentes. Podés cachear cualquier función async, incluyendo queries de base de datos o fetches a APIs externas.
 
-```tsx filename="lib/data/posts.ts"
+```tsx title="lib/data/posts.ts"
 export async function getTopPosts() {
   "use cache";
   return db.posts.findMany({

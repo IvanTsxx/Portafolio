@@ -5,6 +5,7 @@ import { visit } from "unist-util-visit";
 
 /**
  * Copies the language from <code class="language-tsx"> to <pre data-language="tsx">
+ * Also extracts title from fence meta like title="filename.ts"
  * Must run BEFORE rehype-shiki
  */
 const rehypeCodeLanguage: Plugin<[], Root> = () => (tree) => {
@@ -22,10 +23,20 @@ const rehypeCodeLanguage: Plugin<[], Root> = () => (tree) => {
     // className is string[] in hast, not string
     const classArray = Array.isArray(className) ? className.map(String) : [];
     const langClass = classArray.find((c) => c.startsWith("language-"));
-    if (!langClass) return;
+    if (langClass) {
+      const language = langClass.replace("language-", "");
+      node.properties["data-language"] = language;
+    }
 
-    const language = langClass.replace("language-", "");
-    node.properties["data-language"] = language;
+    // Extract title from meta property (remark stores fence info here)
+    const meta = code.properties?.meta;
+    if (typeof meta === "string") {
+      const titleMatch = meta.match(/title="([^"]+)"/);
+      if (titleMatch) {
+        const [_, title] = titleMatch;
+        node.properties["data-title"] = title;
+      }
+    }
   });
 };
 export { rehypeCodeLanguage };

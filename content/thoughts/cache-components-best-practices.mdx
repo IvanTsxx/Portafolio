@@ -35,7 +35,7 @@ El problema más frecuente en aplicaciones medianas y grandes es que los tags de
 
 La solución es centralizar ambos en un archivo con `server-only`:
 
-```ts filename="lib/cache-constants.ts"
+```ts title="lib/cache-constants.ts"
 import "server-only";
 
 // oxlint-disable sort-keys
@@ -79,7 +79,7 @@ El `import "server-only"` es importante: garantiza que este módulo nunca se imp
 
 Luego en tus data functions:
 
-```ts filename="lib/data/posts.ts"
+```ts title="lib/data/posts.ts"
 import { cacheLife, cacheTag } from "next/cache";
 import { CACHE_TAGS, CACHE_LIFE } from "@/lib/cache-constants";
 
@@ -102,7 +102,7 @@ export async function getFeaturedPosts() {
 
 Y en tus Server Actions:
 
-```ts filename="app/actions/posts.ts"
+```ts title="app/actions/posts.ts"
 "use server";
 
 import { revalidateTag } from "next/cache";
@@ -132,7 +132,7 @@ La regla general es matchear el perfil con la frecuencia real de cambio del dato
 
 Para casos que no entran en ningún perfil, configurá uno custom en `next.config.ts`:
 
-```ts filename="next.config.ts"
+```ts title="next.config.ts"
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -171,7 +171,7 @@ Un error común es usar tags demasiado amplios. Si todo lo que tiene que ver con
 
 El patrón correcto es tagear en capas: un tag genérico para la colección y un tag específico para cada entidad.
 
-```ts filename="lib/data/posts.ts"
+```ts title="lib/data/posts.ts"
 export async function getPostBySlug(slug: string) {
   "use cache";
   cacheLife(CACHE_LIFE.POST_BY_SLUG);
@@ -221,7 +221,7 @@ La diferencia entre estas dos funciones no es obvia al principio, pero es import
 
 En la práctica, la mayoría de las invalidaciones deberían ser `revalidateTag`. La consistencia eventual es aceptable en casi todos los flujos CRUD. `updateTag` es para los casos donde el usuario está mirando la pantalla esperando ver el efecto inmediato de su acción.
 
-```ts filename="app/actions/post.ts"
+```ts title="app/actions/post.ts"
 "use server";
 
 import { revalidateTag, updateTag } from "next/cache";
@@ -265,7 +265,7 @@ async function getGlobalStats() {
 
 `'use cache: remote'` le indica a la plataforma que use un cache handler externo (Redis, KV, etc.). En Vercel se configura automáticamente. En hosting propio, configurás el handler en `next.config.ts`:
 
-```ts filename="next.config.ts"
+```ts title="next.config.ts"
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
