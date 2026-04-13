@@ -1,9 +1,8 @@
 import type { MetadataRoute } from "next";
 
 import { SITE } from "@/shared/config/site";
-
-import { getAllThoughts } from "@/shared/lib/thoughts";
 import { getComponents } from "@/shared/lib/registry";
+import { getAllThoughts } from "@/shared/lib/thoughts";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE.url;
@@ -18,16 +17,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${baseUrl}/thoughts/${thought.slug}`,
   }));
 
-  const componentEntries: MetadataRoute.Sitemap = components.map((component) => ({
-    changeFrequency: "monthly",
-    priority: 0.6,
-    url: `${baseUrl}/components/${component.name}`,
-  }));
+  const componentEntries: MetadataRoute.Sitemap = components.map(
+    (component) => ({
+      changeFrequency: "monthly",
+      priority: 0.6,
+      url: `${baseUrl}/components/${component.name}`,
+    })
+  );
 
   return [
     {
       changeFrequency: "daily",
-      priority: 1.0,
+      priority: 1,
       url: baseUrl,
     },
     {

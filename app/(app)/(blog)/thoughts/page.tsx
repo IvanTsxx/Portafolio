@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { SITE } from "@/shared/config/site";
 import { BreadcrumbJsonLd } from "@/shared/components/json-ld";
 import { Spinner } from "@/shared/components/ui/spinner";
+import { SITE } from "@/shared/config/site";
 import { getAllThoughts, getAllTags } from "@/shared/lib/thoughts";
 
 import { ThoughtsFilter } from "./_components/thoughts-filter";

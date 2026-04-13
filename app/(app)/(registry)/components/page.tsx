@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
-import { SITE } from "@/shared/config/site";
 import { BreadcrumbJsonLd } from "@/shared/components/json-ld";
 import { ShadcnInstallCommandFlip } from "@/shared/components/shadcn-install-command-flip";
+import { SITE } from "@/shared/config/site";
 import { getComponents } from "@/shared/lib/registry";
 
 import { RegistryCard } from "../_components/registry-card";

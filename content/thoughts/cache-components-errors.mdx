@@ -1,0 +1,313 @@
+---
+title: "Cache Components en Next.js: Errores comunes y soluciones"
+description: "Los errores más frecuentes al usar use cache en Next.js 16, qué los causa y cómo solucionarlos con ejemplos de código antes y después."
+keywords:
+  [
+    "Next.js",
+    "Cache Components",
+    "use cache errors",
+    "use cache private",
+    "cookies in use cache",
+    "serialization error",
+    "Suspense boundary",
+    "React.cache isolation",
+    "Next.js 16 errors",
+  ]
+date: "2026-04-13"
+published: true
+tags:
+  [
+    "Next.js",
+    "Cache Components",
+    "use cache",
+    "errores",
+    "debugging",
+    "React Server Components",
+  ]
+series: "cache-components"
+seriesOrder: 2
+---
+
+## Error 1: Acceder a runtime APIs dentro de `'use cache'`
+
+<ErrorCard
+  title="Runtime API inside use cache"
+  errorMessage="Error: cookies() was called inside a cached function. Runtime APIs cannot be accessed from cached scopes."
+  cause="cookies(), headers() y searchParams son APIs de runtime: su valor depende del request que llega, no existe en build time ni en el momento en que se crea la entrada de caché. Acceder a ellas dentro de 'use cache' rompe la promesa de que la función produce el mismo resultado para los mismos inputs."
+  fix="Leer el valor fuera del scope cacheado y pasarlo como argumento. El argumento pasa a ser parte automática de la cache key, así que diferentes valores generan diferentes entradas."
+  tip="Si tenés un caso de compliance donde no podés refactorizar (por ejemplo, necesitás acceder a cookies dentro de una librería de terceros que no controlás), existe 'use cache: private' que sí permite runtime APIs. Usalo como último recurso."
+/>
+
+```tsx
+// ❌ Rompe en runtime
+async function CachedProfile() {
+  "use cache";
+  const session = (await cookies()).get("session")?.value; // Error
+  return <div>{session}</div>;
+}
+```
+
+```tsx
+// ✅ Leer afuera, pasar como argumento
+async function ProfilePage() {
+  const sessionId = (await cookies()).get("session")?.value;
+  return <CachedProfile sessionId={sessionId} />;
+}
+
+async function CachedProfile({ sessionId }: { sessionId?: string }) {
+  "use cache";
+  cacheLife("hours");
+  // sessionId es parte de la cache key → cada usuario tiene su entrada
+  const data = await fetchUserData(sessionId);
+  return <div>{data?.name}</div>;
+}
+```
+
+Cuando no podés refactorizar:
+
+```tsx
+// ⚠️ Último recurso: use cache: private
+async function ComplianceComponent() {
+  "use cache: private";
+  const session = (await cookies()).get("session")?.value; // Permitido
+  return <div>{session}</div>;
+}
+```
+
+---
+
+## Error 2: Pasar tipos no serializables como argumentos
+
+<ErrorCard
+  title="Non-serializable argument"
+  errorMessage="Error: Arguments to cached functions must be serializable. Class instances, functions, and Symbols are not supported."
+  cause="La cache key se construye serializando los argumentos. Los tipos que no se pueden serializar (instancias de clase, funciones, Symbols, WeakMaps) no tienen una representación estable que pueda usarse como key ni transmitirse entre el servidor y el cliente."
+  fix="Pasá solo primitivos o plain objects como argumentos. Si necesitás datos de un objeto complejo, extraé solo el ID o los valores escalares y hacé el fetch adentro de la función cacheada."
+/>
+
+```tsx
+// ❌ Instancia de clase → no serializable
+async function UserProfile({ user }: { user: UserClass }) {
+  "use cache";
+  return <div>{user.name}</div>;
+}
+
+// ❌ Date como argumento → tampoco recomendado, serialización inconsistente
+async function EventCard({ date }: { date: Date }) {
+  "use cache";
+  return <div>{date.toISOString()}</div>;
+}
+```
+
+```tsx
+// ✅ Solo el ID, fetch adentro
+async function UserProfile({ userId }: { userId: string }) {
+  "use cache";
+  cacheLife("days");
+  const user = await db.users.findUnique({ where: { id: userId } });
+  return <div>{user?.name}</div>;
+}
+
+// ✅ String en lugar de Date
+async function EventCard({ dateString }: { dateString: string }) {
+  "use cache";
+  return <div>{dateString}</div>;
+}
+```
+
+**Tipos soportados como argumentos:**
+
+| Soportado                                          | No soportado                |
+| -------------------------------------------------- | --------------------------- |
+| `string`, `number`, `boolean`, `null`, `undefined` | Instancias de clase         |
+| Plain objects `{ key: value }`                     | Funciones                   |
+| Arrays                                             | Symbols, WeakMaps, WeakSets |
+| `Date`, `Map`, `Set`, `TypedArray`, `ArrayBuffer`  | Instancias de `URL`         |
+| React elements (pass-through únicamente)           | Clases con métodos          |
+
+---
+
+## Error 3: Valores no determinísticos dentro de `'use cache'`
+
+<ErrorCard
+  title="Non-deterministic value inside use cache"
+  errorMessage="Comportamiento inesperado: Math.random() o Date.now() siempre devuelven el mismo valor."
+  cause="Las funciones con 'use cache' se ejecutan una sola vez para producir la entrada de caché. Cualquier llamada a Math.random(), Date.now(), o crypto.randomUUID() dentro de ese scope se ejecuta en el primer render y el resultado queda congelado en la entrada cacheada. Todos los requests siguientes ven el mismo valor."
+  fix="Mover el valor no determinístico fuera del scope cacheado. Si necesitás que el valor sea distinto en cada request, generarlo en un componente dinámico y pasarlo como argumento a la función cacheada."
+  tip="Usá import { connection } from 'next/server' y await connection() para forzar que un componente se ejecute en request-time y no en build time. Es la forma semántica de decir 'esto es dinámico'."
+/>
+
+```tsx
+// ❌ Se ejecuta una sola vez, siempre el mismo valor
+async function Banner() {
+  "use cache";
+  const id = Math.random(); // Siempre el mismo número
+  const now = Date.now(); // Siempre el mismo timestamp
+  return <div data-id={id}>Última actualización: {now}</div>;
+}
+```
+
+```tsx
+// ✅ Generar el valor dinámico afuera, pasar como argumento
+import { connection } from "next/server";
+
+async function BannerWrapper() {
+  await connection(); // Fuerza ejecución en request-time
+  const requestId = crypto.randomUUID(); // Distinto por request
+  return <Banner requestId={requestId} />;
+}
+
+async function Banner({ requestId }: { requestId: string }) {
+  "use cache";
+  const bannerData = await fetchBannerData(requestId);
+  return <div>{bannerData.text}</div>;
+}
+```
+
+---
+
+## Error 4: Componente dinámico sin `<Suspense>`
+
+<ErrorCard
+  title="Missing Suspense boundary around dynamic component"
+  errorMessage="Error: A component accessed a runtime API (cookies, headers, searchParams) but is not wrapped in a Suspense boundary. With cacheComponents enabled, dynamic components must be inside Suspense."
+  cause="Con cacheComponents: true, Next.js construye el static shell en build time. Si un componente accede a cookies(), headers() o searchParams sin estar en Suspense, no hay forma de incluirlo en el shell estático ni de streamear después. El build falla."
+  fix="Envolver todos los componentes que accedan a runtime APIs en <Suspense> con un fallback adecuado. El shell se sirve estático y el componente dinámico streamea cuando el servidor lo resuelve."
+/>
+
+```tsx
+// ❌ Rompe el build con cacheComponents: true
+export default function Page() {
+  return (
+    <div>
+      <StaticNav />
+      <UserCart /> {/* accede a cookies() — no tiene Suspense */}
+    </div>
+  );
+}
+```
+
+```tsx
+// ✅ Con Suspense: el shell es estático, el dinámico streamea
+export default function Page() {
+  return (
+    <div>
+      <StaticNav />
+      <Suspense fallback={<CartSkeleton />}>
+        <UserCart />
+      </Suspense>
+    </div>
+  );
+}
+
+async function UserCart() {
+  const userId = (await cookies()).get("userId")?.value;
+  const cart = await db.carts.findUnique({ where: { userId } });
+  return <CartDisplay items={cart?.items ?? []} />;
+}
+```
+
+Un patrón útil es crear un componente skeleton consistente con el contenido real para evitar layout shifts:
+
+```tsx
+function CartSkeleton() {
+  return <div className="h-10 w-24 animate-pulse rounded bg-secondary" />;
+}
+```
+
+---
+
+## Error 5: `React.cache` no cruza boundaries de `use cache`
+
+<ErrorCard
+  title="React.cache isolation inside use cache"
+  errorMessage="Comportamiento inesperado: un valor guardado en React.cache() afuera no es visible adentro de 'use cache'."
+  cause="React.cache opera con scope aislado dentro de cada boundary de 'use cache'. Los valores almacenados via React.cache() en el componente padre no son visibles dentro de una función 'use cache'. Cada scope tiene su propio store de React.cache."
+  fix="Pasar los datos como argumentos de función en lugar de usar React.cache como canal de comunicación entre scopes. React.cache sigue siendo útil para deduplicar requests dentro del mismo scope, no para compartir datos entre scopes."
+/>
+
+```tsx
+import { cache } from "react";
+
+const store = cache(() => ({ userId: null as string | null }));
+
+function Parent() {
+  store().userId = "user_123"; // Guarda en el store del padre
+  return <Child />;
+}
+
+async function Child() {
+  "use cache";
+  const shared = store();
+  // ❌ shared.userId es null acá
+  // 'use cache' tiene su propio scope de React.cache
+  return <div>{shared.userId}</div>;
+}
+```
+
+```tsx
+// ✅ Pasar el valor como argumento
+function Parent() {
+  const userId = "user_123";
+  return <Child userId={userId} />;
+}
+
+async function Child({ userId }: { userId: string }) {
+  "use cache";
+  const data = await fetchUserData(userId);
+  return <div>{data.name}</div>;
+}
+```
+
+---
+
+## Error 6: Exportar funciones síncronas en un archivo con `'use cache'` a nivel de archivo
+
+<ErrorCard
+  title="Synchronous export in file-level use cache"
+  errorMessage="Error: All exports from a file with 'use cache' at the top level must be async functions."
+  cause="Cuando ponés 'use cache' al principio del archivo, le estás diciendo a Next.js que todos los exports son funciones cacheables. Las funciones cacheables deben ser async porque el resultado se guarda de forma asíncrona."
+  fix="Mover las funciones utilitarias síncronas a otro archivo, o cambiar la directiva de nivel de archivo a nivel de función para las que necesitás cachear específicamente."
+/>
+
+```tsx
+// ❌ Rompe: formatDate es síncrona pero el archivo tiene 'use cache' global
+"use cache";
+
+export async function getPosts() {
+  return db.posts.findMany();
+}
+
+export function formatDate(date: Date) {
+  // ❌ Error: debe ser async
+  return date.toLocaleDateString();
+}
+```
+
+```tsx
+// ✅ Opción 1: mover las utilidades síncronas a otro archivo
+// lib/utils/date.ts
+export function formatDate(date: Date) {
+  return date.toLocaleDateString();
+}
+
+// lib/data/posts.ts — sin 'use cache' global
+export async function getPosts() {
+  "use cache";
+  cacheLife("days");
+  return db.posts.findMany();
+}
+```
+
+---
+
+## Checklist rápida
+
+Antes de hacer deploy, revisá estos puntos:
+
+- ¿Estás leyendo `cookies()`, `headers()` o `searchParams` fuera del scope `'use cache'` y pasándolos como argumento?
+- ¿Todos los argumentos de tus funciones cacheadas son tipos serializables (primitivos, plain objects)?
+- ¿Todos los componentes que accedan a runtime APIs están envueltos en `<Suspense>`?
+- ¿Estás usando `Math.random()` o `Date.now()` dentro de `'use cache'`? Movelos afuera.
+- ¿Tu archivo tiene `'use cache'` global pero exporta funciones síncronas? Refactorizá.
+- ¿Esperás que un valor de `React.cache` sea visible dentro de un scope `'use cache'`? Usá argumentos en cambio.

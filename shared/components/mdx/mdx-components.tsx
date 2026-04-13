@@ -5,6 +5,14 @@ import * as React from "react";
 import { RegistryPreview } from "@/app/(app)/(registry)/_components/registry-preview";
 import { PreShikiComponent } from "@/shared/components/code-block/mdx/pre-shiki";
 import { InstallCommand } from "@/shared/components/install-command";
+import {
+  CacheFlowDiagram,
+  CacheLifeProfiles,
+  ContentTypesTable,
+  ErrorCard,
+  InvalidationCompare,
+  Showcase,
+} from "@/shared/components/mdx";
 import { ShadcnInstallCommand } from "@/shared/components/shadcn-install-command";
 import {
   Tabs,
@@ -13,8 +21,6 @@ import {
   TabsContent,
 } from "@/shared/components/ui/tabs";
 import { cn } from "@/shared/lib/utils";
-
-import { Showcase } from "./showcase";
 
 const DocCard = ({
   folder,
@@ -85,4 +91,9 @@ export const mdxComponents: MDXComponentsType = {
     />
   ),
   ...PreShikiComponent,
+  CacheFlowDiagram,
+  CacheLifeProfiles,
+  ContentTypesTable,
+  ErrorCard,
+  InvalidationCompare,
 };

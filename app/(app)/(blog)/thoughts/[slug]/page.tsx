@@ -4,7 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Icons } from "@/shared/components/icons";
-import { BreadcrumbJsonLd, BlogPostingJsonLd } from "@/shared/components/json-ld";
+import {
+  BreadcrumbJsonLd,
+  BlogPostingJsonLd,
+} from "@/shared/components/json-ld";
 import { Markdown } from "@/shared/components/markdown";
 import { SITE } from "@/shared/config/site";
 import { getCommentsBySlug } from "@/shared/lib/data";
@@ -83,6 +86,9 @@ export default async function ThoughtPostPage({ params }: Props) {
         <h1 className="text-[28px] font-medium leading-tight mb-3 text-balance">
           {thought.title}
         </h1>
+        <p className="text-[16px] text-muted-foreground mb-4">
+          {thought.description}
+        </p>
 
         {/* Meta row */}
         <div className="flex items-center gap-3 flex-wrap mb-4">

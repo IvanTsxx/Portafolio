@@ -1,0 +1,324 @@
+---
+title: "Cache Components en Next.js: Mejores prácticas"
+description: "Cómo escalar el sistema de caché en Next.js 16: centralizar tags y lifetimes en constantes, elegir el perfil correcto, invalidación granular y patrones avanzados con use cache: remote."
+keywords:
+  [
+    "Next.js",
+    "Cache Components",
+    "use cache best practices",
+    "cacheTag constants",
+    "cacheLife profiles",
+    "cache invalidation",
+    "revalidateTag",
+    "updateTag",
+    "use cache remote",
+    "Next.js 16 patterns",
+  ]
+date: "2026-04-13"
+published: true
+tags:
+  [
+    "Next.js",
+    "Cache Components",
+    "use cache",
+    "mejores prácticas",
+    "arquitectura",
+    "React Server Components",
+  ]
+series: "cache-components"
+seriesOrder: 3
+---
+
+## Práctica 1: centralizar tags y lifetimes
+
+El problema más frecuente en aplicaciones medianas y grandes es que los tags de caché y los perfiles de `cacheLife` terminan dispersos como strings mágicos en decenas de archivos. Cambiar el nombre de un tag implica un grep-and-replace en todo el repo. Un typo y la invalidación deja de funcionar silenciosamente.
+
+La solución es centralizar ambos en un archivo con `server-only`:
+
+```ts filename="lib/cache-constants.ts"
+import "server-only";
+
+// oxlint-disable sort-keys
+/**
+ * Cache tags para invalidación granular.
+ * Usar con cacheTag() dentro de funciones 'use cache'.
+ */
+export const CACHE_TAGS = {
+  // Posts
+  POSTS_LIST: "POSTS_LIST",
+  POST_BY_SLUG: (slug: string) => `POST-${slug}`,
+  FEATURED_POSTS: "FEATURED_POSTS",
+
+  // Users
+  USER_BY_ID: (userId: string) => `USER-${userId}`,
+  USER_PROFILE: (slug: string) => `USER_PROFILE-${slug}`,
+  USERS_LIST: "USERS_LIST",
+
+  // Home
+  HOME_DATA: "HOME_DATA",
+} as const;
+
+/**
+ * Cache lifetime profiles.
+ * Usar con cacheLife() dentro de funciones 'use cache'.
+ *
+ * Built-in profiles: 'minutes', 'hours', 'days', 'weeks', 'max'
+ */
+export const CACHE_LIFE = {
+  POSTS_LIST: "days",
+  POST_BY_SLUG: "days",
+  FEATURED_POSTS: "days",
+  USER_BY_ID: "days",
+  USER_PROFILE: "days",
+  USERS_LIST: "days",
+  HOME_DATA: "days",
+} as const;
+```
+
+El `import "server-only"` es importante: garantiza que este módulo nunca se importe en Client Components accidentalmente, evitando que datos sensibles o lógica de servidor lleguen al bundle del cliente.
+
+Luego en tus data functions:
+
+```ts filename="lib/data/posts.ts"
+import { cacheLife, cacheTag } from "next/cache";
+import { CACHE_TAGS, CACHE_LIFE } from "@/lib/cache-constants";
+
+export async function getPostBySlug(slug: string) {
+  "use cache";
+  cacheLife(CACHE_LIFE.POST_BY_SLUG);
+  cacheTag(CACHE_TAGS.POST_BY_SLUG(slug), CACHE_TAGS.POSTS_LIST);
+
+  return db.posts.findFirst({ where: { slug } });
+}
+
+export async function getFeaturedPosts() {
+  "use cache";
+  cacheLife(CACHE_LIFE.FEATURED_POSTS);
+  cacheTag(CACHE_TAGS.FEATURED_POSTS, CACHE_TAGS.POSTS_LIST);
+
+  return db.posts.findMany({ where: { featured: true }, take: 3 });
+}
+```
+
+Y en tus Server Actions:
+
+```ts filename="app/actions/posts.ts"
+"use server";
+
+import { revalidateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cache-constants";
+
+export async function deletePost(slug: string) {
+  await db.posts.delete({ where: { slug } });
+
+  // Invalida la entrada individual y la lista
+  revalidateTag(CACHE_TAGS.POST_BY_SLUG(slug));
+  revalidateTag(CACHE_TAGS.POSTS_LIST);
+  revalidateTag(CACHE_TAGS.FEATURED_POSTS); // Por si era featured
+}
+```
+
+Los beneficios son concretos: TypeScript autocompleta los nombres, el compilador te avisa si usás un tag que no existe, y tenés una vista centralizada de toda la estrategia de caché de la aplicación.
+
+---
+
+## Práctica 2: elegir el perfil correcto
+
+Los perfiles built-in de `cacheLife` cubren la mayoría de los casos. La tabla de abajo muestra sus valores y cuándo aplica cada uno:
+
+<CacheLifeProfiles />
+
+La regla general es matchear el perfil con la frecuencia real de cambio del dato, no con la frecuencia con la que querés que se actualice en la UI. Si un post se edita raramente, `'days'` está bien aunque preferirías ver los cambios al instante: podés siempre invalidad on-demand con `revalidateTag` cuando sí ocurre una edición.
+
+Para casos que no entran en ningún perfil, configurá uno custom en `next.config.ts`:
+
+```ts filename="next.config.ts"
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  cacheComponents: true,
+  cacheLife: {
+    // Para datos de sesión: corto pero no tan agresivo como 'minutes'
+    session: {
+      stale: 60, // 1 min
+      revalidate: 300, // 5 min
+      expire: 1800, // 30 min
+    },
+    // Para assets semi-estáticos: muy largo pero invalidable on-demand
+    semistatic: {
+      stale: 3600, // 1 hora
+      revalidate: 86400, // 1 día
+      expire: 604800, // 1 semana
+    },
+  },
+};
+
+export default nextConfig;
+```
+
+Y los usás igual que los built-in:
+
+```tsx
+cacheLife("session");
+cacheLife("semistatic");
+```
+
+---
+
+## Práctica 3: taggeado granular
+
+Un error común es usar tags demasiado amplios. Si todo lo que tiene que ver con posts usa el tag `"posts"`, cada vez que se crea, edita o borra cualquier post, invalidás el caché de todas las páginas de posts para todos los usuarios.
+
+El patrón correcto es tagear en capas: un tag genérico para la colección y un tag específico para cada entidad.
+
+```ts filename="lib/data/posts.ts"
+export async function getPostBySlug(slug: string) {
+  "use cache";
+  cacheLife(CACHE_LIFE.POST_BY_SLUG);
+  // Tag individual + tag de colección
+  cacheTag(CACHE_TAGS.POST_BY_SLUG(slug), CACHE_TAGS.POSTS_LIST);
+  return db.posts.findFirst({ where: { slug } });
+}
+
+export async function getPostsList() {
+  "use cache";
+  cacheLife(CACHE_LIFE.POSTS_LIST);
+  // Solo el tag de colección
+  cacheTag(CACHE_TAGS.POSTS_LIST);
+  return db.posts.findMany({ orderBy: { createdAt: "desc" } });
+}
+```
+
+Cuando editás un post específico:
+
+```ts
+// Solo invalida ese post, no la lista completa
+revalidateTag(CACHE_TAGS.POST_BY_SLUG(slug));
+```
+
+Cuando creás un post nuevo (que sí afecta a la lista):
+
+```ts
+// Invalida la lista pero no entradas individuales
+revalidateTag(CACHE_TAGS.POSTS_LIST);
+```
+
+Cuando borrás un post:
+
+```ts
+// Ambos: la entrada individual y la lista
+revalidateTag(CACHE_TAGS.POST_BY_SLUG(slug));
+revalidateTag(CACHE_TAGS.POSTS_LIST);
+```
+
+---
+
+## Práctica 4: `revalidateTag` vs `updateTag`
+
+La diferencia entre estas dos funciones no es obvia al principio, pero es importante para diseñar el comportamiento correcto:
+
+<InvalidationCompare />
+
+En la práctica, la mayoría de las invalidaciones deberían ser `revalidateTag`. La consistencia eventual es aceptable en casi todos los flujos CRUD. `updateTag` es para los casos donde el usuario está mirando la pantalla esperando ver el efecto inmediato de su acción.
+
+```ts filename="app/actions/post.ts"
+"use server";
+
+import { revalidateTag, updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cache-constants";
+
+// revalidateTag: el usuario creó un post, la lista se actualizará pronto
+export async function createPost(data: FormData) {
+  const post = await db.posts.create({ data: parsePostData(data) });
+  revalidateTag(CACHE_TAGS.POSTS_LIST);
+  return post;
+}
+
+// updateTag: el usuario acaba de editar su propio post y espera verlo actualizado
+export async function updatePost(slug: string, data: FormData) {
+  await db.posts.update({ where: { slug }, data: parsePostData(data) });
+  updateTag(CACHE_TAGS.POST_BY_SLUG(slug)); // El redirect lo llevará al post actualizado
+  revalidateTag(CACHE_TAGS.POSTS_LIST); // La lista puede esperar un request más
+}
+```
+
+---
+
+## Práctica 5: `use cache: remote` en entornos serverless
+
+El caché in-memory de `'use cache'` funciona perfecto en entornos con estado persistente (self-hosted, VMs). En serverless, cada request puede ejecutarse en una instancia distinta y el caché in-memory no se comparte.
+
+Si tu app corre en Vercel, Cloudflare Workers, o similar y necesitás que el caché persista entre instancias, usá `'use cache: remote'`:
+
+```tsx
+async function getGlobalStats() {
+  "use cache: remote";
+  cacheLife("hours");
+  cacheTag("global-stats");
+
+  return db.stats.aggregate({
+    _sum: { views: true },
+    _count: { posts: true },
+  });
+}
+```
+
+`'use cache: remote'` le indica a la plataforma que use un cache handler externo (Redis, KV, etc.). En Vercel se configura automáticamente. En hosting propio, configurás el handler en `next.config.ts`:
+
+```ts filename="next.config.ts"
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  cacheComponents: true,
+  cacheHandlers: {
+    remote: require.resolve("./cache-handler.ts"),
+  },
+};
+
+export default nextConfig;
+```
+
+El trade-off es que cada lectura de caché remoto implica una llamada de red. Para datos que ya son costosos de computar (queries complejas, APIs externas lentas), el overhead es irrelevante. Para datos muy livianos, el caché in-memory puede ser más rápido.
+
+---
+
+## Práctica 6: composition con `children`
+
+Un patrón que vale la pena conocer: podés pasar `children` a componentes cacheados y los children no van a afectar la cache key ni van a romper el caché.
+
+```tsx
+// El wrapper se cachea, los children son dinámicos
+async function CachedLayout({ children }: { children: React.ReactNode }) {
+  "use cache";
+  cacheLife("days");
+
+  const navItems = await db.navItems.findMany();
+
+  return (
+    <div>
+      <nav>
+        {navItems.map((item) => (
+          <a key={item.id} href={item.href}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+      {/* children se pasan through, no afectan el caché */}
+      <main>{children}</main>
+    </div>
+  );
+}
+
+// Página dinámica que usa el layout cacheado
+export default function Page() {
+  return (
+    <CachedLayout>
+      <Suspense fallback={<Skeleton />}>
+        <DynamicContent /> {/* dinámico, pero dentro del layout cacheado */}
+      </Suspense>
+    </CachedLayout>
+  );
+}
+```
+
+La condición es no leer ni modificar los `children` dentro del body de la función cacheada: solo pasarlos al JSX retornado.
