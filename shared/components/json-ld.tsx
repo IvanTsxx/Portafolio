@@ -19,7 +19,7 @@ export function OrganizationJsonLd() {
       data={{
         "@context": "https://schema.org",
         "@type": "Organization",
-        logo: `${SITE.url}/images/avatar.jpeg`,
+        logo: `${SITE.url}/images/avatar.webp`,
         name: SITE.name,
         sameAs: [SITE.github, SITE.twitter, SITE.linkedin],
         url: SITE.url,
@@ -79,7 +79,7 @@ export function BlogPostingJsonLd({
           "@type": "Organization",
           logo: {
             "@type": "ImageObject",
-            url: `${SITE.url}/images/avatar.jpeg`,
+            url: `${SITE.url}/images/avatar.webp`,
           },
           name: SITE.name,
         },

@@ -48,6 +48,14 @@ export const viewport: Viewport = {
   width: "device-width",
 };
 
+const preloadImages = [
+  { src: "/images/avatar.webp", type: "image/webp" },
+  { src: "/logos/aliva-shop.webp", type: "image/webp" },
+  { src: "/logos/basement.webp", type: "image/webp" },
+  { src: "/logos/doctor-qali.webp", type: "image/webp" },
+  { src: "/logos/tensolite.webp", type: "image/webp" },
+];
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -58,15 +66,17 @@ export default function RootLayout({
       lang="en"
       className={`${GeistPixelTriangle.variable}`}
       suppressHydrationWarning={true}
-      
     >
       {/* preload avatar imgage */}
-      <link
-        rel="preload"
-        href="/images/avatar.jpeg"
-        as="image"
-        type="image/jpeg"
-      />
+      {preloadImages.map((image) => (
+        <link
+          key={image.src}
+          rel="preload"
+          href={image.src}
+          as="image"
+          type={image.type}
+        />
+      ))}
 
       <body className="relative pixel-grid">
         <NuqsAdapter>

@@ -18,7 +18,7 @@ export const NavLogo = () => (
       className="flex items-center gap-x-2 text-sm tracking-tight hover:text-brand-green transition-colors duration-150"
     >
       <Image
-        src="/images/avatar.jpeg"
+        src="/images/avatar.webp"
         alt="Logo"
         width={20}
         height={20}

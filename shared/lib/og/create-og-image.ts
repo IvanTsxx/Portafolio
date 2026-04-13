@@ -31,7 +31,9 @@ export async function createOgImage(
   const candidates = ["avatar.webp", "avatar.jpeg", "avatar.jpg", "avatar.png"];
   for (const file of candidates) {
     try {
-      const buf = await readFile(path.join(process.cwd(), "public", file));
+      const buf = await readFile(
+        path.join(process.cwd(), "public/images", file)
+      );
       // oxlint-disable-next-line typescript/no-non-null-assertion
       const ext = file.split(".").pop()!;
       const mime =

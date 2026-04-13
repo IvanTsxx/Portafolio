@@ -8,7 +8,7 @@ export function Avatar() {
         <div className="absolute rounded-full blur-sm -inset-[2px] z-0" />
         <div className="relative z-10  h-16 w-16 lg:h-24 lg:w-24 p-[2px]">
           <Image
-            src="/images/avatar.jpeg"
+            src="/images/avatar.webp"
             alt="Iván Bongiovanni"
             width={100}
             height={100}

@@ -20,11 +20,12 @@ export function Hero() {
             <section className="w-full md:w-auto">
               <section className="flex w-full md:w-auto flex-row items-center justify-between">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Skeleton className="h-5 rounded-full w-5" /> Visitors
+                  <Skeleton className="h-5 rounded-full w-10" /> Visitors
                 </div>
 
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  You are visitor #<Skeleton className="h-5 rounded-full w-5" />
+                  You are visitor #
+                  <Skeleton className="h-5 rounded-full w-10" />
                 </div>
               </section>
             </section>
