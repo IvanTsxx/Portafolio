@@ -1,30 +1,30 @@
 "use client";
 
 export interface CacheFlowDiagramProps {
-  title?: string;
-  ariaLabel?: string;
-  staleDesc?: string;
-  revalidatingDesc?: string;
-  expiredDesc?: string;
-  arrowText?: string;
-  legendStale?: string;
-  legendRevalidate?: string;
-  legendExpire?: string;
+  title: string;
+  ariaLabel: string;
+  staleDesc: string;
+  revalidatingDesc: string;
+  expiredDesc: string;
+  arrowText: string;
+  legendStale: string;
+  legendRevalidate: string;
+  legendExpire: string;
 }
 
 export function CacheFlowDiagram({
-  title = "Ciclo de vida de una entrada de caché",
-  ariaLabel = "Diagrama del ciclo de vida de caché: First render → Stale → Revalidating → Expired",
-  staleDesc = "sirve desde caché",
-  revalidatingDesc = "background fetch, sirve stale",
-  expiredDesc = "re-genera bloqueado",
-  arrowText = "nuevo valor listo → actualiza caché",
-  legendStale = "stale — se sirve el valor cacheado",
-  legendRevalidate = "revalidate — fetch en background, el cliente no espera",
-  legendExpire = "expire — próximo request espera el nuevo valor",
-}: CacheFlowDiagramProps = {}) {
+  title,
+  ariaLabel,
+  staleDesc,
+  revalidatingDesc,
+  expiredDesc,
+  arrowText,
+  legendStale,
+  legendRevalidate,
+  legendExpire,
+}: CacheFlowDiagramProps) {
   return (
-    <div className="my-6 overflow-x-auto rounded-lg border border-border bg-secondary/10 p-6">
+    <div className="my-6 overflow-x-auto rounded-lg border border-border bg-background p-6">
       <p className="text-[11px] uppercase tracking-widest text-muted-foreground/60 font-medium mb-4">
         {title}
       </p>

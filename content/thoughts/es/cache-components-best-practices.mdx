@@ -126,7 +126,7 @@ Los beneficios son concretos: TypeScript autocompleta los nombres, el compilador
 
 Los perfiles built-in de `cacheLife` cubren la mayoría de los casos. La tabla de abajo muestra sus valores y cuándo aplica cada uno:
 
-<CacheLifeProfiles />
+<CacheLifeProfiles locale="es" />
 
 La regla general es matchear el perfil con la frecuencia real de cambio del dato, no con la frecuencia con la que querés que se actualice en la UI. Si un post se edita raramente, `'days'` está bien aunque preferirías ver los cambios al instante: podés siempre invalidad on-demand con `revalidateTag` cuando sí ocurre una edición.
 
@@ -217,7 +217,7 @@ revalidateTag(CACHE_TAGS.POSTS_LIST);
 
 La diferencia entre estas dos funciones no es obvia al principio, pero es importante para diseñar el comportamiento correcto:
 
-<InvalidationCompare />
+<InvalidationCompare locale="es" />
 
 En la práctica, la mayoría de las invalidaciones deberían ser `revalidateTag`. La consistencia eventual es aceptable en casi todos los flujos CRUD. `updateTag` es para los casos donde el usuario está mirando la pantalla esperando ver el efecto inmediato de su acción.
 

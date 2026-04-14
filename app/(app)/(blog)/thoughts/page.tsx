@@ -45,13 +45,12 @@ export default async function ThoughtsPage() {
         ]}
       />
       {/* Page header */}
-      <div className="mb-8">
+      <header className="bg-background border-t border-border px-2 py-1 mb-4">
         <h1 className="text-2xl font-medium tracking-tight">Thoughts</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Writing about Next.js, architecture, and building things on the web.
         </p>
-        <div className="border-b border-border mt-4" />
-      </div>
+      </header>
 
       {/* Client filter + list */}
       <Suspense fallback={<Spinner />}>

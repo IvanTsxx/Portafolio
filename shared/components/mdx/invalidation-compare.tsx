@@ -1,54 +1,99 @@
 import { cn } from "@/shared/lib/utils";
 
+type Locale = "en" | "es";
+
 interface Method {
   name: string;
   import: string;
   timing: string;
   behavior: string;
   consistency: "eventual" | "strong";
-  consistencyLabel?: string;
   useWhen: string[];
   color: "green" | "blue";
 }
 
-export interface InvalidationCompareProps {
-  methods?: Method[];
-  consistencyLabel?: string;
-  strongConsistencyText?: string;
-  eventualConsistencyText?: string;
-  useWhenLabel?: string;
+interface LocaleData {
+  consistencyLabel: string;
+  strongConsistencyText: string;
+  eventualConsistencyText: string;
+  useWhenLabel: string;
+  methods: Method[];
 }
 
-const defaultMethods: Method[] = [
-  {
-    behavior:
-      "Marca la entrada como stale. El siguiente request que llegue después lanza un fetch en background y sirve el valor anterior mientras tanto.",
-    color: "green",
-    consistency: "eventual",
-    import: "import { revalidateTag } from 'next/cache'",
-    name: "revalidateTag()",
-    timing: "Background",
-    useWhen: [
-      "Creás o actualizás un recurso y está bien que el usuario vea la versión anterior por un request más",
-      "Operaciones de alta frecuencia donde el bloqueo sería costoso",
-      "La mayoría de los casos",
+const localeData: Record<Locale, LocaleData> = {
+  en: {
+    consistencyLabel: "Consistency:",
+    eventualConsistencyText: "eventual",
+    methods: [
+      {
+        behavior:
+          "Marks the entry as stale. The next request triggers a background fetch and serves the previous value meanwhile.",
+        color: "green",
+        consistency: "eventual",
+        import: "import { revalidateTag } from 'next/cache'",
+        name: "revalidateTag()",
+        timing: "Background",
+        useWhen: [
+          "You create or update a resource and it's fine for the user to see the previous version for one more request",
+          "High-frequency operations where blocking would be expensive",
+          "Most common cases",
+        ],
+      },
+      {
+        behavior:
+          "Invalidates the cache entry synchronously. The same request (and all following) will see the new value. No inconsistency window.",
+        color: "blue",
+        consistency: "strong",
+        import: "import { updateTag } from 'next/cache'",
+        name: "updateTag()",
+        timing: "Immediate",
+        useWhen: [
+          "The user just modified data and needs to see the result immediately",
+          "Flows where showing the previous value would be a critical UX error",
+          "Critical operations: delete, publish, status changes",
+        ],
+      },
     ],
+    strongConsistencyText: "strong",
+    useWhenLabel: "Use it when...",
   },
-  {
-    behavior:
-      "Invalida la entrada de caché de forma síncrona. El mismo request (y todos los siguientes) ya verán el nuevo valor. No hay ventana de inconsistencia.",
-    color: "blue",
-    consistency: "strong",
-    import: "import { updateTag } from 'next/cache'",
-    name: "updateTag()",
-    timing: "Inmediato",
-    useWhen: [
-      "El usuario acaba de modificar un dato y debe ver el resultado de inmediato",
-      "Flujos donde mostrar el valor anterior sería un error de UX grave",
-      "Operaciones críticas: delete, publish, status changes",
+  es: {
+    consistencyLabel: "Consistencia:",
+    eventualConsistencyText: "eventual",
+    methods: [
+      {
+        behavior:
+          "Marca la entrada como stale. El siguiente request que llegue después lanza un fetch en background y sirve el valor anterior mientras tanto.",
+        color: "green",
+        consistency: "eventual",
+        import: "import { revalidateTag } from 'next/cache'",
+        name: "revalidateTag()",
+        timing: "Background",
+        useWhen: [
+          "Creás o actualizás un recurso y está bien que el usuario vea la versión anterior por un request más",
+          "Operaciones de alta frecuencia donde el bloqueo sería costoso",
+          "La mayoría de los casos",
+        ],
+      },
+      {
+        behavior:
+          "Invalida la entrada de caché de forma síncrona. El mismo request (y todos los siguientes) ya verán el nuevo valor. No hay ventana de inconsistencia.",
+        color: "blue",
+        consistency: "strong",
+        import: "import { updateTag } from 'next/cache'",
+        name: "updateTag()",
+        timing: "Inmediato",
+        useWhen: [
+          "El usuario acaba de modificar un dato y debe ver el resultado de inmediato",
+          "Flujos donde mostrar el valor anterior sería un error de UX grave",
+          "Operaciones críticas: delete, publish, status changes",
+        ],
+      },
     ],
+    strongConsistencyText: "fuerte",
+    useWhenLabel: "Usalo cuando...",
   },
-];
+};
 
 const colorConfig = {
   blue: {
@@ -67,13 +112,18 @@ const colorConfig = {
   },
 };
 
-export function InvalidationCompare({
-  methods = defaultMethods,
-  consistencyLabel = "Consistencia:",
-  strongConsistencyText = "fuerte",
-  eventualConsistencyText = "eventual",
-  useWhenLabel = "Usalo cuando...",
-}: InvalidationCompareProps = {}) {
+export interface InvalidationCompareProps {
+  locale: Locale;
+}
+
+export function InvalidationCompare({ locale }: InvalidationCompareProps) {
+  const {
+    methods,
+    consistencyLabel,
+    strongConsistencyText,
+    eventualConsistencyText,
+    useWhenLabel,
+  } = localeData[locale];
   return (
     <div className="my-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
       {methods.map((method) => {

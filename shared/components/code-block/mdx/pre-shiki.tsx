@@ -26,7 +26,7 @@ const PreShikiComponent: MDXComponents = {
 
     return (
       <CodeBlock>
-        <CodeBlockHeader>
+        <CodeBlockHeader className="bg-background">
           <CodeBlockGroup>
             <CodeBlockIcon language={language} />
             <span>{title ?? (language ? `.${language}` : "code")}</span>

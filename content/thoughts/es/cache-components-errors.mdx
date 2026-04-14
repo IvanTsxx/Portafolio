@@ -36,6 +36,8 @@ seriesOrder: 2
   cause="cookies(), headers() y searchParams son APIs de runtime: su valor depende del request que llega, no existe en build time ni en el momento en que se crea la entrada de caché. Acceder a ellas dentro de 'use cache' rompe la promesa de que la función produce el mismo resultado para los mismos inputs."
   fix="Leer el valor fuera del scope cacheado y pasarlo como argumento. El argumento pasa a ser parte automática de la cache key, así que diferentes valores generan diferentes entradas."
   tip="Si tenés un caso de compliance donde no podés refactorizar (por ejemplo, necesitás acceder a cookies dentro de una librería de terceros que no controlás), existe 'use cache: private' que sí permite runtime APIs. Usalo como último recurso."
+  causeLabel="Causa"
+  fixLabel="Solución"
 />
 
 ```tsx
@@ -83,6 +85,8 @@ async function ComplianceComponent() {
   errorMessage="Error: Arguments to cached functions must be serializable. Class instances, functions, and Symbols are not supported."
   cause="La cache key se construye serializando los argumentos. Los tipos que no se pueden serializar (instancias de clase, funciones, Symbols, WeakMaps) no tienen una representación estable que pueda usarse como key ni transmitirse entre el servidor y el cliente."
   fix="Pasá solo primitivos o plain objects como argumentos. Si necesitás datos de un objeto complejo, extraé solo el ID o los valores escalares y hacé el fetch adentro de la función cacheada."
+  causeLabel="Causa"
+  fixLabel="Solución"
 />
 
 ```tsx
@@ -135,6 +139,8 @@ async function EventCard({ dateString }: { dateString: string }) {
   cause="Las funciones con 'use cache' se ejecutan una sola vez para producir la entrada de caché. Cualquier llamada a Math.random(), Date.now(), o crypto.randomUUID() dentro de ese scope se ejecuta en el primer render y el resultado queda congelado en la entrada cacheada. Todos los requests siguientes ven el mismo valor."
   fix="Mover el valor no determinístico fuera del scope cacheado. Si necesitás que el valor sea distinto en cada request, generarlo en un componente dinámico y pasarlo como argumento a la función cacheada."
   tip="Usá import { connection } from 'next/server' y await connection() para forzar que un componente se ejecute en request-time y no en build time. Es la forma semántica de decir 'esto es dinámico'."
+  causeLabel="Causa"
+  fixLabel="Solución"
 />
 
 ```tsx
@@ -173,6 +179,8 @@ async function Banner({ requestId }: { requestId: string }) {
   errorMessage="Error: A component accessed a runtime API (cookies, headers, searchParams) but is not wrapped in a Suspense boundary. With cacheComponents enabled, dynamic components must be inside Suspense."
   cause="Con cacheComponents: true, Next.js construye el static shell en build time. Si un componente accede a cookies(), headers() o searchParams sin estar en Suspense, no hay forma de incluirlo en el shell estático ni de streamear después. El build falla."
   fix="Envolver todos los componentes que accedan a runtime APIs en <Suspense> con un fallback adecuado. El shell se sirve estático y el componente dinámico streamea cuando el servidor lo resuelve."
+  causeLabel="Causa"
+  fixLabel="Solución"
 />
 
 ```tsx
@@ -224,6 +232,8 @@ function CartSkeleton() {
   errorMessage="Comportamiento inesperado: un valor guardado en React.cache() afuera no es visible adentro de 'use cache'."
   cause="React.cache opera con scope aislado dentro de cada boundary de 'use cache'. Los valores almacenados via React.cache() en el componente padre no son visibles dentro de una función 'use cache'. Cada scope tiene su propio store de React.cache."
   fix="Pasar los datos como argumentos de función en lugar de usar React.cache como canal de comunicación entre scopes. React.cache sigue siendo útil para deduplicar requests dentro del mismo scope, no para compartir datos entre scopes."
+  causeLabel="Causa"
+  fixLabel="Solución"
 />
 
 ```tsx
@@ -268,6 +278,8 @@ async function Child({ userId }: { userId: string }) {
   errorMessage="Error: All exports from a file with 'use cache' at the top level must be async functions."
   cause="Cuando ponés 'use cache' al principio del archivo, le estás diciendo a Next.js que todos los exports son funciones cacheables. Las funciones cacheables deben ser async porque el resultado se guarda de forma asíncrona."
   fix="Mover las funciones utilitarias síncronas a otro archivo, o cambiar la directiva de nivel de archivo a nivel de función para las que necesitás cachear específicamente."
+  causeLabel="Causa"
+  fixLabel="Solución"
 />
 
 ```tsx

@@ -34,7 +34,7 @@ export function RegistryCard({ entry, basePath }: RegistryCardProps) {
         <Link
           prefetch={false}
           href={`${basePath}/${name}`}
-          className="inline-flex items-center gap-1   text-[12px] text-muted-foreground hover:text-foreground transition-colors self-end"
+          className="inline-flex items-center gap-1   text-[12px] text-muted-foreground hover:text-brand-green transition-colors self-end"
         >
           View <ArrowRight className="size-3" />
         </Link>

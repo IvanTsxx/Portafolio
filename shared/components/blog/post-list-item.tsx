@@ -35,6 +35,7 @@ export function PostListItem({ thought, index }: PostListItemProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       transition={{ delay: index * 0.04, duration: 0.18 }}
+      className="bg-background dark:bg-transparent"
     >
       <Link
         prefetch={false}

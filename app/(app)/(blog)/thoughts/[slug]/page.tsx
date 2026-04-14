@@ -90,57 +90,59 @@ export default async function ThoughtPostPage({ params, searchParams }: Props) {
             { name: thought.title, url: `${SITE.url}/thoughts/${slug}` },
           ]}
         />
-        {/* Back link */}
-        <Link
-          prefetch={false}
-          href="/thoughts"
-          className="text-[12px] text-muted-foreground hover:text-brand-green transition-colors duration-150 mb-8 inline-block"
-        >
-          ← Thoughts
-        </Link>
 
-        {/* Language switcher - above title */}
-        <div className="mb-4">
-          <LanguageSwitcherWrapper
-            currentLang={thought.lang}
-            availableLangs={thought.availableLangs}
-            slug={slug}
-          />
-        </div>
+        <header className="bg-background border-t border-border px-2 py-1 mb-4">
+          <Link
+            prefetch={false}
+            href="/thoughts"
+            className="text-[12px] text-muted-foreground hover:text-brand-green transition-colors duration-150 mb-8 inline-block"
+          >
+            ← Thoughts
+          </Link>
 
-        {/* Post header */}
-        <header className="grid grid-cols-1 gap-2">
-          <h1 className="text-[28px] font-medium leading-tight mb-3 text-balance">
-            {thought.title}
-          </h1>
-          <p className="text-[16px] text-muted-foreground mb-4">
-            {thought.description}
-          </p>
-
-          {/* Meta row */}
-          <div className="flex items-center gap-3 flex-wrap mb-4">
-            <span className="text-[12px] text-muted-foreground">
-              {formatDate(thought.date, "MMM dd, yyyy")}
-            </span>
-            <span className="text-muted-foreground text-[12px]">·</span>
-            <span className="text-[12px] text-muted-foreground">
-              {thought.readingTime} min read
-            </span>
-            {thought.tags.map((tag) => (
-              <Link
-                prefetch={false}
-                key={tag}
-                href={`/thoughts?tag=${tag}`}
-                className="text-[11px] border border-border px-1.5 py-0.5 text-muted-foreground hover:border-brand-green hover:text-brand-green transition-colors duration-150"
-              >
-                {tag}
-              </Link>
-            ))}
+          {/* Language switcher - above title */}
+          <div className="mb-4">
+            <LanguageSwitcherWrapper
+              currentLang={thought.lang}
+              availableLangs={thought.availableLangs}
+              slug={slug}
+            />
           </div>
 
-          <Reactions slug={slug} />
+          {/* Post header */}
+          <header className="grid grid-cols-1 gap-2">
+            <h1 className="text-2xl font-medium tracking-tight">
+              {thought.title}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {thought.description}
+            </p>
 
-          <hr className="border-border mt-4 pb-2" />
+            {/* Meta row */}
+            <div className="flex items-center gap-3 flex-wrap mb-4">
+              <span className="text-[12px] text-muted-foreground">
+                {formatDate(thought.date, "MMM dd, yyyy")}
+              </span>
+              <span className="text-muted-foreground text-[12px]">·</span>
+              <span className="text-[12px] text-muted-foreground">
+                {thought.readingTime} min read
+              </span>
+              {thought.tags.map((tag) => (
+                <Link
+                  prefetch={false}
+                  key={tag}
+                  href={`/thoughts?tag=${tag}`}
+                  className="text-[11px] border border-border px-1.5 py-0.5 text-muted-foreground hover:border-brand-green hover:text-brand-green transition-colors duration-150"
+                >
+                  {tag}
+                </Link>
+              ))}
+            </div>
+
+            <Reactions slug={slug} />
+
+            <hr className="border-border mt-4 pb-2" />
+          </header>
         </header>
 
         {/* MDX content */}

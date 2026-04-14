@@ -49,7 +49,7 @@ export function ThoughtsFilter({ thoughts, allTags }: ThoughtsFilterProps) {
       {/* Tag pills */}
       {allTags.length > 0 && (
         <div
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap gap-2 bg-background"
           role="group"
           aria-label="Filter by tag"
         >
@@ -63,7 +63,7 @@ export function ThoughtsFilter({ thoughts, allTags }: ThoughtsFilterProps) {
                   "  text-[11px] px-2 py-1 border transition-colors duration-150 leading-none",
                   isActive
                     ? "border-brand-green text-brand-green"
-                    : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
+                    : "border-border text-muted-foreground hover:border-foreground hover:text-brand-green"
                 )}
                 aria-pressed={isActive}
               >

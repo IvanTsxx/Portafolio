@@ -143,7 +143,7 @@ function CommentItem({
                 "flex items-center gap-1 text-[12px] px-1.5 py-0.5 rounded transition-colors",
                 totalReactions > 0
                   ? "bg-secondary text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-brand-green"
               )}
             >
               {totalReactions > 0 && (
@@ -199,7 +199,7 @@ function CommentItem({
           <button
             type="button"
             onClick={() => onReply(comment.id)}
-            className="text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+            className="text-[12px] text-muted-foreground hover:text-brand-green transition-colors"
           >
             Reply
           </button>
@@ -296,7 +296,7 @@ function ReplyForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-3 py-1 text-[12px] text-muted-foreground hover:text-foreground"
+          className="px-3 py-1 text-[12px] text-muted-foreground hover:text-brand-green"
         >
           Cancel
         </button>

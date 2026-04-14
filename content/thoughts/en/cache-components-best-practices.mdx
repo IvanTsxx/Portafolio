@@ -126,53 +126,7 @@ The benefits are concrete: TypeScript autocompletes names, the compiler warns if
 
 Built-in `cacheLife` profiles cover most cases. The table below shows their values and when each applies:
 
-<CacheLifeProfiles
-  columns={["Profile", "stale", "revalidate", "expire", "When to use"]}
-  profiles={[
-    {
-      expire: "Never",
-      name: "default",
-      revalidate: "15 min",
-      stale: "5 min",
-      useCase: "General use when you don't specify anything",
-    },
-    {
-      expire: "15 min",
-      name: "minutes",
-      revalidate: "5 min",
-      stale: "1 min",
-      useCase: "Frequently changing data",
-    },
-    {
-      expire: "4 hours",
-      name: "hours",
-      revalidate: "1 hour",
-      stale: "5 min",
-      useCase: "Stats, metrics, feeds",
-    },
-    {
-      expire: "3 days",
-      name: "days",
-      revalidate: "1 day",
-      stale: "5 min",
-      useCase: "Posts, products, content pages",
-    },
-    {
-      expire: "1 month",
-      name: "weeks",
-      revalidate: "1 week",
-      stale: "5 min",
-      useCase: "Sponsors, rarely modified data",
-    },
-    {
-      expire: "1 year",
-      name: "max",
-      revalidate: "1 year",
-      stale: "30 days",
-      useCase: "Static assets, immutable data",
-    },
-  ]}
-/>
+<CacheLifeProfiles locale="en" />
 
 The general rule is to match the profile to the real change frequency of the data, not how often you want it to update in the UI. If a post is rarely edited, `'days'` is fine even if you would prefer to see updates instantly: you can always invalidate on-demand with `revalidateTag` when an edit actually happens.
 
@@ -263,42 +217,7 @@ revalidateTag(CACHE_TAGS.POSTS_LIST);
 
 The difference between these two functions is not obvious at first, but it is important to design correct behavior:
 
-<InvalidationCompare
-  consistencyLabel="Consistency:"
-  strongConsistencyText="strong"
-  eventualConsistencyText="eventual"
-  useWhenLabel="Use it when..."
-  methods={[
-    {
-      behavior:
-        "Marks the entry as stale. The next request triggers a background fetch and serves the previous value meanwhile.",
-      color: "green",
-      consistency: "eventual",
-      import: "import { revalidateTag } from 'next/cache'",
-      name: "revalidateTag()",
-      timing: "Background",
-      useWhen: [
-        "You create or update a resource and it's fine for the user to see the previous version for one more request",
-        "High-frequency operations where blocking would be expensive",
-        "Most common cases",
-      ],
-    },
-    {
-      behavior:
-        "Invalidates the cache entry synchronously. The same request (and all following) will see the new value. No inconsistency window.",
-      color: "blue",
-      consistency: "strong",
-      import: "import { updateTag } from 'next/cache'",
-      name: "updateTag()",
-      timing: "Immediate",
-      useWhen: [
-        "The user just modified data and needs to see the result immediately",
-        "Flows where showing the previous value would be a critical UX error",
-        "Critical operations: delete, publish, status changes",
-      ],
-    },
-  ]}
-/>
+<InvalidationCompare locale="en" />
 
 In practice, most invalidations should be `revalidateTag`. Eventual consistency is acceptable in almost all CRUD flows. `updateTag` is for cases where the user is looking at the screen expecting to immediately see the effect of their action.
 

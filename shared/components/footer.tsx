@@ -60,7 +60,7 @@ export function Footer() {
               href={link.href}
               target="_blank"
               rel="noopener"
-              className="underline underline-offset-4 hover:text-foreground"
+              className="underline underline-offset-4 hover:text-brand-green"
             >
               {link.label}
               {index !== inspiredByLinks.length - 1 && " / "}
@@ -74,7 +74,7 @@ export function Footer() {
             href="https://github.com/IvanTsxx"
             target="_blank"
             rel="noopener"
-            className="font-medium underline underline-offset-4 hover:text-foreground"
+            className="font-medium underline underline-offset-4 hover:text-brand-green"
           >
             Ivan Bongiovanni
           </Link>
@@ -83,7 +83,7 @@ export function Footer() {
             href="https://github.com/ivantsxx/portafolio"
             target="_blank"
             rel="noopener"
-            className="font-medium underline underline-offset-4 hover:text-foreground"
+            className="font-medium underline underline-offset-4 hover:text-brand-green"
           >
             GitHub
           </Link>

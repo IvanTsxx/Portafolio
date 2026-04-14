@@ -164,7 +164,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
                 onClick={() => setIsOpen(false)}
                 className={cn(
                   "py-2 px-3 text-sm rounded-md transition-colors text-left",
-                  "hover:bg-secondary hover:text-foreground",
+                  "hover:bg-secondary hover:text-brand-green",
                   activeId === heading.id
                     ? "bg-brand-green/10 text-brand-green"
                     : "text-muted-foreground"

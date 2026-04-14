@@ -33,7 +33,7 @@ export const DesktopNavbar = () => {
                 "text-xs transition-colors duration-150",
                 isActive
                   ? "text-brand-green"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-brand-green"
               )}
               aria-current={isActive ? "page" : undefined}
             >

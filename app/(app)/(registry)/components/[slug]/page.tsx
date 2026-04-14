@@ -53,7 +53,7 @@ export default async function ComponentPage({ params }: Props) {
   const mdxContent = await getMdxComponent(entry.name);
 
   return (
-    <section className="py-10 bg-background px-1">
+    <section className="py-10 px-6">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: SITE.url },
@@ -61,25 +61,27 @@ export default async function ComponentPage({ params }: Props) {
           { name: entry.title, url: `${SITE.url}/components/${slug}` },
         ]}
       />
-      {/* Back */}
-      <Link
-        prefetch={false}
-        href="/components"
-        className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-foreground transition-colors mb-8"
-      >
-        <ArrowLeft className="size-3" />
-        Components
-      </Link>
+      <header className="bg-background border-t border-border px-2 py-1">
+        {/* Back */}
+        <Link
+          prefetch={false}
+          href="/components"
+          className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-brand-green transition-colors"
+        >
+          <ArrowLeft className="size-3" />
+          Components
+        </Link>
 
-      {/* Header */}
-      <div className="mb-8 border-t border-border pt-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {entry.title}
-        </h1>
-        <p className="mt-1 text-[13px] text-muted-foreground">
-          {entry.description}
-        </p>
-      </div>
+        {/* Header */}
+        <div className="grid grid-cols-1 gap-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            {entry.title}
+          </h1>
+          <p className="text-[13px] text-muted-foreground">
+            {entry.description}
+          </p>
+        </div>
+      </header>
 
       <article className="my-12 prose w-full max-w-full prose-neutral dark:prose-invert">
         <Markdown content={mdxContent} />

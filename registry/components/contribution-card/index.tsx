@@ -37,7 +37,7 @@ export default function ContributionCard({
         <span className="text-[13px] font-medium text-foreground transition-colors group-hover:text-brand-green truncate">
           {contribution.title}
         </span>
-        <span className="transition-colors group-hover:brightness-100 group-hover:text-foreground  text-[11px] text-muted-foreground">
+        <span className="transition-colors group-hover:brightness-100 group-hover:text-brand-green  text-[11px] text-muted-foreground">
           {contribution.repository}
         </span>
       </div>

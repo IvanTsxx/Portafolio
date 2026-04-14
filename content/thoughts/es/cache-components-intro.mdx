@@ -55,7 +55,7 @@ Eso es todo lo que necesitás a nivel de configuración para empezar. El flag re
 
 Con `cacheComponents: true`, cada ruta puede mezclar tres tipos de contenido. La granularidad es por componente o función, no por ruta completa.
 
-<ContentTypesTable />
+<ContentTypesTable locale="es" />
 
 La clave está en que podés tener los tres tipos en la misma página. El shell estático se sirve instantáneo desde el CDN, el contenido cacheado aparece casi de inmediato, y el dinámico streamea al cliente.
 
@@ -184,7 +184,17 @@ Cada entrada de caché tiene tres parámetros de tiempo que determinan su compor
 - **`revalidate`** — pasado el `stale`, el servidor lanza un fetch en background y actualiza la entrada. El cliente sigue viendo el valor anterior hasta que el nuevo esté listo
 - **`expire`** — expiración hard. El próximo request después de este tiempo bloquea hasta que haya un valor nuevo
 
-<CacheFlowDiagram />
+<CacheFlowDiagram
+  title="Ciclo de vida de una entrada de caché"
+  ariaLabel="Diagrama del ciclo de vida de caché: First render → Stale → Revalidating → Expired"
+  staleDesc="sirve desde caché"
+  revalidatingDesc="background fetch, sirve stale"
+  expiredDesc="re-genera bloqueado"
+  arrowText="nuevo valor listo → actualiza caché"
+  legendStale="stale — se sirve el valor cacheado"
+  legendRevalidate="revalidate — fetch en background, el cliente no espera"
+  legendExpire="expire — próximo request espera el nuevo valor"
+/>
 
 Por defecto (sin especificar nada), se usa el perfil `'default'`: 5 minutos de stale y 15 minutos de revalidate. En el siguiente post vemos todos los perfiles disponibles y cómo configurar tiempos custom.
 

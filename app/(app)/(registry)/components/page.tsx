@@ -40,9 +40,9 @@ export default async function ComponentsPage() {
         ]}
       />
       {/* Page header */}
-      <div className="mb-10 border-t bg-background border-border pt-4">
-        <div className="flex flex-col items-start gap-3 w-full">
-          <div>
+      <header className="mb-10 border-t bg-background border-border pt-4">
+        <section className="flex flex-col items-start gap-3 w-full">
+          <section>
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               Components ({components.length})
             </h1>
@@ -50,14 +50,14 @@ export default async function ComponentsPage() {
               Reusable components built for the modern web. Install via shadcn
               CLI.
             </p>
-          </div>
+          </section>
           <div className="flex w-full items-center gap-2">
             <ShadcnInstallCommandFlip
               names={components.map((component) => `${component.name}.json`)}
             />
           </div>
-        </div>
-      </div>
+        </section>
+      </header>
 
       {components.length === 0 ? (
         <p className="text-[13px] text-muted-foreground">No components yet.</p>

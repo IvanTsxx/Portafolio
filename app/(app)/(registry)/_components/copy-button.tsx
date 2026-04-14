@@ -25,7 +25,7 @@ export function CopyButton({ value, className }: CopyButtonProps) {
       aria-label={copied ? "Copied" : "Copy to clipboard"}
       className={cn(
         "inline-flex items-center justify-center size-6 text-muted-foreground",
-        "hover:text-foreground transition-colors shrink-0",
+        "hover:text-brand-green transition-colors shrink-0",
         className
       )}
     >

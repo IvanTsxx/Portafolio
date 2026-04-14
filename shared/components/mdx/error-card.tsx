@@ -6,8 +6,8 @@ export interface ErrorCardProps {
   cause: string;
   fix: string;
   tip?: string;
-  causeLabel?: string;
-  fixLabel?: string;
+  causeLabel: string;
+  fixLabel: string;
 }
 
 export function ErrorCard({
@@ -16,8 +16,8 @@ export function ErrorCard({
   cause,
   fix,
   tip,
-  causeLabel = "Causa",
-  fixLabel = "Solución",
+  causeLabel,
+  fixLabel,
 }: ErrorCardProps) {
   return (
     <div className="my-6 rounded-lg border border-red-500/20 bg-red-500/5 overflow-hidden">

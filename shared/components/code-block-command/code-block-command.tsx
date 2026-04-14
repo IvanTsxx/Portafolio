@@ -165,12 +165,12 @@ export function CodeBlockCommand({
         </div>
 
         {tabsFiltered.map(([key, value]) => (
-          <TabsContent key={key} value={key}>
+          <TabsContent key={key} value={key} className="bg-background">
             <pre className="overflow-x-auto overscroll-x-contain p-4">
               <code
                 data-slot="code-block"
                 data-language="bash"
-                className="font-mono text-sm leading-none text-muted-foreground"
+                className="text-sm leading-none"
               >
                 {key !== "prompt" && <span className="select-none">$ </span>}
                 {value}

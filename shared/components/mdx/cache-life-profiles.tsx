@@ -1,5 +1,7 @@
 import { cn } from "@/shared/lib/utils";
 
+type Locale = "en" | "es";
+
 interface Profile {
   name: string;
   stale: string;
@@ -8,73 +10,119 @@ interface Profile {
   useCase: string;
 }
 
-export interface CacheLifeProfilesProps {
-  columns?: string[];
-  profiles?: Profile[];
+interface LocaleData {
+  columns: string[];
+  profiles: Profile[];
 }
 
-const defaultProfiles: Profile[] = [
-  {
-    expire: "Nunca",
-    name: "default",
-    revalidate: "15 min",
-    stale: "5 min",
-    useCase: "Uso general cuando no especificás nada",
+const localeData: Record<Locale, LocaleData> = {
+  en: {
+    columns: ["Profile", "stale", "revalidate", "expire", "When to use"],
+    profiles: [
+      {
+        expire: "Never",
+        name: "default",
+        revalidate: "15 min",
+        stale: "5 min",
+        useCase: "General use when you don't specify anything",
+      },
+      {
+        expire: "15 min",
+        name: "minutes",
+        revalidate: "5 min",
+        stale: "1 min",
+        useCase: "Frequently changing data",
+      },
+      {
+        expire: "4 hours",
+        name: "hours",
+        revalidate: "1 hour",
+        stale: "5 min",
+        useCase: "Stats, metrics, feeds",
+      },
+      {
+        expire: "3 days",
+        name: "days",
+        revalidate: "1 day",
+        stale: "5 min",
+        useCase: "Posts, products, content pages",
+      },
+      {
+        expire: "1 month",
+        name: "weeks",
+        revalidate: "1 week",
+        stale: "5 min",
+        useCase: "Sponsors, rarely modified data",
+      },
+      {
+        expire: "1 year",
+        name: "max",
+        revalidate: "1 year",
+        stale: "30 days",
+        useCase: "Static assets, immutable data",
+      },
+    ],
   },
-  {
-    expire: "15 min",
-    name: "minutes",
-    revalidate: "5 min",
-    stale: "1 min",
-    useCase: "Datos que cambian frecuentemente",
+  es: {
+    columns: ["Perfil", "stale", "revalidate", "expire", "Cuándo usar"],
+    profiles: [
+      {
+        expire: "Nunca",
+        name: "default",
+        revalidate: "15 min",
+        stale: "5 min",
+        useCase: "Uso general cuando no especificas nada",
+      },
+      {
+        expire: "15 min",
+        name: "minutes",
+        revalidate: "5 min",
+        stale: "1 min",
+        useCase: "Datos que cambian con frecuencia",
+      },
+      {
+        expire: "4 horas",
+        name: "hours",
+        revalidate: "1 hora",
+        stale: "5 min",
+        useCase: "Estadísticas, métricas, feeds",
+      },
+      {
+        expire: "3 días",
+        name: "days",
+        revalidate: "1 día",
+        stale: "5 min",
+        useCase: "Posts, productos, páginas de contenido",
+      },
+      {
+        expire: "1 mes",
+        name: "weeks",
+        revalidate: "1 semana",
+        stale: "5 min",
+        useCase: "Sponsors, datos que rara vez cambian",
+      },
+      {
+        expire: "1 año",
+        name: "max",
+        revalidate: "1 año",
+        stale: "30 días",
+        useCase: "Assets estáticos, datos inmutables",
+      },
+    ],
   },
-  {
-    expire: "4 horas",
-    name: "hours",
-    revalidate: "1 hora",
-    stale: "5 min",
-    useCase: "Stats, métricas, feeds",
-  },
-  {
-    expire: "3 días",
-    name: "days",
-    revalidate: "1 día",
-    stale: "5 min",
-    useCase: "Posts, productos, páginas de contenido",
-  },
-  {
-    expire: "1 mes",
-    name: "weeks",
-    revalidate: "1 semana",
-    stale: "5 min",
-    useCase: "Sponsors, datos raramente modificados",
-  },
-  {
-    expire: "1 año",
-    name: "max",
-    revalidate: "1 año",
-    stale: "30 días",
-    useCase: "Assets estáticos, datos inmutables",
-  },
-];
+};
 
-const defaultColumns = [
-  "Perfil",
-  "stale",
-  "revalidate",
-  "expire",
-  "Cuándo usarlo",
-];
+export interface CacheLifeProfilesProps {
+  locale: Locale;
+}
 
-export function CacheLifeProfiles({
-  columns = defaultColumns,
-  profiles = defaultProfiles,
-}: CacheLifeProfilesProps = {}) {
+export function CacheLifeProfiles({ locale }: CacheLifeProfilesProps) {
+  const { columns, profiles } = localeData[locale];
   return (
-    <div className="my-6 overflow-x-auto rounded-lg border border-border">
+    <div className="my-6 overflow-x-auto bg-background rounded-lg border border-border">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border bg-secondary/30">
+          <tr className="border-b border-border">
             {columns.map((col) => (
               <th
                 key={col}
