@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 import InlineCode from "@/shared/components/code-block/blocks/inline-code";
@@ -40,7 +39,7 @@ export function RegistryPreview({
   }, []);
 
   return (
-    <motion.div className="w-full">
+    <div className="w-full">
       <Tabs className="w-full" defaultValue="preview">
         {/* Header */}
         <TabsList className="flex w-full items-center justify-between">
@@ -56,25 +55,21 @@ export function RegistryPreview({
             className={cn(
               "w-full border-t",
               type === "component"
-                ? "flex justify-center p-6"
+                ? "flex min-w-full justify-center p-6"
                 : "overflow-auto max-h-[600px]"
             )}
           >
-            <motion.iframe
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
+            <iframe
               ref={iframeRef}
               src={previewUrl}
               title={`Preview of ${componentName}`}
               style={{
                 height: iframeHeight,
-                maxWidth: type === "component" ? "fit-content" : "100%",
+                maxWidth: type === "component" ? "100%" : "100%",
               }}
               className={cn(
                 "block",
-                type === "component" ? "w-auto min-w-[200px]" : "w-full mx-auto"
+                type === "component" ? "w-screen" : "w-full mx-auto"
               )}
             />
           </div>
@@ -85,6 +80,6 @@ export function RegistryPreview({
           <InlineCode code={source} language="tsx" />
         </TabsContent>
       </Tabs>
-    </motion.div>
+    </div>
   );
 }

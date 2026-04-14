@@ -20,6 +20,25 @@
       ],
       "type": "registry:component",
       "author": "ivantsx"
+    },
+    {
+      "name": "load-more-items-wrapper",
+      "title": "Load More Items Wrapper",
+      "description": "load-more-items-wrapper component.",
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/load-more-items-wrapper.tsx",
+          "type": "registry:component",
+          "target": ""
+        }
+      ],
+      "type": "registry:component",
+      "author": "ivantsx"
     }
   ],
   "name": "ivantsx"

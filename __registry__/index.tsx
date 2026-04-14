@@ -24,4 +24,21 @@ export const Index: Record<string, any> = {
     categories: [],
     meta: {},
   },
+  "load-more-items-wrapper": {
+    name: "load-more-items-wrapper",
+    description: "load-more-items-wrapper component.",
+    type: "registry:component",
+    files: [{
+      path: "registry/components/load-more-items-wrapper.tsx",
+      type: "registry:component",
+      target: "",
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/components/load-more-items-wrapper.tsx")
+      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "load-more-items-wrapper"
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: [],
+    meta: {},
+  },
 }

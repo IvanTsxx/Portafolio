@@ -23,7 +23,7 @@ export interface ProcessedContribution {
   kind: "pr" | "issue";
 }
 
-const contribution: ProcessedContribution = {
+const contributionExample: ProcessedContribution = {
   date:"2022-01-01",
   description: "feat: add contribution card",
   kind:"pr",
@@ -37,8 +37,10 @@ const contribution: ProcessedContribution = {
 
 export default function ContributionCard({
   index,
+  contribution=contributionExample,
 }: {
   index: number;
+  contribution: ProcessedContribution;
 }) {
   return (
     <motion.div

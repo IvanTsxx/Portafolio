@@ -27,7 +27,6 @@
     ".claude/**",
     "__registry__/**",
     "public/r**",
-    "registry/**",
     "env/*",
   ],
 }
