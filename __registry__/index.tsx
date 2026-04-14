@@ -12,12 +12,20 @@ export const Index: Record<string, any> = {
     description: "contribution-card component.",
     type: "registry:component",
     files: [{
-      path: "registry/components/contribution-card.tsx",
+      path: "registry/components/contribution-card/example.ts",
       type: "registry:component",
-      target: "",
+      target: "components/contribution-card/example.ts",
+    },{
+      path: "registry/components/contribution-card/index.tsx",
+      type: "registry:component",
+      target: "components/contribution-card/index.tsx",
+    },{
+      path: "registry/components/contribution-card/types.ts",
+      type: "registry:component",
+      target: "components/contribution-card/types.ts",
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/components/contribution-card.tsx")
+      const mod = await import("@/registry/components/contribution-card/index.tsx")
       const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "contribution-card"
       return { default: mod.default || mod[exportName] }
     }),
@@ -29,12 +37,16 @@ export const Index: Record<string, any> = {
     description: "load-more-items-wrapper component.",
     type: "registry:component",
     files: [{
-      path: "registry/components/load-more-items-wrapper.tsx",
+      path: "registry/components/load-more-items-wrapper/example.tsx",
       type: "registry:component",
-      target: "",
+      target: "components/load-more-items-wrapper/example.tsx",
+    },{
+      path: "registry/components/load-more-items-wrapper/index.tsx",
+      type: "registry:component",
+      target: "components/load-more-items-wrapper/index.tsx",
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/components/load-more-items-wrapper.tsx")
+      const mod = await import("@/registry/components/load-more-items-wrapper/example.tsx")
       const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "load-more-items-wrapper"
       return { default: mod.default || mod[exportName] }
     }),

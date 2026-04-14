@@ -6,7 +6,11 @@ import { notFound } from "next/navigation";
 import { BreadcrumbJsonLd } from "@/shared/components/json-ld";
 import { Markdown } from "@/shared/components/markdown";
 import { SITE } from "@/shared/config/site";
-import { getComponent, getComponents } from "@/shared/lib/registry";
+import {
+  getComponent,
+  getComponents,
+  getMdxComponent,
+} from "@/shared/lib/registry";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -46,6 +50,8 @@ export default async function ComponentPage({ params }: Props) {
   const entry = getComponent(slug);
   if (!entry) notFound();
 
+  const mdxContent = await getMdxComponent(entry.name);
+
   return (
     <section className="py-10 bg-background px-1">
       <BreadcrumbJsonLd
@@ -76,7 +82,7 @@ export default async function ComponentPage({ params }: Props) {
       </div>
 
       <article className="my-12 prose w-full max-w-full prose-neutral dark:prose-invert">
-        <Markdown content={entry.content} />
+        <Markdown content={mdxContent} />
       </article>
 
       {/* Dependencies components (Can be placed at the bottom or inside MDX, keeping here for now just in case) */}

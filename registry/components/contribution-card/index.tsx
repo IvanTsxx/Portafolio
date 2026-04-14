@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
 import { ExternalLink, GitPullRequest } from "lucide-react";
+import { motion } from "motion/react";
 import type { Route } from "next";
 import Link from "next/link";
 
@@ -11,33 +11,12 @@ import {
   TooltipContent,
 } from "@/shared/components/ui/tooltip";
 
-
-export interface ProcessedContribution {
-  title: string;
-  description: string;
-  repository: string;
-  link: string;
-  date: string;
-  type: "feature" | "fix" | "perf" | "docs" | "refactor" | "test" | "chore";
-  state: "open" | "closed" | "merged";
-  kind: "pr" | "issue";
-}
-
-const contributionExample: ProcessedContribution = {
-  date:"2022-01-01",
-  description: "feat: add contribution card",
-  kind:"pr",
-  link:"https://github.com/ivantsxx/portafolio",
-  repository:"ivantsxx/portafolio",
-  state:"open",
-  title: "feat: add contribution card",
-  type:"feature",
-}
-
+import { contributionExample } from "./example";
+import type { ProcessedContribution } from "./types";
 
 export default function ContributionCard({
   index,
-  contribution=contributionExample,
+  contribution = contributionExample,
 }: {
   index: number;
   contribution: ProcessedContribution;

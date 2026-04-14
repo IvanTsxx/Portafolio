@@ -223,6 +223,77 @@ async function scanFlatDirectory(
   return items;
 }
 
+/**
+ * Scan components directory (handles both flat files and nested directories)
+ */
+async function scanComponentsDirectory(): Promise<Registry["items"]> {
+  const items: Registry["items"] = [];
+  const targetDir = path.join(REGISTRY_DIR, "components");
+
+  if (!(await fs.stat(targetDir).catch(() => false))) {
+    return items;
+  }
+
+  const entries = await fs.readdir(targetDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.name.startsWith("_")) continue;
+
+    if (entry.isDirectory()) {
+      const itemDir = path.join(targetDir, entry.name);
+      const itemFiles = await fs.readdir(itemDir);
+      const hasIndex = itemFiles.includes("index.tsx") || itemFiles.includes("index.ts");
+      if (!hasIndex) continue;
+
+      const mainFile = itemFiles.includes("index.tsx") ? "index.tsx" : "index.ts";
+      const content = await fs.readFile(path.join(itemDir, mainFile), "utf-8");
+      const dependencies = extractDependencies(content);
+
+      const files: Registry["items"][number]["files"] = [];
+      
+      for (const cf of itemFiles) {
+        if (!cf.endsWith(".ts") && !cf.endsWith(".tsx")) continue;
+        
+        files.push({
+          path: `components/${entry.name}/${cf}`,
+          target: `components/${entry.name}/${cf}`,
+          type: "registry:component",
+        });
+      }
+
+      items.push({
+        dependencies: [...dependencies].toSorted(),
+        description: `${entry.name} component.`,
+        files,
+        name: entry.name,
+        registryDependencies: [],
+        title: entry.name.split("-").map((n) => n.charAt(0).toUpperCase() + n.slice(1)).join(" "),
+        type: "registry:component",
+      } as Registry["items"][number]);
+
+    } else {
+      if (!entry.name.endsWith(".tsx") && !entry.name.endsWith(".ts")) continue;
+      if (entry.name === "index.ts" || entry.name === "index.tsx") continue;
+
+      const name = entry.name.replace(/\.tsx?$/, "");
+      const content = await fs.readFile(path.join(targetDir, entry.name), "utf-8");
+      const dependencies = extractDependencies(content);
+      
+      items.push({
+        dependencies: [...dependencies].toSorted(),
+        description: `${name} component.`,
+        files: [{ path: `components/${entry.name}`, target: "", type: "registry:component" }],
+        name,
+        registryDependencies: [],
+        title: name.split("-").map((n) => n.charAt(0).toUpperCase() + n.slice(1)).join(" "),
+        type: "registry:component",
+      } as Registry["items"][number]);
+    }
+  }
+  
+  return items;
+}
+
 export async function buildRegistry(registry: Registry) {
   let index = `/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -239,7 +310,17 @@ export const Index: Record<string, any> = {`;
       continue;
     }
 
-    const componentFilePath = item.files[0].path;
+    const mainFile =
+      item.files.find((f) => f.path.endsWith("example.tsx")) ||
+      item.files.find((f) => f.path.endsWith("index.tsx")) ||
+      item.files.find((f) => f.path.endsWith("page.tsx")) ||
+      item.files[0];
+
+    const componentFilePath = mainFile.path;
+    // We already added 'registry/' to the file path below, but in the index generation
+    // the item.files still have the prefix without 'registry/' if it wasn't mutated yet?
+    // Wait, let's just make sure we strip 'registry/' if it's there or just use it.
+    // In buildRegistry, file.path is like "components/contribution-card/example.ts" 
     const componentPath = `@/registry/${componentFilePath}`;
 
     index += `
@@ -319,7 +400,7 @@ try {
   ] = await Promise.all([
     scanNestedDirectory("blocks", "registry:block"),
     scanNestedDirectory("app", "registry:page"),
-    scanFlatDirectory("components", "registry:component"),
+    scanComponentsDirectory(),
     scanFlatDirectory("hooks", "registry:hook"),
     scanFlatDirectory("lib", "registry:lib"),
     scanFlatDirectory("utils", "registry:lib"),

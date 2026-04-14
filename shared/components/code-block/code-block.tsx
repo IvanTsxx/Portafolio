@@ -83,7 +83,7 @@ const CodeBlockContent = ({
 }: ComponentProps<"div">) => (
   <div
     className={cn(
-      "max-h-96 overflow-y-auto",
+      "max-h-full overflow-y-scroll",
       "bg-white dark:bg-neutral-900",
       "rounded-lg font-mono text-sm leading-5 whitespace-pre",
       className

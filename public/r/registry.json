@@ -13,9 +13,19 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "registry/components/contribution-card.tsx",
+          "path": "registry/components/contribution-card/example.ts",
           "type": "registry:component",
-          "target": ""
+          "target": "components/contribution-card/example.ts"
+        },
+        {
+          "path": "registry/components/contribution-card/index.tsx",
+          "type": "registry:component",
+          "target": "components/contribution-card/index.tsx"
+        },
+        {
+          "path": "registry/components/contribution-card/types.ts",
+          "type": "registry:component",
+          "target": "components/contribution-card/types.ts"
         }
       ],
       "type": "registry:component",
@@ -26,15 +36,19 @@
       "title": "Load More Items Wrapper",
       "description": "load-more-items-wrapper component.",
       "dependencies": [
-        "lucide-react",
         "motion"
       ],
       "registryDependencies": [],
       "files": [
         {
-          "path": "registry/components/load-more-items-wrapper.tsx",
+          "path": "registry/components/load-more-items-wrapper/example.tsx",
           "type": "registry:component",
-          "target": ""
+          "target": "components/load-more-items-wrapper/example.tsx"
+        },
+        {
+          "path": "registry/components/load-more-items-wrapper/index.tsx",
+          "type": "registry:component",
+          "target": "components/load-more-items-wrapper/index.tsx"
         }
       ],
       "type": "registry:component",
