@@ -311,6 +311,12 @@ async function scanComponentsDirectory(): Promise<Registry["items"]> {
   return items;
 }
 
+const mapFiles = (files: Registry["items"][number]["files"]) =>
+  files?.map(({ content: _content, ...file }) => ({
+    ...file,
+    path: `registry/${file.path}`,
+  })) ?? [];
+
 export async function buildRegistry(registry: Registry) {
   let index = `/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -372,11 +378,7 @@ export const Index: Record<string, any> = {`;
       items: registry.items.map((item) => ({
         ...item,
         author: item.author ?? "ivantsx",
-        files:
-          item.files?.map((file) => ({
-            ...file,
-            path: `registry/${file.path}`,
-          })) ?? [],
+        files: mapFiles(item.files ?? []),
       })),
       name: "ivantsx",
     },
@@ -393,6 +395,25 @@ export const Index: Record<string, any> = {`;
     registryJSON,
     "utf-8"
   );
+
+  // public/r/<name>.json — individual item files (no content field)
+  for (const item of registry.items) {
+    const itemJSON = JSON.stringify(
+      {
+        $schema: "https://ui.shadcn.com/schema/registry-item.json",
+        ...item,
+        author: item.author ?? "ivantsx",
+        files: mapFiles(item.files ?? []),
+      },
+      null,
+      2
+    );
+    await fs.writeFile(
+      path.join(PUBLIC_REGISTRY_PATH, `${item.name}.json`),
+      itemJSON,
+      "utf-8"
+    );
+  }
 
   // __registry__/index.tsx
   await fs.mkdir(REGISTRY_PATH, { recursive: true });

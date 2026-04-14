@@ -16,7 +16,7 @@
     "db:migrate": "bun x prisma migrate dev",
     "db:studio": "bun x prisma studio",
     "db:reset": "bun x prisma migrate reset --force",
-    "registry:build": "bun run ./scripts/build-registry.mts && shadcn build ./public/r/registry.json",
+    "registry:build": "bun run ./scripts/build-registry.mts",
     "postinstall": "prisma generate",
     "deploy": "vercel build --prod && vercel deploy --prebuilt --prod"
   },
