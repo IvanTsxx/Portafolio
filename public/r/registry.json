@@ -3,6 +3,29 @@
   "homepage": "https://bongi.dev",
   "items": [
     {
+      "name": "command-menu",
+      "title": "Command Menu",
+      "description": "command-menu component.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/command-menu/example.tsx",
+          "type": "registry:component",
+          "target": ""
+        },
+        {
+          "path": "registry/components/command-menu/index.tsx",
+          "type": "registry:component",
+          "target": ""
+        }
+      ],
+      "type": "registry:component",
+      "author": "ivantsx"
+    },
+    {
       "name": "contribution-card",
       "title": "Contribution Card",
       "description": "contribution-card component.",
@@ -47,6 +70,30 @@
         },
         {
           "path": "registry/components/load-more-items-wrapper/index.tsx",
+          "type": "registry:component",
+          "target": ""
+        }
+      ],
+      "type": "registry:component",
+      "author": "ivantsx"
+    },
+    {
+      "name": "tag-input",
+      "title": "Tag Input",
+      "description": "tag-input component.",
+      "dependencies": [
+        "lucide-react",
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/tag-input/example.tsx",
+          "type": "registry:component",
+          "target": ""
+        },
+        {
+          "path": "registry/components/tag-input/index.tsx",
           "type": "registry:component",
           "target": ""
         }

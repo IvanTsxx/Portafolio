@@ -1,0 +1,219 @@
+---
+title: Command Menu
+description: An animated command palette dialog with grouped actions, keyboard shortcuts, search, and external links. Composes shadcn's Command and Dialog with motion animations.
+featured: true
+component: true
+---
+
+## Installation
+
+<Tabs defaultValue="cli">
+
+<TabsList>
+  <TabsTrigger value="cli">Command</TabsTrigger>
+  <TabsTrigger value="manual">Manual</TabsTrigger>
+</TabsList>
+<TabsContent value="cli">
+
+<ShadcnInstallCommand name="command-menu" />
+
+</TabsContent>
+
+<TabsContent value="manual">
+
+<div className="mb-0 pt-2 flex flex-col gap-4">
+
+**1. Install the following dependencies:**
+
+<InstallCommand command="npm install motion" />
+
+**2. Ensure you have the command and dialog components installed:**
+
+<InstallCommand command="npx shadcn@latest add command dialog" />
+
+**3. Copy and paste the following code into your project.**
+
+```tsx
+"use client";
+
+import { AnimatePresence } from "motion/react";
+import { useCallback, useEffect, useState } from "react";
+
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandShortcut,
+} from "@/components/ui/command";
+
+import { cn } from "@/lib/utils";
+
+export interface CommandMenuItem {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+  shortcut?: string;
+  href?: string;
+  onSelect?: () => void;
+  disabled?: boolean;
+}
+
+export interface CommandMenuGroup {
+  heading: string;
+  items: CommandMenuItem[];
+}
+
+export interface CommandMenuProps {
+  groups: CommandMenuGroup[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  placeholder?: string;
+  emptyMessage?: string;
+  className?: string;
+}
+
+export function CommandMenu({
+  groups,
+  open,
+  onOpenChange,
+  placeholder = "Type a command or search...",
+  emptyMessage = "No results found.",
+  className,
+}: CommandMenuProps) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const flatItems = groups.flatMap((g) => g.items);
+
+  const handleSelect = useCallback(
+    (item: CommandMenuItem) => {
+      if (item.disabled) return;
+      item.onSelect?.();
+      if (item.href) {
+        window.open(item.href, "_blank", "noopener,noreferrer");
+      }
+      onOpenChange(false);
+    },
+    [onOpenChange]
+  );
+
+  useEffect(() => {
+    if (open && flatItems.length > 0) {
+      setActiveId(flatItems[0].id);
+    }
+  }, [open, flatItems]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <CommandDialog
+          open={open}
+          onOpenChange={onOpenChange}
+          title="Command Palette"
+          description="Search for a command or navigate to a page."
+          showCloseButton={false}
+          className={cn("top-[20%] -translate-y-0", className)}
+        >
+          <Command className="[&_[cmdk-input]]:h-9">
+            <CommandInput placeholder={placeholder} />
+            <CommandList>
+              <CommandEmpty>{emptyMessage}</CommandEmpty>
+              {groups.map((group) => (
+                <CommandGroup key={group.heading} heading={group.heading}>
+                  {group.items.map((item) => (
+                    <CommandItem
+                      key={item.id}
+                      value={item.label}
+                      disabled={item.disabled}
+                      onSelect={() => handleSelect(item)}
+                      className={cn(
+                        activeId === item.id && "bg-muted text-foreground"
+                      )}
+                    >
+                      {item.icon && (
+                        <span className="shrink-0">{item.icon}</span>
+                      )}
+                      <span className="flex-1 truncate">{item.label}</span>
+                      {item.shortcut && (
+                        <CommandShortcut>{item.shortcut}</CommandShortcut>
+                      )}
+                      {item.href && (
+                        <svg
+                          className="size-3 shrink-0 text-muted-foreground"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                          <polyline points="15 3 21 3 21 9" />
+                          <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                      )}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ))}
+            </CommandList>
+          </Command>
+        </CommandDialog>
+      )}
+    </AnimatePresence>
+  );
+}
+```
+
+**4. Update the import paths to match your project setup.**
+
+</div>
+
+</TabsContent>
+
+</Tabs>
+
+## Usage
+
+**1. Import the component:**
+
+```tsx
+import { CommandMenu } from "@/components/command-menu";
+import type { CommandMenuGroup } from "@/components/command-menu";
+```
+
+**2. Define your groups and manage open state:**
+
+```tsx
+const groups: CommandMenuGroup[] = [
+  {
+    heading: "Navigation",
+    items: [
+      { id: "home", label: "Home", shortcut: "⌘H" },
+      { id: "blog", label: "Blog", shortcut: "⌘B" },
+    ],
+  },
+  {
+    heading: "External",
+    items: [{ id: "github", label: "GitHub", href: "https://github.com" }],
+  },
+];
+
+const [open, setOpen] = useState(false);
+```
+
+**3. Render with a trigger:**
+
+```tsx
+<button onClick={() => setOpen(true)}>Open menu (⌘K)</button>
+<CommandMenu groups={groups} open={open} onOpenChange={setOpen} />
+```
+
+<ArchitectureNote title="RSC Architecture">
+  This component requires `"use client"` because it uses `useState`,
+  `useEffect`, and `useCallback`. The `CommandMenu` itself orchestrates the
+  open/close state and renders `CommandDialog` from shadcn, which handles
+  keyboard navigation and accessibility. The `groups` data can be defined in
+  Server Components and passed as props.
+</ArchitectureNote>

@@ -7,6 +7,27 @@
 import * as React from "react"
 
 export const Index: Record<string, any> = {
+  "command-menu": {
+    name: "command-menu",
+    description: "command-menu component.",
+    type: "registry:component",
+    files: [{
+      path: "registry/components/command-menu/example.tsx",
+      type: "registry:component",
+      target: "",
+    },{
+      path: "registry/components/command-menu/index.tsx",
+      type: "registry:component",
+      target: "",
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/components/command-menu/example.tsx")
+      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "command-menu"
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: [],
+    meta: {},
+  },
   "contribution-card": {
     name: "contribution-card",
     description: "contribution-card component.",
@@ -48,6 +69,27 @@ export const Index: Record<string, any> = {
     component: React.lazy(async () => {
       const mod = await import("@/registry/components/load-more-items-wrapper/example.tsx")
       const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "load-more-items-wrapper"
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: [],
+    meta: {},
+  },
+  "tag-input": {
+    name: "tag-input",
+    description: "tag-input component.",
+    type: "registry:component",
+    files: [{
+      path: "registry/components/tag-input/example.tsx",
+      type: "registry:component",
+      target: "",
+    },{
+      path: "registry/components/tag-input/index.tsx",
+      type: "registry:component",
+      target: "",
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/components/tag-input/example.tsx")
+      const exportName = Object.keys(mod).find((key) => typeof mod[key] === "function" || typeof mod[key] === "object") || "tag-input"
       return { default: mod.default || mod[exportName] }
     }),
     categories: [],
