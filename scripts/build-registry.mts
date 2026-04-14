@@ -242,18 +242,21 @@ async function scanComponentsDirectory(): Promise<Registry["items"]> {
     if (entry.isDirectory()) {
       const itemDir = path.join(targetDir, entry.name);
       const itemFiles = await fs.readdir(itemDir);
-      const hasIndex = itemFiles.includes("index.tsx") || itemFiles.includes("index.ts");
+      const hasIndex =
+        itemFiles.includes("index.tsx") || itemFiles.includes("index.ts");
       if (!hasIndex) continue;
 
-      const mainFile = itemFiles.includes("index.tsx") ? "index.tsx" : "index.ts";
+      const mainFile = itemFiles.includes("index.tsx")
+        ? "index.tsx"
+        : "index.ts";
       const content = await fs.readFile(path.join(itemDir, mainFile), "utf-8");
       const dependencies = extractDependencies(content);
 
       const files: Registry["items"][number]["files"] = [];
-      
+
       for (const cf of itemFiles) {
         if (!cf.endsWith(".ts") && !cf.endsWith(".tsx")) continue;
-        
+
         files.push({
           path: `components/${entry.name}/${cf}`,
           target: `components/${entry.name}/${cf}`,
@@ -267,30 +270,44 @@ async function scanComponentsDirectory(): Promise<Registry["items"]> {
         files,
         name: entry.name,
         registryDependencies: [],
-        title: entry.name.split("-").map((n) => n.charAt(0).toUpperCase() + n.slice(1)).join(" "),
+        title: entry.name
+          .split("-")
+          .map((n) => n.charAt(0).toUpperCase() + n.slice(1))
+          .join(" "),
         type: "registry:component",
       } as Registry["items"][number]);
-
     } else {
       if (!entry.name.endsWith(".tsx") && !entry.name.endsWith(".ts")) continue;
       if (entry.name === "index.ts" || entry.name === "index.tsx") continue;
 
       const name = entry.name.replace(/\.tsx?$/, "");
-      const content = await fs.readFile(path.join(targetDir, entry.name), "utf-8");
+      const content = await fs.readFile(
+        path.join(targetDir, entry.name),
+        "utf-8"
+      );
       const dependencies = extractDependencies(content);
-      
+
       items.push({
         dependencies: [...dependencies].toSorted(),
         description: `${name} component.`,
-        files: [{ path: `components/${entry.name}`, target: "", type: "registry:component" }],
+        files: [
+          {
+            path: `components/${entry.name}`,
+            target: "",
+            type: "registry:component",
+          },
+        ],
         name,
         registryDependencies: [],
-        title: name.split("-").map((n) => n.charAt(0).toUpperCase() + n.slice(1)).join(" "),
+        title: name
+          .split("-")
+          .map((n) => n.charAt(0).toUpperCase() + n.slice(1))
+          .join(" "),
         type: "registry:component",
       } as Registry["items"][number]);
     }
   }
-  
+
   return items;
 }
 
@@ -320,7 +337,7 @@ export const Index: Record<string, any> = {`;
     // We already added 'registry/' to the file path below, but in the index generation
     // the item.files still have the prefix without 'registry/' if it wasn't mutated yet?
     // Wait, let's just make sure we strip 'registry/' if it's there or just use it.
-    // In buildRegistry, file.path is like "components/contribution-card/example.ts" 
+    // In buildRegistry, file.path is like "components/contribution-card/example.ts"
     const componentPath = `@/registry/${componentFilePath}`;
 
     index += `

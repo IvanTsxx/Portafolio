@@ -5,14 +5,13 @@ import * as React from "react";
 import { RegistryPreview } from "@/app/(app)/(registry)/_components/registry-preview";
 import { PreShikiComponent } from "@/shared/components/code-block/mdx/pre-shiki";
 import { InstallCommand } from "@/shared/components/install-command";
-import {
-  CacheFlowDiagram,
-  CacheLifeProfiles,
-  ContentTypesTable,
-  ErrorCard,
-  InvalidationCompare,
-  Showcase,
-} from "@/shared/components/mdx";
+import { ArchitectureNote } from "@/shared/components/mdx/architecture-note";
+import { CacheFlowDiagram } from "@/shared/components/mdx/cache-flow-diagram";
+import { CacheLifeProfiles } from "@/shared/components/mdx/cache-life-profiles";
+import { ContentTypesTable } from "@/shared/components/mdx/content-types-table";
+import { ErrorCard } from "@/shared/components/mdx/error-card";
+import { InvalidationCompare } from "@/shared/components/mdx/invalidation-compare";
+import { Showcase } from "@/shared/components/mdx/showcase";
 import { ShadcnInstallCommand } from "@/shared/components/shadcn-install-command";
 import {
   Tabs,
@@ -66,8 +65,14 @@ const DocCard = ({
 );
 
 export const mdxComponents: MDXComponentsType = {
+  ArchitectureNote,
+  CacheFlowDiagram,
+  CacheLifeProfiles,
+  ContentTypesTable,
   DocCard,
+  ErrorCard,
   InstallCommand,
+  InvalidationCompare,
   RegistryPreview,
   ShadcnInstallCommand,
   Showcase,
@@ -91,9 +96,4 @@ export const mdxComponents: MDXComponentsType = {
     />
   ),
   ...PreShikiComponent,
-  CacheFlowDiagram,
-  CacheLifeProfiles,
-  ContentTypesTable,
-  ErrorCard,
-  InvalidationCompare,
 };

@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Skeleton } from "@/shared/components/ui/skeleton";
+
 import { Icons } from "@/shared/components/icons";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 export default function Loading() {
   return (

@@ -170,3 +170,10 @@ export function LoadMoreItemsWrapperDemo() {
   );
 }
 ```
+
+<ArchitectureNote title="RSC Architecture">
+  This component leverages **React Server Components (RSC)** to the maximum. By
+  passing elements as `children`, the wrapped items remain Server Components and
+  are not serialized into the client bundle. Only the wrapper itself runs on the
+  client, maintaining optimal performance and minimal JavaScript payload.
+</ArchitectureNote>

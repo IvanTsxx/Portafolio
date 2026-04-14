@@ -9,13 +9,13 @@ import { cn } from "@/shared/lib/utils";
 import type { Thought } from "@/shared/types/thought";
 
 const LANG_FLAGS: Record<string, string> = {
+  de: "🇩🇪",
   en: "🇺🇸",
   es: "🇪🇸",
-  pt: "🇧🇷",
   fr: "🇫🇷",
-  de: "🇩🇪",
   it: "🇮🇹",
   ja: "🇯🇵",
+  pt: "🇧🇷",
   zh: "🇨🇳",
 };
 
@@ -28,7 +28,7 @@ export function PostListItem({ thought, index }: PostListItemProps) {
   // Show language badge always (at least the current lang)
   const langsToShow = thought.availableLangs?.length
     ? thought.availableLangs
-    : [thought.lang].filter(Boolean);  
+    : [thought.lang].filter(Boolean);
   return (
     <motion.div
       initial={{ opacity: 0, y: 6 }}

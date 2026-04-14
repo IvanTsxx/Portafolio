@@ -15,7 +15,8 @@ export function ReadingProgress() {
       const articleHeight = rect.height;
       const scrolled = window.scrollY - articleTop;
       const totalScrollable = articleHeight - window.innerHeight + 100;
-      const scrolledPercent = totalScrollable > 0 ? (scrolled / totalScrollable) * 100 : 0;
+      const scrolledPercent =
+        totalScrollable > 0 ? (scrolled / totalScrollable) * 100 : 0;
 
       setProgress(Math.min(100, Math.max(0, scrolledPercent)));
     };

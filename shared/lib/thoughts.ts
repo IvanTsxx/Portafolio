@@ -164,8 +164,7 @@ export async function getAllThoughts(): Promise<Thought[]> {
   // For each slug, load the default lang version
   for (const [slug, group] of slugGroups) {
     // Find the default lang version, fallback to first available
-    const targetFile =
-      group.find((f) => f.lang === defaultLang) || group[0];
+    const targetFile = group.find((f) => f.lang === defaultLang) || group[0];
 
     const raw = fs.readFileSync(targetFile.filePath, "utf-8");
     const { data, content } = matter(raw);

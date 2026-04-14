@@ -9,8 +9,8 @@ export function rehypeHeadingId() {
         const text = hastToString(node).trim();
         const id = text
           .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, "")
-          .replace(/\s+/g, "-");
+          .replaceAll(/[^a-z0-9\s-]/g, "")
+          .replaceAll(/\s+/g, "-");
 
         node.properties.id = id;
       }

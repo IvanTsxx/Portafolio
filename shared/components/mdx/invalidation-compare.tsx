@@ -130,7 +130,9 @@ export function InvalidationCompare({
                     : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
                 )}
               >
-                {method.consistency === "strong" ? strongConsistencyText : eventualConsistencyText}
+                {method.consistency === "strong"
+                  ? strongConsistencyText
+                  : eventualConsistencyText}
               </span>
             </div>
 

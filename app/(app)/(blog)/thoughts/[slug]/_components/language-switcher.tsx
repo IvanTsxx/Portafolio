@@ -1,8 +1,8 @@
 "use client";
 
+import { ChevronDown, Languages } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, useRef, useEffect } from "react";
-import { ChevronDown, Languages } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 
@@ -85,7 +85,9 @@ export function LanguageSwitcher({
         aria-expanded={isOpen}
       >
         <Languages size={14} className="text-muted-foreground" />
-        <span>{currentFlag} {currentLabel}</span>
+        <span>
+          {currentFlag} {currentLabel}
+        </span>
         <ChevronDown
           size={14}
           className={cn(

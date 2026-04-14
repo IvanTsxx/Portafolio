@@ -58,7 +58,13 @@ const defaultProfiles: Profile[] = [
   },
 ];
 
-const defaultColumns = ["Perfil", "stale", "revalidate", "expire", "Cuándo usarlo"];
+const defaultColumns = [
+  "Perfil",
+  "stale",
+  "revalidate",
+  "expire",
+  "Cuándo usarlo",
+];
 
 export function CacheLifeProfiles({
   columns = defaultColumns,
