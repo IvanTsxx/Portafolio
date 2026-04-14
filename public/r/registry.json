@@ -15,17 +15,17 @@
         {
           "path": "registry/components/contribution-card/example.ts",
           "type": "registry:component",
-          "target": "components/contribution-card/example.ts"
+          "target": ""
         },
         {
           "path": "registry/components/contribution-card/index.tsx",
           "type": "registry:component",
-          "target": "components/contribution-card/index.tsx"
+          "target": ""
         },
         {
           "path": "registry/components/contribution-card/types.ts",
           "type": "registry:component",
-          "target": "components/contribution-card/types.ts"
+          "target": ""
         }
       ],
       "type": "registry:component",
@@ -43,12 +43,12 @@
         {
           "path": "registry/components/load-more-items-wrapper/example.tsx",
           "type": "registry:component",
-          "target": "components/load-more-items-wrapper/example.tsx"
+          "target": ""
         },
         {
           "path": "registry/components/load-more-items-wrapper/index.tsx",
           "type": "registry:component",
-          "target": "components/load-more-items-wrapper/index.tsx"
+          "target": ""
         }
       ],
       "type": "registry:component",

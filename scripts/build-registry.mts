@@ -259,7 +259,7 @@ async function scanComponentsDirectory(): Promise<Registry["items"]> {
 
         files.push({
           path: `components/${entry.name}/${cf}`,
-          target: `components/${entry.name}/${cf}`,
+          target: "",
           type: "registry:component",
         });
       }

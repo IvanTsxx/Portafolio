@@ -14,15 +14,15 @@ export const Index: Record<string, any> = {
     files: [{
       path: "registry/components/contribution-card/example.ts",
       type: "registry:component",
-      target: "components/contribution-card/example.ts",
+      target: "",
     },{
       path: "registry/components/contribution-card/index.tsx",
       type: "registry:component",
-      target: "components/contribution-card/index.tsx",
+      target: "",
     },{
       path: "registry/components/contribution-card/types.ts",
       type: "registry:component",
-      target: "components/contribution-card/types.ts",
+      target: "",
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/components/contribution-card/index.tsx")
@@ -39,11 +39,11 @@ export const Index: Record<string, any> = {
     files: [{
       path: "registry/components/load-more-items-wrapper/example.tsx",
       type: "registry:component",
-      target: "components/load-more-items-wrapper/example.tsx",
+      target: "",
     },{
       path: "registry/components/load-more-items-wrapper/index.tsx",
       type: "registry:component",
-      target: "components/load-more-items-wrapper/index.tsx",
+      target: "",
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/components/load-more-items-wrapper/example.tsx")

@@ -14,19 +14,19 @@
       "path": "registry/components/contribution-card/example.ts",
       "content": "import type { ProcessedContribution } from \"./types\";\n\nexport const contributionExample: ProcessedContribution = {\n  date: \"2022-01-01\",\n  description: \"feat: add contribution card\",\n  kind: \"pr\",\n  link: \"https://github.com/ivantsxx/portafolio\",\n  repository: \"ivantsxx/portafolio\",\n  state: \"open\",\n  title: \"feat: add contribution card\",\n  type: \"feature\",\n};\n",
       "type": "registry:component",
-      "target": "components/contribution-card/example.ts"
+      "target": ""
     },
     {
       "path": "registry/components/contribution-card/index.tsx",
       "content": "\"use client\";\n\nimport { ExternalLink, GitPullRequest } from \"lucide-react\";\nimport { motion } from \"motion/react\";\nimport type { Route } from \"next\";\nimport Link from \"next/link\";\n\nimport {\n  Tooltip,\n  TooltipTrigger,\n  TooltipContent,\n} from \"@/shared/components/ui/tooltip\";\n\nimport { contributionExample } from \"./example\";\nimport type { ProcessedContribution } from \"./types\";\n\nexport default function ContributionCard({\n  index,\n  contribution = contributionExample,\n}: {\n  index: number;\n  contribution: ProcessedContribution;\n}) {\n  return (\n    <motion.div\n      key={contribution.title}\n      initial={{ opacity: 0, x: -16 }}\n      animate={{ opacity: 1, x: 0 }}\n      transition={{ delay: index * 0.08, duration: 0.35, ease: \"easeOut\" }}\n      className=\"group flex items-start gap-3 border-b border-border py-3 transition-colors last:border-0 hover:text-brand-green\"\n    >\n      <GitPullRequest\n        className=\"mt-0.5 h-[14px] w-[14px] shrink-0 text-muted-foreground transition-colors group-hover:text-brand-green\"\n        aria-hidden=\"true\"\n      />\n      <div className=\"flex flex-1 flex-col gap-0.5 min-w-0\">\n        <span className=\"text-[13px] font-medium text-foreground transition-colors group-hover:text-brand-green truncate\">\n          {contribution.title}\n        </span>\n        <span className=\"transition-colors group-hover:brightness-100 group-hover:text-brand-green  text-[11px] text-muted-foreground\">\n          {contribution.repository}\n        </span>\n      </div>\n      <div className=\"ml-auto flex items-center gap-2 shrink-0\">\n        <span className=\"transition-colors group-hover:text-brand-green text-[11px] text-muted-foreground\">\n          {contribution.date}\n        </span>\n\n        <Tooltip>\n          <TooltipTrigger\n            render={\n              <Link\n                prefetch={false}\n                href={contribution.link as Route}\n                target=\"_blank\"\n                rel=\"noopener noreferrer\"\n              />\n            }\n          >\n            <ExternalLink\n              className=\"h-[12px] transition-colors group-hover:text-brand-green w-[12px] text-muted-foreground\"\n              aria-hidden=\"true\"\n            />\n          </TooltipTrigger>\n          <TooltipContent>View contribution</TooltipContent>\n        </Tooltip>\n      </div>\n    </motion.div>\n  );\n}\n",
       "type": "registry:component",
-      "target": "components/contribution-card/index.tsx"
+      "target": ""
     },
     {
       "path": "registry/components/contribution-card/types.ts",
       "content": "export interface ProcessedContribution {\n  title: string;\n  description: string;\n  repository: string;\n  link: string;\n  date: string;\n  type: \"feature\" | \"fix\" | \"perf\" | \"docs\" | \"refactor\" | \"test\" | \"chore\";\n  state: \"open\" | \"closed\" | \"merged\";\n  kind: \"pr\" | \"issue\";\n}\n",
       "type": "registry:component",
-      "target": "components/contribution-card/types.ts"
+      "target": ""
     }
   ],
   "type": "registry:component"
