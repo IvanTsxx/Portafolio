@@ -8,7 +8,12 @@ interface Profile {
   useCase: string;
 }
 
-const profiles: Profile[] = [
+export interface CacheLifeProfilesProps {
+  columns?: string[];
+  profiles?: Profile[];
+}
+
+const defaultProfiles: Profile[] = [
   {
     expire: "Nunca",
     name: "default",
@@ -53,9 +58,12 @@ const profiles: Profile[] = [
   },
 ];
 
-const columns = ["Perfil", "stale", "revalidate", "expire", "Cuándo usarlo"];
+const defaultColumns = ["Perfil", "stale", "revalidate", "expire", "Cuándo usarlo"];
 
-export function CacheLifeProfiles() {
+export function CacheLifeProfiles({
+  columns = defaultColumns,
+  profiles = defaultProfiles,
+}: CacheLifeProfilesProps = {}) {
   return (
     <div className="my-6 overflow-x-auto rounded-lg border border-border">
       <table className="w-full text-sm">

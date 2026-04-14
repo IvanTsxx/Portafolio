@@ -55,7 +55,48 @@ That is all you need at the configuration level to get started. The flag replace
 
 With `cacheComponents: true`, each route can mix three types of content. The granularity is per component or function, not per full route.
 
-<ContentTypesTable />
+<ContentTypesTable
+  directiveLabel="Directive"
+  servedFromLabel="Served from"
+  examplesLabel="Examples"
+  types={[
+    {
+      badge: "Instant",
+      description:
+        "Synchronous code, imports, JSX without async. Pre-rendered at build time and served from CDN instantly.",
+      directive: "no directive",
+      examples: ["Headers", "Navbars", "Footers", "Static text"],
+      label: "Static",
+      servedFrom: "CDN (build time)",
+      type: "static",
+    },
+    {
+      badge: "Configurable",
+      description:
+        "Async data that doesn't need to be fresh on every request. Cached on the first render and revalidated according to configured cacheLife.",
+      directive: "'use cache'",
+      examples: ["Post lists", "Global stats", "Products", "Categories"],
+      label: "Cached",
+      servedFrom: "Cache (server / CDN)",
+      type: "cached",
+    },
+    {
+      badge: "Always fresh",
+      description:
+        "Data that must be fresh on every request. Accesses cookies, headers, or searchParams. Must be wrapped in <Suspense>.",
+      directive: "<Suspense>",
+      examples: [
+        "User data",
+        "Notifications",
+        "Shopping cart",
+        "Preferences",
+      ],
+      label: "Dynamic",
+      servedFrom: "Server (every request)",
+      type: "dynamic",
+    },
+  ]}
+/>
 
 The key is that you can have all three types on the same page. The static shell is served instantly from the CDN, the cached content appears almost immediately, and the dynamic content streams to the client.
 
@@ -184,7 +225,17 @@ Each cache entry has three time parameters that determine its behavior:
 - **`revalidate`** — after `stale`, the server triggers a background fetch and updates the entry. The client keeps seeing the old value until the new one is ready
 - **`expire`** — hard expiration. The next request after this time blocks until a new value is available
 
-<CacheFlowDiagram />
+<CacheFlowDiagram
+  title="Cache entry life cycle"
+  ariaLabel="Cache lifecycle diagram: First render → Stale → Revalidating → Expired"
+  staleDesc="served from cache"
+  revalidatingDesc="background fetch, serve stale"
+  expiredDesc="re-generates blocking"
+  arrowText="new value ready → update cache"
+  legendStale="stale — cached value is served"
+  legendRevalidate="revalidate — background fetch, client doesn't wait"
+  legendExpire="expire — next request waits for the new value"
+/>
 
 By default (without specifying anything), the `'default'` profile is used: 5 minutes of stale and 15 minutes of revalidate. In the next post we will cover all available profiles and how to configure custom timings.
 

@@ -10,7 +10,14 @@ interface ContentType {
   badge: string;
 }
 
-const types: ContentType[] = [
+export interface ContentTypesTableProps {
+  types?: ContentType[];
+  directiveLabel?: string;
+  servedFromLabel?: string;
+  examplesLabel?: string;
+}
+
+const defaultTypes: ContentType[] = [
   {
     badge: "Instantáneo",
     description:
@@ -72,7 +79,12 @@ const typeConfig = {
   },
 };
 
-export function ContentTypesTable() {
+export function ContentTypesTable({
+  types = defaultTypes,
+  directiveLabel = "Directiva",
+  servedFromLabel = "Servido desde",
+  examplesLabel = "Ejemplos",
+}: ContentTypesTableProps = {}) {
   return (
     <div className="my-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
       {types.map((item) => {
@@ -112,7 +124,7 @@ export function ContentTypesTable() {
             {/* Directive */}
             <div className="space-y-1">
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
-                Directiva
+                {directiveLabel}
               </p>
               <code
                 className={cn(
@@ -127,7 +139,7 @@ export function ContentTypesTable() {
             {/* Served from */}
             <div className="space-y-1">
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
-                Servido desde
+                {servedFromLabel}
               </p>
               <p className="text-xs text-foreground/80">{item.servedFrom}</p>
             </div>
@@ -135,7 +147,7 @@ export function ContentTypesTable() {
             {/* Examples */}
             <div className="space-y-1.5">
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
-                Ejemplos
+                {examplesLabel}
               </p>
               <div className="flex flex-wrap gap-1">
                 {item.examples.map((ex) => (

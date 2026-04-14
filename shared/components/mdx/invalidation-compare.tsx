@@ -6,11 +6,20 @@ interface Method {
   timing: string;
   behavior: string;
   consistency: "eventual" | "strong";
+  consistencyLabel?: string;
   useWhen: string[];
   color: "green" | "blue";
 }
 
-const methods: Method[] = [
+export interface InvalidationCompareProps {
+  methods?: Method[];
+  consistencyLabel?: string;
+  strongConsistencyText?: string;
+  eventualConsistencyText?: string;
+  useWhenLabel?: string;
+}
+
+const defaultMethods: Method[] = [
   {
     behavior:
       "Marca la entrada como stale. El siguiente request que llegue después lanza un fetch en background y sirve el valor anterior mientras tanto.",
@@ -58,7 +67,13 @@ const colorConfig = {
   },
 };
 
-export function InvalidationCompare() {
+export function InvalidationCompare({
+  methods = defaultMethods,
+  consistencyLabel = "Consistencia:",
+  strongConsistencyText = "fuerte",
+  eventualConsistencyText = "eventual",
+  useWhenLabel = "Usalo cuando...",
+}: InvalidationCompareProps = {}) {
   return (
     <div className="my-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
       {methods.map((method) => {
@@ -105,7 +120,7 @@ export function InvalidationCompare() {
             {/* Consistency */}
             <div className="flex items-center gap-2">
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
-                Consistencia:
+                {consistencyLabel}
               </span>
               <span
                 className={cn(
@@ -115,14 +130,14 @@ export function InvalidationCompare() {
                     : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
                 )}
               >
-                {method.consistency === "strong" ? "fuerte" : "eventual"}
+                {method.consistency === "strong" ? strongConsistencyText : eventualConsistencyText}
               </span>
             </div>
 
             {/* Use when */}
             <div className="space-y-1.5">
               <p className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
-                Usalo cuando...
+                {useWhenLabel}
               </p>
               <ul className="space-y-1">
                 {method.useWhen.map((item) => (

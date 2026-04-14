@@ -1,11 +1,13 @@
 import { cn } from "@/shared/lib/utils";
 
-interface ErrorCardProps {
+export interface ErrorCardProps {
   title: string;
   errorMessage?: string;
   cause: string;
   fix: string;
   tip?: string;
+  causeLabel?: string;
+  fixLabel?: string;
 }
 
 export function ErrorCard({
@@ -14,6 +16,8 @@ export function ErrorCard({
   cause,
   fix,
   tip,
+  causeLabel = "Causa",
+  fixLabel = "Solución",
 }: ErrorCardProps) {
   return (
     <div className="my-6 rounded-lg border border-red-500/20 bg-red-500/5 overflow-hidden">
@@ -50,7 +54,7 @@ export function ErrorCard({
       <div className="px-4 py-3 space-y-3">
         <div className="space-y-1">
           <p className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground/60">
-            Causa
+            {causeLabel}
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed">
             {cause}
@@ -59,7 +63,7 @@ export function ErrorCard({
 
         <div className="space-y-1">
           <p className="text-[10px] uppercase tracking-widest font-medium text-green-400/60">
-            Solución
+            {fixLabel}
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed">{fix}</p>
         </div>

@@ -33,7 +33,9 @@ seriesOrder: 2
 <ErrorCard
   title="Runtime API inside use cache"
   errorMessage="Error: cookies() was called inside a cached function. Runtime APIs cannot be accessed from cached scopes."
+  causeLabel="Cause"
   cause="cookies(), headers() and searchParams are runtime APIs: their value depends on the incoming request, it does not exist at build time nor at the moment the cache entry is created. Accessing them inside 'use cache' breaks the guarantee that the function produces the same result for the same inputs."
+  fixLabel="Fix"
   fix="Read the value outside the cached scope and pass it as an argument. The argument becomes an automatic part of the cache key, so different values generate different entries."
   tip="If you have a compliance case where you cannot refactor (for example, you need to access cookies inside a third-party library you do not control), there is 'use cache: private' which does allow runtime APIs. Use it as a last resort."
 />
@@ -81,7 +83,9 @@ async function ComplianceComponent() {
 <ErrorCard
   title="Non-serializable argument"
   errorMessage="Error: Arguments to cached functions must be serializable. Class instances, functions, and Symbols are not supported."
+  causeLabel="Cause"
   cause="The cache key is built by serializing the arguments. Types that cannot be serialized (class instances, functions, Symbols, WeakMaps) do not have a stable representation that can be used as a key or transmitted between the server and the client."
+  fixLabel="Fix"
   fix="Pass only primitives or plain objects as arguments. If you need data from a complex object, extract only the ID or scalar values and perform the fetch inside the cached function."
 />
 
@@ -132,7 +136,9 @@ async function EventCard({ dateString }: { dateString: string }) {
 <ErrorCard
   title="Non-deterministic value inside use cache"
   errorMessage="Unexpected behavior: Math.random() or Date.now() always return the same value."
+  causeLabel="Cause"
   cause="Functions with 'use cache' run only once to produce the cache entry. Any call to Math.random(), Date.now(), or crypto.randomUUID() inside that scope runs on the first render and the result is frozen in the cached entry. All subsequent requests see the same value."
+  fixLabel="Fix"
   fix="Move the non-deterministic value outside the cached scope. If you need the value to differ per request, generate it in a dynamic component and pass it as an argument to the cached function."
   tip="Use import { connection } from 'next/server' and await connection() to force a component to run at request-time instead of build time. It is the semantic way to say 'this is dynamic'."
 />
@@ -171,7 +177,9 @@ async function Banner({ requestId }: { requestId: string }) {
 <ErrorCard
   title="Missing Suspense boundary around dynamic component"
   errorMessage="Error: A component accessed a runtime API (cookies, headers, searchParams) but is not wrapped in a Suspense boundary. With cacheComponents enabled, dynamic components must be inside Suspense."
+  causeLabel="Cause"
   cause="With cacheComponents: true, Next.js builds the static shell at build time. If a component accesses cookies(), headers() or searchParams without being inside Suspense, there is no way to include it in the static shell or to stream it later. The build fails."
+  fixLabel="Fix"
   fix="Wrap all components that access runtime APIs in <Suspense> with an appropriate fallback. The shell is served statically and the dynamic component streams when the server resolves it."
 />
 
@@ -222,7 +230,9 @@ function CartSkeleton() {
 <ErrorCard
   title="React.cache isolation inside use cache"
   errorMessage="Unexpected behavior: a value stored in React.cache() outside is not visible inside 'use cache'."
+  causeLabel="Cause"
   cause="React.cache operates with an isolated scope inside each 'use cache' boundary. Values stored via React.cache() in the parent component are not visible inside a 'use cache' function. Each scope has its own React.cache store."
+  fixLabel="Fix"
   fix="Pass data as function arguments instead of using React.cache as a communication channel between scopes. React.cache is still useful for deduplicating requests within the same scope, not for sharing data between scopes."
 />
 
@@ -266,7 +276,9 @@ async function Child({ userId }: { userId: string }) {
 <ErrorCard
   title="Synchronous export in file-level use cache"
   errorMessage="Error: All exports from a file with 'use cache' at the top level must be async functions."
+  causeLabel="Cause"
   cause="When you place 'use cache' at the top of the file, you are telling Next.js that all exports are cacheable functions. Cacheable functions must be async because the result is stored asynchronously."
+  fixLabel="Fix"
   fix="Move synchronous utility functions to another file, or change from file-level directive to function-level for the ones you specifically need to cache."
 />
 

@@ -1,17 +1,39 @@
 "use client";
 
-export function CacheFlowDiagram() {
+export interface CacheFlowDiagramProps {
+  title?: string;
+  ariaLabel?: string;
+  staleDesc?: string;
+  revalidatingDesc?: string;
+  expiredDesc?: string;
+  arrowText?: string;
+  legendStale?: string;
+  legendRevalidate?: string;
+  legendExpire?: string;
+}
+
+export function CacheFlowDiagram({
+  title = "Ciclo de vida de una entrada de caché",
+  ariaLabel = "Diagrama del ciclo de vida de caché: First render → Stale → Revalidating → Expired",
+  staleDesc = "sirve desde caché",
+  revalidatingDesc = "background fetch, sirve stale",
+  expiredDesc = "re-genera bloqueado",
+  arrowText = "nuevo valor listo → actualiza caché",
+  legendStale = "stale — se sirve el valor cacheado",
+  legendRevalidate = "revalidate — fetch en background, el cliente no espera",
+  legendExpire = "expire — próximo request espera el nuevo valor",
+}: CacheFlowDiagramProps = {}) {
   return (
     <div className="my-6 overflow-x-auto rounded-lg border border-border bg-secondary/10 p-6">
       <p className="text-[11px] uppercase tracking-widest text-muted-foreground/60 font-medium mb-4">
-        Ciclo de vida de una entrada de caché
+        {title}
       </p>
       <svg
         viewBox="0 0 720 180"
         xmlns="http://www.w3.org/2000/svg"
         className="w-full max-w-2xl"
         role="img"
-        aria-label="Diagrama del ciclo de vida de caché: First render → Stale → Revalidating → Expired"
+        aria-label={ariaLabel}
       >
         {/* Timeline base line */}
         <line
@@ -63,7 +85,7 @@ export function CacheFlowDiagram() {
           fill="hsl(var(--muted-foreground))"
           fontFamily="monospace"
         >
-          sirve desde caché
+          {staleDesc}
         </text>
 
         {/* ---- ZONE: REVALIDATING ---- */}
@@ -106,7 +128,7 @@ export function CacheFlowDiagram() {
           fill="hsl(var(--muted-foreground))"
           fontFamily="monospace"
         >
-          background fetch, sirve stale
+          {revalidatingDesc}
         </text>
 
         {/* ---- ZONE: EXPIRED ---- */}
@@ -149,7 +171,7 @@ export function CacheFlowDiagram() {
           fill="hsl(var(--muted-foreground))"
           fontFamily="monospace"
         >
-          re-genera bloqueado
+          {expiredDesc}
         </text>
 
         {/* ---- DOTS & LABELS ---- */}
@@ -256,21 +278,21 @@ export function CacheFlowDiagram() {
           fontFamily="monospace"
           opacity="0.8"
         >
-          nuevo valor listo → actualiza caché
+          {arrowText}
         </text>
       </svg>
 
       {/* Legend */}
       <div className="mt-4 flex flex-wrap gap-4">
         {[
-          { color: "bg-blue-400", label: "stale — se sirve el valor cacheado" },
+          { color: "bg-blue-400", label: legendStale },
           {
             color: "bg-green-400",
-            label: "revalidate — fetch en background, el cliente no espera",
+            label: legendRevalidate,
           },
           {
             color: "bg-orange-400",
-            label: "expire — próximo request espera el nuevo valor",
+            label: legendExpire,
           },
         ].map((item) => (
           <div key={item.label} className="flex items-center gap-2">
