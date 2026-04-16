@@ -20,8 +20,8 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className="rounded-full"
-      onClick={() => changeTheme(theme === "dark" ? "light" : "dark")}
+      className="rounded-full active:scale-90 transition-transform duration-150"
+      onClick={(e) => changeTheme(theme === "dark" ? "light" : "dark", e)}
     >
       {theme === "dark" ? (
         <Sun className="size-5" />

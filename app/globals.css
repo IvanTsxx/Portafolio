@@ -190,30 +190,40 @@
 /* View Transition - Theme switcher */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.4s;
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
 }
 
-::view-transition-old(root) {
-  animation-name: theme-out;
-}
-
+/* nueva UI entra desde derecha */
 ::view-transition-new(root) {
-  animation-name: theme-in;
+  animation-name: theme-slide-in;
 }
 
-@keyframes theme-in {
+/* vieja UI sale hacia izquierda */
+::view-transition-old(root) {
+  animation-name: theme-slide-out;
+}
+
+@keyframes theme-slide-in {
   from {
-    clip-path: circle(0% at var(--vt-x, 50%) var(--vt-y, 50%));
+    transform: translateX(16px) skewX(-2deg);
+    opacity: 0;
   }
   to {
-    clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%));
+    transform: translateX(0) skewX(0);
+    opacity: 1;
   }
 }
 
-@keyframes theme-out {
-  from,
-  to {
+@keyframes theme-slide-out {
+  from {
+    transform: translateX(0) skewX(0);
     opacity: 1;
+  }
+  to {
+    transform: translateX(-12px) skewX(2deg);
+    opacity: 0;
   }
 }
 
