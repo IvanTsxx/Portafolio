@@ -6,6 +6,7 @@ export interface ThoughtMeta {
   date: string;
   description: string;
   tags: string[];
+  keywords?: string[];
   published: boolean;
   readingTime: number;
 }

@@ -44,12 +44,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: `/thoughts/${slug}`,
     },
-    description: thought.description,
+   	description: thought.description,
+    keywords: thought.keywords?.length
+      ? thought.keywords
+      : thought.tags,
     openGraph: {
       description: thought.description,
       publishedTime: thought.date,
       siteName: SITE.name,
-      tags: thought.tags,
+      tags: thought.keywords?.length
+        ? thought.keywords
+        : thought.tags,
       title: thought.title,
       type: "article",
       url: `${SITE.url}/thoughts/${slug}`,
