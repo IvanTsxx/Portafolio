@@ -283,10 +283,18 @@
 @utility pixel-grid {
   background-image: radial-gradient(
     circle,
-    oklch(0.25 0 0) 1px,
-    transparent 1px
+    oklch(0.25 0 0 / 0.135) 1px,
+    /* light */ transparent 1px
   );
   background-size: 16px 16px;
+
+  @variant dark {
+    background-image: radial-gradient(
+      circle,
+      oklch(0.25 0 0 / 0.3) 1px,
+      /* dark */ transparent 1px
+    );
+  }
 }
 
 /* Shiki Light/Dark Mode */

@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   return (
-    <section className="flex bg-background dark:bg-transparent flex-col gap-1 w-full">
+    <section className="flex bg-background dark:bg-transparent flex-col w-full">
       <OrganizationJsonLd />
       <WebSiteJsonLd />
       <Suspense fallback={<Skeleton className="h-40 w-full" />}>

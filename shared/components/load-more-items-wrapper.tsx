@@ -29,7 +29,7 @@ export function LoadMoreItemsWrapper({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col">
       <AnimatePresence initial={false}>
         {visible.map((child, i) => (
           <motion.div
@@ -51,7 +51,9 @@ export function LoadMoreItemsWrapper({
         <Button
           disabled={loading}
           onClick={handleLoadMore}
-          className="relative max-w-fit mx-auto"
+          className="relative max-w-fit mx-auto my-6 cursor-pointer"
+          variant="outline"
+          size="sm"
         >
           <AnimatePresence mode="wait">
             {loading ? (
