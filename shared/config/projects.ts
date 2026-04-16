@@ -11,6 +11,33 @@ export interface Project {
 export const PROJECTS: Project[] = [
   {
     description: `
+  Hackathon platform for developers
+  - Create, join and explore hackathons and teams.
+  - Built with Next.js 16 + React 19 (App Router, RSC).
+  - Fullstack setup with Prisma + PostgreSQL.
+  - Authentication and sessions with Better Auth.
+  - Modern UI with Tailwind CSS v4 and shadcn/ui.
+  - Focused on community, collaboration and events.
+    `,
+    github: "https://github.com/IvanTsxx/Hackra",
+    id: "hackra",
+    link: "https://github.com/IvanTsxx/Hackra",
+    period: { start: "2026" },
+    skills: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Prisma",
+      "PostgreSQL",
+      "Better Auth",
+      "Tailwind CSS",
+      "shadcn/ui",
+    ],
+    title: "Hackra",
+  },
+
+  {
+    description: `
     MercadoPago plugin for Better Auth
     - Authentication-first payments tied to users.
     - Subscription management (recurring payments).
@@ -31,7 +58,7 @@ export const PROJECTS: Project[] = [
       "Next.js",
       "Prisma",
     ],
-    title: "MercadoPago Plugin for Better Auth",
+    title: "Better Auth MercadoPago Plugin",
   },
 
   {
@@ -177,32 +204,6 @@ export const PROJECTS: Project[] = [
     title: "MemesDev",
   },
 
-  {
-    description: `
-  Hackathon platform for developers
-  - Create, join and explore hackathons and teams.
-  - Built with Next.js 16 + React 19 (App Router, RSC).
-  - Fullstack setup with Prisma + PostgreSQL.
-  - Authentication and sessions with Better Auth.
-  - Modern UI with Tailwind CSS v4 and shadcn/ui.
-  - Focused on community, collaboration and events.
-    `,
-    github: "https://github.com/IvanTsxx/Hackra",
-    id: "hackra",
-    link: "https://github.com/IvanTsxx/Hackra",
-    period: { start: "2026" },
-    skills: [
-      "Next.js",
-      "React",
-      "TypeScript",
-      "Prisma",
-      "PostgreSQL",
-      "Better Auth",
-      "Tailwind CSS",
-      "shadcn/ui",
-    ],
-    title: "Hackra",
-  },
   {
     description: `
   Reusable media upload microservice
