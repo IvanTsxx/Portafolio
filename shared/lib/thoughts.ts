@@ -173,22 +173,22 @@ export async function getAllThoughts(): Promise<Thought[]> {
 
     const availableLangs = slugMap.get(slug) || [];
 
-thoughts.push({
-    availableLangs,
-    content,
-    date: data.date ?? "2025-01-01",
-    description: data.description ?? "",
-    keywords: Array.isArray(data.keywords) ? data.keywords : [],
-    lang: targetFile.lang,
-    published: data.published !== false,
-    readingTime:
-      typeof data.readingTime === "number"
-        ? data.readingTime
-        : estimateReadingTime(content),
-    slug,
-    tags: Array.isArray(data.tags) ? data.tags : [],
-    title: data.title ?? "Untitled",
-  });
+    thoughts.push({
+      availableLangs,
+      content,
+      date: data.date ?? "2025-01-01",
+      description: data.description ?? "",
+      keywords: Array.isArray(data.keywords) ? data.keywords : [],
+      lang: targetFile.lang,
+      published: data.published !== false,
+      readingTime:
+        typeof data.readingTime === "number"
+          ? data.readingTime
+          : estimateReadingTime(content),
+      slug,
+      tags: Array.isArray(data.tags) ? data.tags : [],
+      title: data.title ?? "Untitled",
+    });
   }
 
   return thoughts.toSorted(

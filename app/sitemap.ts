@@ -10,16 +10,41 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const thoughts = await getAllThoughts();
   const components = await getComponents();
 
-  const thoughtEntries: MetadataRoute.Sitemap = thoughts.map((thought) => ({
-    changeFrequency: "monthly",
-    lastModified: new Date(thought.date),
-    priority: 0.7,
-    url: `${baseUrl}/thoughts/${thought.slug}`,
-  }));
+  // Group thoughts by slug (English and Spanish versions)
+  const thoughtsBySlug = new Map<string, typeof thoughts>();
+  for (const thought of thoughts) {
+    const existing = thoughtsBySlug.get(thought.slug) || [];
+    existing.push(thought);
+    thoughtsBySlug.set(thought.slug, existing);
+  }
+
+  const thoughtEntries: MetadataRoute.Sitemap = [];
+
+  // Add each post with language alternatives
+  for (const [slug, langVersions] of thoughtsBySlug) {
+    const enVersion = langVersions.find((t) => t.lang === "en");
+    const esVersion = langVersions.find((t) => t.lang === "es");
+
+    const alternatesLanguages: Record<string, string> = {};
+    if (enVersion) alternatesLanguages["en"] = `${baseUrl}/thoughts/${slug}?lang=en`;
+    if (esVersion) alternatesLanguages["es"] = `${baseUrl}/thoughts/${slug}?lang=es`;
+
+    thoughtEntries.push({
+      changeFrequency: "monthly" as const,
+      lastModified: new Date(enVersion?.date || new Date().toISOString()),
+      priority: 0.7,
+      url: `${baseUrl}/thoughts/${slug}`,
+      ...(Object.keys(alternatesLanguages).length > 0 && {
+        alternates: {
+          languages: alternatesLanguages,
+        },
+      }),
+    });
+  }
 
   const componentEntries: MetadataRoute.Sitemap = components.map(
     (component) => ({
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.6,
       url: `${baseUrl}/components/${component.name}`,
     })
@@ -27,17 +52,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      changeFrequency: "daily",
+      changeFrequency: "daily" as const,
       priority: 1,
       url: baseUrl,
     },
     {
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: 0.8,
       url: `${baseUrl}/thoughts`,
+      alternates: {
+        languages: {
+          en: `${baseUrl}/thoughts?lang=en`,
+          es: `${baseUrl}/thoughts?lang=es`,
+        },
+      },
     },
     {
-      changeFrequency: "monthly",
+      changeFrequency: "monthly" as const,
       priority: 0.6,
       url: `${baseUrl}/components`,
     },

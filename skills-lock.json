@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "ai-seo": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "0bda4a0839dbb8ecb19b40707299c2558ddc7b63164d1d8008209ce6d03772b7"
+    },
     "brand-guidelines": {
       "source": "anthropics/skills",
       "sourceType": "github",

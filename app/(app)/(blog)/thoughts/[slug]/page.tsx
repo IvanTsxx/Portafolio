@@ -40,28 +40,45 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const thought = await getThoughtBySlug(slug, "en");
   if (!thought) return {};
+
+  // Build language alternates for bilingual content
+  const languages: Record<string, string> = {};
+  if (thought.availableLangs.includes("en")) {
+    languages["en"] = `${SITE.url}/thoughts/${slug}?lang=en`;
+  }
+  if (thought.availableLangs.includes("es")) {
+    languages["es"] = `${SITE.url}/thoughts/${slug}?lang=es`;
+  }
+
   return {
     alternates: {
       canonical: `/thoughts/${slug}`,
+      languages,
     },
-   	description: thought.description,
-    keywords: thought.keywords?.length
-      ? thought.keywords
-      : thought.tags,
+    description: thought.description,
+    keywords:
+      thought.keywords?.length
+        ? thought.keywords
+        : thought.tags,
     openGraph: {
       description: thought.description,
       publishedTime: thought.date,
       siteName: SITE.name,
-      tags: thought.keywords?.length
-        ? thought.keywords
-        : thought.tags,
+      tags:
+        thought.keywords?.length
+          ? thought.keywords
+          : thought.tags,
       title: thought.title,
       type: "article",
       url: `${SITE.url}/thoughts/${slug}`,
     },
-    title: thought.title,
+    title: {
+      default: thought.title,
+      template: "%s | Thoughts",
+    },
     twitter: {
       card: "summary_large_image",
+      title: thought.title,
     },
   };
 }

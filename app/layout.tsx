@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { GlobalClickSound } from "@/shared/components/global-click-sound";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/shared/components/json-ld";
 import { ScrollToTop } from "@/shared/components/scroll-to-top";
 
 import "./globals.css";
@@ -79,6 +80,8 @@ export default function RootLayout({
       ))}
 
       <body className="relative pixel-grid">
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
         <NuqsAdapter>
           <ThemeProvider
             attribute="class"
