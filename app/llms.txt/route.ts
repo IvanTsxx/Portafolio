@@ -2,8 +2,6 @@ import { SITE } from "@/shared/config/site";
 import { getComponents } from "@/shared/lib/registry";
 import { getAllThoughts } from "@/shared/lib/thoughts";
 
-export const dynamic = "force-static";
-
 export async function GET() {
   const thoughts = await getAllThoughts();
   const components = getComponents();

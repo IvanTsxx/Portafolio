@@ -26,13 +26,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const esVersion = langVersions.find((t) => t.lang === "es");
 
     const alternatesLanguages: Record<string, string> = {};
-    if (enVersion) alternatesLanguages["en"] = `${baseUrl}/thoughts/${slug}?lang=en`;
-    if (esVersion) alternatesLanguages["es"] = `${baseUrl}/thoughts/${slug}?lang=es`;
+    if (enVersion)
+      alternatesLanguages["en"] = `${baseUrl}/thoughts/${slug}?lang=en`;
+    if (esVersion)
+      alternatesLanguages["es"] = `${baseUrl}/thoughts/${slug}?lang=es`;
 
     thoughtEntries.push({
       changeFrequency: "monthly" as const,
       lastModified: new Date(enVersion?.date || new Date().toISOString()),
-      priority: 0.7,
+      priority: 0.9,
       url: `${baseUrl}/thoughts/${slug}`,
       ...(Object.keys(alternatesLanguages).length > 0 && {
         alternates: {
@@ -45,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const componentEntries: MetadataRoute.Sitemap = components.map(
     (component) => ({
       changeFrequency: "monthly" as const,
-      priority: 0.6,
+      priority: 0.9,
       url: `${baseUrl}/components/${component.name}`,
     })
   );
@@ -57,20 +59,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: baseUrl,
     },
     {
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-      url: `${baseUrl}/thoughts`,
       alternates: {
         languages: {
           en: `${baseUrl}/thoughts?lang=en`,
           es: `${baseUrl}/thoughts?lang=es`,
         },
       },
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+      url: `${baseUrl}/thoughts`,
     },
     {
       changeFrequency: "monthly" as const,
-      priority: 0.6,
+      priority: 0.9,
       url: `${baseUrl}/components`,
+    },
+    // Machine-readable files for AI systems
+    {
+      changeFrequency: "monthly" as const,
+      priority: 0.3,
+      url: `${baseUrl}/llms.txt`,
     },
     ...thoughtEntries,
     ...componentEntries,
