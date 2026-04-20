@@ -87,6 +87,33 @@ export const PROJECTS: Project[] = [
 
   {
     description: `
+  Collection of AI agent skill packs
+  - Organized skill packs by technology (Next.js, React, SEO, Design, etc).
+  - Installable via Vercel Skills CLI (plug & play workflow).
+  - Covers real-world patterns: architecture, caching, auth, UI, AI SDK.
+  - Reduces repetitive setup by packaging reusable dev workflows.
+  - Designed for AI coding agents and developer productivity.
+  - Includes categories like accessibility, marketing and SEO.
+    `,
+    github: "https://github.com/IvanTsxx/skills-packs",
+    id: "skills-packs",
+    link: "https://github.com/IvanTsxx/skills-packs",
+    period: { start: "2026" },
+    skills: [
+      "AI Agents",
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Vercel Skills",
+      "Developer Experience",
+      "Architecture",
+      "SEO",
+    ],
+    title: "Skills Packs",
+  },
+
+  {
+    description: `
   Custom AI skills for Next.js development
   - Architect Next.js skill enforcing scalable architecture patterns.
   - Applies Scope Rule (local vs shared components).
