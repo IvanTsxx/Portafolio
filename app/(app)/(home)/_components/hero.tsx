@@ -11,29 +11,31 @@ import { VisitTracker } from "./visit-tracker";
 export function Hero() {
   return (
     <HeroEntrance>
-      <section className="flex flex-col w-full justify-center gap-y-2">
-        <HeroInfoMiddle />
+      {/* Identity block */}
+      <HeroInfoMiddle />
 
-        <Suspense
-          fallback={
-            <section className="w-full md:w-auto">
-              <section className="flex w-full md:w-auto flex-row items-center justify-between">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Skeleton className="h-5 rounded-full w-10" /> Visitors
-                </div>
+      {/* Visitor count */}
+      <Suspense
+        fallback={
+          <div
+            data-hero-visitors
+            className="w-full flex items-center justify-between font-mono text-xs text-muted-foreground"
+          >
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-3.5 w-8" />
+              <span>visitors</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>visitor #</span>
+              <Skeleton className="h-3.5 w-8" />
+            </div>
+          </div>
+        }
+      >
+        <VisitTrackerContent />
+      </Suspense>
 
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  You are visitor #
-                  <Skeleton className="h-5 rounded-full w-10" />
-                </div>
-              </section>
-            </section>
-          }
-        >
-          <VisitTrackerContent />
-        </Suspense>
-      </section>
-
+      {/* Social links */}
       <HeroSocial />
     </HeroEntrance>
   );
@@ -42,6 +44,8 @@ export function Hero() {
 async function VisitTrackerContent() {
   const { visitorNumber, totalVisits } = await getVisitorData();
   return (
-    <VisitTracker totalVisits={totalVisits} visitorNumber={visitorNumber} />
+    <div data-hero-visitors>
+      <VisitTracker totalVisits={totalVisits} visitorNumber={visitorNumber} />
+    </div>
   );
 }
