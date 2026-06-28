@@ -29,6 +29,7 @@ export const HeroSocial = () => (
         href={href}
         target="_blank"
         rel="noopener noreferrer"
+        data-hero-social
         className="flex items-center justify-between gap-3 border-border border h-full p-4 hover:bg-muted/50"
       >
         <div className="flex items-center gap-3">

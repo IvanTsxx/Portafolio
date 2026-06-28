@@ -3,15 +3,14 @@ import { Suspense } from "react";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 
 import { getVisitorData } from "../_actions";
+import { HeroEntrance } from "./hero-entrance";
 import { HeroInfoMiddle } from "./hero-info-middle";
 import { HeroSocial } from "./hero-social";
 import { VisitTracker } from "./visit-tracker";
 
-// ─── Avatar with shimmer border on hover ──────────────────────────────────────
-
 export function Hero() {
   return (
-    <section className="flex flex-col flex-1 items-start gap-y-4">
+    <HeroEntrance>
       <section className="flex flex-col w-full justify-center gap-y-2">
         <HeroInfoMiddle />
 
@@ -36,7 +35,7 @@ export function Hero() {
       </section>
 
       <HeroSocial />
-    </section>
+    </HeroEntrance>
   );
 }
 

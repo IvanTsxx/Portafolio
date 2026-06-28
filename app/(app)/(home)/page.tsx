@@ -9,7 +9,6 @@ import { AboutSection } from "./_components/about-section";
 import { BookmarksSection } from "./_components/bookmarks-section";
 import { CoverHero } from "./_components/cover-hero";
 import { ExperienceSection } from "./_components/experience-section";
-import { FeedbacksSection } from "./_components/feedbacks-section";
 import { GitHubContributions } from "./_components/github-contributions";
 import { GitHubOpenSource } from "./_components/github-opensource";
 import { Hero } from "./_components/hero";
@@ -54,7 +53,6 @@ export default async function HomePage() {
         <AboutSection />
         <GitHubContributions />
         <ProjectsSection />
-        <FeedbacksSection />
         <ThoughtsPreviewSection />
         <GitHubOpenSource />
         <BookmarksSection />

@@ -1,5 +1,5 @@
-import { DinoGame } from "./dino-game";
+import { SvgHero } from "./svg-hero";
 
 export function CoverHero() {
-  return <DinoGame />;
+  return <SvgHero />;
 }
