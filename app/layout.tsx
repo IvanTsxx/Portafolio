@@ -3,6 +3,8 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
+import { RafProvider }    from '@/lib/ascii/raf-provider'
+import { PortalProvider } from '@/lib/portal/portal-provider'
 import { Navbar } from '@/components/site/navbar'
 import { Footer } from '@/components/site/footer'
 import { StatusBar } from '@/components/site/status-bar'
@@ -74,17 +76,21 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} bg-ax-void`}
     >
       <body className="font-sans antialiased min-h-screen flex flex-col">
-        {/* Global chrome — RSC, no client boundary at layout level */}
-        <Navbar />
-        <StatusBar />
-        <ContactPanel />
+        <RafProvider>
+          <PortalProvider>
+            {/* Global chrome — RSC, no client boundary at layout level */}
+            <Navbar />
+            <StatusBar />
+            <ContactPanel />
 
-        {/* Page content */}
-        <main className="flex-1">
-          {children}
-        </main>
+            {/* Page content */}
+            <main className="flex-1">
+              {children}
+            </main>
 
-        <Footer />
+            <Footer />
+          </PortalProvider>
+        </RafProvider>
 
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
