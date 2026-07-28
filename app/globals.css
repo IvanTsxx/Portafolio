@@ -1,163 +1,170 @@
+/* app/globals.css */
+/* Source of truth for all ax- design tokens. Hex is canonical; OKLCH is computed. */
 @import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
 
-@custom-variant dark (&:is(.dark *));
-
+/* ─── Font face variables (populated by layout.tsx via next/font) ─── */
 @theme inline {
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* ── Typography ── */
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-geist-mono, ui-monospace, 'Geist Mono', monospace);
+
+  /* ── ax- color tokens ── */
+  /* #050505 */ --color-ax-void:   oklch(3% 0 0);
+  /* #0D0D0D */ --color-ax-ink:    oklch(7% 0 0);
+  /* #1F1F1F */ --color-ax-line:   oklch(14% 0 0);
+  /* #4A4A4A */ --color-ax-dim:    oklch(32% 0 0);
+  /* #8A8A8A */ --color-ax-mid:    oklch(57% 0 0);
+  /* #EDEDED */ --color-ax-bright: oklch(94% 0 0);
+  /* #F2EFE8 */ --color-ax-paper:  oklch(95% 0.008 88);
+  /* #FF4D00 */ --color-ax-signal: oklch(62% 0.225 32);
+
+  /* ── Duration scale (5 values, no others) ── */
+  --dur-micro:  90ms;   /* hover, press, focus, nav inversion */
+  --dur-state:  180ms;  /* local state changes, stagger entries */
+  --dur-enter:  320ms;  /* section entrances, AsciiImage crossfade */
+  --dur-fade:   120ms;  /* ONLY reduced-motion and portal initial degrade */
+  --dur-portal: 900ms;  /* ONLY the full portal sequence */
+
+  /* ── Easing curves (4 named, no others) ── */
+  --ease-portal: cubic-bezier(0.65, 0, 0.35, 1);  /* portal: symmetric, decisive */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);    /* entrances: fast start, settle */
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);    /* exits */
+  --ease-mono:   linear;                            /* scramble, marquees, ASCII fields */
+
+  /* ── Spacing scale (the only sizes used for type) ── */
+  --text-2xs: 0.6875rem;  /* 11px */
+  --text-xs:  0.8125rem;  /* 13px */
+  --text-sm:  0.9375rem;  /* 15px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg:  1.125rem;   /* 18px */
+  --text-xl:  1.5rem;     /* 24px */
+  --text-2xl: 2.125rem;   /* 34px */
+  --text-3xl: 3.25rem;    /* 52px */
+  --text-4xl: 5.5rem;     /* 88px */
+
+  /* ── Border radius (sharp by default, ONE exception: navbar) ── */
+  --radius-none: 0;
+  --radius-nav:  0.25rem;  /* 4px — only for the floating navbar */
+
+  /* ── Z-index scale ── */
+  --z-field:  10;
+  --z-nav:    50;
+  --z-panel:  80;
+  --z-portal: 100;
+  --z-debug:  200;
+
+  /* ── Layout ── */
+  --max-grid: 1440px;
+  --gutter:   1.5rem;  /* 24px */
+  --max-prose: 58ch;
 }
 
-:root {
-  color-scheme: light;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+/* ─── Dark-mode variant (class-based, set by default) ─── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Dither pattern (Bayer 4x4, used as background-image utility) ─── */
+@utility dither-bg {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect x='0' y='0' width='1' height='1' fill='%23ffffff08'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23ffffff08'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23ffffff05'/%3E%3Crect x='3' y='1' width='1' height='1' fill='%23ffffff05'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 4px 4px;
 }
 
-.dark {
-  color-scheme: dark;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    color-scheme: dark;
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-  }
-}
-
+/* ─── Base layer ─── */
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  *, *::before, *::after {
+    border-radius: 0;
+    box-sizing: border-box;
   }
+
+  html {
+    /* Prevent tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
+    /* Base font size */
+    font-size: 16px;
+    /* Smooth scroll without forced scroll-behavior (portal manages it) */
+    scroll-behavior: auto;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: oklch(3% 0 0);     /* ax-void */
+    color: oklch(94% 0 0);               /* ax-bright */
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent horizontal scroll from ASCII overflow */
+    overflow-x: hidden;
+  }
+
+  /* Global focus ring: 1px signal color, no browser default */
+  :focus-visible {
+    outline: 1px solid oklch(62% 0.225 32);  /* ax-signal */
+    outline-offset: 2px;
+  }
+
+  /* Scrollbar: thin, monochrome */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: oklch(7% 0 0);  /* ax-ink */
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(32% 0 0);  /* ax-dim */
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(57% 0 0);  /* ax-mid */
+  }
+
+  /* Selections */
+  ::selection {
+    background-color: oklch(62% 0.225 32 / 0.3);  /* ax-signal transparent */
+    color: oklch(94% 0 0);
+  }
+}
+
+/* ─── Utility: font-mono uppercase tracking ─── */
+@utility mono-label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: var(--text-xs);
+}
+
+/* ─── Utility: paper theme (only /about) ─── */
+@utility theme-paper {
+  background-color: oklch(95% 0.008 88);
+  color: oklch(14% 0 0);
+}
+
+/* ─── Utility: clip-reveal for h1 lines ─── */
+@utility clip-reveal {
+  clip-path: inset(0 0 100% 0);
+}
+@utility clip-revealed {
+  clip-path: inset(0 0 0% 0);
+}
+
+/* ─── ASCII pre reset ─── */
+@utility ascii-pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  line-height: 1.2;
+  letter-spacing: 0;
+  white-space: pre;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ─── Reduced motion: freeze all CSS transitions and animations ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: var(--dur-fade) !important;
+    transition-delay: 0ms !important;
   }
 }
