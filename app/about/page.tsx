@@ -1,10 +1,10 @@
 // app/about/page.tsx
 import * as React from 'react'
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
 import { SocialLinks } from '@/components/site/social-links'
+import { AsciiImage } from '@/components/ui/ascii-image'
 import { chamberSide } from '@/components/home/portal/content'
 import { IDENTITY } from '@/content/identity'
 import { portal } from '@/lib/portal/styles'
@@ -17,16 +17,15 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <PortalPage label={`${IDENTITY.studio} · origin`} side={chamberSide('about')}>
-      <div className="mb-8 flex items-start gap-5">
-        <Image
+      <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-7">
+        <AsciiImage
           src={IDENTITY.avatar}
           alt={IDENTITY.displayName}
-          width={72}
-          height={72}
-          className="size-[72px] rounded-[4px] border border-p-line object-cover"
-          priority
+          aspect="3 / 4"
+          variant="field"
+          className={portal.aboutPortrait}
         />
-        <div>
+        <div className="min-w-0">
           <p className={`${portal.label} mb-2`}>
             {IDENTITY.handle} · {IDENTITY.role}
           </p>
@@ -63,28 +62,6 @@ export default function AboutPage() {
           </div>
         ))}
       </dl>
-
-      <p className={`${portal.label} mb-4`}>Experience</p>
-      <ul className="space-y-6 pb-8">
-        {IDENTITY.experiences.map((e) => (
-          <li key={e.id} className="flex gap-4">
-            <Image
-              src={e.logo}
-              alt=""
-              width={36}
-              height={36}
-              className="mt-0.5 size-9 rounded-[3px] border border-p-line object-contain"
-            />
-            <div>
-              <p className="font-semibold text-p-bright">{e.company}</p>
-              <p className={`${portal.meta} mt-1`}>
-                {e.role} · {e.when} · {e.type}
-              </p>
-              <p className={`${portal.bodySm} mt-1`}>{e.note}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
 
       <SocialLinks className="pb-8" />
     </PortalPage>

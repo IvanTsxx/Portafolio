@@ -24,6 +24,18 @@ export type AsciiImageProps = {
    * `card` — bordered lab still. `field` — borderless knockout portrait over the cosmos.
    */
   variant?: 'card' | 'field'
+  /**
+   * Glyph density. `mark` = small logos (work). `fine` = hero/about portraits.
+   */
+  grain?: 'default' | 'fine' | 'mark'
+  /**
+   * Controlled reveal — parent hover (e.g. work row). When set, ignores own hover.
+   */
+  reveal?: boolean
+  /**
+   * No tabIndex / own pointer handlers — for use inside links.
+   */
+  passive?: boolean
 }
 
 type FrameMetrics = {
@@ -40,12 +52,14 @@ const DISSOLVE_EASE = [0.22, 1, 0.36, 1] as const
 function metricsFromBox(
   width: number,
   height: number,
-  fine = false,
+  grain: 'default' | 'fine' | 'mark' = 'default',
 ): FrameMetrics {
-  const cellW = fine ? 4.75 : 7
-  const cellH = fine ? 5.5 : 8
-  const cols = Math.max(fine ? 28 : 18, Math.round(width / cellW))
-  const rows = Math.max(fine ? 22 : 12, Math.round(height / cellH))
+  const cellW = grain === 'mark' ? 3.2 : grain === 'fine' ? 4.75 : 7
+  const cellH = grain === 'mark' ? 3.5 : grain === 'fine' ? 5.5 : 8
+  const minCols = grain === 'mark' ? 10 : grain === 'fine' ? 28 : 18
+  const minRows = grain === 'mark' ? 10 : grain === 'fine' ? 22 : 12
+  const cols = Math.max(minCols, Math.round(width / cellW))
+  const rows = Math.max(minRows, Math.round(height / cellH))
   return {
     cols,
     rows,
@@ -65,9 +79,13 @@ export function AsciiImage({
   className,
   aspect = '4 / 3',
   variant = 'card',
+  grain: grainProp,
+  reveal: revealProp,
+  passive = false,
 }: AsciiImageProps) {
   const hasPhoto = Boolean(src)
   const field = variant === 'field'
+  const grain = grainProp ?? (field ? 'fine' : 'default')
   const prefersReduced = useReducedMotion()
   const frameRef = React.useRef<HTMLElement>(null)
   const glyphsRef = React.useRef<HTMLPreElement>(null)
@@ -75,20 +93,20 @@ export function AsciiImage({
   const sourceRef = React.useRef('')
   const progress = useMotionValue(0)
 
-  const [metrics, setMetrics] = React.useState<FrameMetrics>({
-    cols: field ? 56 : 48,
-    rows: field ? 40 : 26,
-    fontSize: 10,
-    lineHeight: 12,
-  })
+  const [metrics, setMetrics] = React.useState<FrameMetrics>(() =>
+    metricsFromBox(grain === 'mark' ? 48 : 280, grain === 'mark' ? 48 : 210, grain),
+  )
   const [ascii, setAscii] = React.useState(asciiProp ?? '')
   const [ready, setReady] = React.useState(Boolean(asciiProp))
   const [failed, setFailed] = React.useState(false)
   const [touched, setTouched] = React.useState(false)
   const [hot, setHot] = React.useState(false)
 
-  const interactive = hasPhoto && !failed
-  const revealed = interactive && (hot || touched)
+  const canDissolve = hasPhoto && !failed
+  const ownsPointer = canDissolve && !passive && revealProp === undefined
+  const revealed =
+    canDissolve &&
+    (revealProp !== undefined ? revealProp : hot || touched)
   const seed = metrics.cols * 997 + metrics.rows
 
   React.useEffect(() => {
@@ -105,7 +123,7 @@ export function AsciiImage({
     const ro = new ResizeObserver((entries) => {
       const box = entries[0]?.contentRect
       if (!box || box.width < 8 || box.height < 8) return
-      const next = metricsFromBox(box.width, box.height, field)
+      const next = metricsFromBox(box.width, box.height, grain)
       setMetrics((prev) =>
         prev.cols === next.cols &&
         prev.rows === next.rows &&
@@ -116,7 +134,7 @@ export function AsciiImage({
     })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [field])
+  }, [grain])
 
   React.useEffect(() => {
     let cancelled = false
@@ -137,7 +155,7 @@ export function AsciiImage({
           imageToAscii(img, {
             cols: metrics.cols,
             rows: metrics.rows,
-            fit: 'cover',
+            fit: grain === 'mark' ? 'fill' : 'cover',
             knockout: field ? 0.11 : undefined,
           }),
         )
@@ -160,7 +178,7 @@ export function AsciiImage({
     return () => {
       cancelled = true
     }
-  }, [asciiProp, field, hasPhoto, metrics.cols, metrics.rows, src])
+  }, [asciiProp, field, grain, hasPhoto, metrics.cols, metrics.rows, src])
 
   useMotionValueEvent(progress, 'change', (v) => {
     const source = sourceRef.current
@@ -176,13 +194,17 @@ export function AsciiImage({
     }
 
     if (photoRef.current) {
-      const o = prefersReduced ? (v > 0.5 ? 1 : 0) : Math.min(1, Math.max(0, (v - 0.08) / 0.72))
+      const o = prefersReduced
+        ? v > 0.5
+          ? 1
+          : 0
+        : Math.min(1, Math.max(0, (v - 0.08) / 0.72))
       photoRef.current.style.opacity = String(o)
     }
   })
 
   React.useEffect(() => {
-    if (!interactive) return
+    if (!canDissolve) return
 
     if (prefersReduced) {
       progress.set(revealed ? 1 : 0)
@@ -194,17 +216,18 @@ export function AsciiImage({
       ease: DISSOLVE_EASE,
     })
     return () => controls.stop()
-  }, [interactive, prefersReduced, progress, revealed])
+  }, [canDissolve, prefersReduced, progress, revealed])
 
   return (
     <figure
       ref={frameRef}
       className={cn('portal-ascii-image', className)}
       data-variant={variant}
-      data-static={interactive ? undefined : ''}
+      data-grain={grain}
+      data-static={canDissolve ? undefined : ''}
       data-failed={failed ? 'true' : undefined}
-      data-dissolve={interactive ? '' : undefined}
-      tabIndex={interactive ? 0 : undefined}
+      data-dissolve={canDissolve ? '' : undefined}
+      tabIndex={ownsPointer ? 0 : undefined}
       style={
         {
           aspectRatio: aspect,
@@ -213,19 +236,19 @@ export function AsciiImage({
         } as React.CSSProperties
       }
       onPointerEnter={() => {
-        if (interactive) setHot(true)
+        if (ownsPointer) setHot(true)
       }}
       onPointerLeave={() => {
-        if (interactive) setHot(false)
+        if (ownsPointer) setHot(false)
       }}
       onFocus={() => {
-        if (interactive) setHot(true)
+        if (ownsPointer) setHot(true)
       }}
       onBlur={() => {
-        if (interactive) setHot(false)
+        if (ownsPointer) setHot(false)
       }}
       onPointerUp={(e) => {
-        if (!interactive) return
+        if (!ownsPointer) return
         if (e.pointerType === 'touch' || e.pointerType === 'pen') {
           setTouched((v) => !v)
         }

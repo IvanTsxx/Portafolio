@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
+import { AsciiImage } from '@/components/ui/ascii-image'
 import { chamberSide } from '@/components/home/portal/content'
 import { getWork, WORK } from '@/content/work'
 import { portal } from '@/lib/portal/styles'
@@ -36,8 +37,21 @@ export default async function WorkDetailPage({
   return (
     <PortalPage label={`Work · ${job.index}`} side={chamberSide('work')}>
       <WorkBackLink />
-      <PageHeading className="mt-6">{job.company}</PageHeading>
-      <p className={`${portal.body} mb-8`}>{job.summary}</p>
+      <div className="mt-6 mb-8 flex items-start gap-5">
+        {job.logo && (
+          <AsciiImage
+            src={job.logo}
+            alt=""
+            aspect="1 / 1"
+            grain="mark"
+            className={portal.workLogoLg}
+          />
+        )}
+        <div className="min-w-0">
+          <PageHeading>{job.company}</PageHeading>
+          <p className={`${portal.body} mt-3`}>{job.summary}</p>
+        </div>
+      </div>
       <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <div>
           <dt className={`${portal.label} mb-2`}>ROLE</dt>

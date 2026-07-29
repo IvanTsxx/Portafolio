@@ -273,6 +273,13 @@
     user-select: none;
   }
 
+  &[data-grain='mark'] .portal-ascii-image-photo {
+    object-fit: contain;
+    object-position: center;
+    padding: 18%;
+    box-sizing: border-box;
+  }
+
   & .portal-ascii-image-glyphs {
     display: block;
     box-sizing: border-box;
