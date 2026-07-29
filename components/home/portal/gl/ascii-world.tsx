@@ -42,9 +42,15 @@ type Uniforms = {
   uLandMood: { value: number }
   uBg: { value: THREE.Color }
   uFg: { value: THREE.Color }
+  /** Scales glyph mix so copy stays readable over the field (light needs more room). */
+  uGlyphGain: { value: number }
   uCell: { value: number }
   uAtlas: { value: THREE.Texture | null }
   uAtlasLen: { value: number }
+}
+
+function glyphGainFor(theme: PortalTheme) {
+  return theme === 'dark' ? 0.58 : 0.32
 }
 
 function easeInOut(t: number) {
@@ -90,6 +96,7 @@ function FieldMesh({
       uLandMood: { value: 0 },
       uBg: { value: new THREE.Color(theme === 'dark' ? '#0c0b0a' : '#e8e4dc') },
       uFg: { value: new THREE.Color(theme === 'dark' ? '#e8e4dc' : '#1a1816') },
+      uGlyphGain: { value: glyphGainFor(theme) },
       uCell: { value: cell },
       uAtlas: { value: tex },
       uAtlasLen: { value: ASCII_RAMP.length },
@@ -145,6 +152,7 @@ function FieldMesh({
         if (!u) return
         u.uBg!.value.set(t === 'dark' ? '#0c0b0a' : '#e8e4dc')
         u.uFg!.value.set(t === 'dark' ? '#e8e4dc' : '#1a1816')
+        u.uGlyphGain!.value = glyphGainFor(t)
       },
     }
     return () => {

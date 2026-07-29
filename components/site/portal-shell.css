@@ -4,7 +4,8 @@
   --p-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --p-void: #0c0b0a;
   --p-bright: #e8e4dc;
-  --p-dim: #8a847c;
+  /* Clear of ASCII glyph wash — was #8a847c, then #a8a29a */
+  --p-dim: #b8b2aa;
   --p-mid: #cfc9bf;
   --p-signal: #e85d2a;
   /* Bridge portal tokens → shadcn/typeset (and any UI that reads --color-*) */
@@ -29,8 +30,8 @@
 .portal-shell[data-theme='light'] {
   --p-void: #e8e4dc;
   --p-bright: #1a1816;
-  /* Dim must clear ~4.5:1 over paper + ASCII wash (was #6e6860 — lost in canvas) */
-  --p-dim: #3a3530;
+  /* Dim must clear ~4.5:1 over paper + ASCII wash (was #6e6860 / #3a3530) */
+  --p-dim: #2c2824;
   --p-mid: #2a2622;
   --p-signal: #c44a1f;
   /* Code chips need a bit more ink wash on paper so glyphs don't fight the canvas */

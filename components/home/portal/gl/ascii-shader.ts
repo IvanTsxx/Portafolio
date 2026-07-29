@@ -21,6 +21,7 @@ uniform float uLand;
 uniform float uLandMood;
 uniform vec3 uBg;
 uniform vec3 uFg;
+uniform float uGlyphGain;
 uniform float uCell;
 uniform sampler2D uAtlas;
 uniform float uAtlasLen;
@@ -124,7 +125,8 @@ void main() {
 
   float idx = floor(clamp(d, 0.0, 1.0) * (uAtlasLen - 1.0) + 0.5);
   float glyph = texture2D(uAtlas, vec2((idx + cellUv.x) / uAtlasLen, cellUv.y)).r;
-  float strength = glyph * (0.22 + d * 0.5);
+  /* Gain < 1 leaves headroom for floating UI (dim labels especially) over the field */
+  float strength = glyph * (0.22 + d * 0.5) * clamp(uGlyphGain, 0.0, 1.0);
   gl_FragColor = vec4(mix(uBg, uFg, strength), 1.0);
 }
 `
