@@ -183,14 +183,15 @@ html.light .portal-shell {
     bottom: 0;
     z-index: 2;
     display: block;
-    height: 3.25rem;
-    margin-top: -3.25rem;
+    height: 5.25rem;
+    margin-top: -5.25rem;
     flex-shrink: 0;
     pointer-events: none;
-    /* Dark: solid void matches the cosmos field. */
+    /* Dark: taller, denser cue into void */
     background: linear-gradient(to top,
         var(--color-p-void) 0%,
-        color-mix(in oklab, var(--color-p-void) 55%, transparent) 45%,
+        color-mix(in oklab, var(--color-p-void) 78%, transparent) 38%,
+        color-mix(in oklab, var(--color-p-void) 28%, transparent) 72%,
         transparent 100%);
     opacity: 0;
 
@@ -207,7 +208,7 @@ html.light .portal-shell {
         opacity: 1;
         animation: portal-scroll-fade-out linear both;
         animation-timeline: --portal-scroll;
-        animation-range: calc(100% - 4rem) 100%;
+        animation-range: calc(100% - 6rem) 100%;
       }
     }
   }
@@ -220,12 +221,13 @@ html.light .portal-shell {
  */
 .portal-shell[data-theme='light'] .portal-scroll-edge>[data-portal-scroll-fade],
 html.light .portal-shell .portal-scroll-edge>[data-portal-scroll-fade] {
-  height: 2.75rem;
-  margin-top: -2.75rem;
-  /* Soft veil only — never a black slab over the last code fence */
+  height: 5.25rem;
+  margin-top: -5.25rem;
+  /* Stronger veil — still lets ASCII through, no solid paper slab */
   background: linear-gradient(to top,
-      color-mix(in oklab, var(--color-p-void) 28%, transparent) 0%,
-      color-mix(in oklab, var(--color-p-void) 10%, transparent) 50%,
+      color-mix(in oklab, var(--color-p-void) 82%, transparent) 0%,
+      color-mix(in oklab, var(--color-p-void) 48%, transparent) 40%,
+      color-mix(in oklab, var(--color-p-void) 16%, transparent) 72%,
       transparent 100%);
 }
 

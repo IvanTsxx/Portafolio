@@ -3,21 +3,22 @@
 .typeset-notes {
   --note-code-ink: #141210;
   --note-code-fg: #e8e4dc;
-  /* ~92% ink — field barely peeks; readable, not a glass smear */
-  --note-code-bg: color-mix(in oklab, var(--note-code-ink) 92%, transparent);
+  /* ~72% ink — ASCII peeks through; tokens stay readable */
+  --note-code-bg: color-mix(in oklab, var(--note-code-ink) 72%, transparent);
   --note-code-border: color-mix(in oklab, var(--note-code-fg) 14%, transparent);
-  --note-code-inline-bg: color-mix(in oklab, var(--note-code-ink) 88%, transparent);
+  --note-code-inline-bg: color-mix(in oklab, var(--note-code-ink) 78%, transparent);
   /* room so sticky scroll-fade doesn’t eat the last fence */
-  padding-bottom: 3.5rem;
+  padding-bottom: 5.5rem;
 }
 
 .portal-shell[data-theme='light'] .typeset-notes,
 html.light .portal-shell .typeset-notes {
   --note-code-ink: #161412;
   --note-code-fg: #e8e4dc;
-  --note-code-bg: color-mix(in oklab, var(--note-code-ink) 94%, transparent);
+  /* Light field bleeds hard through dark glass — keep denser than dark mode */
+  --note-code-bg: color-mix(in oklab, var(--note-code-ink) 90%, transparent);
   --note-code-border: color-mix(in oklab, var(--note-code-ink) 40%, transparent);
-  --note-code-inline-bg: color-mix(in oklab, var(--note-code-ink) 90%, transparent);
+  --note-code-inline-bg: color-mix(in oklab, var(--note-code-ink) 86%, transparent);
 }
 
 .typeset-notes :where(:not(pre) > code) {
