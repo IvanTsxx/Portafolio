@@ -1561,64 +1561,6 @@ html.light .portal-shell .portal-signal-node {
 
 /* ─── Portal story diagrams (building-the-portal note) ─── */
 
-@keyframes ps-ring-spin {
-  to {
-    stroke-dashoffset: -48;
-  }
-}
-
-@keyframes ps-ray-pulse {
-
-  0%,
-  100% {
-    stroke-opacity: 0.15;
-  }
-
-  50% {
-    stroke-opacity: 0.7;
-  }
-}
-
-@keyframes ps-glow-breathe {
-
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(0.92);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-}
-
-@keyframes ps-core-pulse {
-
-  0%,
-  100% {
-    stroke-opacity: 0.55;
-    r: 9;
-  }
-
-  50% {
-    stroke-opacity: 1;
-    r: 12;
-  }
-}
-
-@keyframes ps-glyph-orbit {
-
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
 @keyframes ps-fade-up {
   from {
     opacity: 0;
@@ -1679,18 +1621,74 @@ html.light .portal-shell .portal-signal-node {
   }
 }
 
-.portal-story-wormhole .ps-worm-glow {
-  transform-origin: 160px 100px;
+.ps-tunnel .portal-story-wormhole .ps-worm-glow {
+  transform-origin: 160px 96px;
   transform-box: fill-box;
 }
 
+@keyframes ps-ring-spin {
+  to {
+    stroke-dashoffset: -42;
+  }
+}
+
+@keyframes ps-ray-pulse {
+
+  0%,
+  100% {
+    stroke-opacity: 0.18;
+  }
+
+  50% {
+    stroke-opacity: 0.75;
+  }
+}
+
+@keyframes ps-glow-breathe {
+
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes ps-core-pulse {
+
+  0%,
+  100% {
+    stroke-opacity: 0.55;
+  }
+
+  50% {
+    stroke-opacity: 1;
+  }
+}
+
+@keyframes ps-glyph-orbit {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
 .portal-story[data-animating] .ps-worm-ring {
-  animation: ps-ring-spin calc(4s + var(--i, 0) * 0.55s) linear infinite;
+  animation: ps-ring-spin calc(3.6s + var(--i, 0) * 0.45s) linear infinite;
 }
 
 .portal-story[data-animating] .ps-worm-ray {
-  animation: ps-ray-pulse calc(1.6s + var(--i, 0) * 0.12s) ease-in-out infinite;
-  animation-delay: calc(var(--i, 0) * 80ms);
+  animation: ps-ray-pulse calc(1.5s + var(--i, 0) * 0.1s) ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 70ms);
 }
 
 .portal-story[data-animating] .ps-worm-glow {

@@ -36,6 +36,8 @@ export const portal = {
   chromeControls: [
     'fixed top-3.5 right-3.5 z-[80] inline-flex items-center gap-0.5',
     'border border-p-bright/12 bg-p-void/55 p-[3px] backdrop-blur-[8px]',
+    // Light: same thin glass as open wheel — /55 paper reads as a white slab
+    'p-light:border-p-bright/8 p-light:bg-p-void/22 p-light:backdrop-blur-[5px]',
   ].join(' '),
 
   chromeBtn: [
@@ -159,6 +161,9 @@ export const portal = {
     'focus-visible:text-p-bright focus-visible:outline focus-visible:outline-1',
     'focus-visible:outline-offset-2 focus-visible:outline-p-signal',
     'disabled:cursor-default disabled:opacity-45',
+    // Match open wheel glass in light — avoid solid paper chip
+    'p-light:border-p-bright/8 p-light:bg-p-void/22 p-light:backdrop-blur-[5px]',
+    'p-light:shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-p-bright)_5%,transparent),0_8px_24px_color-mix(in_oklab,var(--color-p-bright)_6%,transparent)]',
   ].join(' '),
 
   wheelTriggerGlyph: 'inline-flex size-7 items-center justify-center text-p-signal [&_svg]:size-4',

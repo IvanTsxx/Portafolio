@@ -47,130 +47,185 @@ function FigureShell({
       ref={figureRef}
       data-animating={animating ? '' : undefined}
       className={cn(
-        'portal-story not-typeset my-7 overflow-hidden',
-        'border border-p-bright/14 bg-p-bright/[0.035] p-4 sm:p-5',
+        'portal-story not-typeset my-7 overflow-x-auto overflow-y-visible',
+        'border-0 bg-transparent p-0',
         '[text-shadow:0_0_12px_var(--color-p-void)]',
         className,
       )}
     >
-      <figcaption className={cn(portal.label, 'mb-3.5')}>{title}</figcaption>
+      <figcaption className={cn(portal.label, 'mb-3')}>{title}</figcaption>
       {children}
     </figure>
   )
 }
 
-/** Concentric ASCII tunnel — the wormhole metaphor. */
+/** Wormhole metaphor — geometric SVG over soft glass (reads against the cosmos canvas). */
 export function WormholeDiagram() {
   const { ref, inView } = useInViewAnim(0.3)
   const uid = useId().replace(/:/g, '')
-  const rings = [18, 36, 56, 78, 102, 128]
-  const glyphs = ['.', ':', '+', '*', '#', '@']
+  const phasesRef = useRef<HTMLOListElement>(null)
+
+  useEffect(() => {
+    const list = phasesRef.current
+    if (!list || !inView) return
+
+    const reduce =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce) {
+      list.children[0]
+        ?.querySelector('[data-phase]')
+        ?.setAttribute('data-active', '')
+      return
+    }
+
+    let i = 0
+    const tick = () => {
+      for (let n = 0; n < list.children.length; n++) {
+        const label = list.children[n]?.querySelector('[data-phase]')
+        if (!(label instanceof HTMLElement)) continue
+        if (n === i) label.setAttribute('data-active', '')
+        else label.removeAttribute('data-active')
+      }
+      i = (i + 1) % 4
+    }
+    tick()
+    const id = window.setInterval(tick, 700)
+    return () => window.clearInterval(id)
+  }, [inView])
+
+  const rings = [22, 40, 58, 78, 100, 124]
+  const steps = ['HOLD', 'CHARGE', 'TUNNEL', 'LAND'] as const
 
   return (
     <FigureShell title="WORMHOLE · 900ms" figureRef={ref} animating={inView}>
-      <svg
-        viewBox="0 0 320 200"
-        className="portal-story-wormhole mx-auto block h-auto w-full max-w-[36rem]"
-        role="img"
-        aria-label="Animated ASCII wormhole tunnel with concentric rings charging toward the center"
+      <div
+        className={cn(
+          'ps-tunnel mx-auto w-full max-w-[36rem]',
+          'border border-p-bright/12 bg-p-void/55 p-3 backdrop-blur-[10px] sm:p-4',
+          'shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-p-void)_40%,transparent)]',
+          'p-light:border-p-bright/10 p-light:bg-p-bright/[0.04] p-light:backdrop-blur-[6px]',
+          'p-light:shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-p-bright)_6%,transparent)]',
+        )}
       >
-        <defs>
-          <radialGradient id={`${uid}-void`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="var(--color-p-void)" stopOpacity="0.2" />
-            <stop offset="55%" stopColor="var(--color-p-void)" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="var(--color-p-void)" stopOpacity="1" />
-          </radialGradient>
-          <radialGradient id={`${uid}-glow`} cx="50%" cy="50%" r="40%">
-            <stop offset="0%" stopColor="var(--color-p-signal)" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="var(--color-p-signal)" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        <rect width="320" height="200" fill={`url(#${uid}-void)`} />
-        <circle className="ps-worm-glow" cx="160" cy="100" r="48" fill={`url(#${uid}-glow)`} />
-
-        {rings.map((r, i) => (
-          <circle
-            key={r}
-            className="ps-worm-ring"
-            style={{ ['--i' as string]: i }}
-            cx="160"
-            cy="100"
-            r={r}
-            fill="none"
-            stroke="var(--color-p-bright)"
-            strokeOpacity={0.12 + i * 0.06}
-            strokeWidth={i === rings.length - 1 ? 1.4 : 1}
-            strokeDasharray={i % 2 === 0 ? '2 6' : '1 4'}
-          />
-        ))}
-
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => {
-          const rad = (deg * Math.PI) / 180
-          const x1 = 160 + Math.cos(rad) * 118
-          const y1 = 100 + Math.sin(rad) * 88
-          const x2 = 160 + Math.cos(rad) * 28
-          const y2 = 100 + Math.sin(rad) * 22
-          return (
-            <line
-              key={deg}
-              className="ps-worm-ray"
-              style={{ ['--i' as string]: i }}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="var(--color-p-signal)"
-              strokeOpacity="0.45"
-              strokeWidth="1"
-              strokeLinecap="round"
-            />
-          )
-        })}
-
-        <circle
-          className="ps-worm-core"
-          cx="160"
-          cy="100"
-          r="10"
-          fill="var(--color-p-void)"
-          stroke="var(--color-p-signal)"
-          strokeWidth="1.5"
-        />
-
-        {glyphs.map((g, i) => {
-          const a = (i / glyphs.length) * Math.PI * 2 - Math.PI / 2
-          const rr = 64
-          return (
-            <text
-              key={g}
-              className="ps-worm-glyph"
-              style={{ ['--i' as string]: i }}
-              x={160 + Math.cos(a) * rr}
-              y={100 + Math.sin(a) * rr}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="var(--color-p-mid)"
-              fontFamily="var(--font-mono), ui-monospace, monospace"
-              fontSize="11"
-            >
-              {g}
-            </text>
-          )
-        })}
-
-        <text
-          x="160"
-          y="188"
-          textAnchor="middle"
-          fill="var(--color-p-dim)"
-          fontFamily="var(--font-mono), ui-monospace, monospace"
-          fontSize="8"
-          letterSpacing="0.16em"
+        <svg
+          viewBox="0 0 320 200"
+          className="portal-story-wormhole mx-auto block h-auto w-full"
+          role="img"
+          aria-label="Wormhole tunnel diagram: hold, charge, tunnel, land"
         >
-          HOLD → CHARGE → TUNNEL → LAND
-        </text>
-      </svg>
+          <defs>
+            <radialGradient id={`${uid}-glow`} cx="50%" cy="50%" r="42%">
+              <stop offset="0%" stopColor="var(--color-p-signal)" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="var(--color-p-signal)" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+
+          <circle
+            className="ps-worm-glow"
+            cx="160"
+            cy="96"
+            r="52"
+            fill={`url(#${uid}-glow)`}
+          />
+
+          {rings.map((r, i) => (
+            <ellipse
+              key={r}
+              className="ps-worm-ring"
+              style={{ ['--i' as string]: i }}
+              cx="160"
+              cy="96"
+              rx={r}
+              ry={r * 0.72}
+              fill="none"
+              stroke="var(--color-p-bright)"
+              strokeOpacity={0.18 + i * 0.08}
+              strokeWidth={i === rings.length - 1 ? 1.5 : 1}
+              strokeDasharray={i % 2 === 0 ? '3 5' : '1.5 4'}
+            />
+          ))}
+
+          {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => {
+            const rad = (deg * Math.PI) / 180
+            const x1 = 160 + Math.cos(rad) * 118
+            const y1 = 96 + Math.sin(rad) * 84
+            const x2 = 160 + Math.cos(rad) * 26
+            const y2 = 96 + Math.sin(rad) * 18
+            return (
+              <line
+                key={deg}
+                className="ps-worm-ray"
+                style={{ ['--i' as string]: i }}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="var(--color-p-signal)"
+                strokeOpacity="0.5"
+                strokeWidth="1"
+                strokeLinecap="round"
+              />
+            )
+          })}
+
+          <ellipse
+            className="ps-worm-core"
+            cx="160"
+            cy="96"
+            rx="11"
+            ry="8"
+            fill="none"
+            stroke="var(--color-p-signal)"
+            strokeWidth="1.6"
+          />
+
+          {['.', ':', '+', '*', '#', '@'].map((g, i) => {
+            const a = (i / 6) * Math.PI * 2 - Math.PI / 2
+            return (
+              <text
+                key={g}
+                className="ps-worm-glyph"
+                style={{ ['--i' as string]: i }}
+                x={160 + Math.cos(a) * 58}
+                y={96 + Math.sin(a) * 42}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="var(--color-p-bright)"
+                fontFamily="var(--font-mono), ui-monospace, monospace"
+                fontSize="11"
+              >
+                {g}
+              </text>
+            )
+          })}
+        </svg>
+
+        <ol
+          ref={phasesRef}
+          className="m-0 mt-2 flex list-none items-center justify-center gap-1.5 p-0 sm:gap-2.5"
+        >
+          {steps.map((step, i) => (
+            <li key={step} className="flex items-center gap-1.5 sm:gap-2.5">
+              {i > 0 ? (
+                <span className="font-mono text-[9px] text-p-dim/50" aria-hidden>
+                  →
+                </span>
+              ) : null}
+              <span
+                data-phase
+                className={cn(
+                  portal.meta,
+                  'text-p-dim transition-colors duration-150',
+                  'data-[active]:text-p-signal',
+                )}
+              >
+                {step}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
     </FigureShell>
   )
 }
@@ -203,7 +258,7 @@ export function BuildLayers() {
                 <span className="ps-layer-rail absolute top-3 bottom-[-0.65rem] w-px bg-p-bright/18" />
               ) : null}
             </div>
-            <div className="min-w-0 flex-1 border border-p-bright/10 bg-p-void/40 px-3 py-2">
+            <div className="min-w-0 flex-1 border border-p-bright/14 bg-transparent px-3 py-2">
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                 <span className={cn(portal.meta, 'text-p-signal')}>{step.n}</span>
                 <span className="text-[14px] font-semibold tracking-[-0.02em] text-p-bright">
@@ -239,7 +294,7 @@ export function TokenPalette() {
         {TOKENS.map((t, i) => (
           <li
             key={t.name}
-            className="ps-token border border-p-bright/12 bg-p-void/50 p-2"
+            className="ps-token border border-p-bright/14 bg-transparent p-2"
             style={{ ['--i' as string]: i }}
           >
             <div className="mb-2 flex h-10 overflow-hidden border border-p-bright/10">
@@ -299,7 +354,7 @@ export function DurationScale() {
   )
 }
 
-/** Layered shell architecture — non-overlapping bands + nested cosmos frame. */
+/** Layered shell architecture — all labels inside the viewBox, no clip. */
 export function ShellStack() {
   const { ref, inView } = useInViewAnim(0.3)
 
@@ -309,42 +364,41 @@ export function ShellStack() {
       label: 'Chrome',
       sub: 'theme · sound',
       tone: 'signal' as const,
-      y: 14,
-      h: 28,
+      y: 36,
+      h: 26,
     },
     {
       id: 'chambers',
       label: 'Chambers',
       sub: 'route float',
       tone: 'bright' as const,
-      y: 50,
-      h: 72,
+      y: 70,
+      h: 56,
     },
     {
       id: 'wheel',
       label: 'Half-wheel',
       sub: 'hold to travel',
       tone: 'signal' as const,
-      y: 130,
-      h: 28,
+      y: 134,
+      h: 26,
     },
   ] as const
 
   return (
     <FigureShell title="SHELL STACK" figureRef={ref} animating={inView}>
       <svg
-        viewBox="0 0 380 176"
+        viewBox="0 0 360 176"
         className="portal-story-shell mx-auto block h-auto w-full max-w-[30rem]"
         role="img"
         aria-label="Portal shell layers: AsciiWorld behind, then chambers, chrome, and half-wheel"
       >
-        {/* Cosmos frame — behind everything, label on the left */}
         <g className="ps-shell-layer" style={{ ['--i' as string]: 0 }}>
           <rect
-            x="48"
-            y="10"
-            width="168"
-            height="156"
+            x="12"
+            y="28"
+            width="176"
+            height="140"
             fill="var(--color-p-bright)"
             fillOpacity="0.05"
             stroke="var(--color-p-bright)"
@@ -353,9 +407,8 @@ export function ShellStack() {
             strokeDasharray="3 4"
           />
           <text
-            x="40"
-            y="88"
-            textAnchor="end"
+            x="12"
+            y="18"
             fill="var(--color-p-bright)"
             fontFamily="var(--font-sans), system-ui, sans-serif"
             fontSize="11"
@@ -364,15 +417,14 @@ export function ShellStack() {
             AsciiWorld
           </text>
           <text
-            x="40"
-            y="104"
-            textAnchor="end"
+            x="92"
+            y="18"
             fill="var(--color-p-dim)"
             fontFamily="var(--font-mono), ui-monospace, monospace"
             fontSize="9"
             letterSpacing="0.06em"
           >
-            WebGL cosmos
+            WebGL cosmos · behind all
           </text>
         </g>
 
@@ -383,7 +435,7 @@ export function ShellStack() {
             style={{ ['--i' as string]: i + 1 }}
           >
             <rect
-              x="56"
+              x="24"
               y={band.y}
               width="152"
               height={band.h}
@@ -397,18 +449,17 @@ export function ShellStack() {
               strokeOpacity="0.22"
               strokeWidth="1"
             />
-            {/* Leader line to label */}
             <line
-              x1="208"
+              x1="176"
               y1={band.y + band.h / 2}
-              x2="228"
+              x2="196"
               y2={band.y + band.h / 2}
               stroke="var(--color-p-bright)"
               strokeOpacity="0.28"
               strokeWidth="1"
             />
             <text
-              x="234"
+              x="202"
               y={band.y + band.h / 2 - 4}
               fill="var(--color-p-bright)"
               fontFamily="var(--font-sans), system-ui, sans-serif"
@@ -418,7 +469,7 @@ export function ShellStack() {
               {band.label}
             </text>
             <text
-              x="234"
+              x="202"
               y={band.y + band.h / 2 + 12}
               fill="var(--color-p-dim)"
               fontFamily="var(--font-mono), ui-monospace, monospace"
