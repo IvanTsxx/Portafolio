@@ -108,7 +108,7 @@ html.light .portal-shell {
   -webkit-user-select: none;
 
   &[data-wide] {
-    max-width: min(60rem, 85vw);
+    max-width: none;
   }
 
   & h1,
@@ -155,8 +155,10 @@ html.light .portal-shell {
     text-shadow: 0 0 14px var(--color-p-void);
   }
 
-  & .typeset-notes :is(pre, code, pre *, code *) {
-    text-shadow: none;
+  /* Code fences: never inherit portal-float cream bloom (washes tokens out) */
+  & .typeset-notes figure[data-rehype-pretty-code-figure],
+  & .typeset-notes figure[data-rehype-pretty-code-figure] * {
+    text-shadow: none !important;
   }
 }
 
@@ -218,11 +220,12 @@ html.light .portal-shell {
  */
 .portal-shell[data-theme='light'] .portal-scroll-edge>[data-portal-scroll-fade],
 html.light .portal-shell .portal-scroll-edge>[data-portal-scroll-fade] {
-  height: 4.5rem;
-  margin-top: -4.5rem;
+  height: 2.75rem;
+  margin-top: -2.75rem;
+  /* Soft veil only — never a black slab over the last code fence */
   background: linear-gradient(to top,
-      color-mix(in oklab, var(--color-p-void) 42%, transparent) 0%,
-      color-mix(in oklab, var(--color-p-void) 16%, transparent) 42%,
+      color-mix(in oklab, var(--color-p-void) 28%, transparent) 0%,
+      color-mix(in oklab, var(--color-p-void) 10%, transparent) 50%,
       transparent 100%);
 }
 

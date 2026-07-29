@@ -84,7 +84,7 @@ export const portal = {
     'portal-float portal-emerge portal-scroll-halo portal-scroll-edge pointer-events-auto',
     'max-h-[calc(100dvh-160px)] w-full max-w-[min(40rem,92vw)]',
     'overflow-y-auto overscroll-contain pr-2',
-    'data-[wide]:max-w-[min(60rem,85vw)]',
+    'data-[wide]:max-w-none',
     '[[data-side=right]_&]:pr-0 [[data-side=right]_&]:pl-2',
   ].join(' '),
 

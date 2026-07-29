@@ -1,24 +1,25 @@
-/* app/notes-code.css — fenced code only (pretty-code figures), never ErrorCard <pre> */
+/* app/notes-code.css — almost-opaque terminal panels + Shiki token colors */
 
 .typeset-notes {
-  --note-code-ink: #12110f;
+  --note-code-ink: #141210;
   --note-code-fg: #e8e4dc;
-  /* Semi-transparent panel — field shows through; no solid black slab */
-  --note-code-bg: color-mix(in oklab, var(--note-code-ink) 58%, transparent);
+  /* ~92% ink — field barely peeks; readable, not a glass smear */
+  --note-code-bg: color-mix(in oklab, var(--note-code-ink) 92%, transparent);
   --note-code-border: color-mix(in oklab, var(--note-code-fg) 14%, transparent);
-  --note-code-inline-bg: color-mix(in oklab, var(--note-code-ink) 48%, transparent);
+  --note-code-inline-bg: color-mix(in oklab, var(--note-code-ink) 88%, transparent);
+  /* room so sticky scroll-fade doesn’t eat the last fence */
+  padding-bottom: 3.5rem;
 }
 
 .portal-shell[data-theme='light'] .typeset-notes,
 html.light .portal-shell .typeset-notes {
-  --note-code-ink: #1a1816;
+  --note-code-ink: #161412;
   --note-code-fg: #e8e4dc;
-  --note-code-bg: color-mix(in oklab, var(--note-code-ink) 62%, transparent);
-  --note-code-border: color-mix(in oklab, var(--note-code-ink) 28%, transparent);
-  --note-code-inline-bg: color-mix(in oklab, var(--note-code-ink) 55%, transparent);
+  --note-code-bg: color-mix(in oklab, var(--note-code-ink) 94%, transparent);
+  --note-code-border: color-mix(in oklab, var(--note-code-ink) 40%, transparent);
+  --note-code-inline-bg: color-mix(in oklab, var(--note-code-ink) 90%, transparent);
 }
 
-/* Inline chips — translucent, not solid black */
 .typeset-notes :where(:not(pre) > code) {
   border: 1px solid var(--note-code-border);
   background-color: var(--note-code-inline-bg);
@@ -26,32 +27,39 @@ html.light .portal-shell .typeset-notes {
   padding: 0.12em 0.4em;
   font-size: 11px;
   border-radius: 0;
+  text-shadow: none !important;
 }
 
-/* One wrapper border — kills the double “hairline” between title + pre */
-.typeset-notes :where(figure[data-rehype-pretty-code-figure]) {
+/* Kill portal-float cream bloom on every token */
+.typeset-notes figure[data-rehype-pretty-code-figure],
+.typeset-notes figure[data-rehype-pretty-code-figure] * {
+  text-shadow: none !important;
+}
+
+.typeset-notes figure[data-rehype-pretty-code-figure] {
   margin-block: 1.5em;
   border: 1px solid var(--note-code-border);
   background-color: var(--note-code-bg);
+  color: var(--note-code-fg);
+  color-scheme: dark;
+  isolation: isolate;
   contain: content;
   overflow: hidden;
 }
 
-.typeset-notes :where(figcaption[data-rehype-pretty-code-title]) {
+.typeset-notes figure[data-rehype-pretty-code-figure] figcaption[data-rehype-pretty-code-title] {
   border: 0;
   border-bottom: 1px solid var(--note-code-border);
   background: transparent;
-  color: color-mix(in oklab, var(--note-code-fg) 55%, transparent);
+  color: color-mix(in oklab, var(--note-code-fg) 62%, transparent);
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   padding: 0.55rem 1rem;
-  text-shadow: none;
 }
 
-/* Only pretty-code fences — do NOT style ErrorCard / plain <pre> */
-.typeset-notes :where(figure[data-rehype-pretty-code-figure] pre) {
+.typeset-notes figure[data-rehype-pretty-code-figure] pre {
   margin: 0;
   border: 0 !important;
   border-radius: 0;
@@ -60,32 +68,19 @@ html.light .portal-shell .typeset-notes {
   overflow-x: auto;
   padding: 1rem 1.15rem;
   font-size: 11px;
-  line-height: 1.65;
+  line-height: 1.7;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  text-shadow: none !important;
 }
 
-.typeset-notes :where(figure[data-rehype-pretty-code-figure] pre code) {
+.typeset-notes figure[data-rehype-pretty-code-figure] pre code {
   border: 0;
   background: transparent !important;
-  /* Do NOT set color — Shiki inline token colors must win */
   padding: 0;
   font-size: inherit;
-  text-shadow: none !important;
+  /* Shiki inline colors must win — do not set `color` here */
 }
 
-.typeset-notes :where(figure[data-rehype-pretty-code-figure] span) {
-  text-shadow: none !important;
-}
-
-/* Fallback fences without pretty-code wrapper */
-.typeset-notes :where(pre:not([data-language]):not(:has(code[data-language]))) {
-  border: 1px solid var(--note-code-border);
-  background-color: var(--note-code-bg);
+.typeset-notes figure[data-rehype-pretty-code-figure] pre code span:not([style*='color']) {
   color: var(--note-code-fg);
-  padding: 1rem 1.15rem;
-  font-size: 11px;
-  line-height: 1.65;
-  text-shadow: none;
 }

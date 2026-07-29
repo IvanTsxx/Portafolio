@@ -2,12 +2,11 @@
 import remarkGfm from 'remark-gfm'
 import rehypePrettyCode, { type Options as PrettyCodeOptions } from 'rehype-pretty-code'
 import type { PluggableList } from 'unified'
-import { portalCodeTheme } from '@/lib/notes/shiki-theme'
 
 const prettyCodeOptions: PrettyCodeOptions = {
-  // Must be VS Code JSON shape with `tokenColors` (not Shiki `settings`)
-  // so rehype-pretty-code's isJSONTheme() recognizes it.
-  theme: portalCodeTheme,
+  // Bundled editor theme — real token hues (keywords/strings/types), not flat grey.
+  // keepBackground false → panel bg comes from notes-code.css (portal ink, not GitHub navy).
+  theme: 'github-dark-dimmed',
   keepBackground: false,
   defaultLang: 'tsx',
 }
