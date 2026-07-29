@@ -32,7 +32,6 @@ A shared infinite ASCII field that every route floats over, with wormhole travel
 - Live generative fields stay on the ASCII / WebGL cosmos path; SVG is for static marks only (see `docs/ascii-vs-svg.md`)
 - Do not cover the infinite canvas with a second competing WebGL scene on home
 - Reduced-motion paths must exist for travel / ripples / entrance motion
-- Lexicon vortex (R3F spiral) exists as a legacy Horizon exception — not the portal home companion by default
 - Home constellation: catch glyphs pulse the shared cosmos (`pulseRipple`); no chamber nav; positions reshuffle per load, never over hero
 
 ## Brand Commitments
@@ -48,7 +47,9 @@ A shared infinite ASCII field that every route floats over, with wormhole travel
 - Identity + lexicon: `content/identity.ts`
 - Portal home: `components/home/portal/portal-home.tsx`
 - Cosmos: `components/home/portal/gl/ascii-world.tsx`
-- Design decisions: `docs/home.md`, `docs/ascii-vs-svg.md`
+- Design / product / agents: `DESIGN.md`, `PRODUCT.md`, `AGENTS.md`
+- Technical contracts: `docs/plan.md`, `docs/home.md`, `docs/ascii-vs-svg.md`
+- Origin narrative (public note): `content/notes/building-the-portal.mdx`
 - No fabricated testimonials or client logos beyond real CV in identity/content
 
 ## Product Principles

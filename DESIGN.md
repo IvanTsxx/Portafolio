@@ -160,3 +160,10 @@ Mostly sharp (`0–2px`). Pill only for the wheel home capsule. No rounded media
 - Fill emptiness with marketing cards or SVG generative fields
 - Use purple/glow SaaS tropes or cream-serif editorial defaults
 - Overuse signal orange
+
+## References
+
+- Product principles: `PRODUCT.md`
+- Agent conventions: `AGENTS.md`
+- Technical contracts: `docs/plan.md`
+- Public origin note: `content/notes/building-the-portal.mdx`

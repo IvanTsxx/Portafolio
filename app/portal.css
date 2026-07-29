@@ -383,6 +383,9 @@ html.light .portal-shell .portal-scroll-edge>[data-portal-scroll-fade] {
     border: 0;
     background: transparent;
     overflow: visible;
+    /* Own layer — mask + parent emerge translateZ was tanking FPS on /about */
+    transform: translateZ(0);
+    contain: paint;
     /* Soft falloff — keeps face readable, blends into cosmos */
     -webkit-mask-image: radial-gradient(ellipse 88% 82% at 50% 36%,
         #000 52%,
@@ -1553,5 +1556,239 @@ html.light .portal-shell .portal-signal-node {
   .invalidation-loop,
   .invalidation-cut {
     opacity: 0.75;
+  }
+}
+
+/* ─── Portal story diagrams (building-the-portal note) ─── */
+
+@keyframes ps-ring-spin {
+  to {
+    stroke-dashoffset: -48;
+  }
+}
+
+@keyframes ps-ray-pulse {
+
+  0%,
+  100% {
+    stroke-opacity: 0.15;
+  }
+
+  50% {
+    stroke-opacity: 0.7;
+  }
+}
+
+@keyframes ps-glow-breathe {
+
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes ps-core-pulse {
+
+  0%,
+  100% {
+    stroke-opacity: 0.55;
+    r: 9;
+  }
+
+  50% {
+    stroke-opacity: 1;
+    r: 12;
+  }
+}
+
+@keyframes ps-glyph-orbit {
+
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ps-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ps-bar-grow {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: var(--w, 50%);
+  }
+}
+
+@keyframes ps-charge {
+  0% {
+    stroke-dashoffset: 390;
+  }
+
+  55% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ps-hold-blink {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes ps-density-breathe {
+
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.portal-story-wormhole .ps-worm-glow {
+  transform-origin: 160px 100px;
+  transform-box: fill-box;
+}
+
+.portal-story[data-animating] .ps-worm-ring {
+  animation: ps-ring-spin calc(4s + var(--i, 0) * 0.55s) linear infinite;
+}
+
+.portal-story[data-animating] .ps-worm-ray {
+  animation: ps-ray-pulse calc(1.6s + var(--i, 0) * 0.12s) ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+.portal-story[data-animating] .ps-worm-glow {
+  animation: ps-glow-breathe 2.4s ease-in-out infinite;
+}
+
+.portal-story[data-animating] .ps-worm-core {
+  animation: ps-core-pulse 1.8s ease-in-out infinite;
+}
+
+.portal-story[data-animating] .ps-worm-glyph {
+  animation: ps-glyph-orbit 2.2s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 140ms);
+}
+
+.portal-story .ps-layer,
+.portal-story .ps-token,
+.portal-story .ps-dur,
+.portal-story .ps-shell-layer,
+.portal-story .ps-wheel-spoke,
+.portal-story .ps-density-row {
+  opacity: 0;
+}
+
+.portal-story[data-animating] .ps-layer,
+.portal-story[data-animating] .ps-token,
+.portal-story[data-animating] .ps-dur,
+.portal-story[data-animating] .ps-shell-layer,
+.portal-story[data-animating] .ps-wheel-spoke,
+.portal-story[data-animating] .ps-density-row {
+  animation: ps-fade-up 420ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.portal-story .ps-dur-bar {
+  width: 0;
+}
+
+.portal-story[data-animating] .ps-dur-bar {
+  animation: ps-bar-grow 720ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  animation-delay: calc(120ms + var(--i, 0) * 80ms);
+}
+
+.portal-story[data-animating] .ps-token-signal {
+  animation: portal-status-pulse 2.4s ease-out infinite;
+}
+
+.portal-story[data-animating] .ps-wheel-charge {
+  animation: ps-charge 2.8s var(--ease-portal, cubic-bezier(0.65, 0, 0.35, 1)) infinite;
+}
+
+.portal-story[data-animating] .ps-wheel-label {
+  animation: ps-hold-blink 1.4s ease-in-out infinite;
+}
+
+.portal-story[data-animating] .ps-density-row {
+  animation:
+    ps-fade-up 420ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both,
+    ps-density-breathe 2.8s ease-in-out infinite;
+  animation-delay:
+    calc(var(--i, 0) * 60ms),
+    calc(400ms + var(--i, 0) * 90ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .portal-story .ps-layer,
+  .portal-story .ps-token,
+  .portal-story .ps-dur,
+  .portal-story .ps-shell-layer,
+  .portal-story .ps-wheel-spoke,
+  .portal-story .ps-density-row {
+    opacity: 1;
+  }
+
+  .portal-story .ps-dur-bar {
+    width: var(--w, 50%);
+  }
+
+  .portal-story[data-animating] .ps-worm-ring,
+  .portal-story[data-animating] .ps-worm-ray,
+  .portal-story[data-animating] .ps-worm-glow,
+  .portal-story[data-animating] .ps-worm-core,
+  .portal-story[data-animating] .ps-worm-glyph,
+  .portal-story[data-animating] .ps-layer,
+  .portal-story[data-animating] .ps-token,
+  .portal-story[data-animating] .ps-dur,
+  .portal-story[data-animating] .ps-shell-layer,
+  .portal-story[data-animating] .ps-wheel-spoke,
+  .portal-story[data-animating] .ps-density-row,
+  .portal-story[data-animating] .ps-dur-bar,
+  .portal-story[data-animating] .ps-token-signal,
+  .portal-story[data-animating] .ps-wheel-charge,
+  .portal-story[data-animating] .ps-wheel-label {
+    animation: none;
+  }
+
+  .portal-story .ps-wheel-charge {
+    stroke-dashoffset: 0;
   }
 }

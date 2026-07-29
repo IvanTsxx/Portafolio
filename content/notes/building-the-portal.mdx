@@ -1,0 +1,102 @@
+---
+title: "Building the portal: origin, tokens, and style"
+date: "2026-07-29"
+excerpt: How this site became a persistent ASCII cosmos — wormhole travel, design tokens, and why the field is the product.
+---
+
+This portfolio did not start as a marketing page with a decorative background. It started as a question: what if the generative system *was* the site?
+
+The answer is a shared ASCII cosmos, chambers that float over it, and a half-wheel that charges a wormhole when you hold a destination.
+
+<WormholeDiagram />
+
+## How it was built
+
+Work landed in layers — each one still visible in the shipping shell.
+
+<BuildLayers />
+
+1. **Base** — Geist + Geist Mono, a closed duration/easing scale, sharp radii, RSC-first App Router on Bun.
+2. **ASCII engine** — shared `rAF`, density ramps, `<pre>` mutation with zero React re-renders per frame.
+3. **Portal contract** — one named window (`--dur-portal` = 900ms) owns route travel. Scramble and land are slices inside that budget.
+4. **Content** — work, about, and notes as MDX RSC, so writing lives on the same surface as the craft.
+5. **Cosmos** — one `AsciiWorld` WebGL field behind every route.
+6. **Shell** — floating chambers, half-wheel nav, theme + sound chrome.
+
+The north star: **The Persistent Terminal Field** — warm paper-bright type on near-black void, rare orange signal. No purple SaaS gradients, no card grids in the hero, no cream-serif editorial defaults.
+
+<Callout tone="signal" title="Field first">
+If the first viewport still works after you remove the nav chrome, the branding is strong. If it only works as a dashboard of cards, it failed.
+</Callout>
+
+## Shell architecture
+
+Everything hangs off `PortalProvider`: cosmos always mounted, route content hides while traveling, wheel docks at the bottom.
+
+<ShellStack />
+
+## Navigation as charge
+
+Hold a spoke. Signal fills the arc. At threshold the shared canvas becomes the tunnel — then mid-flight `router.push`, land with a route mood, and text emerges.
+
+<WheelChargeDiagram />
+
+## Design tokens
+
+One portal palette. Dark and light are inversions of the same five roles.
+
+<TokenPalette />
+
+Defined in `@theme` **without** `inline`, so light overrides on `.portal-shell[data-theme=light]` cascade into utilities like `text-p-bright`. Shared class strings live in `lib/portal/styles.ts`; nested chrome in `app/portal.css`.
+
+### Motion scale (closed)
+
+Exactly five durations. Exactly four easings. If it is not on the scale, it does not ship.
+
+<DurationScale />
+
+Easings: `--ease-portal` (symmetric travel), `--ease-out`, `--ease-in`, `--ease-mono` (linear scramble / fields).
+
+## Two ASCII paths
+
+Site background is WebGL. Lab panels and image dissolve stay on the character grid.
+
+<AsciiDensityField />
+
+| Surface | Renderer |
+|---------|----------|
+| Site field (all routes) | WebGL `AsciiWorld` |
+| Lab / dissolve / image→ASCII | `<pre>` + rAF engine |
+| Icons, dither, chrome marks | SVG / CSS |
+
+## Style rules that stuck
+
+**The One Signal Rule.** Orange on status, wheel fill, highlight marks, focus — not panel paint.
+
+**The Field First Rule.** Copy floats with soft void bloom. Depth from glyph density, not Material shadows.
+
+**Typography.** Geist for the name; Geist Mono for HUD language. Wide tracking + uppercase on labels.
+
+**Layout.** Full-viewport shell. Chambers bias left/right. Half-wheel bottom-center. Chrome top-right.
+
+**Two audiences.** Humans skim craft; agents read structured identity in `content/identity.ts`. Same surface.
+
+## Constraints worth keeping
+
+- Do not cover the cosmos with opaque card stacks
+- Do not mount a second competing WebGL scene on home
+- Theme View Transitions must not snapshot the WebGL canvas
+- Raise glyph gain / dim contrast instead of paper-wash overlays
+- No third font, sixth duration, or second accent
+
+## Where to look
+
+| Concern | Source |
+|---------|--------|
+| Visual north star | `DESIGN.md` |
+| Product principles | `PRODUCT.md` |
+| Agent conventions | `AGENTS.md` |
+| Technical contracts | `docs/plan.md`, `docs/home.md` |
+| Renderer choice | `docs/ascii-vs-svg.md` |
+
+The site is done when the visitor feels the system — not the pitch.

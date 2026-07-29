@@ -1,40 +1,45 @@
-# ASCII vs SVG
+# ASCII vs SVG vs WebGL
 
 ## Decision
 
-**Keep generative fields as ASCII `<pre>`.** Use SVG (or CSS data-URI SVG) only for **static** marks.
+Tres caminos, roles distintos:
 
-## Why ASCII for fields
+| Superficie | Renderer | Cuándo |
+|------------|----------|--------|
+| **Site field** (fondo de todas las rutas) | WebGL `AsciiWorld` (R3F) | Persistente, wormhole, ripples, moods |
+| **Lab / dissolve / image→ASCII** | ASCII `<pre>` + rAF | Densidad tipográfica, O(cells), SSR snapshot |
+| **Marcas fijas** | SVG / CSS | Iconos, dither tile, geometría chrome |
 
-| Criterion | ASCII `<pre>` | SVG paths |
-|-----------|---------------|-----------|
-| Brand / identity | Terminal density — unique | Generic illustration |
-| Per-frame cost model | String write, O(cells) | DOM/path churn or canvas redraw |
-| SSR + reduced-motion | Same snapshot string | Separate static asset pipeline |
-| Seeded math → output | Natural (ramps) | Needs tessellation / sampling |
-| Portal scramble affinity | Same character vocabulary | Disconnect |
+## Por qué el cosmos es WebGL
 
-This site’s subject **is** the generative system. Replacing the home field with SVG blobs fails the brand test: the first viewport could belong to another product.
+El portal necesita un **único canvas** que sobreviva a los cambios de ruta, anime charge/tunnel/land, y responda a clicks (`pulseRipple`) sin remontar DOM de `<pre>` a full-viewport. Eso es `AsciiWorld`.
 
-## Where SVG is correct
+## Por qué Lab sigue en `<pre>`
 
-- Bayer dither tile (`dither-bg` utility) — fixed 4×4 pattern
-- Icons / favicons
-- Future static diagrams that never animate per cell
+| Criterio | `<pre>` engine | SVG paths |
+|----------|----------------|-----------|
+| Brand density | Terminal grid | Ilustración genérica |
+| Costo por frame | `textContent`, O(cells) | Path/DOM churn |
+| SSR + reduced-motion | Mismo string snapshot | Pipeline aparte |
+| Cap | `MAX_CELLS = 9000` | — |
+
+Reemplazar fields Lab por blobs SVG falla el brand test.
 
 ## Hybrid rule
 
 ```
-live density field  → ASCII engine (<pre> + rAF)
-static ornament     → SVG / CSS
+site background     → AsciiWorld (WebGL)
+live density panels → lib/ascii (<pre> + rAF)
+static ornament     → SVG / CSS (dither-bg, icons)
 ```
 
-Do not redraw phyllotaxis / flow / moiré as SVG art for “sharpness.” Sharpness comes from mono metrics and token discipline, not vector outlines.
+## Anti-patrones
 
-## When to revisit Canvas
+- Segundo canvas R3F compitiendo con el cosmos en home.
+- Redibujar phyllotaxis/flow como “SVG art” por nitidez.
+- Snapshotear el canvas WebGL en View Transitions del theme toggle (OOM en Chromium).
 
-Only if profiling shows `<pre>` textContent writes missing frame budget under `MAX_CELLS` with multiple simultaneous fields. Document the branch in `ascii-engine.md` before adding it.
+## Cuándo revisar
 
-**Prototype exception (2026-07-28):** `/prototypes/ascii-home` explores Canvas 2D / R3F.
-
-**Production exception (promoted):** home hero uses R3F `LexiconVortex` for an interactive 3D spiral of personal lexicon words. All other live fields stay on the ASCII `<pre>` engine (`HomeOrigin`, lab, etc.). Revisit if the hero spiral fails performance budgets.
+- Cosmos: si el shader no llega a budget en mobile low-end → bajar resolución / glyph gain, no duplicar renderers.
+- `<pre>`: solo si profiling bajo `MAX_CELLS` con varios fields simultáneos falla el frame budget — documentar en `ascii-engine.md` antes de Canvas 2D.

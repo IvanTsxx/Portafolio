@@ -1,19 +1,19 @@
-# Prototype — round 7 (wormhole)
+# Prototype — ASCII home
+
+Exploración previa del wormhole + campo persistente. El shipping path es el shell portal documentado en [`home.md`](./home.md).
 
 ## Intent
 
-ASCII universe estable. Texto flotando (sin plate). Rueda solo apunta — **no cambia el fondo**. Hold = agujero de gusano: entrar → atravesar → salir escupido con el contenido.
+ASCII universe estable. Texto flotando. Rueda apunta — hold = wormhole en el mismo campo.
 
-## Variantes (estilo del túnel)
+## Variantes de túnel exploradas
 
-| # | Nombre | Eje | Cuándo gana | Costo |
-|---|--------|-----|-------------|-------|
-| 1 | **Worm** | Anillos radiales clásicos | La metáfora más clara | Más “sci-fi” |
-| 2 | **Bolt** | Tubo de speed-lines | Viaje más agresivo/corto | Menos poético |
-| 3 | **Fold** | Compresión a una raja | Más abstracto / craft | Menos legible como túnel |
+| # | Nombre | Eje |
+|---|--------|-----|
+| 1 | Worm | Anillos radiales |
+| 2 | Bolt | Speed-lines |
+| 3 | Fold | Compresión a raja |
 
-## Flujo
+## Outcome
 
-surface (hero float) → hold → transit (campo = throat, sin copy) → spit → landed (copy emerge blur→sharp) → surface via back/wheel
-
-http://localhost:3000/prototypes/ascii-home
+Wormhole + campo persistente shippea como `AsciiWorld` + `PortalProvider` + half-wheel.

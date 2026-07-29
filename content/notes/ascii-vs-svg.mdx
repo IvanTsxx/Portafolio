@@ -1,34 +1,45 @@
 ---
 title: Why the fields stay ASCII
 date: "2026-07-28"
-excerpt: Generative density belongs in a character grid. SVG stays for static marks.
+excerpt: Generative density belongs in a character grid. The site cosmos is WebGL; Lab fields stay on pre + rAF. SVG stays for static marks.
 ---
 
-The portfolio identity is a generative terminal surface — seeded math written into a monospace grid at rAF. That contract is why backgrounds stay ASCII `<pre>`, not SVG paths.
+The portfolio identity is a generative terminal surface. That contract splits into two live paths — and one static path.
 
-## What ASCII wins
+## Site cosmos → WebGL
+
+Every route floats over a persistent `AsciiWorld` canvas. Wormhole travel, land moods, and click ripples need one shared field that survives navigation. That is WebGL on purpose — not a Lab panel scaled up.
+
+## Lab / dissolve → `<pre>` + rAF
+
+Seeded math written into a monospace grid at rAF. That is why exploratory fields stay ASCII `<pre>`, not SVG paths.
+
+### What ASCII wins here
 
 - **O(cells) buffers** map cleanly to `textContent` mutation — zero React re-renders per frame.
 - **Character ramps** encode density with typographic texture that reads as system, not illustration.
 - **SSR snapshot + reduced-motion** freeze share the same string pipeline.
-- **Brand test:** replace the field with a soft SVG blob and the site could belong to anyone.
+- **Brand test:** replace a Lab field with a soft SVG blob and that panel could belong to anyone.
 
 ## Where SVG still belongs
 
 Static marks: Bayer dither tiles, icons, and fixed chrome ornaments. Those do not need per-frame density evaluation.
 
 <Callout tone="signal" title="Rule">
-Mix both — SVG for fixed geometry, ASCII for live fields. Do not redraw generative backgrounds as path art.
+Site background → WebGL cosmos. Live Lab density → ASCII engine. Fixed geometry → SVG / CSS. Do not redraw generative panels as path art.
 </Callout>
 
 ```ts
-// Keep fields on <pre>
+// Lab / dissolve fields
 pre.textContent = frame
 
-// Keep static ornament on SVG / CSS
-// (see dither-bg utility)
+// Site shell (PortalProvider)
+// AsciiWorld — shared WebGL canvas
+
+// Static ornament
+// dither-bg utility, lucide / SVGL icons
 ```
 
 ---
 
-The engine cap stays at **9000 cells**. Canvas/WebGL is deferred until a field proves the `<pre>` path is the bottleneck.
+The `<pre>` engine cap stays at **9000 cells**. Promote a Lab field to Canvas only after profiling proves the text path is the bottleneck — and document it in `docs/ascii-engine.md`.

@@ -11,6 +11,15 @@ import { CacheLifeProfiles } from '@/components/mdx/cache-life-profiles'
 import { ContentTypesTable } from '@/components/mdx/content-types-table'
 import { ErrorCard } from '@/components/mdx/error-card'
 import { InvalidationCompare } from '@/components/mdx/invalidation-compare'
+import {
+  AsciiDensityField,
+  BuildLayers,
+  DurationScale,
+  ShellStack,
+  TokenPalette,
+  WheelChargeDiagram,
+  WormholeDiagram,
+} from '@/components/mdx/portal-story'
 
 function Hr() {
   return (
@@ -86,4 +95,11 @@ export const noteComponents = {
   ContentTypesTable,
   ErrorCard,
   InvalidationCompare,
+  WormholeDiagram,
+  BuildLayers,
+  TokenPalette,
+  DurationScale,
+  ShellStack,
+  WheelChargeDiagram,
+  AsciiDensityField,
 } satisfies MDXComponents

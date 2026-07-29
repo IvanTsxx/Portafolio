@@ -21,7 +21,8 @@ export const IDENTITY = {
   timeZone: 'America/Argentina/Tucuman',
   email: 'bongiovannidev@gmail.com',
   website: 'https://bongi.dev',
-  avatar: '/profile.png',
+  /** Display + ASCII sample source — keep ≤512px; full still at /profile.png */
+  avatar: '/images/avatar-portrait.webp',
   avatarRemote: 'https://github.com/IvanTsxx.png',
   socials: {
     github: 'https://github.com/IvanTsxx',

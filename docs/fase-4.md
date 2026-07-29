@@ -1,21 +1,14 @@
 # Fase 4 — Phyllotaxis + Index
 
 ## Status
-COMPLETA — home layout superseded 2026-07-28 (`docs/home.md`)
+COMPLETA — ver home actual en `docs/home.md`
 
-## Entregado (histórico)
+## Entregado
 
-- `lib/ascii/fields/phyllotaxis.ts` — buffer stamp + O(cells) modulate
-- `PhyllotaxisCanvas` (now primarily `/lab`)
-- `ClipRevealHeading` — clip-path line reveal (no scramble on h1)
-- `HomeNav` + `HomeCta` with `PortalLink` leaves (orphaned from `/`; still exported)
+- Phyllotaxis field + home clip-reveal
+- Shipping home: portal shell + cosmos — see `docs/home.md`
 
-## Current home
+## Verificar
 
-Horizon split + R3F lexicon vortex + sections — see `docs/home.md`.
-
-## Verificar (histórico)
-
-1. Home LCP text visible without JS; reveal enhances
-2. Phyllotaxis responds to pointer when over field container
-3. Reduced-motion freezes field
+1. `bun dev` → `/` muestra cosmos + hero
+2. Reduced-motion respeta snapshot / travel degrade

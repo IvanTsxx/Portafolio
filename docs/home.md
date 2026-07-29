@@ -1,31 +1,46 @@
-# Home — Persistent cosmos shell (2026-07-28)
+# Home — Persistent cosmos shell
 
 ## Decision
 
-The **ASCII WebGL cosmos is site-wide**, not home-only. Every route floats content over the same field. The wormhole runs on that shared canvas for entry/exit.
+El **cosmos ASCII WebGL es site-wide**. Cada ruta flota contenido sobre el mismo campo. El wormhole corre en ese canvas compartido.
 
 ## Shell
 
-`PortalProvider` mounts:
+`PortalProvider` monta:
 
-1. `AsciiWorld` (persistent)
-2. Theme toggle
-3. Route content layer (hidden while `traveling`)
-4. Half-wheel nav (all routes)
+1. `AsciiWorld` (persistente, `dynamic` ssr:false)
+2. Chrome: theme + sound
+3. Capa de ruta (opacity 0 mientras `traveling`)
+4. Overlay de tránsito (eyebrow + título scramble / highlight)
+5. `WheelDock` / half-wheel (todas las rutas)
 
 ## Navigation
 
-- Hold spoke / `PortalLink` → charge → tunnel on shared canvas → mid `router.push` → land with route mood → text emerge
-- Home → `land=0` (idle cosmos)
-- Work/Notes → mood 0.2 · Lab → 0.45 · About → 0.7
-- Open → local chamber on `/` only
+| Acción | Efecto |
+|--------|--------|
+| Hold spoke / `PortalLink` | charge → tunnel en canvas → mid `router.push` → land mood → texto emerge |
+| Home | mood `0` (idle cosmos) |
+| Work / Notes / Lab / About | moods `0.2` / `0.4` / `0.6` / `0.8` |
+| Open (solo `/`) | cámara local, sin cambio de ruta |
+
+Cancelación: una segunda navegación aborta la in-flight; gana el destino nuevo.
+
+Reduced-motion: fade corto, sin scramble/tunnel expandido.
 
 ## Pages
 
-`PortalPage` wrapper — floating scroll chamber. No traditional navbar/footer.
+`PortalPage` — chamber scrolleable con bias L/R (`chamberSide` en `content.ts`).
+Home — `PortalHome`: hero izquierda (marca, nombre, status, socials) + `HomeConstellation` (glifos clickeables → `pulseRipple`).
+
+Sin navbar/footer tradicionales en el shell portal.
 
 ## Source
 
-- Shell: `lib/portal/portal-provider.tsx`, `components/site/portal-shell.css`
-- Pages: `components/site/portal-page.tsx`
-- Home content: `components/home/portal/portal-home.tsx`
+| Pieza | Path |
+|-------|------|
+| Shell | `lib/portal/portal-provider.tsx` |
+| Styles | `lib/portal/styles.ts`, `app/portal.css` |
+| Page wrapper | `components/site/portal-page.tsx` |
+| Home | `components/home/portal/portal-home.tsx` |
+| Destinos / copy | `components/home/portal/content.ts` |
+| Cosmos | `components/home/portal/gl/ascii-world.tsx` |

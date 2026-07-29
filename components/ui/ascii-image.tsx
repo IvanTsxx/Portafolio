@@ -48,6 +48,24 @@ type FrameMetrics = {
 /** Mono advance ≈ 0.6em for Geist Mono / ui-monospace */
 const MONO_ADVANCE = 0.6
 const DISSOLVE_EASE = [0.22, 1, 0.36, 1] as const
+/** Field portraits land during wormhole emerge (~620ms) + WebGL land — sample after. */
+const FIELD_SAMPLE_DELAY_MS = 720
+
+function scheduleIdle(fn: () => void, timeoutMs: number): () => void {
+  if (typeof window === 'undefined') {
+    return () => {}
+  }
+  const w = window as Window & {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number
+    cancelIdleCallback?: (id: number) => void
+  }
+  if (typeof w.requestIdleCallback === 'function') {
+    const id = w.requestIdleCallback(fn, { timeout: timeoutMs })
+    return () => w.cancelIdleCallback?.(id)
+  }
+  const id = window.setTimeout(fn, 0)
+  return () => window.clearTimeout(id)
+}
 
 function metricsFromBox(
   width: number,
@@ -96,6 +114,7 @@ export function AsciiImage({
   const [metrics, setMetrics] = React.useState<FrameMetrics>(() =>
     metricsFromBox(grain === 'mark' ? 48 : 280, grain === 'mark' ? 48 : 210, grain),
   )
+  const [measured, setMeasured] = React.useState(false)
   const [ascii, setAscii] = React.useState(asciiProp ?? '')
   const [ready, setReady] = React.useState(Boolean(asciiProp))
   const [failed, setFailed] = React.useState(false)
@@ -131,6 +150,7 @@ export function AsciiImage({
           ? prev
           : next,
       )
+      setMeasured(true)
     })
     ro.observe(el)
     return () => ro.disconnect()
@@ -138,18 +158,21 @@ export function AsciiImage({
 
   React.useEffect(() => {
     let cancelled = false
+    let cancelDelay: (() => void) | undefined
+    let cancelIdle: (() => void) | undefined
 
-    if (!hasPhoto) {
+    const photoSrc = typeof src === 'string' && src.length > 0 ? src : null
+    if (!hasPhoto || !photoSrc) {
       setAscii(asciiProp ?? '')
       setReady(Boolean(asciiProp))
       setFailed(false)
       return
     }
 
-    const img = new Image()
-    img.decoding = 'async'
-    img.onload = () => {
-      if (cancelled) return
+    if (!measured) return
+
+    const sampleFrom = (img: HTMLImageElement) => {
+      if (cancelled || !img.naturalWidth) return
       try {
         setAscii(
           imageToAscii(img, {
@@ -167,18 +190,57 @@ export function AsciiImage({
         setReady(Boolean(asciiProp))
       }
     }
-    img.onerror = () => {
+
+    const runWhenReady = (img: HTMLImageElement) => {
+      const kick = () => {
+        cancelIdle = scheduleIdle(() => sampleFrom(img), field ? 400 : 200)
+      }
+      if (field) {
+        const t = window.setTimeout(kick, FIELD_SAMPLE_DELAY_MS)
+        cancelDelay = () => window.clearTimeout(t)
+      } else {
+        kick()
+      }
+    }
+
+    const photo = photoRef.current
+    if (photo?.complete && photo.naturalWidth > 0) {
+      runWhenReady(photo)
+      return () => {
+        cancelled = true
+        cancelDelay?.()
+        cancelIdle?.()
+      }
+    }
+
+    const probe = new Image()
+    probe.decoding = 'async'
+    probe.onload = () => {
+      if (!cancelled) runWhenReady(probe)
+    }
+    probe.onerror = () => {
       if (cancelled) return
       setFailed(true)
       setAscii(asciiProp ?? '')
       setReady(Boolean(asciiProp))
     }
-    img.src = src!
+    probe.src = photoSrc
 
     return () => {
       cancelled = true
+      cancelDelay?.()
+      cancelIdle?.()
     }
-  }, [asciiProp, field, grain, hasPhoto, metrics.cols, metrics.rows, src])
+  }, [
+    asciiProp,
+    field,
+    grain,
+    hasPhoto,
+    measured,
+    metrics.cols,
+    metrics.rows,
+    src,
+  ])
 
   useMotionValueEvent(progress, 'change', (v) => {
     const source = sourceRef.current
@@ -254,16 +316,18 @@ export function AsciiImage({
         }
       }}
     >
-      {hasPhoto && (
+      {src ? (
         // eslint-disable-next-line @next/next/no-img-element -- paired with canvas ASCII sampling
         <img
           ref={photoRef}
-          src={src!}
+          src={src}
           alt={alt}
           className="portal-ascii-image-photo"
           draggable={false}
+          decoding="async"
+          fetchPriority={field ? 'low' : 'auto'}
         />
-      )}
+      ) : null}
 
       <pre
         ref={glyphsRef}
