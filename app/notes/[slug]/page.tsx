@@ -47,9 +47,7 @@ export default async function NoteDetailPage({
       <p className="mb-8 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
         {frontmatter.excerpt}
       </p>
-      <div className="portal-mdx text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
-        {content}
-      </div>
+      <div className="typeset typeset-notes">{content}</div>
     </PortalPage>
   )
 }

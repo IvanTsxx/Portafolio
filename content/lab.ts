@@ -39,8 +39,6 @@ export const LAB: LabStudy[] = [
     year: '2025',
     note: 'Operator surface for multi-agent runs — timelines, tool traces, interruption-safe UI.',
     tags: ['eve', 'AI SDK', 'TypeScript'],
-    // ASCII-only for now — drop imageSrc when a shot exists
-    imageSrc: null,
   },
   {
     slug: 'edge-toolkit',
@@ -49,7 +47,6 @@ export const LAB: LabStudy[] = [
     year: '2025',
     note: 'Primitives for interactive UI at the edge without losing typography control.',
     tags: ['Next.js', 'Vercel', 'Performance'],
-    imageSrc: null,
   },
 ]
 

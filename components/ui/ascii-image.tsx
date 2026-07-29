@@ -1,14 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { imageToAscii, placeholderAscii } from '@/lib/ascii/image-to-ascii'
+import { imageToAscii } from '@/lib/ascii/image-to-ascii'
 import { cn } from '@/lib/utils'
 
 export type AsciiImageProps = {
   alt: string
-  /** Optional photo — hover reveals it. Omit for ASCII-only studies. */
+  /** Photo — hover reveals from ASCII resting state. Required unless `ascii` is set. */
   src?: string | null
-  /** Precomputed ASCII (.txt). When set with no src, shown as-is (fitted to frame). */
+  /** Precomputed ASCII (.txt). Alone = static frame; with src = optional override (sampling preferred). */
   ascii?: string | null
   className?: string
   /** Aspect ratio CSS value — locked frame for ASCII + photo */
@@ -18,9 +18,7 @@ export type AsciiImageProps = {
 type FrameMetrics = {
   cols: number
   rows: number
-  /** px — sized so the glyph grid fills width */
   fontSize: number
-  /** px — sized so rows fill height */
   lineHeight: number
 }
 
@@ -30,14 +28,17 @@ const MONO_ADVANCE = 0.6
 function metricsFromBox(width: number, height: number): FrameMetrics {
   const cols = Math.max(32, Math.round(width / 7))
   const rows = Math.max(16, Math.round(height / 8))
-  const lineHeight = height / rows
-  const fontSize = width / (cols * MONO_ADVANCE)
-  return { cols, rows, fontSize, lineHeight }
+  return {
+    cols,
+    rows,
+    fontSize: width / (cols * MONO_ADVANCE),
+    lineHeight: height / rows,
+  }
 }
 
 /**
- * Fixed aspect frame. ASCII glyphs are metric-fitted to fill the same box as the photo.
- * Photo optional — without it, no hover reveal (static ASCII).
+ * Fixed aspect frame. With `src`: ASCII resting → photo on hover.
+ * With only `ascii`: static glyphs. No invented placeholders.
  */
 export function AsciiImage({
   alt,
@@ -82,23 +83,10 @@ export function AsciiImage({
   React.useEffect(() => {
     let cancelled = false
 
-    // Explicit .txt wins as source string; still reflow metrics via CSS only
-    if (asciiProp && !hasPhoto) {
-      setAscii(asciiProp)
-      setReady(true)
-      return
-    }
-
-    if (asciiProp && hasPhoto) {
-      // Prefer sampling from photo so crop matches object-fit:cover
-    }
-
     if (!hasPhoto) {
-      setAscii(
-        asciiProp ??
-          placeholderAscii(metrics.cols, metrics.rows, alt.length),
-      )
-      setReady(true)
+      setAscii(asciiProp ?? '')
+      setReady(Boolean(asciiProp))
+      setFailed(false)
       return
     }
 
@@ -118,25 +106,22 @@ export function AsciiImage({
         setReady(true)
       } catch {
         setFailed(true)
-        setAscii(placeholderAscii(metrics.cols, metrics.rows, alt.length))
-        setReady(true)
+        setAscii(asciiProp ?? '')
+        setReady(Boolean(asciiProp))
       }
     }
     img.onerror = () => {
       if (cancelled) return
       setFailed(true)
-      setAscii(
-        asciiProp ??
-          placeholderAscii(metrics.cols, metrics.rows, alt.length),
-      )
-      setReady(true)
+      setAscii(asciiProp ?? '')
+      setReady(Boolean(asciiProp))
     }
     img.src = src!
 
     return () => {
       cancelled = true
     }
-  }, [alt.length, asciiProp, hasPhoto, metrics.cols, metrics.rows, src])
+  }, [asciiProp, hasPhoto, metrics.cols, metrics.rows, src])
 
   const interactive = hasPhoto && !failed
 
@@ -177,7 +162,7 @@ export function AsciiImage({
         className="portal-ascii-image-glyphs"
         style={{ opacity: ready ? undefined : 0.25 }}
       >
-        {ascii || '········'}
+        {ascii}
       </pre>
 
       {!hasPhoto && <span className="sr-only">{alt}</span>}

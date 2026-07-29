@@ -7,6 +7,15 @@
   --p-dim: #8a847c;
   --p-mid: #cfc9bf;
   --p-signal: #e85d2a;
+  /* Bridge portal tokens → shadcn/typeset (and any UI that reads --color-*) */
+  --color-foreground: var(--p-bright);
+  --color-muted-foreground: var(--p-dim);
+  --color-border: color-mix(in oklab, var(--p-bright) 18%, transparent);
+  --color-muted: color-mix(in oklab, var(--p-bright) 9%, transparent);
+  --color-primary: var(--p-signal);
+  --color-ring: var(--p-signal);
+  --font-heading: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --radius: 0;
   position: fixed;
   inset: 0;
   z-index: 40;
@@ -24,6 +33,50 @@
   --p-dim: #3a3530;
   --p-mid: #2a2622;
   --p-signal: #c44a1f;
+  /* Code chips need a bit more ink wash on paper so glyphs don't fight the canvas */
+  --color-muted: color-mix(in oklab, var(--p-bright) 7%, transparent);
+}
+
+/* Notes / MDX — shadcn/typeset preset tuned for floating portal chambers */
+.typeset-notes {
+  --typeset-font-body: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --typeset-font-heading: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --typeset-font-mono: var(--font-geist-mono, ui-monospace, monospace);
+  --typeset-size: 15px;
+  --typeset-leading: 1.7;
+  --typeset-flow: 1.35em;
+  color: var(--p-mid);
+}
+
+.typeset-notes :where(h1, h2, h3, h4) {
+  letter-spacing: -0.02em;
+}
+
+.typeset-notes :where(a) {
+  color: var(--p-bright);
+  text-decoration-color: color-mix(in oklab, var(--p-signal) 45%, transparent);
+}
+
+.typeset-notes :where(a:hover) {
+  color: var(--p-signal);
+  text-decoration-color: var(--p-signal);
+}
+
+.typeset-notes :where(:not(pre) > code),
+.typeset-notes :where(pre) {
+  border: 1px solid var(--color-border);
+  background-color: color-mix(in oklab, var(--p-void) 78%, transparent);
+  color: var(--p-bright);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.typeset-notes :where(pre code) {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .portal-shell * {

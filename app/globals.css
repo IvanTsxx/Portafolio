@@ -1,6 +1,7 @@
 /* app/globals.css */
 /* Source of truth for all ax- design tokens. Hex is canonical; OKLCH is computed. */
 @import 'tailwindcss';
+@import './typeset.css';
 
 /* ─── Font face variables (populated by layout.tsx via next/font) ─── */
 @theme inline {

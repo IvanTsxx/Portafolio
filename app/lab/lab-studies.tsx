@@ -17,18 +17,21 @@ async function loadAscii(src: string | null | undefined): Promise<string | null>
 
 async function LabCard({ study }: { study: LabStudy }) {
   const ascii = await loadAscii(study.asciiSrc)
+  const hasMedia = Boolean(study.imageSrc) || Boolean(ascii)
 
   return (
     <li>
       <p className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
         {study.index} · {study.year}
       </p>
-      <AsciiImage
-        src={study.imageSrc}
-        alt={study.title}
-        ascii={ascii}
-        className="mb-3"
-      />
+      {hasMedia && (
+        <AsciiImage
+          src={study.imageSrc}
+          alt={study.title}
+          ascii={ascii}
+          className="mb-3"
+        />
+      )}
       <h2
         className="font-semibold mb-1"
         style={{ color: 'var(--p-bright)', letterSpacing: '-0.02em', fontSize: '1.15rem' }}

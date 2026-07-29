@@ -15,8 +15,8 @@ export default function LabPage() {
     <PortalPage label="Lab · projects & explorations" side={chamberSide('lab')} wide>
       <PageHeading>Personal projects</PageHeading>
       <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
-        Explorations, engines, and side builds. Frames with a photo dissolve on hover —
-        ASCII-only entries stay as glyphs. Professional experience lives in Work.
+        Explorations, engines, and side builds. Add an image to unlock the ASCII → photo
+        hover; entries without media stay text-only. Experience lives in Work.
       </p>
       <LabStudies />
     </PortalPage>

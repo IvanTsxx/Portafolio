@@ -89,19 +89,3 @@ export function imageToAscii(
 
   return lines.join('\n')
 }
-
-/** Dense placeholder when a study has no photo and no asciiSrc. */
-export function placeholderAscii(cols: number, rows: number, seed = 0): string {
-  const ramp = ' .:-=+*#%@'
-  const lines: string[] = []
-  for (let y = 0; y < rows; y++) {
-    let line = ''
-    for (let x = 0; x < cols; x++) {
-      const n = ((x * 17 + y * 31 + seed * 13) % 97) / 97
-      const edge = x === 0 || y === 0 || x === cols - 1 || y === rows - 1
-      line += edge ? '·' : ramp[Math.floor(n * (ramp.length - 1))]!
-    }
-    lines.push(line)
-  }
-  return lines.join('\n')
-}
