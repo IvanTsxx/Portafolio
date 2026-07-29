@@ -4,7 +4,7 @@ import { PortalHome } from '@/components/home/portal/portal-home'
 import { IDENTITY } from '@/content/identity'
 
 export const metadata: Metadata = {
-  title: 'AX — Frontend Developer',
+  title: `${IDENTITY.name} — ${IDENTITY.role}`,
   description: IDENTITY.summary,
 }
 

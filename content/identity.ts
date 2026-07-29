@@ -1,9 +1,16 @@
 // content/identity.ts
-// Canonical personal facts — humans read the prose; agents read the structured fields.
+// Canonical personal facts — sourced from the previous portfolio (IvanTsxx/Portafolio).
+// Marked as possibly outdated by the owner, but real. Update when facts change.
 
 export const IDENTITY = {
-  name: 'AX',
+  /** Short brand / moniker used on generative surfaces */
+  brand: 'IB',
+  name: 'Ivan Bongiovanni',
+  displayName: 'Iván Bongiovanni',
+  short: 'Ivan',
+  handle: 'ivantsx',
   role: 'Frontend Developer',
+  studio: 'basement studio',
   year: '2026',
   location: {
     city: 'San Miguel de Tucumán',
@@ -11,10 +18,22 @@ export const IDENTITY = {
     country: 'Argentina',
     short: 'Tucumán, AR',
   },
+  timeZone: 'America/Argentina/Tucuman',
+  email: 'bongiovannidev@gmail.com',
+  website: 'https://bongi.dev',
+  avatar: '/images/avatar.webp',
+  avatarRemote: 'https://github.com/IvanTsxx.png',
+  socials: {
+    github: 'https://github.com/IvanTsxx',
+    twitter: 'https://x.com/IvanTsxx',
+    linkedin: 'https://www.linkedin.com/in/bongiovanni-ivan45',
+  },
   tagline: 'Building at the edge of generative systems.',
   summary:
-    'Frontend developer from Tucumán. I ship Next.js surfaces, agent tooling, and generative ASCII — work that reads clean to people and to agents.',
+    'Frontend developer at basement studio, from Tucumán. Next.js surfaces, agent tooling, and generative ASCII — work that reads clean to people and to agents.',
+  bio: 'Specializing in Next.js. Building fast, typesafe, and beautiful web experiences.',
   openTo: 'Focused contracts',
+  available: true,
   stack: ['Next.js', 'TypeScript', 'AI SDK', 'eve', 'Motion', 'Three'],
   focus: ['Generative UI', 'Agent surfaces', 'Edge delivery'],
   /** Words that appear in the live spiral — identity, place, stack. Not filler. */
@@ -23,7 +42,8 @@ export const IDENTITY = {
     'SAN MIGUEL',
     'CERRO',
     'YERBA',
-    'AX',
+    'IVAN',
+    'IVANTSX',
     'FRONTEND',
     'NEXT',
     'TYPESCRIPT',
@@ -38,15 +58,68 @@ export const IDENTITY = {
   ],
   /** Machine-oriented card — also shown in the UI for transparency. */
   agent: {
-    'NAME': 'AX',
-    'ROLE': 'Frontend Developer',
-    'LOC': 'Tucumán, AR',
-    'STACK': 'Next 16 · TS strict · AI SDK · eve',
-    'ASCII': 'live',
-    'PORTAL': '900ms',
-    'STATUS': 'open',
-    'PREFERS': 'structured briefs · clear constraints · RSC-first',
+    NAME: 'Ivan Bongiovanni',
+    ROLE: 'Frontend Developer · basement studio',
+    LOC: 'Tucumán, AR',
+    STACK: 'Next 16 · TS strict · AI SDK · eve',
+    ASCII: 'live',
+    PORTAL: '900ms',
+    STATUS: 'open',
+    PREFERS: 'structured briefs · clear constraints · RSC-first',
   },
+  /**
+   * Work history from the previous portfolio.
+   * Dates may need a refresh — treat as real but not necessarily current.
+   */
+  experiences: [
+    {
+      id: 'studio-basement',
+      company: 'basement studio',
+      website: 'https://basement.studio',
+      logo: '/logos/basement.webp',
+      current: true,
+      role: 'Frontend Developer',
+      when: '04.2026 — Present',
+      type: 'Full-time',
+      note: 'Product UI, design systems adjacent work, motion, delivery with high-craft teams.',
+      skills: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
+    },
+    {
+      id: 'aliva-shop',
+      company: 'Aliva Shop',
+      website: 'https://www.linkedin.com/company/alivashop',
+      logo: '/logos/aliva-shop.webp',
+      current: false,
+      role: 'Frontend Developer',
+      when: '06.2025 — 04.2026',
+      type: 'Full-time',
+      note: 'Led Q-commerce modernization: Angular → standalone + Signals; Ionic + Capacitor for iOS/Android.',
+      skills: ['Angular', 'Ionic', 'RxJS', 'Signals', 'Capacitor', 'Architecture', 'Performance'],
+    },
+    {
+      id: 'tensolite',
+      company: 'Tensolite SA',
+      website: 'https://tensolite.com',
+      logo: '/logos/tensolite.webp',
+      current: false,
+      role: 'Full Stack Developer',
+      when: '07.2023 — 11.2023',
+      type: 'Full-time',
+      note: 'Internal ops tools — Excel import/export, PDF generation, workflow automation.',
+      skills: ['React', 'Node.js', 'Automation', 'Data Processing', 'Excel', 'PDF Generation'],
+    },
+    {
+      id: 'doctor-qali',
+      company: 'Doctor Qali',
+      logo: '/logos/doctor-qali.webp',
+      current: false,
+      role: 'Frontend Developer',
+      when: '01.2023 — 06.2023',
+      type: 'Contract',
+      note: 'HealthTech performance: render bottlenecks, bundle size, Lighthouse, modern React patterns.',
+      skills: ['React', 'Performance', 'Refactoring', 'Frontend Architecture'],
+    },
+  ],
 } as const
 
 export type Identity = typeof IDENTITY

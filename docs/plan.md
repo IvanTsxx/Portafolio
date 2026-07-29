@@ -1,4 +1,4 @@
-# AX Portfolio — Frozen Plan
+# IB Portfolio — Frozen Plan
 
 > Source of truth. If code and plan differ, update the plan (or fix the code to match).
 > Last updated: Steps 1–6 complete · notes switched to MDX RSC.

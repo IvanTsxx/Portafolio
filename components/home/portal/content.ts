@@ -27,10 +27,20 @@ export function chamberSide(id: DestId): ChamberSide {
 
 export const IVAN = {
   name: 'Ivan Bongiovanni',
+  displayName: 'Iván Bongiovanni',
   short: 'Ivan',
+  handle: 'ivantsx',
   role: 'Frontend Developer',
   studio: 'basement studio',
   location: 'Tucumán, AR',
+  email: 'bongiovannidev@gmail.com',
+  website: 'https://bongi.dev',
+  avatar: '/images/avatar.webp',
+  socials: {
+    github: 'https://github.com/IvanTsxx',
+    twitter: 'https://x.com/IvanTsxx',
+    linkedin: 'https://www.linkedin.com/in/bongiovanni-ivan45',
+  },
   tagline: 'Next.js products, serious craft.',
   blurb:
     'Frontend en basement studio. Construyo productos en Next.js, TypeScript y shadcn — con Motion cuando el detalle importa. Aprendo rápido; demuestro valor en shipping.',
@@ -43,19 +53,32 @@ export const IVAN = {
     {
       place: 'basement studio',
       role: 'Frontend Developer',
-      when: 'Present',
+      when: '04.2026 — Present',
       note: 'Product UI, design systems adjacent work, motion, delivery con equipos de alto nivel.',
     },
     {
-      place: 'Earlier roles',
-      role: 'Frontend',
-      when: 'Before',
-      note: 'Placeholder — Ivan completa estudios / labs previos.',
+      place: 'Aliva Shop',
+      role: 'Frontend Developer',
+      when: '06.2025 — 04.2026',
+      note: 'Modernización Q-commerce: Angular → standalone + Signals; app móvil Ionic + Capacitor.',
+    },
+    {
+      place: 'Tensolite SA',
+      role: 'Full Stack Developer',
+      when: '07.2023 — 11.2023',
+      note: 'Tools internos: Excel import/export, PDF, automatización de workflows operativos.',
+    },
+    {
+      place: 'Doctor Qali',
+      role: 'Frontend Developer',
+      when: '01.2023 — 06.2023',
+      note: 'HealthTech: bottlenecks de render, bundle size, Lighthouse, patrones React modernos.',
     },
   ],
   agentPrompt: `Ivan Bongiovanni — Frontend Developer at basement studio (Tucumán, AR).
 Serious Next.js / TypeScript / shadcn / Motion. Ships product UI; strong CV via basement.
 Also building agent-aware surfaces (skills, Claude, MCPs).
+Contact: bongiovannidev@gmail.com · https://bongi.dev · github.com/IvanTsxx
 Prefers: structured briefs, clear constraints, RSC-first.
 Status: open to product teams and focused collabs.`,
 } as const

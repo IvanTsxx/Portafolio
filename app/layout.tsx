@@ -21,28 +21,42 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://bongi.dev'),
   title: {
-    default: 'AX — Frontend Developer',
-    template: '%s · AX',
+    default: 'Ivan Bongiovanni — Frontend Developer',
+    template: '%s · Ivan Bongiovanni',
   },
   description:
-    'Frontend developer building at the edge of generative systems, agent tooling, and whatever ships next. Next.js · TypeScript · AI SDK · eve.',
-  keywords: ['frontend', 'developer', 'Next.js', 'TypeScript', 'AI SDK', 'generative', 'ASCII'],
-  authors: [{ name: 'AX' }],
-  creator: 'AX',
+    'Frontend developer at basement studio building generative systems, agent tooling, and product UI. Next.js · TypeScript · AI SDK · eve.',
+  keywords: [
+    'Ivan Bongiovanni',
+    'IvanTsxx',
+    'frontend',
+    'developer',
+    'Next.js',
+    'TypeScript',
+    'basement studio',
+    'AI SDK',
+    'generative',
+    'ASCII',
+  ],
+  authors: [{ name: 'Ivan Bongiovanni', url: 'https://bongi.dev' }],
+  creator: 'Ivan Bongiovanni',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    title: 'AX — Frontend Developer',
+    title: 'Ivan Bongiovanni — Frontend Developer',
     description:
-      'Frontend developer building at the edge of generative systems, agent tooling, and whatever ships next.',
-    siteName: 'AX Portfolio',
+      'Frontend developer at basement studio building generative systems, agent tooling, and product UI.',
+    siteName: 'Ivan Bongiovanni',
+    url: 'https://bongi.dev',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AX — Frontend Developer',
+    creator: '@IvanTsxx',
+    title: 'Ivan Bongiovanni — Frontend Developer',
     description:
-      'Frontend developer building at the edge of generative systems, agent tooling, and whatever ships next.',
+      'Frontend developer at basement studio building generative systems, agent tooling, and product UI.',
   },
   robots: { index: true, follow: true },
   icons: {

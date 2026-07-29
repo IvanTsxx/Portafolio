@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 import { PortalLink } from '@/lib/portal/portal-link'
 
 const NAV_ITEMS = [
-  { href: '/',      label: 'AX',    routeLabel: 'HOME'  },
+  { href: '/',      label: 'IB',    routeLabel: 'HOME'  },
   { href: '/work',  label: 'WORK',  routeLabel: 'WORK'  },
   { href: '/lab',   label: 'LAB',   routeLabel: 'LAB'   },
   { href: '/notes', label: 'NOTES', routeLabel: 'NOTES' },

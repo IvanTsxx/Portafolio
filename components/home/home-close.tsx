@@ -36,7 +36,7 @@ export function HomeClose() {
           label="ABOUT"
           className="mt-8 inline-block border border-ax-bright bg-ax-bright px-5 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ax-void transition-transform duration-[90ms] ease-out active:scale-[0.97]"
         >
-          About AX
+          About {IDENTITY.short}
         </PortalLink>
       </div>
     </section>

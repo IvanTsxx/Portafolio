@@ -1,6 +1,6 @@
 # ascii-generative-portfolio
 
-Portfolio AX — generative ASCII engine, portal transitions, MDX notes.
+Portfolio IB — generative ASCII engine, portal transitions, MDX notes.
 
 ## Stack
 
