@@ -135,7 +135,12 @@ html.light .portal-shell {
 
 /* Chamber / page scroll — halo so ASCII cannot erase copy.
  * Do NOT target bare `span` — Shiki wraps every token in <span> and
- * multi-layer text-shadow on hundreds of tokens tanks scroll FPS. */
+ * multi-layer text-shadow on hundreds of tokens tanks scroll FPS.
+ *
+ * Critical: portal-float’s 3-layer shadow inherits to every descendant.
+ * On long MDX notes that inheritance alone drops scroll to ~25–35ms/frame.
+ * Cut inheritance at .typeset-notes, then re-apply a single soft layer
+ * only on block copy (measured: ~17ms/frame, no dropped frames). */
 @utility portal-scroll-halo {
   & :is(h1, h2, h3) {
     color: var(--color-p-bright);
@@ -150,9 +155,17 @@ html.light .portal-shell {
       0 0 32px var(--color-p-void);
   }
 
-  /* Long MDX notes: one soft bloom layer is enough */
-  & .typeset-notes :is(p, li, dd, dt) {
+  /* Stop float inheritance before it fans out across the article tree */
+  & .typeset-notes {
+    text-shadow: none;
+  }
+
+  & .typeset-notes :is(h1, h2, h3) {
     text-shadow: 0 0 14px var(--color-p-void);
+  }
+
+  & .typeset-notes :is(p, li, dd, dt, blockquote) {
+    text-shadow: 0 0 10px var(--color-p-void);
   }
 
   /* Code fences: never inherit portal-float cream bloom (washes tokens out) */
@@ -241,11 +254,10 @@ html.light .portal-shell .portal-scroll-edge>[data-portal-scroll-fade] {
   }
 }
 
-/* Emerge stagger (chamber open / page land) */
+/* Emerge stagger (chamber open / page land).
+ * No perspective/preserve-3d — those stayed on the overflow scroller after
+ * the animation and forced expensive 3D compositing during notes scroll. */
 @utility portal-emerge {
-  perspective: 1200px;
-  perspective-origin: 50% 42%;
-  transform-style: preserve-3d;
   animation: portal-emerge 620ms var(--ease-out) both;
 
   &>* {
