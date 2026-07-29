@@ -53,6 +53,7 @@ export function Highlighter({
     let annotation: RoughAnnotation | null = null
     let resizeObserver: ResizeObserver | null = null
     let redrawTimer: ReturnType<typeof setTimeout> | null = null
+    let settleTimer: ReturnType<typeof setTimeout> | null = null
 
     if (shouldShow && element) {
       const annotationConfig = {
@@ -69,20 +70,23 @@ export function Highlighter({
       annotation = currentAnnotation
       currentAnnotation.show()
 
-      // Only watch the text node — body observers remeasure against full-width
-      // line boxes during layout thrash and overdraw the highlight.
-      resizeObserver = new ResizeObserver(() => {
-        if (redrawTimer) clearTimeout(redrawTimer)
-        redrawTimer = setTimeout(() => {
-          currentAnnotation.hide()
-          currentAnnotation.show()
-        }, 50)
-      })
-
-      resizeObserver.observe(element)
+      // Defer resize watches until emerge/layout settle — mid-animation
+      // hide→show redraws stack strokes and smear the highlight.
+      const settleMs = Math.max(animationDuration + 80, 620)
+      settleTimer = setTimeout(() => {
+        resizeObserver = new ResizeObserver(() => {
+          if (redrawTimer) clearTimeout(redrawTimer)
+          redrawTimer = setTimeout(() => {
+            currentAnnotation.hide()
+            currentAnnotation.show()
+          }, 50)
+        })
+        resizeObserver.observe(element)
+      }, settleMs)
     }
 
     return () => {
+      if (settleTimer) clearTimeout(settleTimer)
       if (redrawTimer) clearTimeout(redrawTimer)
       annotation?.remove()
       resizeObserver?.disconnect()

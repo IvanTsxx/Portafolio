@@ -81,9 +81,9 @@ export const portal = {
   ].join(' '),
 
   pageScroll: [
-    'portal-float portal-emerge portal-scroll-halo pointer-events-auto',
+    'portal-float portal-emerge portal-scroll-halo portal-scroll-edge pointer-events-auto',
     'max-h-[calc(100dvh-160px)] w-full max-w-[min(40rem,92vw)]',
-    'overflow-y-auto overscroll-contain pr-2 [scrollbar-width:thin]',
+    'overflow-y-auto overscroll-contain pr-2',
     'data-[wide]:max-w-[min(52rem,94vw)]',
     '[[data-side=right]_&]:pr-0 [[data-side=right]_&]:pl-2',
   ].join(' '),
@@ -97,9 +97,9 @@ export const portal = {
   ].join(' '),
 
   chamberScroll: [
-    'portal-float portal-emerge portal-scroll-halo',
+    'portal-float portal-emerge portal-scroll-halo portal-scroll-edge',
     'max-h-[calc(100dvh-220px)] w-full max-w-[min(36rem,90vw)]',
-    'overflow-y-auto overscroll-contain pr-2 [scrollbar-width:thin]',
+    'overflow-y-auto overscroll-contain pr-2',
     '[[data-side=right]_&]:pr-0 [[data-side=right]_&]:pl-2',
   ].join(' '),
 
@@ -127,15 +127,16 @@ export const portal = {
     '[[data-available=false]_&]:bg-p-dim [[data-available=false]_&]:shadow-none',
   ].join(' '),
 
-  transit: 'absolute inset-0 z-[60] grid place-items-center pointer-events-none text-center',
+  transit: 'absolute inset-0 z-[60] grid place-items-center pointer-events-none text-center px-[clamp(1rem,4vw,2rem)]',
   transitMark: [
-    'portal-emerge flex max-w-[min(20ch,86vw)] flex-col items-center gap-[0.55rem]',
+    // Wide enough for note titles; short dest labels stay compact via w-max.
+    'portal-emerge flex w-max max-w-[min(36rem,92vw)] flex-col items-center gap-[0.55rem]',
     '[text-shadow:0_0_24px_var(--color-p-void),0_0_48px_var(--color-p-void),0_2px_8px_var(--color-p-void)]',
   ].join(' '),
   transitEyebrow: `${mono} m-0 text-[10px] tracking-[0.18em] text-p-dim`,
   transitTitle: [
-    'm-0 text-balance font-semibold text-p-bright',
-    'text-[clamp(2rem,5vw,3.25rem)] leading-[0.92] tracking-[-0.04em]',
+    'm-0 max-w-full text-pretty font-semibold text-p-bright',
+    'text-[clamp(1.65rem,4.2vw,3rem)] leading-[1.02] tracking-[-0.04em]',
   ].join(' '),
 
   wheelDock: [

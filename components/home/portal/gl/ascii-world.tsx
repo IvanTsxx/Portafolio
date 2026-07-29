@@ -29,6 +29,8 @@ export type AsciiWorldApi = {
   ) => void
   cancelTravel: () => void
   setPalette: (theme: PortalTheme) => void
+  /** Programmatic starquake — UV in canvas space (y up). */
+  pulseRipple: (uv: { x: number; y: number }, strength?: number) => void
 }
 
 type Uniforms = {
@@ -178,11 +180,21 @@ function FieldMesh({
         u.uFg!.value.set(t === 'dark' ? '#e8e4dc' : '#1a1816')
         u.uGlyphGain!.value = glyphGainFor(t)
       },
+      pulseRipple: (uv, strength) => {
+        const slot = rippleCursor.current % RIPPLE_SLOTS
+        rippleCursor.current = slot + 1
+        ripples.current[slot] = {
+          x: Math.min(1, Math.max(0, uv.x)),
+          y: Math.min(1, Math.max(0, uv.y)),
+          age: 0,
+          strength: strength ?? (reduced ? 0.72 : 1),
+        }
+      },
     }
     return () => {
       apiRef.current = null
     }
-  }, [apiRef])
+  }, [apiRef, reduced])
 
   React.useEffect(() => {
     apiRef.current?.setPalette(theme)
@@ -338,8 +350,14 @@ export function AsciiWorld({
   className?: string
 }) {
   const bg = theme === 'dark' ? '#0c0b0a' : '#e8e4dc'
+  // Exclude from View Transition snapshots — capturing a full-viewport WebGL
+  // canvas on every theme toggle OOMs Chromium (tab crash, error code 5).
+  const noVt = { viewTransitionName: 'none' } as const
   return (
-    <div className={className} style={{ background: bg }}>
+    <div
+      className={className}
+      style={{ background: bg, ...noVt }}
+    >
       <Canvas
         orthographic
         camera={{ position: [0, 0, 1], zoom: 1 }}
@@ -352,7 +370,7 @@ export function AsciiWorld({
           stencil: false,
           depth: false,
         }}
-        style={{ width: '100%', height: '100%', background: bg }}
+        style={{ width: '100%', height: '100%', background: bg, ...noVt }}
       >
         <color attach="background" args={[bg]} />
         <FieldMesh theme={theme} apiRef={apiRef} cell={cell} />

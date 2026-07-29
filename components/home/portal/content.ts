@@ -178,9 +178,21 @@ export const NOTE_STUBS = [
     href: '/notes/portal-900',
   },
   {
-    title: 'Invisible details in shipping UI',
-    year: '2025',
-    note: 'What I learned applying Emil on real product.',
-    href: '/notes',
+    title: 'Cache Components intro',
+    year: '2026',
+    note: 'use cache, three content types, and automatic cache keys in Next.js 16.',
+    href: '/notes/cache-components-intro',
+  },
+  {
+    title: 'Cache Components errors',
+    year: '2026',
+    note: 'Common use cache failures — cause, fix, and before/after patterns.',
+    href: '/notes/cache-components-errors',
+  },
+  {
+    title: 'Scope Rule architecture',
+    year: '2026',
+    note: 'Feature-local vs shared — screaming architecture for Next.js.',
+    href: '/notes/scope-architecture-nextjs',
   },
 ] as const

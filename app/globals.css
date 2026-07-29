@@ -31,14 +31,6 @@
   /* #FF4D00 */
   --color-ax-signal: oklch(62% 0.225 32);
 
-  /* ── Portal semantic colors (default = dark shell) ── */
-  --color-p-void: #0c0b0a;
-  --color-p-bright: #e8e4dc;
-  --color-p-dim: #b8b2aa;
-  --color-p-mid: #cfc9bf;
-  --color-p-signal: #e85d2a;
-  --color-p-line: color-mix(in oklab, var(--color-p-bright) 18%, transparent);
-
   --animate-portal-status-pulse: portal-status-pulse 2.4s ease-out infinite;
 
   @keyframes portal-emerge {
@@ -138,6 +130,20 @@
   --gutter: 1.5rem;
   /* 24px */
   --max-prose: 58ch;
+}
+
+/*
+ * Portal colors MUST stay in non-inline @theme so utilities emit
+ * `var(--color-p-*)` and `.portal-shell[data-theme=light]` overrides cascade.
+ * (@theme inline would hardcode dark hex into text-p-bright / bg-p-void / …)
+ */
+@theme {
+  --color-p-void: #0c0b0a;
+  --color-p-bright: #e8e4dc;
+  --color-p-dim: #b8b2aa;
+  --color-p-mid: #cfc9bf;
+  --color-p-signal: #e85d2a;
+  --color-p-line: color-mix(in oklab, var(--color-p-bright) 18%, transparent);
 }
 
 /* ─── Dark-mode variant (class-based, set by default) ─── */

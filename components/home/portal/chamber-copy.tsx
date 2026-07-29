@@ -4,6 +4,7 @@ import * as React from 'react'
 import Link from 'next/link'
 import { HighlightMark } from '@/components/ui/highlight-mark'
 import { SocialLinks } from '@/components/site/social-links'
+import { PortalScrollFade } from '@/components/site/portal-scroll-fade'
 import {
   IVAN,
   WORK_STUBS,
@@ -115,6 +116,7 @@ export function ChamberCopy({
           )}
         </div>
       )}
+      <PortalScrollFade />
     </div>
   )
 }

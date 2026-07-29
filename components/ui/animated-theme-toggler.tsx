@@ -171,6 +171,25 @@ export const AnimatedThemeToggler = ({
     )
       return
 
+    const applyTheme = () => {
+      // next-themes applies the class synchronously + persists to localStorage.
+      setTheme(isDark ? 'light' : 'dark')
+    }
+
+    const reducedMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // Hidden tabs + VT, or reduced motion: swap theme without snapshotting.
+    if (
+      typeof document.startViewTransition !== 'function' ||
+      reducedMotion ||
+      document.visibilityState === 'hidden'
+    ) {
+      applyTheme()
+      return
+    }
+
     // innerWidth/innerHeight (not visualViewport): percentages must resolve
     // against the snapshot reference box, which includes classic scrollbars.
     const viewportWidth = window.innerWidth
@@ -192,16 +211,6 @@ export const AnimatedThemeToggler = ({
       Math.max(y, viewportHeight - y),
     )
 
-    const applyTheme = () => {
-      // next-themes applies the class synchronously + persists to localStorage.
-      setTheme(isDark ? 'light' : 'dark')
-    }
-
-    if (typeof document.startViewTransition !== 'function') {
-      applyTheme()
-      return
-    }
-
     const clipPath = getThemeTransitionClipPaths(
       shape,
       x,
@@ -220,7 +229,29 @@ export const AnimatedThemeToggler = ({
     // Pin the collapsed clip-path via CSS so Firefox does not paint the new
     // theme unclipped between snapshot and the ready.then() JS animation.
     root.style.setProperty('--magicui-theme-vt-clip-from', clipPath[0])
+
+    // Hide canvases for old+new VT snapshots only. Full-viewport WebGL readback
+    // on every toggle OOMs Chromium (tab crash, error code 5). Restore once
+    // `ready` fires so the live canvas sits under the VT overlay during anim.
+    const canvases = Array.from(
+      document.querySelectorAll<HTMLCanvasElement>('canvas'),
+    )
+    const canvasPrev = canvases.map((c) => c.style.visibility)
+    for (const c of canvases) c.style.visibility = 'hidden'
+    let canvasesRestored = false
+    const restoreCanvases = () => {
+      if (canvasesRestored) return
+      canvasesRestored = true
+      canvases.forEach((c, i) => {
+        c.style.visibility = canvasPrev[i] ?? ''
+      })
+    }
+
+    let clipAnim: Animation | undefined
     const cleanup = () => {
+      clipAnim?.cancel()
+      clipAnim = undefined
+      restoreCanvases()
       isTransitioningRef.current = false
       delete root.dataset.magicuiThemeVt
       root.style.removeProperty('--magicui-theme-toggle-vt-duration')
@@ -228,20 +259,30 @@ export const AnimatedThemeToggler = ({
     }
 
     isTransitioningRef.current = true
-    const transition = document.startViewTransition(() => {
-      flushSync(applyTheme)
-    })
-    if (typeof transition?.finished?.finally === 'function') {
+    let transition: ViewTransition
+    try {
+      transition = document.startViewTransition(() => {
+        flushSync(applyTheme)
+      })
+    } catch {
+      cleanup()
+      applyTheme()
+      return
+    }
+
+    if (typeof transition.finished?.finally === 'function') {
       transition.finished.finally(cleanup).catch(() => {})
     } else {
       cleanup()
     }
 
-    const ready = transition?.ready
+    const ready = transition.ready
     if (ready && typeof ready.then === 'function') {
       ready
         .then(() => {
-          document.documentElement.animate(
+          restoreCanvases()
+          if (!isTransitioningRef.current) return
+          clipAnim = document.documentElement.animate(
             {
               clipPath,
             },
@@ -254,7 +295,9 @@ export const AnimatedThemeToggler = ({
             },
           )
         })
-        .catch(() => {})
+        .catch(() => {
+          restoreCanvases()
+        })
     }
   }, [shape, fromCenter, duration, isDark, setTheme])
 

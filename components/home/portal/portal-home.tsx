@@ -12,6 +12,7 @@ import { usePortal } from '@/lib/portal'
 import { portal } from '@/lib/portal/styles'
 import { cue } from '@/lib/cuelume'
 import type { AsciiWorldApi } from './gl/ascii-world'
+import { HomeConstellation } from './home-constellation'
 
 const ease = [0.16, 1, 0.3, 1] as const
 
@@ -51,6 +52,7 @@ export function PortalHome() {
   const [open, setOpen] = React.useState(false)
   const [copied, setCopied] = React.useState(false)
   const busyRef = React.useRef(false)
+  const heroRef = React.useRef<HTMLDivElement>(null)
 
   const openChamber = React.useCallback(() => {
     if (busyRef.current || state === 'traveling') return
@@ -113,35 +115,42 @@ export function PortalHome() {
   return (
     <>
       {showHero && (
-        <div className={portal.hero} data-side={chamberSide('home')}>
-          <PortalStagger className="portal-float">
-            <p className={`${portal.label} ${portal.eyebrow} mb-4`}>
-              <EyebrowMark />
-              <span>{IDENTITY.role}</span>
-            </p>
+        <>
+          <HomeConstellation apiRef={apiRef} heroRef={heroRef} />
+          <div
+            ref={heroRef}
+            className={portal.hero}
+            data-side={chamberSide('home')}
+          >
+            <PortalStagger className="portal-float">
+              <p className={`${portal.label} ${portal.eyebrow} mb-4`}>
+                <EyebrowMark />
+                <span>{IDENTITY.role}</span>
+              </p>
 
-            <h1
-              className="max-w-[12ch] font-semibold tracking-[-0.04em] text-[clamp(2rem,4.5vw,3.4rem)] leading-[0.92]"
-            >
-              <HighlightMark>{IDENTITY.name}</HighlightMark>
-            </h1>
+              <h1
+                className="max-w-[12ch] font-semibold tracking-[-0.04em] text-[clamp(2rem,4.5vw,3.4rem)] leading-[0.92]"
+              >
+                <HighlightMark>{IDENTITY.name}</HighlightMark>
+              </h1>
 
-            <p className={`${portal.label} mt-4`}>
-              Currently at {IDENTITY.studio}
-            </p>
+              <p className={`${portal.label} mt-4`}>
+                Currently at {IDENTITY.studio}
+              </p>
 
-            <p
-              className={`${portal.status} mt-4`}
-              data-available={IDENTITY.available ? 'true' : 'false'}
-              aria-label={`Status: ${statusLabel}`}
-            >
-              <span className={portal.statusDot} aria-hidden />
-              <span className={`${portal.mono} text-[10px]`}>{statusLabel}</span>
-            </p>
+              <p
+                className={`${portal.status} mt-4`}
+                data-available={IDENTITY.available ? 'true' : 'false'}
+                aria-label={`Status: ${statusLabel}`}
+              >
+                <span className={portal.statusDot} aria-hidden />
+                <span className={`${portal.mono} text-[10px]`}>{statusLabel}</span>
+              </p>
 
-            <SocialLinks className="mt-2" />
-          </PortalStagger>
-        </div>
+              <SocialLinks className="mt-2" />
+            </PortalStagger>
+          </div>
+        </>
       )}
 
       <div className={portal.chamber} data-open={open ? 'true' : 'false'} data-side={openSide}>

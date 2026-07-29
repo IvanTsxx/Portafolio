@@ -12,12 +12,20 @@
   --radius: 0;
 }
 
-.portal-shell[data-theme='light'] {
+/*
+ * Light tokens: data-theme (React) + html.light (next-themes blocking script).
+ * html.light covers the SSR window where data-theme is still the dark default
+ * because resolvedTheme is undefined until the client syncs.
+ */
+.portal-shell[data-theme='light'],
+html.light .portal-shell {
   --color-p-void: #e8e4dc;
   --color-p-bright: #1a1816;
-  --color-p-dim: #2c2824;
-  --color-p-mid: #2a2622;
+  /* mid/dim stay darker than paper but lighter than bright for hierarchy */
+  --color-p-dim: #5c564e;
+  --color-p-mid: #3a3530;
   --color-p-signal: #c44a1f;
+  --color-p-line: color-mix(in oklab, var(--color-p-bright) 18%, transparent);
   --color-muted: color-mix(in oklab, var(--color-p-bright) 7%, transparent);
 }
 
@@ -111,6 +119,86 @@
   }
 }
 
+/* Bottom scroll cue — sticky overlay (no JS).
+ * Pattern: Engram #236 + Chrome scroll-state nested @container.
+ * opacity:0 lives on the same selector as the @container match —
+ * a root @container { [data-…] } loses to .portal-scroll-edge > […] specificity.
+ */
+@utility portal-scroll-edge {
+  container-type: scroll-state;
+  scroll-timeline-name: --portal-scroll;
+  scroll-timeline-axis: block;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  &>[data-portal-scroll-fade] {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    display: block;
+    height: 3.25rem;
+    margin-top: -3.25rem;
+    flex-shrink: 0;
+    pointer-events: none;
+    /* Dark: solid void matches the cosmos field. */
+    background: linear-gradient(
+      to top,
+      var(--color-p-void) 0%,
+      color-mix(in oklab, var(--color-p-void) 55%, transparent) 45%,
+      transparent 100%
+    );
+    opacity: 0;
+
+    /* Nested so specificity matches the opacity:0 rule above */
+    @container scroll-state(scrollable: bottom) {
+      opacity: 1;
+    }
+  }
+
+  /* Fallback when scroll-state is unavailable: Engram named timeline */
+  @supports (animation-timeline: scroll()) {
+    @supports not (container-type: scroll-state) {
+      &>[data-portal-scroll-fade] {
+        opacity: 1;
+        animation: portal-scroll-fade-out linear both;
+        animation-timeline: --portal-scroll;
+        animation-range: calc(100% - 4rem) 100%;
+      }
+    }
+  }
+}
+
+/*
+ * Light: never paint opaque paper — the “bg” is void + ASCII glyphs.
+ * A solid #e8e4dc bar kills the texture and reads as a weird slab.
+ * Soft veil of the same void token, ASCII still shows through.
+ */
+.portal-shell[data-theme='light'] .portal-scroll-edge > [data-portal-scroll-fade],
+html.light .portal-shell .portal-scroll-edge > [data-portal-scroll-fade] {
+  height: 4.5rem;
+  margin-top: -4.5rem;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--color-p-void) 42%, transparent) 0%,
+    color-mix(in oklab, var(--color-p-void) 16%, transparent) 42%,
+    transparent 100%
+  );
+}
+
+@keyframes portal-scroll-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
 /* Emerge stagger (chamber open / page land) */
 @utility portal-emerge {
   perspective: 1200px;
@@ -121,6 +209,10 @@
   &>* {
     transform-origin: 50% 55%;
     animation: portal-emerge 560ms var(--ease-out) both;
+  }
+
+  &>[data-portal-scroll-fade] {
+    animation: none;
   }
 
   &>*:nth-child(1) {
@@ -413,5 +505,62 @@
 
   &[data-active] {
     fill: var(--color-p-bright);
+  }
+}
+
+
+/* Home constellation — readable over ASCII field */
+@keyframes portal-signal-dash {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
+@keyframes portal-signal-blink {
+  0%,
+  100% {
+    opacity: 0.42;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.portal-signal-link {
+  stroke: var(--color-p-signal);
+  stroke-width: 1.5px;
+  stroke-linecap: square;
+  stroke-dasharray: 4 3;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  shape-rendering: geometricPrecision;
+  animation:
+    portal-signal-dash 0.7s linear infinite,
+    portal-signal-blink 1.15s ease-in-out infinite;
+}
+
+.portal-signal-node {
+  --signal-outline: var(--color-p-void);
+  color: var(--color-p-mid);
+  display: block;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+}
+
+.portal-shell[data-theme='light'] .portal-signal-node,
+html.light .portal-shell .portal-signal-node {
+  /* ink outline on paper field — not void/paper (was soft white blob) */
+  --signal-outline: var(--color-p-bright);
+  color: var(--color-p-bright);
+}
+
+.portal-signal-node[data-active='true'] {
+  color: var(--color-p-signal);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-signal-link {
+    animation: none;
+    opacity: 0.9;
   }
 }

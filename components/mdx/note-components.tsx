@@ -6,6 +6,11 @@ import { AsciiRule } from '@/lib/ascii/components/ascii-rule'
 import { Label } from '@/components/primitives/label'
 import { Frame } from '@/components/primitives/frame'
 import { portal } from '@/lib/portal/styles'
+import { CacheFlowDiagram } from '@/components/mdx/cache-flow-diagram'
+import { CacheLifeProfiles } from '@/components/mdx/cache-life-profiles'
+import { ContentTypesTable } from '@/components/mdx/content-types-table'
+import { ErrorCard } from '@/components/mdx/error-card'
+import { InvalidationCompare } from '@/components/mdx/invalidation-compare'
 
 function Hr() {
   return (
@@ -76,4 +81,9 @@ export const noteComponents = {
   FieldPreview,
   AsciiRule,
   Label,
+  CacheFlowDiagram,
+  CacheLifeProfiles,
+  ContentTypesTable,
+  ErrorCard,
+  InvalidationCompare,
 } satisfies MDXComponents

@@ -74,12 +74,28 @@ export function destFromPath(path: string): DestId {
   return 'home'
 }
 
+/** Prefer next-themes once set; else trust the blocking script's html class. */
+function portalThemeFromDom(): PortalTheme {
+  if (typeof document === 'undefined') return 'dark'
+  return document.documentElement.classList.contains('light') ? 'light' : 'dark'
+}
+
 export function PortalProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const rm = useReducedMotion()
   const { resolvedTheme } = useTheme()
-  const theme: PortalTheme = resolvedTheme === 'light' ? 'light' : 'dark'
+  // next-themes leaves resolvedTheme undefined after SSR until setTheme() —
+  // defaulting that to 'dark' desyncs from the script's html.light class and
+  // paints light-on-light portal copy until the user toggles once.
+  const [theme, setPortalTheme] = React.useState<PortalTheme>('dark')
+  React.useLayoutEffect(() => {
+    if (resolvedTheme === 'light' || resolvedTheme === 'dark') {
+      setPortalTheme(resolvedTheme)
+      return
+    }
+    setPortalTheme(portalThemeFromDom())
+  }, [resolvedTheme])
   const apiRef = React.useRef<AsciiWorldApi | null>(null)
   const [phase, setPhase] = React.useState<PortalPhase>('idle')
   const [landId, setLandId] = React.useState(0)
@@ -242,7 +258,9 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
             <div className={portal.transitMark}>
               <p className={portal.transitEyebrow}>{trip.sub}</p>
               <h2 className={portal.transitTitle}>
-                <HighlightMark isView={false}>{trip.label}</HighlightMark>
+                <HighlightMark isView={false} iterations={1} multiline>
+                  {trip.label}
+                </HighlightMark>
               </h2>
             </div>
           </div>
