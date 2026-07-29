@@ -28,7 +28,7 @@ export function PortalHome() {
     if (!api) {
       setOpen(true)
       busyRef.current = false
-      cue('ready')
+      cue('bloom')
       return
     }
     api.cancelTravel()
@@ -40,7 +40,7 @@ export function PortalHome() {
       onDone: () => {
         busyRef.current = false
         setOpen(true)
-        cue('ready')
+        cue('bloom')
       },
     })
   }, [apiRef, state])
@@ -49,6 +49,7 @@ export function PortalHome() {
     if (busyRef.current) return
     const api = (apiRef as React.MutableRefObject<AsciiWorldApi | null>).current
     busyRef.current = true
+    cue('droplet')
     setOpen(false)
     if (!api) {
       busyRef.current = false
@@ -62,6 +63,7 @@ export function PortalHome() {
       returning: true,
       onDone: () => {
         busyRef.current = false
+        cue('ready')
       },
     })
   }, [apiRef])
@@ -76,7 +78,7 @@ export function PortalHome() {
   return (
     <>
       {showHero && (
-        <div className="absolute left-[6%] top-[11%] z-20 md:left-[8%] md:top-[13%]">
+        <div className="absolute left-[6%] top-[min(22vh,9rem)] z-20 md:left-[8%] md:top-[min(24vh,11rem)]">
           <PortalStagger className="portal-float">
             <p className="portal-mono mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
               {IVAN.name} · {IVAN.studio}

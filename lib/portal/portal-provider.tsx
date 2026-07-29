@@ -296,6 +296,7 @@ function ShellWheel({
   const holdStart = React.useCallback(
     (id: DestId) => {
       if (busy) return
+      cue('press')
       holdRef.current = id
       setHover(id)
       const need = 340
@@ -320,6 +321,7 @@ function ShellWheel({
 
   const holdEnd = React.useCallback(() => {
     if (chargeRef.current >= 0.98 || !holdRef.current) return
+    cue('release')
     holdRef.current = null
     cancelAnimationFrame(holdRaf.current)
     const start = chargeRef.current

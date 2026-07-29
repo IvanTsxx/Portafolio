@@ -24,6 +24,14 @@ export function initCuelume() {
     const v = Number(raw)
     if (Number.isFinite(v)) setVolume(v)
   }
+
+  // Warm the shared AudioContext on the first real gesture so later
+  // imperative cues (tunnel land, wheel tick) are not swallowed while suspended.
+  const unlock = () => {
+    play('tick', { volume: 0.001 })
+    window.removeEventListener('pointerdown', unlock, true)
+  }
+  window.addEventListener('pointerdown', unlock, true)
 }
 
 export function isCuelumeMuted(): boolean {

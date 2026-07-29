@@ -38,8 +38,10 @@
   pointer-events: none;
 }
 
-.portal-shell-content > * {
+.portal-shell-content>* {
   pointer-events: auto;
+  position: absolute;
+  inset: 0;
 }
 
 .portal-shell[data-portal-phase='traveling'] .portal-shell-content {
@@ -125,14 +127,14 @@
   flex-direction: column;
   padding: clamp(24px, 5vw, 56px);
   padding-top: clamp(72px, 12vh, 120px);
-  padding-bottom: 100px;
+  padding-bottom: 120px;
   overflow: hidden;
   pointer-events: none;
 }
 
 .portal-page-scroll {
   pointer-events: auto;
-  max-height: calc(100dvh - 140px);
+  max-height: calc(100dvh - 160px);
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -152,27 +154,31 @@
 }
 
 .portal-emerge {
-  animation: portal-emerge 480ms var(--p-ease) both;
+  perspective: 1200px;
+  perspective-origin: 50% 42%;
+  transform-style: preserve-3d;
+  animation: portal-emerge 620ms var(--p-ease) both;
 }
 
 .portal-emerge>* {
-  animation: portal-emerge 440ms var(--p-ease) both;
+  transform-origin: 50% 55%;
+  animation: portal-emerge 560ms var(--p-ease) both;
 }
 
 .portal-emerge>*:nth-child(1) {
-  animation-delay: 0.04s;
+  animation-delay: 0.06s;
 }
 
 .portal-emerge>*:nth-child(2) {
-  animation-delay: 0.1s;
+  animation-delay: 0.14s;
 }
 
 .portal-emerge>*:nth-child(3) {
-  animation-delay: 0.16s;
+  animation-delay: 0.22s;
 }
 
 .portal-emerge>*:nth-child(n + 4) {
-  animation-delay: 0.22s;
+  animation-delay: 0.3s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -186,29 +192,33 @@
 @keyframes portal-emerge {
   from {
     opacity: 0;
-    transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 12px, -200px) scale(0.88);
   }
 
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
 .portal-wheel {
   position: absolute;
   left: 50%;
-  bottom: 6px;
+  bottom: 10px;
   z-index: 50;
-  width: min(340px, 72vw);
+  width: min(440px, 86vw);
   transform: translateX(-50%);
   pointer-events: none;
+  display: flex;
+  justify-content: center;
 }
 
 .portal-wheel-svg {
   display: block;
   width: 100%;
+  max-width: 440px;
   height: auto;
+  margin-inline: auto;
   overflow: visible;
   pointer-events: none;
 }
@@ -284,7 +294,7 @@
 .portal-wheel-hub-label {
   fill: var(--p-mid);
   font-family: var(--font-geist-mono, ui-monospace, monospace);
-  font-size: 7px;
+  font-size: 8px;
   letter-spacing: 0.12em;
   pointer-events: none;
 }
@@ -292,7 +302,7 @@
 .portal-wheel-svg-label {
   fill: var(--p-dim);
   font-family: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: -0.02em;
   pointer-events: none;
@@ -315,7 +325,7 @@
   justify-content: flex-start;
   padding: clamp(24px, 5vw, 56px);
   padding-top: clamp(72px, 12vh, 120px);
-  padding-bottom: 100px;
+  padding-bottom: 120px;
   pointer-events: none;
   overflow: hidden;
 }

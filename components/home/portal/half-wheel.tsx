@@ -56,17 +56,17 @@ export function HalfWheel({
   const onArcRef = React.useRef(false)
   const [hot, setHot] = React.useState(false)
   const n = DESTINATIONS.length
-  /** Compact arc — less vertical footprint */
-  const radius = 96
-  const cx = 160
-  const cy = 112
-  const vbW = 320
-  const vbH = 128
-  const band = 14
-  const labelR = radius + 16
-  const tickInner = radius - 10
-  const hubR = 18
-  const caretR = 4.5
+  /** Mid size — smaller than original, bigger than last pass; cx = vbW/2 for true center */
+  const radius = 124
+  const vbW = 400
+  const cx = vbW / 2
+  const labelR = radius + 20
+  const cy = labelR + 6
+  const vbH = cy + 28
+  const band = 16
+  const tickInner = radius - 11
+  const hubR = 22
+  const caretR = 5.5
 
   const pinT = destProgress(active)
 
