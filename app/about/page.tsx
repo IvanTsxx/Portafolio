@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
+import { SocialLinks } from '@/components/site/social-links'
 import { chamberSide } from '@/components/home/portal/content'
 import { IDENTITY } from '@/content/identity'
 
@@ -94,20 +95,7 @@ export default function AboutPage() {
         ))}
       </ul>
 
-      <div className="flex flex-wrap gap-4 pb-8">
-        <a href={`mailto:${IDENTITY.email}`} className="portal-link">
-          Email →
-        </a>
-        <a href={IDENTITY.socials.github} target="_blank" rel="noreferrer" className="portal-link">
-          GitHub →
-        </a>
-        <a href={IDENTITY.socials.twitter} target="_blank" rel="noreferrer" className="portal-link">
-          X →
-        </a>
-        <a href={IDENTITY.socials.linkedin} target="_blank" rel="noreferrer" className="portal-link">
-          LinkedIn →
-        </a>
-      </div>
+      <SocialLinks className="portal-socials pb-8" />
     </PortalPage>
   )
 }

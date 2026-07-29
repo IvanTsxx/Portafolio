@@ -43,9 +43,9 @@ export const IVAN = {
   },
   tagline: 'Next.js products, serious craft.',
   blurb:
-    'Frontend en basement studio. Construyo productos en Next.js, TypeScript y shadcn — con Motion cuando el detalle importa. Aprendo rápido; demuestro valor en shipping.',
+    'Frontend at basement studio. I ship Next.js, TypeScript, and shadcn products — Motion when the detail matters. Learn fast; prove value in shipping.',
   pitch:
-    'Si buscás alguien que ya labura en un studio de primer nivel y quiere seguir subiendo el listón en App Router, design systems y motion — hablamos.',
+    'If you want someone already shipping at a top-tier studio — and still raising the bar on App Router, design systems, and motion — let’s talk.',
   stack: ['Next.js', 'TypeScript', 'shadcn/ui', 'Motion', 'React', 'Tailwind'],
   learning: ['Agent skills', 'Claude', 'MCPs', 'WebGL'],
   courses: ['Invisible Details', 'animations.dev'],
@@ -54,25 +54,25 @@ export const IVAN = {
       place: 'basement studio',
       role: 'Frontend Developer',
       when: '04.2026 — Present',
-      note: 'Product UI, design systems adjacent work, motion, delivery con equipos de alto nivel.',
+      note: 'Product UI, design-systems-adjacent work, motion, delivery with high-craft teams.',
     },
     {
       place: 'Aliva Shop',
       role: 'Frontend Developer',
       when: '06.2025 — 04.2026',
-      note: 'Modernización Q-commerce: Angular → standalone + Signals; app móvil Ionic + Capacitor.',
+      note: 'Q-commerce modernization: Angular → standalone + Signals; Ionic + Capacitor for mobile.',
     },
     {
       place: 'Tensolite SA',
       role: 'Full Stack Developer',
       when: '07.2023 — 11.2023',
-      note: 'Tools internos: Excel import/export, PDF, automatización de workflows operativos.',
+      note: 'Internal tools: Excel import/export, PDF generation, ops workflow automation.',
     },
     {
       place: 'Doctor Qali',
       role: 'Frontend Developer',
       when: '01.2023 — 06.2023',
-      note: 'HealthTech: bottlenecks de render, bundle size, Lighthouse, patrones React modernos.',
+      note: 'HealthTech: render bottlenecks, bundle size, Lighthouse, modern React patterns.',
     },
   ],
   agentPrompt: `Ivan Bongiovanni — Frontend Developer at basement studio (Tucumán, AR).
@@ -105,7 +105,7 @@ export const DESTINATIONS: {
     label: 'Work',
     sub: 'Experience',
     mood: 0.2,
-    body: 'Roles, equipos y delivery — basement, producto, performance. La trayectoria profesional, no demos sueltas.',
+    body: 'Roles, teams, and delivery — basement, product, performance. The professional track, not loose demos.',
     href: '/work',
   },
   {
@@ -113,7 +113,7 @@ export const DESTINATIONS: {
     label: 'Notes',
     sub: 'Writing · process',
     mood: 0.4,
-    body: 'Notas sobre craft, ASCII vs SVG, portales y detalles invisibles. Pensar en público, con el mismo rigor que el shipping.',
+    body: 'Notes on craft, ASCII vs SVG, portals, and invisible details. Thinking in public with the same rigor as shipping.',
     href: '/notes',
   },
   {
@@ -121,7 +121,7 @@ export const DESTINATIONS: {
     label: 'Lab',
     sub: 'Projects · explorations',
     mood: 0.6,
-    body: 'Proyectos personales, motores ASCII, portales y exploraciones. Lo que construyo por oficio y curiosidad.',
+    body: 'Personal projects, ASCII engines, portals, and explorations. Built for craft and curiosity.',
     href: '/lab',
   },
   {
@@ -129,7 +129,7 @@ export const DESTINATIONS: {
     label: 'About',
     sub: 'basement + origin',
     mood: 0.8,
-    body: 'Trabajo en basement studio. Eso ya dice mucho del listón. Soy de Tucumán; traigo predisposición a aprender y a demostrar valor en el siguiente nivel.',
+    body: 'I work at basement studio — that already sets the bar. From Tucumán; quick to learn, prove value at the next level.',
     href: '/about',
   },
 ]
@@ -140,26 +140,26 @@ export const OPEN_DEST = {
   label: 'Open',
   sub: 'Let’s talk',
   mood: 0.9,
-  body: 'Product teams y collabs focalizados. Brief claro, constraints honestos. El CV ya tiene basement — lo que falta es el problema correcto.',
+  body: 'Product teams and focused collabs. Clear brief, honest constraints. The CV already has basement — what’s missing is the right problem.',
 }
 
 export const WORK_STUBS = [
   {
     title: 'basement studio',
     year: '2026 — Present',
-    note: 'Frontend · product UI, motion, delivery con equipos de craft alto.',
+    note: 'Frontend · product UI, motion, delivery with high-craft teams.',
     href: '/work/basement-studio',
   },
   {
     title: 'Aliva Shop',
     year: '2025 — 2026',
-    note: 'Frontend · modernización Q-commerce Angular → Signals + Ionic.',
+    note: 'Frontend · Q-commerce modernization Angular → Signals + Ionic.',
     href: '/work/aliva-shop',
   },
   {
     title: 'Tensolite SA',
     year: '2023',
-    note: 'Full stack · tools internos, Excel/PDF, automatización operativa.',
+    note: 'Full stack · internal tools, Excel/PDF, ops automation.',
     href: '/work/tensolite',
   },
 ] as const
@@ -168,19 +168,19 @@ export const NOTE_STUBS = [
   {
     title: 'ASCII vs SVG',
     year: '2026',
-    note: 'Cuándo el motor tipográfico gana, y cuándo no.',
+    note: 'When the typographic engine wins — and when it doesn’t.',
     href: '/notes/ascii-vs-svg',
   },
   {
     title: 'Portal 900',
     year: '2026',
-    note: 'Una duración, un ease — navegación como evento.',
+    note: 'One duration, one ease — navigation as an event.',
     href: '/notes/portal-900',
   },
   {
     title: 'Invisible details in shipping UI',
     year: '2025',
-    note: 'Lo que aprendí aplicando Emil en producto real.',
+    note: 'What I learned applying Emil on real product.',
     href: '/notes',
   },
 ] as const

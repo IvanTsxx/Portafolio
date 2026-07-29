@@ -16,6 +16,7 @@ import {
 import type { AsciiWorldApi } from '@/components/home/portal/gl/ascii-world'
 import { SoundToggle } from '@/components/site/sound-toggle'
 import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler'
+import { HighlightMark } from '@/components/ui/highlight-mark'
 import '@/components/site/portal-shell.css'
 
 const AsciiWorld = dynamic(
@@ -80,7 +81,9 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = React.useState<PortalTheme>('dark')
   const [phase, setPhase] = React.useState<PortalPhase>('idle')
   const [landId, setLandId] = React.useState(0)
-  const [tripLabel, setTripLabel] = React.useState<string | null>(null)
+  const [trip, setTrip] = React.useState<{ label: string; sub: string } | null>(
+    null,
+  )
   const abortRef = React.useRef<(() => void) | null>(null)
   const navFired = React.useRef(false)
   const hrefRef = React.useRef('')
@@ -104,7 +107,7 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
         api.setLandMood(moodForHref(href))
       }
     }
-    setTripLabel(null)
+    setTrip(null)
     setLandId((n) => n + 1)
     setPhase('arriving')
     cue('ready')
@@ -128,16 +131,18 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       navFired.current = false
       hrefRef.current = href
 
+      const dest = DESTINATIONS.find((d) => d.href === href)
       const routeLabel =
         label ??
-        (href.replace(/^\//, '').replace(/-/g, ' ').toUpperCase() || 'HOME')
+        dest?.label ??
+        (href.replace(/^\//, '').replace(/-/g, ' ') || 'Home')
       const mood = opts?.mood ?? moodForHref(href)
       const fromCharge = opts?.fromCharge ?? apiRef.current?.getTravel().charge ?? 0
       const goingHome = href === '/'
 
       cue('loading')
       setPhase('traveling')
-      setTripLabel(routeLabel)
+      setTrip({ label: routeLabel, sub: dest?.sub ?? 'Tunnel' })
 
       if (rm) {
         const id = window.setTimeout(() => {
@@ -233,7 +238,16 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
           />
         </div>
 
-        {tripLabel && <p className="portal-transit-label">{tripLabel}</p>}
+        {trip && (
+          <div className="portal-transit" aria-live="polite" aria-atomic="true">
+            <div className="portal-transit-mark">
+              <p className="portal-transit-eyebrow">{trip.sub}</p>
+              <h2 className="portal-transit-title">
+                <HighlightMark isView={false}>{trip.label}</HighlightMark>
+              </h2>
+            </div>
+          </div>
+        )}
 
         <div className="portal-shell-content">{children}</div>
 
@@ -272,7 +286,7 @@ function ShellWheel() {
         clearCharge()
         return
       }
-      trigger(dest.href, dest.label.toUpperCase(), {
+      trigger(dest.href, dest.label, {
         mood: dest.mood,
         fromCharge: chargeRef.current,
       })

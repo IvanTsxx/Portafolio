@@ -1,13 +1,45 @@
 'use client'
 
 import * as React from 'react'
+import { motion, useReducedMotion } from 'motion/react'
 import { IVAN, chamberSide } from './content'
 import { ChamberCopy } from './chamber-copy'
 import { PortalStagger } from '@/components/site/portal-arrive'
+import { SocialLinks } from '@/components/site/social-links'
 import { HighlightMark } from '@/components/ui/highlight-mark'
+import { IDENTITY } from '@/content/identity'
 import { usePortal } from '@/lib/portal'
 import { cue } from '@/lib/cuelume'
 import type { AsciiWorldApi } from './gl/ascii-world'
+
+const ease = [0.16, 1, 0.3, 1] as const
+
+/** Small geometric mark — entrance only; color from theme. */
+function EyebrowMark() {
+  const prefersReduced = useReducedMotion()
+
+  return (
+    <motion.span
+      className="portal-eyebrow-mark"
+      aria-hidden
+      initial={prefersReduced ? false : { opacity: 0, scale: 0.5, rotate: -24 }}
+      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+      transition={{ duration: prefersReduced ? 0 : 0.48, ease, delay: prefersReduced ? 0 : 0.06 }}
+    >
+      <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
+        <rect
+          x="1.5"
+          y="1.5"
+          width="13"
+          height="13"
+          stroke="currentColor"
+          strokeWidth="1.25"
+        />
+        <path d="M4 8h8M8 4v8" stroke="currentColor" strokeWidth="1.25" />
+      </svg>
+    </motion.span>
+  )
+}
 
 /**
  * Home surface content only — cosmos + wheel live in PortalProvider shell.
@@ -75,30 +107,52 @@ export function PortalHome() {
 
   const showHero = !open && state !== 'traveling'
   const openSide = chamberSide('open')
+  const statusLabel = IDENTITY.available ? 'Working' : 'Unavailable'
 
   return (
     <>
       {showHero && (
         <div className="portal-hero" data-side={chamberSide('home')}>
           <PortalStagger className="portal-float">
-            <p className="portal-mono mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-              {IVAN.name} · {IVAN.studio}
+            <p
+              className="portal-mono portal-eyebrow mb-4"
+              style={{ fontSize: 10, color: 'var(--p-dim)' }}
+            >
+              <EyebrowMark />
+              <span>{IDENTITY.role}</span>
             </p>
+
             <h1
               style={{
                 fontSize: 'clamp(2rem, 4.5vw, 3.4rem)',
                 lineHeight: 0.92,
                 letterSpacing: '-0.04em',
                 fontWeight: 600,
-                maxWidth: '14ch',
+                maxWidth: '12ch',
               }}
             >
-              <HighlightMark>{IVAN.tagline}</HighlightMark>
+              <HighlightMark>{IDENTITY.name}</HighlightMark>
             </h1>
-            <p className="mt-5 max-w-[36ch] text-[15px] leading-relaxed">{IVAN.blurb}</p>
-            <p className="portal-mono mt-6" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-              Hold the arc · tunnel between pages
+
+            <p
+              className="portal-mono mt-4"
+              style={{ fontSize: 10, color: 'var(--p-dim)' }}
+            >
+              Currently at {IDENTITY.studio}
             </p>
+
+            <p
+              className="portal-status mt-4"
+              data-available={IDENTITY.available ? 'true' : 'false'}
+              aria-label={`Status: ${statusLabel}`}
+            >
+              <span className="portal-status-dot" aria-hidden />
+              <span className="portal-mono" style={{ fontSize: 10 }}>
+                {statusLabel}
+              </span>
+            </p>
+
+            <SocialLinks className="portal-socials mt-2" />
           </PortalStagger>
         </div>
       )}

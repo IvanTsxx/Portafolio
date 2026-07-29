@@ -3,6 +3,7 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { HighlightMark } from '@/components/ui/highlight-mark'
+import { SocialLinks } from '@/components/site/social-links'
 import {
   IVAN,
   WORK_STUBS,
@@ -91,8 +92,8 @@ export function ChamberCopy({
             Personal projects · explorations
           </p>
           <p className="text-[14px] leading-relaxed">
-            Motores ASCII, portales, agent surfaces y side builds. Frames en glifos —
-            hover para revelar la foto.
+            ASCII engines, portals, agent surfaces, and side builds. Glyph frames —
+            hover to reveal the photo.
           </p>
           <p className="portal-mono mt-5 mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             Stack in play
@@ -128,22 +129,9 @@ export function ChamberCopy({
       {id === 'open' && (
         <div className="mt-6 pb-16">
           <p className="text-[15px] leading-relaxed">{IVAN.pitch}</p>
-          <a href={`mailto:${IVAN.email}`} className="portal-link">
-            Contact →
-          </a>
-          <div className="mt-4 flex flex-wrap gap-4">
-            <a href={IVAN.socials.github} target="_blank" rel="noreferrer" className="portal-link">
-              GitHub
-            </a>
-            <a href={IVAN.socials.twitter} target="_blank" rel="noreferrer" className="portal-link">
-              X
-            </a>
-            <a href={IVAN.socials.linkedin} target="_blank" rel="noreferrer" className="portal-link">
-              LinkedIn
-            </a>
-          </div>
+          <SocialLinks className="portal-socials mt-5" />
           {onCopy && (
-            <button type="button" className="portal-link" style={{ marginLeft: 16 }} onClick={onCopy}>
+            <button type="button" className="portal-link" onClick={onCopy}>
               {copied ? 'Prompt copied ✓' : 'Copy agent prompt'}
             </button>
           )}
