@@ -1,22 +1,25 @@
 // lib/ascii/hooks/use-reduced-motion.ts
-// Detects prefers-reduced-motion media query.
-// Returns true on the server (safe default: no motion on SSR).
+// Detects prefers-reduced-motion. SSR + hydration use the same snapshot
+// (reduced=true) so motion props don't diverge; real preference applies after.
 'use client'
 
-import * as React from 'react'
+import { useSyncExternalStore } from 'react'
+
+function subscribe(onStoreChange: () => void) {
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+  mq.addEventListener('change', onStoreChange)
+  return () => mq.removeEventListener('change', onStoreChange)
+}
+
+function getSnapshot() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+/** A11y-safe default until the client can read the real preference. */
+function getServerSnapshot() {
+  return true
+}
 
 export function useReducedMotion(): boolean {
-  const [reduced, setReduced] = React.useState<boolean>(() => {
-    if (typeof window === 'undefined') return true
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  })
-
-  React.useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
-
-  return reduced
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }

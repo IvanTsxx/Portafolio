@@ -83,12 +83,12 @@ The "silver bullet" of Next.js. It allows the same route to have a **static shel
 
 ## Decision Matrix
 
-| Strategy | Typical Scenario  | Performance (LCP)      | Server Cost   |
-| :------- | :---------------- | :--------------------- | :------------ |
-| **SSG**  | Blog, Landing     | ⭐⭐⭐⭐⭐ (Instant)   | 📉 Low        |
-| **ISR**  | Product Catalog   | ⭐⭐⭐⭐⭐ (Cache Hit) | 📉 Low-Medium |
-| **SSR**  | Admin Panel, Feed | ⭐⭐ (Depends on DB)   | 📈 High       |
-| **PPR**  | Complex App       | ⭐⭐⭐⭐ (Hybrid)      | ⚖️ Balanced   |
+| Strategy | Typical Scenario  | Performance (LCP) | Server Cost |
+| :------- | :---------------- | :---------------- | :---------- |
+| **SSG**  | Blog, Landing     | Instant           | Low         |
+| **ISR**  | Product Catalog   | Cache hit         | Low–Medium  |
+| **SSR**  | Admin Panel, Feed | Depends on DB     | High        |
+| **PPR**  | Complex App       | Hybrid            | Balanced    |
 
 ---
 

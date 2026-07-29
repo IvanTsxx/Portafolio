@@ -54,21 +54,47 @@ html.light .portal-shell {
   text-decoration-color: var(--color-p-signal);
 }
 
-.typeset-notes :where(:not(pre) > code),
-.typeset-notes :where(pre) {
-  border: 1px solid var(--color-border);
-  background-color: color-mix(in oklab, var(--color-p-void) 78%, transparent);
-  color: var(--color-p-bright);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+/* Inline code + fenced blocks → app/notes-code.css */
+
+/* GFM tables — monochrome hairline grid */
+.typeset-notes :where(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin-block: 1.5em;
+  font-size: 14px;
+  display: block;
+  overflow-x: auto;
 }
 
-.typeset-notes :where(pre code) {
-  border: 0;
-  background: transparent;
-  color: inherit;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+.typeset-notes :where(thead) {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.typeset-notes :where(th) {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-p-dim);
+  padding: 0.65rem 0.85rem;
+  white-space: nowrap;
+}
+
+.typeset-notes :where(td) {
+  border-bottom: 1px solid color-mix(in oklab, var(--color-p-bright) 10%, transparent);
+  color: var(--color-p-mid);
+  padding: 0.7rem 0.85rem;
+  vertical-align: top;
+}
+
+.typeset-notes :where(tbody tr:nth-child(even)) {
+  background-color: color-mix(in oklab, var(--color-p-bright) 3%, transparent);
+}
+
+.typeset-notes :where(td code) {
+  font-size: 11px;
 }
 
 /* ─── Floating type over ASCII (child cascade) ─── */
@@ -80,6 +106,10 @@ html.light .portal-shell {
     0 2px 8px var(--color-p-void);
   user-select: none;
   -webkit-user-select: none;
+
+  &[data-wide] {
+    max-width: min(60rem, 85vw);
+  }
 
   & h1,
   & h2,
@@ -103,7 +133,9 @@ html.light .portal-shell {
   }
 }
 
-/* Chamber / page scroll — halo so ASCII cannot erase copy */
+/* Chamber / page scroll — halo so ASCII cannot erase copy.
+ * Do NOT target bare `span` — Shiki wraps every token in <span> and
+ * multi-layer text-shadow on hundreds of tokens tanks scroll FPS. */
 @utility portal-scroll-halo {
   & :is(h1, h2, h3) {
     color: var(--color-p-bright);
@@ -112,10 +144,19 @@ html.light .portal-shell {
       0 0 48px var(--color-p-void);
   }
 
-  & :is(p, li, dd, dt, span, label) {
+  & :is(p, li, dd, dt, label) {
     text-shadow:
       0 0 16px var(--color-p-void),
       0 0 32px var(--color-p-void);
+  }
+
+  /* Long MDX notes: one soft bloom layer is enough */
+  & .typeset-notes :is(p, li, dd, dt) {
+    text-shadow: 0 0 14px var(--color-p-void);
+  }
+
+  & .typeset-notes :is(pre, code, pre *, code *) {
+    text-shadow: none;
   }
 }
 
@@ -145,12 +186,10 @@ html.light .portal-shell {
     flex-shrink: 0;
     pointer-events: none;
     /* Dark: solid void matches the cosmos field. */
-    background: linear-gradient(
-      to top,
-      var(--color-p-void) 0%,
-      color-mix(in oklab, var(--color-p-void) 55%, transparent) 45%,
-      transparent 100%
-    );
+    background: linear-gradient(to top,
+        var(--color-p-void) 0%,
+        color-mix(in oklab, var(--color-p-void) 55%, transparent) 45%,
+        transparent 100%);
     opacity: 0;
 
     /* Nested so specificity matches the opacity:0 rule above */
@@ -177,16 +216,14 @@ html.light .portal-shell {
  * A solid #e8e4dc bar kills the texture and reads as a weird slab.
  * Soft veil of the same void token, ASCII still shows through.
  */
-.portal-shell[data-theme='light'] .portal-scroll-edge > [data-portal-scroll-fade],
-html.light .portal-shell .portal-scroll-edge > [data-portal-scroll-fade] {
+.portal-shell[data-theme='light'] .portal-scroll-edge>[data-portal-scroll-fade],
+html.light .portal-shell .portal-scroll-edge>[data-portal-scroll-fade] {
   height: 4.5rem;
   margin-top: -4.5rem;
-  background: linear-gradient(
-    to top,
-    color-mix(in oklab, var(--color-p-void) 42%, transparent) 0%,
-    color-mix(in oklab, var(--color-p-void) 16%, transparent) 42%,
-    transparent 100%
-  );
+  background: linear-gradient(to top,
+      color-mix(in oklab, var(--color-p-void) 42%, transparent) 0%,
+      color-mix(in oklab, var(--color-p-void) 16%, transparent) 42%,
+      transparent 100%);
 }
 
 @keyframes portal-scroll-fade-out {
@@ -486,7 +523,7 @@ html.light .portal-shell .portal-scroll-edge > [data-portal-scroll-fade] {
 @utility portal-wheel-hub-label {
   fill: var(--color-p-mid);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 0.12em;
   pointer-events: none;
 }
@@ -517,10 +554,12 @@ html.light .portal-shell .portal-scroll-edge > [data-portal-scroll-fade] {
 }
 
 @keyframes portal-signal-blink {
+
   0%,
   100% {
     opacity: 0.42;
   }
+
   50% {
     opacity: 1;
   }

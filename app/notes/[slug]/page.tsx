@@ -8,6 +8,7 @@ import { chamberSide } from '@/components/home/portal/content'
 import { listNoteSlugs, getNote } from '@/lib/notes'
 import { portal } from '@/lib/portal/styles'
 import { NoteBackLink } from './note-back-link'
+import '@/app/notes-code.css'
 
 export async function generateStaticParams() {
   const slugs = await listNoteSlugs()
@@ -40,7 +41,7 @@ export default async function NoteDetailPage({
   const { frontmatter, content } = note
 
   return (
-    <PortalPage label={`Notes · ${frontmatter.date}`} side={chamberSide('notes')}>
+    <PortalPage label={`Notes · ${frontmatter.date}`} side={chamberSide('notes')} wide>
       <NoteBackLink />
       <PageHeading className="mt-6">
         {frontmatter.title}

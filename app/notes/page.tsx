@@ -16,7 +16,7 @@ export default async function NotesPage() {
   const notes = await listNotes()
 
   return (
-    <PortalPage label="Notes · writing" side={chamberSide('notes')}>
+    <PortalPage label="Notes · writing" side={chamberSide('notes')} wide>
       <PageHeading>Notes on systems and motion</PageHeading>
       <p className={`${portal.body} mb-10`}>
         MDX with custom components — compiled on the server.

@@ -1,5 +1,6 @@
 // components/mdx/invalidation-compare.tsx
 import { cn } from '@/lib/utils'
+import { portal } from '@/lib/portal/styles'
 
 type Locale = 'en' | 'es'
 
@@ -10,7 +11,6 @@ interface Method {
   behavior: string
   consistency: 'eventual' | 'strong'
   useWhen: string[]
-  color: 'green' | 'blue'
 }
 
 interface LocaleData {
@@ -23,13 +23,12 @@ interface LocaleData {
 
 const localeData: Record<Locale, LocaleData> = {
   en: {
-    consistencyLabel: 'Consistency:',
+    consistencyLabel: 'Consistency',
     eventualConsistencyText: 'eventual',
     methods: [
       {
         behavior:
           'Marks the entry as stale. The next request triggers a background fetch and serves the previous value meanwhile.',
-        color: 'green',
         consistency: 'eventual',
         import: "import { revalidateTag } from 'next/cache'",
         name: 'revalidateTag()',
@@ -43,7 +42,6 @@ const localeData: Record<Locale, LocaleData> = {
       {
         behavior:
           'Invalidates the cache entry synchronously. The same request (and all following) will see the new value. No inconsistency window.',
-        color: 'blue',
         consistency: 'strong',
         import: "import { updateTag } from 'next/cache'",
         name: 'updateTag()',
@@ -56,16 +54,15 @@ const localeData: Record<Locale, LocaleData> = {
       },
     ],
     strongConsistencyText: 'strong',
-    useWhenLabel: 'Use it when...',
+    useWhenLabel: 'Use it when',
   },
   es: {
-    consistencyLabel: 'Consistencia:',
+    consistencyLabel: 'Consistencia',
     eventualConsistencyText: 'eventual',
     methods: [
       {
         behavior:
           'Marca la entrada como stale. El siguiente request que llegue después lanza un fetch en background y sirve el valor anterior mientras tanto.',
-        color: 'green',
         consistency: 'eventual',
         import: "import { revalidateTag } from 'next/cache'",
         name: 'revalidateTag()',
@@ -79,7 +76,6 @@ const localeData: Record<Locale, LocaleData> = {
       {
         behavior:
           'Invalida la entrada de caché de forma síncrona. El mismo request (y todos los siguientes) ya verán el nuevo valor. No hay ventana de inconsistencia.',
-        color: 'blue',
         consistency: 'strong',
         import: "import { updateTag } from 'next/cache'",
         name: 'updateTag()',
@@ -92,22 +88,9 @@ const localeData: Record<Locale, LocaleData> = {
       },
     ],
     strongConsistencyText: 'fuerte',
-    useWhenLabel: 'Usalo cuando...',
+    useWhenLabel: 'Usalo cuando',
   },
 }
-
-const colorConfig = {
-  blue: {
-    accent: 'text-sky-400',
-    badge: 'border-sky-500/25 bg-sky-500/10 text-sky-400',
-    border: 'border-sky-500/25 bg-sky-500/8',
-  },
-  green: {
-    accent: 'text-emerald-400',
-    badge: 'border-emerald-500/25 bg-emerald-500/10 text-emerald-400',
-    border: 'border-emerald-500/25 bg-emerald-500/8',
-  },
-} as const
 
 export function InvalidationCompare({ locale }: { locale: Locale }) {
   const {
@@ -120,57 +103,47 @@ export function InvalidationCompare({ locale }: { locale: Locale }) {
 
   return (
     <div className="not-typeset my-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {methods.map((method) => {
-        const cfg = colorConfig[method.color]
-        return (
-          <div key={method.name} className={cn('flex flex-col gap-3 border p-4', cfg.border)}>
-            <div className="flex items-center justify-between gap-2">
-              <code className={cn('font-mono text-[14px] font-semibold', cfg.accent)}>
-                {method.name}
-              </code>
-              <span className={cn('shrink-0 border px-1.5 py-0.5 font-mono text-[10px]', cfg.badge)}>
-                {method.timing}
-              </span>
-            </div>
-            <code className="block break-all border border-p-bright/14 bg-p-void/50 px-2 py-1.5 font-mono text-[10px] text-p-dim">
-              {method.import}
-            </code>
-            <p className="text-[14px] leading-relaxed text-p-mid">{method.behavior}</p>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-p-dim">
-                {consistencyLabel}
-              </span>
-              <span
-                className={cn(
-                  'border px-1.5 py-0.5 font-mono text-[10px]',
-                  method.consistency === 'strong'
-                    ? 'border-sky-500/25 bg-sky-500/10 text-sky-400'
-                    : 'border-p-signal/30 bg-p-signal/10 text-p-signal',
-                )}
-              >
-                {method.consistency === 'strong'
-                  ? strongConsistencyText
-                  : eventualConsistencyText}
-              </span>
-            </div>
-            <div className="space-y-1.5">
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-p-dim">
-                {useWhenLabel}
-              </p>
-              <ul className="space-y-1">
-                {method.useWhen.map((item) => (
-                  <li key={item} className="flex items-start gap-1.5">
-                    <span className={cn('mt-0.5 shrink-0 text-[10px]', cfg.accent)} aria-hidden>
-                      →
-                    </span>
-                    <span className="text-[11px] leading-relaxed text-p-mid">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+      {methods.map((method) => (
+        <div
+          key={method.name}
+          className={cn(
+            'flex flex-col gap-3 border border-p-bright/14 bg-p-void/88 p-4',
+            '[text-shadow:0_0_12px_var(--color-p-void)]',
+          )}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <code className="font-mono text-[14px] font-semibold text-p-bright">{method.name}</code>
+            <span className="shrink-0 border border-p-bright/16 bg-p-bright/[0.04] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-p-dim">
+              {method.timing}
+            </span>
           </div>
-        )
-      })}
+          <code className="block break-all border border-p-bright/12 bg-p-void/90 px-2 py-1.5 font-mono text-[10px] text-p-mid">
+            {method.import}
+          </code>
+          <p className="text-[14px] leading-relaxed text-p-mid">{method.behavior}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={portal.label}>{consistencyLabel}</span>
+            <span className="border border-p-bright/16 bg-p-bright/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-p-bright">
+              {method.consistency === 'strong'
+                ? strongConsistencyText
+                : eventualConsistencyText}
+            </span>
+          </div>
+          <div className="space-y-1.5">
+            <p className={portal.label}>{useWhenLabel}</p>
+            <ul className="space-y-1">
+              {method.useWhen.map((item) => (
+                <li key={item} className="flex items-start gap-1.5">
+                  <span className="mt-0.5 shrink-0 font-mono text-[10px] text-p-dim" aria-hidden>
+                    →
+                  </span>
+                  <span className="text-[11px] leading-relaxed text-p-mid">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

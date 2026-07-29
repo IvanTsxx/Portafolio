@@ -1,5 +1,6 @@
 // components/mdx/content-types-table.tsx
 import { cn } from '@/lib/utils'
+import { portal } from '@/lib/portal/styles'
 
 type Locale = 'en' | 'es'
 
@@ -97,71 +98,50 @@ const localeData: Record<Locale, LocaleData> = {
   },
 }
 
-const typeConfig = {
-  cached: {
-    accent: 'text-emerald-400',
-    badgeBg: 'border-emerald-500/25 bg-emerald-500/10 text-emerald-400',
-    border: 'border-emerald-500/25 bg-emerald-500/8',
-  },
-  dynamic: {
-    accent: 'text-p-signal',
-    badgeBg: 'border-p-signal/30 bg-p-signal/10 text-p-signal',
-    border: 'border-p-signal/30 bg-p-signal/8',
-  },
-  static: {
-    accent: 'text-sky-400',
-    badgeBg: 'border-sky-500/25 bg-sky-500/10 text-sky-400',
-    border: 'border-sky-500/25 bg-sky-500/8',
-  },
-} as const
-
 export function ContentTypesTable({ locale }: { locale: Locale }) {
   const { types, directiveLabel, servedFromLabel, examplesLabel } = localeData[locale]
   return (
     <div className="not-typeset my-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-      {types.map((item) => {
-        const cfg = typeConfig[item.type]
-        return (
-          <div key={item.type} className={cn('flex flex-col gap-3 border p-4', cfg.border)}>
-            <div className="flex items-start justify-between gap-2">
-              <span className={cn('text-[14px] font-semibold', cfg.accent)}>{item.label}</span>
-              <span className={cn('shrink-0 border px-1.5 py-0.5 font-mono text-[10px]', cfg.badgeBg)}>
-                {item.badge}
-              </span>
-            </div>
-            <p className="text-[14px] leading-relaxed text-p-mid">{item.description}</p>
-            <div className="space-y-1">
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-p-dim">
-                {directiveLabel}
-              </p>
-              <code className={cn('inline-block border px-1.5 py-0.5 font-mono text-[11px]', cfg.badgeBg)}>
-                {item.directive}
-              </code>
-            </div>
-            <div className="space-y-1">
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-p-dim">
-                {servedFromLabel}
-              </p>
-              <p className="text-[14px] text-p-bright/85">{item.servedFrom}</p>
-            </div>
-            <div className="space-y-1.5">
-              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-p-dim">
-                {examplesLabel}
-              </p>
-              <div className="flex flex-wrap gap-1">
-                {item.examples.map((ex) => (
-                  <span
-                    key={ex}
-                    className="border border-p-bright/14 bg-p-void/50 px-1.5 py-0.5 font-mono text-[9px] text-p-mid"
-                  >
-                    {ex}
-                  </span>
-                ))}
-              </div>
+      {types.map((item) => (
+        <div
+          key={item.type}
+          className={cn(
+            'flex flex-col gap-3 border border-p-bright/14 bg-p-void/88 p-4',
+            '[text-shadow:0_0_12px_var(--color-p-void)]',
+          )}
+        >
+          <div className="flex items-start justify-between gap-2">
+            <span className="text-[14px] font-semibold text-p-bright">{item.label}</span>
+            <span className="shrink-0 border border-p-bright/16 bg-p-bright/[0.04] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-p-dim">
+              {item.badge}
+            </span>
+          </div>
+          <p className="text-[14px] leading-relaxed text-p-mid">{item.description}</p>
+          <div className="space-y-1">
+            <p className={portal.label}>{directiveLabel}</p>
+            <code className="inline-block border border-p-bright/14 bg-p-void/90 px-1.5 py-0.5 font-mono text-[11px] text-p-bright">
+              {item.directive}
+            </code>
+          </div>
+          <div className="space-y-1">
+            <p className={portal.label}>{servedFromLabel}</p>
+            <p className="text-[14px] text-p-bright/85">{item.servedFrom}</p>
+          </div>
+          <div className="space-y-1.5">
+            <p className={portal.label}>{examplesLabel}</p>
+            <div className="flex flex-wrap gap-1">
+              {item.examples.map((ex) => (
+                <span
+                  key={ex}
+                  className="border border-p-bright/12 bg-p-bright/[0.03] px-1.5 py-0.5 font-mono text-[9px] text-p-mid"
+                >
+                  {ex}
+                </span>
+              ))}
             </div>
           </div>
-        )
-      })}
+        </div>
+      ))}
     </div>
   )
 }

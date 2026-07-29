@@ -4,6 +4,7 @@ import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import { noteComponents } from '@/components/mdx/note-components'
+import { noteMdxOptions } from '@/lib/notes/mdx-options'
 
 const NOTES_DIR = path.join(process.cwd(), 'content/notes')
 
@@ -41,7 +42,7 @@ export async function listNotes(): Promise<NoteMeta[]> {
       if (!source) return null
       const { frontmatter } = await compileMDX<NoteFrontmatter>({
         source,
-        options: { parseFrontmatter: true },
+        options: { parseFrontmatter: true, mdxOptions: noteMdxOptions },
       })
       return { slug, ...frontmatter }
     }),
@@ -59,7 +60,7 @@ export async function getNote(slug: string) {
   const { content, frontmatter } = await compileMDX<NoteFrontmatter>({
     source,
     components: noteComponents,
-    options: { parseFrontmatter: true },
+    options: { parseFrontmatter: true, mdxOptions: noteMdxOptions },
   })
 
   return { slug, content, frontmatter }

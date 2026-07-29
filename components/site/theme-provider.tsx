@@ -7,6 +7,7 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes'
 
 export function ThemeProvider({
   children,
+  scriptProps,
   ...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
   return (
@@ -16,6 +17,14 @@ export function ThemeProvider({
       enableSystem={false}
       disableTransitionOnChange
       {...props}
+      // next-themes FOUC script: React 19 warns on <script> in Client Components.
+      // Server: text/javascript (runs before paint). Client: text/plain (no re-exec).
+      // @see https://nextjs.org/docs/app/guides/preventing-flash-before-hydration
+      scriptProps={{
+        ...scriptProps,
+        type:
+          typeof window === 'undefined' ? 'text/javascript' : 'text/plain',
+      }}
     >
       {children}
     </NextThemesProvider>

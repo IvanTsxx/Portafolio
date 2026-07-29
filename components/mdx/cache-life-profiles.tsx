@@ -116,10 +116,10 @@ const localeData: Record<Locale, LocaleData> = {
 export function CacheLifeProfiles({ locale }: { locale: Locale }) {
   const { columns, profiles } = localeData[locale]
   return (
-    <div className="not-typeset my-6 overflow-x-auto border border-p-bright/16 bg-p-void/60">
-      <table className="w-full text-[14px]">
+    <div className="not-typeset my-6 overflow-x-auto border border-p-bright/14 bg-p-void/88">
+      <table className="w-full border-collapse text-[14px]">
         <thead>
-          <tr className="border-b border-p-bright/16">
+          <tr className="border-b border-p-bright/14">
             {columns.map((col) => (
               <th
                 key={col}
@@ -136,17 +136,17 @@ export function CacheLifeProfiles({ locale }: { locale: Locale }) {
               key={p.name}
               className={cn(
                 'border-b border-p-bright/10',
-                i % 2 === 0 ? 'bg-transparent' : 'bg-p-bright/3',
+                i % 2 === 0 ? 'bg-transparent' : 'bg-p-bright/[0.03]',
               )}
             >
               <td className="px-4 py-3">
-                <code className="border border-emerald-500/25 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[11px] text-emerald-400">
+                <code className="border border-p-bright/14 bg-p-void/90 px-1.5 py-0.5 font-mono text-[11px] text-p-bright">
                   &apos;{p.name}&apos;
                 </code>
               </td>
-              <td className="px-4 py-3 font-mono text-[11px] text-sky-400">{p.stale}</td>
-              <td className="px-4 py-3 font-mono text-[11px] text-p-signal">{p.revalidate}</td>
-              <td className="px-4 py-3 font-mono text-[11px] text-red-400">{p.expire}</td>
+              <td className="px-4 py-3 font-mono text-[11px] text-p-mid">{p.stale}</td>
+              <td className="px-4 py-3 font-mono text-[11px] text-p-mid">{p.revalidate}</td>
+              <td className="px-4 py-3 font-mono text-[11px] text-p-mid">{p.expire}</td>
               <td className="px-4 py-3 text-[14px] text-p-mid">{p.useCase}</td>
             </tr>
           ))}
