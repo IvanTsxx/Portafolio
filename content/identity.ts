@@ -8,6 +8,7 @@ export const IDENTITY = {
   name: 'Ivan Bongiovanni',
   displayName: 'Iván Bongiovanni',
   short: 'Ivan',
+  nickname: 'Ivo',
   handle: 'ivantsx',
   role: 'Frontend Developer',
   studio: 'basement studio',
@@ -35,7 +36,7 @@ export const IDENTITY = {
   bio: 'Specializing in Next.js. Building fast, typesafe, and beautiful web experiences.',
   openTo: 'Focused contracts',
   available: true,
-  stack: ['Next.js', 'TypeScript', 'AI SDK', 'eve', 'Motion', 'Three'],
+  stack: ['Next.js', 'TypeScript', 'AI SDK', 'Eve', 'Motion', 'Three'],
   focus: ['Generative UI', 'Agent surfaces', 'Edge delivery'],
   /** Words that appear in the live spiral — identity, place, stack. Not filler. */
   lexicon: [
@@ -62,7 +63,7 @@ export const IDENTITY = {
     NAME: 'Ivan Bongiovanni',
     ROLE: 'Frontend Developer · basement studio',
     LOC: 'Tucumán, AR',
-    STACK: 'Next 16 · TS strict · AI SDK · eve',
+    STACK: 'Next 16 · TS strict · AI SDK · Eve',
     ASCII: 'live',
     PORTAL: '900ms',
     STATUS: 'open',

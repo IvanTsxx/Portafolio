@@ -135,7 +135,7 @@ export function PortalHome() {
               </h1>
 
               <p className={`${portal.label} mt-4`}>
-                Currently at {IDENTITY.studio}
+                aka {IDENTITY.nickname} · Currently at {IDENTITY.studio}
               </p>
 
               <p
