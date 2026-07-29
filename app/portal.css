@@ -1,0 +1,404 @@
+/* Portal shell — theme scope + nested @utilities that cannot be class strings */
+
+/* ─── Theme scope (tokens live in @theme; light overrides here) ─── */
+.portal-shell {
+  --color-foreground: var(--color-p-bright);
+  --color-muted-foreground: var(--color-p-dim);
+  --color-border: color-mix(in oklab, var(--color-p-bright) 18%, transparent);
+  --color-muted: color-mix(in oklab, var(--color-p-bright) 9%, transparent);
+  --color-primary: var(--color-p-signal);
+  --color-ring: var(--color-p-signal);
+  --font-heading: var(--font-sans);
+  --radius: 0;
+}
+
+.portal-shell[data-theme='light'] {
+  --color-p-void: #e8e4dc;
+  --color-p-bright: #1a1816;
+  --color-p-dim: #2c2824;
+  --color-p-mid: #2a2622;
+  --color-p-signal: #c44a1f;
+  --color-muted: color-mix(in oklab, var(--color-p-bright) 7%, transparent);
+}
+
+/* Notes / MDX — shadcn/typeset preset tuned for floating portal chambers */
+.typeset-notes {
+  --typeset-font-body: var(--font-sans);
+  --typeset-font-heading: var(--font-sans);
+  --typeset-font-mono: var(--font-mono);
+  --typeset-size: 15px;
+  --typeset-leading: 1.7;
+  --typeset-flow: 1.35em;
+  color: var(--color-p-mid);
+}
+
+.typeset-notes :where(h1, h2, h3, h4) {
+  letter-spacing: -0.02em;
+}
+
+.typeset-notes :where(a) {
+  color: var(--color-p-bright);
+  text-decoration-color: color-mix(in oklab, var(--color-p-signal) 45%, transparent);
+}
+
+.typeset-notes :where(a:hover) {
+  color: var(--color-p-signal);
+  text-decoration-color: var(--color-p-signal);
+}
+
+.typeset-notes :where(:not(pre) > code),
+.typeset-notes :where(pre) {
+  border: 1px solid var(--color-border);
+  background-color: color-mix(in oklab, var(--color-p-void) 78%, transparent);
+  color: var(--color-p-bright);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.typeset-notes :where(pre code) {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* ─── Floating type over ASCII (child cascade) ─── */
+@utility portal-float {
+  max-width: min(36rem, 90vw);
+  text-shadow:
+    0 0 24px var(--color-p-void),
+    0 0 48px var(--color-p-void),
+    0 2px 8px var(--color-p-void);
+  user-select: none;
+  -webkit-user-select: none;
+
+  & h1,
+  & h2,
+  & h3 {
+    color: var(--color-p-bright);
+    text-wrap: balance;
+  }
+
+  & p,
+  & li {
+    color: var(--color-p-mid);
+  }
+
+  & a {
+    color: var(--color-p-bright);
+    text-decoration: none;
+  }
+
+  & a:hover {
+    color: var(--color-p-signal);
+  }
+}
+
+/* Chamber / page scroll — halo so ASCII cannot erase copy */
+@utility portal-scroll-halo {
+  & :is(h1, h2, h3) {
+    color: var(--color-p-bright);
+    text-shadow:
+      0 0 24px var(--color-p-void),
+      0 0 48px var(--color-p-void);
+  }
+
+  & :is(p, li, dd, dt, span, label) {
+    text-shadow:
+      0 0 16px var(--color-p-void),
+      0 0 32px var(--color-p-void);
+  }
+}
+
+/* Emerge stagger (chamber open / page land) */
+@utility portal-emerge {
+  perspective: 1200px;
+  perspective-origin: 50% 42%;
+  transform-style: preserve-3d;
+  animation: portal-emerge 620ms var(--ease-out) both;
+
+  &>* {
+    transform-origin: 50% 55%;
+    animation: portal-emerge 560ms var(--ease-out) both;
+  }
+
+  &>*:nth-child(1) {
+    animation-delay: 0.06s;
+  }
+
+  &>*:nth-child(2) {
+    animation-delay: 0.14s;
+  }
+
+  &>*:nth-child(3) {
+    animation-delay: 0.22s;
+  }
+
+  &>*:nth-child(n + 4) {
+    animation-delay: 0.3s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+
+    &>* {
+      animation: none;
+    }
+  }
+}
+
+/* Post-tunnel spit — nested selectors need CSS */
+@utility portal-arrive {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+
+  &[data-fresh] {
+    perspective: 1400px;
+    perspective-origin: 50% 42%;
+    transform-style: preserve-3d;
+  }
+
+  &[data-fresh] :is(h1, h2, h3) {
+    transform-origin: 50% 60%;
+    animation: portal-spit 0.68s var(--ease-out) both;
+    animation-delay: 0.1s;
+  }
+
+  &[data-fresh] :is(header p, .portal-float > p, article p:first-of-type) {
+    transform-origin: 50% 60%;
+    animation: portal-spit 0.62s var(--ease-out) both;
+    animation-delay: 0.18s;
+  }
+
+  &[data-fresh] li {
+    transform-origin: 50% 50%;
+    animation: portal-spit 0.54s var(--ease-out) both;
+  }
+
+  &[data-fresh] li:nth-child(1) {
+    animation-delay: 0.2s;
+  }
+
+  &[data-fresh] li:nth-child(2) {
+    animation-delay: 0.26s;
+  }
+
+  &[data-fresh] li:nth-child(3) {
+    animation-delay: 0.32s;
+  }
+
+  &[data-fresh] li:nth-child(4) {
+    animation-delay: 0.38s;
+  }
+
+  &[data-fresh] li:nth-child(5) {
+    animation-delay: 0.44s;
+  }
+
+  &[data-fresh] li:nth-child(n + 6) {
+    animation-delay: 0.5s;
+  }
+
+  &[data-fresh] :is(nav, .portal-float > a, header + *) {
+    transform-origin: 50% 50%;
+  }
+
+  &[data-fresh] nav {
+    animation: portal-spit 0.56s var(--ease-out) both;
+    animation-delay: 0.28s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &[data-fresh] :is(h1, h2, h3, p, li, nav) {
+      animation: none;
+    }
+  }
+}
+
+/* AsciiImage — hover/focus/touched cascade */
+@utility portal-ascii-image {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid color-mix(in oklab, var(--color-p-bright) 12%, transparent);
+  background: color-mix(in oklab, var(--color-p-void) 70%, transparent);
+  outline: none;
+  cursor: crosshair;
+
+  &[data-static] {
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--color-p-signal);
+    outline-offset: 2px;
+  }
+
+  & .portal-ascii-image-photo,
+  & .portal-ascii-image-glyphs {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition-property: opacity, filter;
+    transition-duration: 640ms;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .portal-ascii-image-photo {
+    display: block;
+    object-fit: cover;
+    object-position: center center;
+    opacity: 0;
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  & .portal-ascii-image-glyphs {
+    display: block;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    color: var(--color-p-mid);
+    font-family: var(--font-mono);
+    font-size: var(--ascii-fs, 7px);
+    line-height: var(--ascii-lh, 8px);
+    letter-spacing: 0;
+    white-space: pre;
+    text-align: left;
+    pointer-events: none;
+    user-select: none;
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  &:not([data-static]):hover .portal-ascii-image-photo,
+  &:not([data-static]):focus-within .portal-ascii-image-photo,
+  &:not([data-static])[data-touched='true'] .portal-ascii-image-photo {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  &:not([data-static]):hover .portal-ascii-image-glyphs,
+  &:not([data-static]):focus-within .portal-ascii-image-glyphs,
+  &:not([data-static])[data-touched='true'] .portal-ascii-image-glyphs {
+    opacity: 0;
+    filter: blur(2px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    & .portal-ascii-image-photo,
+    & .portal-ascii-image-glyphs {
+      transition-duration: var(--dur-fade);
+      filter: none;
+    }
+
+    &:not([data-static]) .portal-ascii-image-photo {
+      opacity: 1;
+    }
+
+    &:not([data-static]) .portal-ascii-image-glyphs {
+      opacity: 0;
+    }
+  }
+}
+
+/* Wheel SVG presentation (stroke/fill/paint-order) */
+@utility portal-wheel-hit {
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+@utility portal-wheel-track {
+  stroke: color-mix(in oklab, var(--color-p-bright) 18%, transparent);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+@utility portal-wheel-hover {
+  stroke: color-mix(in oklab, var(--color-p-bright) 55%, transparent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  pointer-events: none;
+  transition: opacity 120ms ease-out;
+}
+
+@utility portal-wheel-pin {
+  stroke: var(--color-p-signal);
+  stroke-width: 3;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+@utility portal-wheel-charge {
+  stroke: color-mix(in oklab, var(--color-p-signal) 85%, white);
+  stroke-width: 4;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+@utility portal-wheel-caret {
+  fill: var(--color-p-bright);
+  stroke: var(--color-p-void);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+@utility portal-wheel-tick {
+  stroke: color-mix(in oklab, var(--color-p-bright) 25%, transparent);
+  stroke-width: 1.5;
+  pointer-events: none;
+
+  &[data-active] {
+    stroke: var(--color-p-bright);
+  }
+}
+
+@utility portal-wheel-dot {
+  fill: color-mix(in oklab, var(--color-p-bright) 40%, transparent);
+  pointer-events: none;
+
+  &[data-active] {
+    fill: var(--color-p-signal);
+  }
+}
+
+@utility portal-wheel-hub {
+  fill: color-mix(in oklab, var(--color-p-void) 40%, transparent);
+  stroke: color-mix(in oklab, var(--color-p-bright) 30%, transparent);
+  stroke-width: 1.1;
+  pointer-events: none;
+}
+
+@utility portal-wheel-hub-label {
+  fill: var(--color-p-mid);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+}
+
+@utility portal-wheel-svg-label {
+  fill: var(--color-p-dim);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--color-p-void);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+
+  &[data-active] {
+    fill: var(--color-p-bright);
+  }
+}

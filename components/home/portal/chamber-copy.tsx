@@ -12,6 +12,7 @@ import {
   OPEN_DEST,
   type DestId,
 } from './content'
+import { portal } from '@/lib/portal/styles'
 
 export function ChamberCopy({
   id,
@@ -28,36 +29,23 @@ export function ChamberCopy({
   if (!dest) return null
 
   return (
-    <div className="portal-float portal-emerge portal-chamber-scroll">
-      <p className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-        {dest.sub}
-      </p>
-      <h2
-        style={{
-          fontSize: 'clamp(1.85rem, 4vw, 2.75rem)',
-          fontWeight: 600,
-          letterSpacing: '-0.035em',
-          lineHeight: 0.95,
-        }}
-      >
+    <div className={portal.chamberScroll}>
+      <p className={`${portal.label} mb-2`}>{dest.sub}</p>
+      <h2 className="font-semibold tracking-[-0.035em] text-[clamp(1.85rem,4vw,2.75rem)] leading-[0.95]">
         <HighlightMark>{dest.label}</HighlightMark>
       </h2>
       <p className="mt-4 text-[15px] leading-relaxed">{dest.body}</p>
 
       {id === 'work' && (
         <>
-          <p className="portal-mono mt-8 mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            Experience · open for full page
-          </p>
+          <p className={`${portal.label} mt-8 mb-3`}>Experience · open for full page</p>
           <ul className="space-y-6 pb-16">
             {WORK_STUBS.map((w) => (
               <li key={w.title}>
-                <Link href={w.href} className="font-semibold tracking-[-0.02em]" style={{ color: 'var(--p-bright)' }}>
+                <Link href={w.href} className={`${portal.title}`}>
                   {w.title}
                 </Link>
-                <p className="portal-mono mt-1" style={{ fontSize: 9, color: 'var(--p-dim)' }}>
-                  {w.year}
-                </p>
+                <p className={`${portal.meta} mt-1`}>{w.year}</p>
                 <p className="mt-1 text-[14px]">{w.note}</p>
               </li>
             ))}
@@ -67,18 +55,14 @@ export function ChamberCopy({
 
       {id === 'notes' && (
         <>
-          <p className="portal-mono mt-8 mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            Notes / blog
-          </p>
+          <p className={`${portal.label} mt-8 mb-3`}>Notes / blog</p>
           <ul className="space-y-6 pb-16">
             {NOTE_STUBS.map((n) => (
               <li key={n.title}>
-                <Link href={n.href} className="font-semibold tracking-[-0.02em]" style={{ color: 'var(--p-bright)' }}>
+                <Link href={n.href} className={portal.title}>
                   {n.title}
                 </Link>
-                <p className="portal-mono mt-1" style={{ fontSize: 9, color: 'var(--p-dim)' }}>
-                  {n.year}
-                </p>
+                <p className={`${portal.meta} mt-1`}>{n.year}</p>
                 <p className="mt-1 text-[14px]">{n.note}</p>
               </li>
             ))}
@@ -88,18 +72,14 @@ export function ChamberCopy({
 
       {id === 'lab' && (
         <div className="mt-8 pb-16">
-          <p className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            Personal projects · explorations
-          </p>
+          <p className={`${portal.label} mb-2`}>Personal projects · explorations</p>
           <p className="text-[14px] leading-relaxed">
             ASCII engines, portals, agent surfaces, and side builds. Glyph frames —
             hover to reveal the photo.
           </p>
-          <p className="portal-mono mt-5 mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            Stack in play
-          </p>
-          <p style={{ color: 'var(--p-bright)' }}>{IVAN.stack.join(' · ')}</p>
-          <Link href="/lab" className="portal-link">
+          <p className={`${portal.label} mt-5 mb-2`}>Stack in play</p>
+          <p className="text-p-bright">{IVAN.stack.join(' · ')}</p>
+          <Link href="/lab" className={portal.link}>
             Open lab →
           </Link>
         </div>
@@ -109,17 +89,15 @@ export function ChamberCopy({
         <ul className="mt-8 space-y-5 pb-16">
           {IVAN.cv.map((e) => (
             <li key={e.place}>
-              <p className="font-semibold" style={{ color: 'var(--p-bright)' }}>
-                {e.place}
-              </p>
-              <p className="portal-mono mt-1" style={{ fontSize: 9, color: 'var(--p-dim)' }}>
+              <p className={`font-semibold text-p-bright`}>{e.place}</p>
+              <p className={`${portal.meta} mt-1`}>
                 {e.role} · {e.when}
               </p>
               <p className="mt-1 text-[14px]">{e.note}</p>
             </li>
           ))}
           <li>
-            <Link href="/about" className="portal-link">
+            <Link href="/about" className={portal.link}>
               About page →
             </Link>
           </li>
@@ -129,9 +107,9 @@ export function ChamberCopy({
       {id === 'open' && (
         <div className="mt-6 pb-16">
           <p className="text-[15px] leading-relaxed">{IVAN.pitch}</p>
-          <SocialLinks className="portal-socials mt-5" />
+          <SocialLinks className="mt-5" />
           {onCopy && (
-            <button type="button" className="portal-link" onClick={onCopy}>
+            <button type="button" className={portal.link} onClick={onCopy}>
               {copied ? 'Prompt copied ✓' : 'Copy agent prompt'}
             </button>
           )}

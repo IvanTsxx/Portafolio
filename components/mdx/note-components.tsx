@@ -5,6 +5,7 @@ import type { MDXComponents } from 'mdx/types'
 import { AsciiRule } from '@/lib/ascii/components/ascii-rule'
 import { Label } from '@/components/primitives/label'
 import { Frame } from '@/components/primitives/frame'
+import { portal } from '@/lib/portal/styles'
 
 function Hr() {
   return (
@@ -26,30 +27,17 @@ function Callout({
 }) {
   const border =
     tone === 'signal'
-      ? 'color-mix(in oklab, var(--p-signal) 55%, transparent)'
-      : 'color-mix(in oklab, var(--p-bright) 16%, transparent)'
+      ? 'border-p-signal/55'
+      : 'border-p-bright/16'
 
   return (
     <aside
-      className="not-typeset mt-[1.35em] border p-4"
+      className={`not-typeset mt-[1.35em] border bg-p-void/82 p-4 text-p-mid backdrop-blur-[8px] [text-shadow:0_0_16px_var(--color-p-void),0_0_32px_var(--color-p-void)] ${border}`}
       role="note"
-      style={{
-        borderColor: border,
-        background: 'color-mix(in oklab, var(--p-void) 82%, transparent)',
-        color: 'var(--p-mid)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        textShadow: '0 0 16px var(--p-void), 0 0 32px var(--p-void)',
-      }}
     >
       {title ? (
         <p
-          className="portal-mono mb-2"
-          style={{
-            fontSize: 10,
-            color: tone === 'signal' ? 'var(--p-signal)' : 'var(--p-dim)',
-            fontWeight: 600,
-          }}
+          className={`${portal.label} mb-2 ${tone === 'signal' ? 'text-p-signal' : ''}`}
         >
           {title}
         </p>

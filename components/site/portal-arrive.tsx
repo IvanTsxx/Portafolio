@@ -4,7 +4,6 @@ import * as React from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { usePathname } from 'next/navigation'
 import { usePortal } from '@/lib/portal'
-import './portal-arrive.css'
 
 /** Ease-out that settles hard — content spat from the wormhole. */
 const ease = [0.16, 1, 0.3, 1] as const

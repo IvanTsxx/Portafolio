@@ -5,6 +5,7 @@ import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
 import { chamberSide } from '@/components/home/portal/content'
 import { PortalLink } from '@/lib/portal/portal-link'
+import { portal } from '@/lib/portal/styles'
 import { listNotes } from '@/lib/notes'
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default async function NotesPage() {
   return (
     <PortalPage label="Notes · writing" side={chamberSide('notes')}>
       <PageHeading>Notes on systems and motion</PageHeading>
-      <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
+      <p className={`${portal.body} mb-10`}>
         MDX with custom components — compiled on the server.
       </p>
 
@@ -29,22 +30,9 @@ export default async function NotesPage() {
               label={note.title.toUpperCase()}
               className="block"
             >
-              <span className="portal-mono block mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-                {note.date}
-              </span>
-              <span
-                className="font-semibold block"
-                style={{
-                  color: 'var(--p-bright)',
-                  fontSize: '1.15rem',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                {note.title}
-              </span>
-              <span className="block mt-1 text-[14px]" style={{ color: 'var(--p-mid)' }}>
-                {note.excerpt}
-              </span>
+              <span className={`${portal.label} mb-2 block`}>{note.date}</span>
+              <span className={portal.titleLg}>{note.title}</span>
+              <span className={`${portal.bodySm} mt-1 block`}>{note.excerpt}</span>
             </PortalLink>
           </li>
         ))}

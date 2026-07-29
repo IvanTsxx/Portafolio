@@ -6,6 +6,7 @@ import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
 import { chamberSide } from '@/components/home/portal/content'
 import { listNoteSlugs, getNote } from '@/lib/notes'
+import { portal } from '@/lib/portal/styles'
 import { NoteBackLink } from './note-back-link'
 
 export async function generateStaticParams() {
@@ -44,7 +45,7 @@ export default async function NoteDetailPage({
       <PageHeading className="mt-6">
         {frontmatter.title}
       </PageHeading>
-      <p className="mb-8 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
+      <p className={`${portal.body} mb-8`}>
         {frontmatter.excerpt}
       </p>
       <div className="typeset typeset-notes">{content}</div>

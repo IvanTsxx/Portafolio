@@ -2,6 +2,10 @@
 /* Source of truth for all ax- design tokens. Hex is canonical; OKLCH is computed. */
 @import 'tailwindcss';
 @import './typeset.css';
+@import './portal.css';
+
+/* Portal light theme — used as p-light: variant */
+@custom-variant p-light (.portal-shell[data-theme='light'] &);
 
 /* ─── Font face variables (populated by layout.tsx via next/font) ─── */
 @theme inline {
@@ -26,6 +30,54 @@
   --color-ax-paper: oklch(95% 0.008 88);
   /* #FF4D00 */
   --color-ax-signal: oklch(62% 0.225 32);
+
+  /* ── Portal semantic colors (default = dark shell) ── */
+  --color-p-void: #0c0b0a;
+  --color-p-bright: #e8e4dc;
+  --color-p-dim: #b8b2aa;
+  --color-p-mid: #cfc9bf;
+  --color-p-signal: #e85d2a;
+  --color-p-line: color-mix(in oklab, var(--color-p-bright) 18%, transparent);
+
+  --animate-portal-status-pulse: portal-status-pulse 2.4s ease-out infinite;
+
+  @keyframes portal-emerge {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 12px, -200px) scale(0.88);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes portal-spit {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 14px, -220px) scale(0.86);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes portal-status-pulse {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-p-signal) 45%, transparent);
+    }
+
+    70% {
+      box-shadow: 0 0 0 8px transparent;
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
 
   /* ── Duration scale (5 values, no others) ── */
   --dur-micro: 90ms;

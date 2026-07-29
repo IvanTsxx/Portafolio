@@ -9,6 +9,7 @@ import { SocialLinks } from '@/components/site/social-links'
 import { HighlightMark } from '@/components/ui/highlight-mark'
 import { IDENTITY } from '@/content/identity'
 import { usePortal } from '@/lib/portal'
+import { portal } from '@/lib/portal/styles'
 import { cue } from '@/lib/cuelume'
 import type { AsciiWorldApi } from './gl/ascii-world'
 
@@ -20,7 +21,7 @@ function EyebrowMark() {
 
   return (
     <motion.span
-      className="portal-eyebrow-mark"
+      className={portal.eyebrowMark}
       aria-hidden
       initial={prefersReduced ? false : { opacity: 0, scale: 0.5, rotate: -24 }}
       animate={{ opacity: 1, scale: 1, rotate: 0 }}
@@ -112,57 +113,43 @@ export function PortalHome() {
   return (
     <>
       {showHero && (
-        <div className="portal-hero" data-side={chamberSide('home')}>
+        <div className={portal.hero} data-side={chamberSide('home')}>
           <PortalStagger className="portal-float">
-            <p
-              className="portal-mono portal-eyebrow mb-4"
-              style={{ fontSize: 10, color: 'var(--p-dim)' }}
-            >
+            <p className={`${portal.label} ${portal.eyebrow} mb-4`}>
               <EyebrowMark />
               <span>{IDENTITY.role}</span>
             </p>
 
             <h1
-              style={{
-                fontSize: 'clamp(2rem, 4.5vw, 3.4rem)',
-                lineHeight: 0.92,
-                letterSpacing: '-0.04em',
-                fontWeight: 600,
-                maxWidth: '12ch',
-              }}
+              className="max-w-[12ch] font-semibold tracking-[-0.04em] text-[clamp(2rem,4.5vw,3.4rem)] leading-[0.92]"
             >
               <HighlightMark>{IDENTITY.name}</HighlightMark>
             </h1>
 
-            <p
-              className="portal-mono mt-4"
-              style={{ fontSize: 10, color: 'var(--p-dim)' }}
-            >
+            <p className={`${portal.label} mt-4`}>
               Currently at {IDENTITY.studio}
             </p>
 
             <p
-              className="portal-status mt-4"
+              className={`${portal.status} mt-4`}
               data-available={IDENTITY.available ? 'true' : 'false'}
               aria-label={`Status: ${statusLabel}`}
             >
-              <span className="portal-status-dot" aria-hidden />
-              <span className="portal-mono" style={{ fontSize: 10 }}>
-                {statusLabel}
-              </span>
+              <span className={portal.statusDot} aria-hidden />
+              <span className={`${portal.mono} text-[10px]`}>{statusLabel}</span>
             </p>
 
-            <SocialLinks className="portal-socials mt-2" />
+            <SocialLinks className="mt-2" />
           </PortalStagger>
         </div>
       )}
 
-      <div className="portal-chamber" data-open={open ? 'true' : 'false'} data-side={openSide}>
+      <div className={portal.chamber} data-open={open ? 'true' : 'false'} data-side={openSide}>
         {open && (
           <>
             <button
               type="button"
-              className="portal-back"
+              className={portal.back}
               data-cuelume-press
               data-cuelume-release
               onClick={closeChamber}

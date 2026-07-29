@@ -6,6 +6,7 @@ import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
 import { chamberSide } from '@/components/home/portal/content'
 import { getWork, WORK } from '@/content/work'
+import { portal } from '@/lib/portal/styles'
 import { WorkBackLink } from './work-back-link'
 
 export function generateStaticParams() {
@@ -36,33 +37,23 @@ export default async function WorkDetailPage({
     <PortalPage label={`Work · ${job.index}`} side={chamberSide('work')}>
       <WorkBackLink />
       <PageHeading className="mt-6">{job.company}</PageHeading>
-      <p className="mb-8 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
-        {job.summary}
-      </p>
-      <dl className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <p className={`${portal.body} mb-8`}>{job.summary}</p>
+      <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <div>
-          <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            ROLE
-          </dt>
-          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{job.role}</dd>
+          <dt className={`${portal.label} mb-2`}>ROLE</dt>
+          <dd className="text-[14px] text-p-bright">{job.role}</dd>
         </div>
         <div>
-          <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            WHEN
-          </dt>
-          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{job.when}</dd>
+          <dt className={`${portal.label} mb-2`}>WHEN</dt>
+          <dd className="text-[14px] text-p-bright">{job.when}</dd>
         </div>
         <div>
-          <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            TYPE
-          </dt>
-          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{job.type}</dd>
+          <dt className={`${portal.label} mb-2`}>TYPE</dt>
+          <dd className="text-[14px] text-p-bright">{job.type}</dd>
         </div>
         <div className="sm:col-span-3">
-          <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            STACK
-          </dt>
-          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{job.tags.join(' · ')}</dd>
+          <dt className={`${portal.label} mb-2`}>STACK</dt>
+          <dd className="text-[14px] text-p-bright">{job.tags.join(' · ')}</dd>
         </div>
       </dl>
       {job.website && (
@@ -70,7 +61,7 @@ export default async function WorkDetailPage({
           href={job.website}
           target="_blank"
           rel="noopener noreferrer"
-          className="portal-link"
+          className={portal.link}
         >
           Visit →
         </a>

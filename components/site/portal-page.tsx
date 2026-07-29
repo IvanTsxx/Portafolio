@@ -1,5 +1,6 @@
 import * as React from 'react'
 import type { ChamberSide } from '@/components/home/portal/content'
+import { portal } from '@/lib/portal/styles'
 
 /** Floating chamber layout for routes inside the cosmos shell. */
 export function PortalPage({
@@ -16,16 +17,9 @@ export function PortalPage({
   wide?: boolean
 }) {
   return (
-    <div className="portal-page" data-side={side}>
-      <div
-        className="portal-page-scroll portal-float portal-emerge"
-        data-wide={wide ? '' : undefined}
-      >
-        {label && (
-          <p className="portal-mono mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            {label}
-          </p>
-        )}
+    <div className={portal.page} data-side={side}>
+      <div className={portal.pageScroll} data-wide={wide ? '' : undefined}>
+        {label && <p className={`${portal.label} mb-3`}>{label}</p>}
         {children}
       </div>
     </div>

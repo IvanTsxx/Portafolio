@@ -1,6 +1,7 @@
 // app/work/work-list.tsx — experience timeline (RSC)
 import * as React from 'react'
 import { PortalLink } from '@/lib/portal/portal-link'
+import { portal } from '@/lib/portal/styles'
 import type { WorkExperience } from '@/content/work'
 
 export function WorkList({ items }: { items: WorkExperience[] }) {
@@ -11,26 +12,17 @@ export function WorkList({ items }: { items: WorkExperience[] }) {
           <PortalLink
             href={`/work/${item.slug}`}
             label={item.company.toUpperCase()}
-            className="block group"
+            className="group block"
           >
-            <span className="portal-mono block mb-1" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
+            <span className={`${portal.label} mb-1 block`}>
               {item.index} · {item.when}
               {item.current ? ' · Now' : ''}
             </span>
-            <span
-              className="block font-semibold"
-              style={{
-                color: 'var(--p-bright)',
-                fontSize: '1.15rem',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              {item.company}
-            </span>
-            <span className="block mt-1 text-[14px]" style={{ color: 'var(--p-mid)' }}>
+            <span className={portal.titleLg}>{item.company}</span>
+            <span className={`${portal.bodySm} mt-1 block`}>
               {item.role} — {item.summary}
             </span>
-            <span className="portal-mono mt-2 block" style={{ fontSize: 9, color: 'var(--p-dim)' }}>
+            <span className={`${portal.meta} mt-2 block`}>
               {item.tags.join(' · ')}
             </span>
           </PortalLink>

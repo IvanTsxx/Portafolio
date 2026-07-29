@@ -17,7 +17,7 @@ import type { AsciiWorldApi } from '@/components/home/portal/gl/ascii-world'
 import { SoundToggle } from '@/components/site/sound-toggle'
 import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler'
 import { HighlightMark } from '@/components/ui/highlight-mark'
-import '@/components/site/portal-shell.css'
+import { portal } from '@/lib/portal/styles'
 
 const AsciiWorld = dynamic(
   () =>
@@ -25,7 +25,7 @@ const AsciiWorld = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div style={{ position: 'absolute', inset: 0, background: '#0c0b0a' }} />
+      <div className="absolute inset-0 bg-p-void" />
     ),
   },
 )
@@ -214,7 +214,7 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
   return (
     <PortalContext.Provider value={ctxValue}>
       <div
-        className="portal-shell"
+        className={portal.shell}
         data-theme={theme}
         data-portal-phase={phase}
         data-portal-land={landId}
@@ -226,10 +226,10 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
           className="absolute inset-0"
         />
 
-        <div className="portal-chrome-controls" role="group" aria-label="Display controls">
-          <SoundToggle className="portal-chrome-btn" />
+        <div className={portal.chromeControls} role="group" aria-label="Display controls">
+          <SoundToggle className={portal.chromeBtn} />
           <AnimatedThemeToggler
-            className="portal-chrome-btn"
+            className={portal.chromeBtn}
             data-cuelume-toggle
             theme={theme}
             onThemeChange={setTheme}
@@ -239,17 +239,17 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
         </div>
 
         {trip && (
-          <div className="portal-transit" aria-live="polite" aria-atomic="true">
-            <div className="portal-transit-mark">
-              <p className="portal-transit-eyebrow">{trip.sub}</p>
-              <h2 className="portal-transit-title">
+          <div className={portal.transit} aria-live="polite" aria-atomic="true">
+            <div className={portal.transitMark}>
+              <p className={portal.transitEyebrow}>{trip.sub}</p>
+              <h2 className={portal.transitTitle}>
                 <HighlightMark isView={false}>{trip.label}</HighlightMark>
               </h2>
             </div>
           </div>
         )}
 
-        <div className="portal-shell-content">{children}</div>
+        <div className={portal.shellContent}>{children}</div>
 
         <ShellWheel />
       </div>

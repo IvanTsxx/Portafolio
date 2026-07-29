@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { LAB, type LabStudy } from '@/content/lab'
 import { AsciiImage } from '@/components/ui/ascii-image'
+import { portal } from '@/lib/portal/styles'
 
 async function loadAscii(src: string | null | undefined): Promise<string | null> {
   if (!src) return null
@@ -21,7 +22,7 @@ async function LabCard({ study }: { study: LabStudy }) {
 
   return (
     <li>
-      <p className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
+      <p className={`${portal.label} mb-2`}>
         {study.index} · {study.year}
       </p>
       {hasMedia && (
@@ -32,18 +33,9 @@ async function LabCard({ study }: { study: LabStudy }) {
           className="mb-3"
         />
       )}
-      <h2
-        className="font-semibold mb-1"
-        style={{ color: 'var(--p-bright)', letterSpacing: '-0.02em', fontSize: '1.15rem' }}
-      >
-        {study.title}
-      </h2>
-      <p className="text-[14px]" style={{ color: 'var(--p-mid)' }}>
-        {study.note}
-      </p>
-      <p className="portal-mono mt-2" style={{ fontSize: 9, color: 'var(--p-dim)' }}>
-        {study.tags.join(' · ')}
-      </p>
+      <h2 className={`${portal.titleLg} mb-1`}>{study.title}</h2>
+      <p className={portal.bodySm}>{study.note}</p>
+      <p className={`${portal.meta} mt-2`}>{study.tags.join(' · ')}</p>
     </li>
   )
 }

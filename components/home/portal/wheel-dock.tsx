@@ -6,6 +6,7 @@ import { Orbit, X } from 'lucide-react'
 import { useReducedMotion } from '@/lib/ascii/hooks/use-reduced-motion'
 import { HalfWheel } from './half-wheel'
 import { DESTINATIONS, type DestId } from './content'
+import { portal } from '@/lib/portal/styles'
 
 /** Drawer-height ease — strong ease-out, no spin */
 const EASE_REVEAL = [0.25, 1, 0.5, 1] as const
@@ -156,7 +157,7 @@ export function WheelDock({
           <motion.button
             key="wheel-scrim"
             type="button"
-            className="portal-wheel-scrim"
+            className={portal.wheelScrim}
             aria-label="Cerrar rueda de destinos"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -171,7 +172,7 @@ export function WheelDock({
 
       <div
         ref={dockRef}
-        className="portal-wheel-dock"
+        className={portal.wheelDock}
         data-open={open ? '' : undefined}
         data-pinned={pinned ? '' : undefined}
         data-touch={touchSession ? '' : undefined}
@@ -187,7 +188,7 @@ export function WheelDock({
             <motion.button
               key="wheel-trigger"
               type="button"
-              className="portal-wheel-trigger"
+              className={portal.wheelTrigger}
               aria-label={`Abrir rueda de destinos — ${activeLabel}`}
               aria-expanded={false}
               disabled={disabled}
@@ -209,16 +210,16 @@ export function WheelDock({
               onClick={toggleFromClick}
               whileTap={rm ? undefined : { scale: 0.96 }}
             >
-              <span className="portal-wheel-trigger-glyph" aria-hidden>
+              <span className={portal.wheelTriggerGlyph} aria-hidden>
                 <Orbit strokeWidth={1.75} />
               </span>
-              <span className="portal-wheel-trigger-label">{activeLabel}</span>
-              <span className="portal-wheel-trigger-dot" aria-hidden />
+              <span className={portal.wheelTriggerLabel}>{activeLabel}</span>
+              <span className={portal.wheelTriggerDot} aria-hidden />
             </motion.button>
           ) : (
             <motion.div
               key="wheel-panel"
-              className="portal-wheel-panel"
+              className={portal.wheelPanel}
               role="dialog"
               aria-label="Rueda de destinos"
               aria-modal={needsDismissUi}
@@ -254,7 +255,7 @@ export function WheelDock({
               {needsDismissUi ? (
                 <button
                   type="button"
-                  className="portal-wheel-dismiss"
+                  className={portal.wheelDismiss}
                   aria-label="Cerrar rueda de destinos"
                   onClick={forceCollapse}
                 >

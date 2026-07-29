@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import { DESTINATIONS, type DestId } from './content'
+import { portal } from '@/lib/portal/styles'
 
 function destProgress(id: DestId): number {
   const i = DESTINATIONS.findIndex((d) => d.id === id)
@@ -214,11 +215,11 @@ export function HalfWheel({
   const pinAngle = Math.PI - pinT * Math.PI
 
   return (
-    <div className="portal-wheel" aria-label="Destination wheel">
+    <div className={portal.wheel} aria-label="Destination wheel">
       <svg
         ref={svgRef}
         viewBox={`0 0 ${vbW} ${vbH}`}
-        className="portal-wheel-svg"
+        className={portal.wheelSvg}
         style={{ touchAction: 'none', userSelect: 'none', cursor: hot ? 'pointer' : 'default' }}
       >
         <path

@@ -7,6 +7,7 @@ import { PortalPage } from '@/components/site/portal-page'
 import { SocialLinks } from '@/components/site/social-links'
 import { chamberSide } from '@/components/home/portal/content'
 import { IDENTITY } from '@/content/identity'
+import { portal } from '@/lib/portal/styles'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -22,11 +23,11 @@ export default function AboutPage() {
           alt={IDENTITY.displayName}
           width={72}
           height={72}
-          className="size-[72px] rounded-[4px] border border-[var(--p-line)] object-cover"
+          className="size-[72px] rounded-[4px] border border-p-line object-cover"
           priority
         />
         <div>
-          <p className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
+          <p className={`${portal.label} mb-2`}>
             {IDENTITY.handle} · {IDENTITY.role}
           </p>
           <PageHeading>
@@ -35,7 +36,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
+      <p className={`${portal.body} mb-10`}>
         {IDENTITY.summary} This site is both portfolio and engine — ASCII cosmos, a wormhole
         portal, and chrome that stays readable to people and to agents.
       </p>
@@ -57,19 +58,13 @@ export default function AboutPage() {
           { k: 'AGENTS', v: IDENTITY.agent.PREFERS },
         ].map(({ k, v }) => (
           <div key={k}>
-            <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-              {k}
-            </dt>
-            <dd className="text-[14px]" style={{ color: 'var(--p-bright)' }}>
-              {v}
-            </dd>
+            <dt className={`${portal.label} mb-2`}>{k}</dt>
+            <dd className="text-[14px] text-p-bright">{v}</dd>
           </div>
         ))}
       </dl>
 
-      <p className="portal-mono mb-4" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-        Experience
-      </p>
+      <p className={`${portal.label} mb-4`}>Experience</p>
       <ul className="space-y-6 pb-8">
         {IDENTITY.experiences.map((e) => (
           <li key={e.id} className="flex gap-4">
@@ -78,24 +73,20 @@ export default function AboutPage() {
               alt=""
               width={36}
               height={36}
-              className="mt-0.5 size-9 rounded-[3px] border border-[var(--p-line)] object-contain"
+              className="mt-0.5 size-9 rounded-[3px] border border-p-line object-contain"
             />
             <div>
-              <p className="font-semibold" style={{ color: 'var(--p-bright)' }}>
-                {e.company}
-              </p>
-              <p className="portal-mono mt-1" style={{ fontSize: 9, color: 'var(--p-dim)' }}>
+              <p className="font-semibold text-p-bright">{e.company}</p>
+              <p className={`${portal.meta} mt-1`}>
                 {e.role} · {e.when} · {e.type}
               </p>
-              <p className="mt-1 text-[14px]" style={{ color: 'var(--p-mid)' }}>
-                {e.note}
-              </p>
+              <p className={`${portal.bodySm} mt-1`}>{e.note}</p>
             </div>
           </li>
         ))}
       </ul>
 
-      <SocialLinks className="portal-socials pb-8" />
+      <SocialLinks className="pb-8" />
     </PortalPage>
   )
 }
