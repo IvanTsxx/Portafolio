@@ -39,7 +39,14 @@ export function PortalLink({
   }
 
   return (
-    <a href={href} onClick={handleClick} {...rest}>
+    <a
+      href={href}
+      onClick={handleClick}
+      data-cuelume-hover="tick"
+      data-cuelume-press
+      data-cuelume-release
+      {...rest}
+    >
       {children}
     </a>
   )

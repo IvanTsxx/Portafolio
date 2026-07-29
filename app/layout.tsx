@@ -3,16 +3,11 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import { RafProvider }    from '@/lib/ascii/raf-provider'
+import { RafProvider } from '@/lib/ascii/raf-provider'
 import { PortalProvider } from '@/lib/portal/portal-provider'
-import { Navbar } from '@/components/site/navbar'
-import { Footer } from '@/components/site/footer'
-import { StatusBar } from '@/components/site/status-bar'
-import { ContactPanel } from '@/components/site/contact-panel'
 import { DebugPanel } from '@/components/site/debug-panel'
-import { ChromeGate } from '@/components/site/chrome-gate'
+import { CuelumeBind } from '@/components/site/cuelume-bind'
 
-// ─── Fonts ───────────────────────────────────────────────────────────────────
 const geistSans = Geist({
   subsets: ['latin'],
   variable: '--font-geist-sans',
@@ -25,7 +20,6 @@ const geistMono = Geist_Mono({
   display: 'swap',
 })
 
-// ─── Metadata ────────────────────────────────────────────────────────────────
 export const metadata: Metadata = {
   title: {
     default: 'AX — Frontend Developer',
@@ -54,7 +48,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon-dark-32x32.png',  media: '(prefers-color-scheme: dark)' },
+      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
       { url: '/icon.svg', type: 'image/svg+xml' },
     ],
     apple: '/apple-icon.png',
@@ -68,7 +62,6 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-// ─── Root Layout ─────────────────────────────────────────────────────────────
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -77,21 +70,12 @@ export default function RootLayout({
       lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable} bg-ax-void`}
     >
-      <body className="font-sans antialiased min-h-screen flex flex-col">
+      <body className="font-sans antialiased overflow-hidden">
         <RafProvider>
           <PortalProvider>
-            <ChromeGate>
-              <Navbar />
-              <StatusBar />
-              <ContactPanel />
-            </ChromeGate>
+            <CuelumeBind />
             <DebugPanel />
-
-            <main className="flex-1">{children}</main>
-
-            <ChromeGate>
-              <Footer />
-            </ChromeGate>
+            {children}
           </PortalProvider>
         </RafProvider>
 

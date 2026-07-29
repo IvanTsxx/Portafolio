@@ -11,6 +11,7 @@ import { Label } from '@/components/primitives/label'
 import { Text } from '@/components/primitives/text'
 import { Frame } from '@/components/primitives/frame'
 import { Stack } from '@/components/primitives/stack'
+import { cue } from '@/lib/cuelume'
 
 export function ContactPanel() {
   const [open, setOpen] = React.useState(false)
@@ -19,6 +20,7 @@ export function ContactPanel() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     // Placeholder: in production, wire to an API route
+    cue('success')
     setSubmitted(true)
   }
 
@@ -29,7 +31,12 @@ export function ContactPanel() {
         <Field
           as="button"
           size="md"
-          onClick={() => setOpen(true)}
+          data-cuelume-press
+          data-cuelume-release
+          onClick={() => {
+            cue('bloom')
+            setOpen(true)
+          }}
           aria-label="Open contact panel"
         >
           +
@@ -37,7 +44,13 @@ export function ContactPanel() {
       </div>
 
       {/* Dialog */}
-      <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Root
+        open={open}
+        onOpenChange={(next) => {
+          if (!next && open) cue('droplet')
+          setOpen(next)
+        }}
+      >
         <Dialog.Portal>
           {/* Backdrop */}
           <Dialog.Backdrop
@@ -64,6 +77,8 @@ export function ContactPanel() {
                   <Dialog.Close
                     className="inline-flex items-center justify-center border border-ax-line font-mono text-[0.6875rem] uppercase tracking-[0.12em] px-2 py-1 text-ax-mid hover:text-ax-bright hover:border-ax-mid transition-colors duration-[90ms] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ax-signal"
                     aria-label="Close contact panel"
+                    data-cuelume-press
+                    data-cuelume-release
                   >
                     ESC
                   </Dialog.Close>
@@ -118,7 +133,7 @@ export function ContactPanel() {
                   </Stack>
 
                   <div className="flex justify-end">
-                    <Field as="button" type="submit" size="md">
+                    <Field as="button" type="submit" size="md" data-cuelume-press data-cuelume-release>
                       SEND
                     </Field>
                   </div>

@@ -2,8 +2,8 @@
 import * as React from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Label } from '@/components/primitives/label'
-import { AsciiRule } from '@/lib/ascii/components/ascii-rule'
+import { PageHeading } from '@/components/site/page-heading'
+import { PortalPage } from '@/components/site/portal-page'
 import { getWork, WORK } from '@/content/work'
 import { WorkBackLink } from './work-back-link'
 
@@ -32,61 +32,32 @@ export default async function WorkDetailPage({
   if (!project) notFound()
 
   return (
-    <article
-      className="w-full max-w-[var(--max-grid)] mx-auto pt-24 pb-20"
-      style={{ paddingInline: 'var(--gutter)' }}
-    >
+    <PortalPage label={`Work · ${project.index}`}>
       <WorkBackLink />
-
-      <header className="mt-8 mb-10 max-w-[58ch]">
-        <Label index={project.index} tone="signal" className="mb-4">
-          {project.year}
-        </Label>
-        <h1
-          className="font-sans font-semibold text-ax-bright mb-4"
-          style={{
-            fontSize: 'clamp(2rem, 5vw, 3.25rem)',
-            letterSpacing: '-0.035em',
-            lineHeight: 0.97,
-          }}
-        >
-          {project.title}
-        </h1>
-        <p className="font-sans text-ax-mid" style={{ fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
-          {project.summary}
-        </p>
-      </header>
-
-      <div className="mb-8">
-        <AsciiRule className="opacity-30" />
-      </div>
-
-      <dl className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-[58ch]">
+      <PageHeading className="mt-6">{project.title}</PageHeading>
+      <p className="mb-8 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
+        {project.summary}
+      </p>
+      <dl className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div>
-          <dt className="font-mono text-ax-dim mb-2" style={{ fontSize: 'var(--text-2xs)', letterSpacing: '0.12em' }}>
+          <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             ROLE
           </dt>
-          <dd className="font-sans text-ax-bright" style={{ fontSize: 'var(--text-sm)' }}>
-            {project.role}
-          </dd>
+          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{project.role}</dd>
         </div>
         <div>
-          <dt className="font-mono text-ax-dim mb-2" style={{ fontSize: 'var(--text-2xs)', letterSpacing: '0.12em' }}>
+          <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             YEAR
           </dt>
-          <dd className="font-sans text-ax-bright" style={{ fontSize: 'var(--text-sm)' }}>
-            {project.year}
-          </dd>
+          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{project.year}</dd>
         </div>
         <div>
-          <dt className="font-mono text-ax-dim mb-2" style={{ fontSize: 'var(--text-2xs)', letterSpacing: '0.12em' }}>
+          <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             STACK
           </dt>
-          <dd className="font-sans text-ax-bright" style={{ fontSize: 'var(--text-sm)' }}>
-            {project.tags.join(' · ')}
-          </dd>
+          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{project.tags.join(' · ')}</dd>
         </div>
       </dl>
-    </article>
+    </PortalPage>
   )
 }

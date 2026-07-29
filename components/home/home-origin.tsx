@@ -6,6 +6,7 @@ import { RAMP_TECH } from '@/lib/ascii/ramps'
 import type { FieldFn } from '@/lib/ascii/types'
 import { IDENTITY } from '@/content/identity'
 import { PortalLink } from '@/lib/portal/portal-link'
+import { HighlightMark } from '@/components/ui/highlight-mark'
 
 const originField: FieldFn = (x, y, t, _dt, meta) => {
   const cx = x - 0.5
@@ -60,7 +61,7 @@ export function HomeOrigin() {
             letterSpacing: '-0.03em',
           }}
         >
-          From {IDENTITY.location.city}.
+          <HighlightMark>From {IDENTITY.location.city}.</HighlightMark>
         </h2>
         <p className="max-w-[42ch] text-[15px] leading-relaxed text-ax-mid">
           I work from the northwest of Argentina — heat, hills, and a long habit of

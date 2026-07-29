@@ -1,6 +1,6 @@
-/* Portal home — floating type in ASCII cosmos */
+/* Persistent cosmos shell — floating type over WebGL ASCII */
 
-.portal-home {
+.portal-shell {
   --p-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --p-void: #0c0b0a;
   --p-bright: #e8e4dc;
@@ -15,11 +15,9 @@
   color: var(--p-bright);
   font-family: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
-  user-select: none;
-  -webkit-user-select: none;
 }
 
-.portal-home[data-theme='light'] {
+.portal-shell[data-theme='light'] {
   --p-void: #e8e4dc;
   --p-bright: #1a1816;
   --p-dim: #6e6860;
@@ -27,8 +25,21 @@
   --p-signal: #c44a1f;
 }
 
-.portal-home * {
+.portal-shell * {
   box-sizing: border-box;
+}
+
+.portal-shell-content {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  transition: opacity 180ms ease-out;
+}
+
+.portal-shell[data-portal-phase='traveling'] .portal-shell-content {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .portal-mono {
@@ -42,18 +53,23 @@
   top: 16px;
   right: 16px;
   z-index: 80;
-  height: 28px;
-  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   border: 1px solid color-mix(in oklab, var(--p-bright) 20%, transparent);
   background: transparent;
   color: var(--p-mid);
-  font: inherit;
-  font-family: var(--font-geist-mono, ui-monospace, monospace);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   cursor: pointer;
   transition: color 150ms ease-out, transform 90ms ease-out;
+}
+
+.portal-theme-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.75;
 }
 
 .portal-theme-btn:hover {
@@ -70,24 +86,94 @@
     0 0 24px var(--p-void),
     0 0 48px var(--p-void),
     0 2px 8px var(--p-void);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .portal-float h1,
-.portal-float h2 {
+.portal-float h2,
+.portal-float h3 {
   color: var(--p-bright);
   text-wrap: balance;
 }
 
-.portal-float p {
+.portal-float p,
+.portal-float li {
   color: var(--p-mid);
 }
 
+.portal-float a {
+  color: var(--p-bright);
+  text-decoration: none;
+}
+
+.portal-float a:hover {
+  color: var(--p-signal);
+}
+
+/* Route pages as floating chambers */
+.portal-page {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(24px, 5vw, 56px);
+  padding-top: clamp(72px, 12vh, 120px);
+  padding-bottom: 160px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.portal-page-scroll {
+  pointer-events: auto;
+  max-height: calc(100dvh - 200px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding-right: 8px;
+  max-width: min(40rem, 92vw);
+}
+
+.portal-page-scroll :is(h1, h2, h3) {
+  color: var(--p-bright);
+  text-shadow:
+    0 0 24px var(--p-void),
+    0 0 48px var(--p-void);
+}
+
+.portal-page-scroll :is(p, li, dd, dt, span, label) {
+  text-shadow: 0 0 16px var(--p-void);
+}
+
 .portal-emerge {
-  animation: portal-emerge 380ms var(--p-ease) both;
+  animation: portal-emerge 480ms var(--p-ease) both;
+}
+
+.portal-emerge>* {
+  animation: portal-emerge 440ms var(--p-ease) both;
+}
+
+.portal-emerge>*:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.portal-emerge>*:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.portal-emerge>*:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.portal-emerge>*:nth-child(n + 4) {
+  animation-delay: 0.22s;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portal-emerge {
+
+  .portal-emerge,
+  .portal-emerge>* {
     animation: none;
   }
 }
@@ -95,7 +181,7 @@
 @keyframes portal-emerge {
   from {
     opacity: 0;
-    transform: translate3d(0, 8px, 0);
+    transform: translate3d(0, 10px, 0);
   }
 
   to {
@@ -133,16 +219,26 @@
   pointer-events: none;
 }
 
-.portal-wheel-progress {
-  stroke: color-mix(in oklab, var(--p-bright) 60%, transparent);
+/* Hover preview — soft bright, not orange */
+.portal-wheel-hover {
+  stroke: color-mix(in oklab, var(--p-bright) 55%, transparent);
   stroke-width: 2.5;
+  stroke-linecap: round;
+  pointer-events: none;
+  transition: opacity 120ms ease-out;
+}
+
+/* Active pin fill — signal orange only to pin */
+.portal-wheel-pin {
+  stroke: var(--p-signal);
+  stroke-width: 3;
   stroke-linecap: round;
   pointer-events: none;
 }
 
 .portal-wheel-charge {
-  stroke: var(--p-signal);
-  stroke-width: 3.5;
+  stroke: color-mix(in oklab, var(--p-signal) 85%, white);
+  stroke-width: 4;
   stroke-linecap: round;
   pointer-events: none;
 }
@@ -276,4 +372,19 @@
 
 .portal-link:hover {
   opacity: 0.75;
+}
+
+.portal-transit-label {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 60;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--p-dim);
+  text-shadow: 0 0 20px var(--p-void);
+  pointer-events: none;
 }

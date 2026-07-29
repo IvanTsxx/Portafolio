@@ -1,0 +1,57 @@
+/* Post-tunnel text spit — opacity/transform only (no blur over pages) */
+
+@keyframes portal-spit {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.portal-arrive[data-fresh] :is(h1, h2, h3) {
+  animation: portal-spit 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.06s;
+}
+
+.portal-arrive[data-fresh] :is(header p, .portal-float > p, article p:first-of-type) {
+  animation: portal-spit 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.12s;
+}
+
+.portal-arrive[data-fresh] li {
+  animation: portal-spit 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.portal-arrive[data-fresh] li:nth-child(1) {
+  animation-delay: 0.14s;
+}
+
+.portal-arrive[data-fresh] li:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.portal-arrive[data-fresh] li:nth-child(3) {
+  animation-delay: 0.22s;
+}
+
+.portal-arrive[data-fresh] li:nth-child(4) {
+  animation-delay: 0.26s;
+}
+
+.portal-arrive[data-fresh] li:nth-child(5) {
+  animation-delay: 0.3s;
+}
+
+.portal-arrive[data-fresh] li:nth-child(n + 6) {
+  animation-delay: 0.34s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-arrive[data-fresh] :is(h1, h2, h3, p, li) {
+    animation: none;
+  }
+}

@@ -1,38 +1,31 @@
-# Home — Portal wheel (promoted 2026-07-28)
+# Home — Persistent cosmos shell (2026-07-28)
 
 ## Decision
 
-Shipping home is the **hold-to-portal wheel** experience (Bolt tunnel + landed chambers). Prototype picker (Worm/Bolt/Fold) removed; iterate on `/`.
+The **ASCII WebGL cosmos is site-wide**, not home-only. Every route floats content over the same field. The wormhole runs on that shared canvas for entry/exit.
 
-## Interaction
+## Shell
 
-1. Surface: floating hero + idle ASCII cosmos (WebGL).
-2. Hold arc spoke → charge → wormhole transit → land with section ambient.
-3. Home spoke / ← home → return tunnel to surface.
-4. Chamber stubs link to real routes (`/work`, `/notes/...`, `/lab`, `/about`) — full portal-route navigation comes next.
+`PortalProvider` mounts:
 
-## Destinations
+1. `AsciiWorld` (persistent)
+2. Theme toggle
+3. Route content layer (hidden while `traveling`)
+4. Half-wheel nav (all routes)
 
-| Spoke | Chamber | Routes |
-|-------|---------|--------|
-| Home | surface | `/` |
-| Work | projects + notes stubs | `/work`, `/notes` |
-| Craft | stack / learning | `/lab` |
-| Studio | CV / origin | `/about` |
-| Open | pitch / contact | mailto + agent prompt |
+## Navigation
+
+- Hold spoke / `PortalLink` → charge → tunnel on shared canvas → mid `router.push` → land with route mood → text emerge
+- Home → `land=0` (idle cosmos)
+- Work/Notes → mood 0.2 · Lab → 0.45 · About → 0.7
+- Open → local chamber on `/` only
+
+## Pages
+
+`PortalPage` wrapper — floating scroll chamber. No traditional navbar/footer.
 
 ## Source
 
-`components/home/portal/*` — content in `content.ts`, shader in `gl/`.
-
-## Perf notes
-
-- Travel driven inside R3F `useFrame` (no parallel rAF).
-- Charge painted from ref on the wheel (no React re-renders during hold).
-- One React state commit on land; `startTransition` for chamber mount.
-- `dpr={1}`, `cell=16`, no `filter:blur` over the canvas.
-- Global navbar/footer gated off on `/` via `ChromeGate`.
-
-## Next
-
-Wire wheel hold → `PortalLink` / shared portal transition into real pages (keep tunnel as the transition).
+- Shell: `lib/portal/portal-provider.tsx`, `components/site/portal-shell.css`
+- Pages: `components/site/portal-page.tsx`
+- Home content: `components/home/portal/portal-home.tsx`

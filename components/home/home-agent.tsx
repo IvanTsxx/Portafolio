@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { IDENTITY } from '@/content/identity'
 import { PortalLink } from '@/lib/portal/portal-link'
+import { HighlightMark } from '@/components/ui/highlight-mark'
 
 export function HomeAgent() {
   return (
@@ -25,7 +26,7 @@ export function HomeAgent() {
               lineHeight: 0.98,
             }}
           >
-            Readable to both.
+            <HighlightMark>Readable to both.</HighlightMark>
           </h2>
           <p className="mt-4 max-w-[44ch] text-[15px] leading-relaxed text-ax-mid">
             This site is built so a human can browse the work and an agent can parse the

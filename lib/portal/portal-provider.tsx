@@ -1,32 +1,48 @@
 // lib/portal/portal-provider.tsx
-// Portal transition system.
-//
-// Sequence (900ms total, split internally):
-//   0ms    — overlay mounts, opacity 0→1 in 120ms (--dur-fade)
-//  120ms   — ASCII field crossfades in (320ms, --dur-enter)
-//  200ms   — route name scramble starts
-//  700ms   — scramble resolves to final string
-//  800ms   — navigation fires (router.push)
-//  900ms   — overlay fades out after new page paint
-//
-// Double-navigation cancellation: if trigger() is called while a
-// transition is already running, the in-flight one is aborted and
-// the new destination wins immediately after a brief flash.
-//
-// Reduced-motion path: overlay fades in/out at --dur-fade (120ms),
-// no ASCII field, no scramble. Navigation fires at 120ms.
+// Persistent ASCII cosmos + wormhole route transitions on the SAME canvas.
 'use client'
 
 import * as React from 'react'
-import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
+import { usePathname, useRouter } from 'next/navigation'
 import { useReducedMotion } from '@/lib/ascii/hooks/use-reduced-motion'
-import { scrambleFrame }    from './scramble'
+import { cue } from '@/lib/cuelume'
+import { HalfWheel } from '@/components/home/portal/half-wheel'
+import {
+  DESTINATIONS,
+  type DestId,
+  type PortalTheme,
+} from '@/components/home/portal/content'
+import type { AsciiWorldApi } from '@/components/home/portal/gl/ascii-world'
+import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler'
+import '@/components/site/portal-shell.css'
 
-// ─── Types ──────────────────────────────────────────────────────────────────
+const AsciiWorld = dynamic(
+  () =>
+    import('@/components/home/portal/gl/ascii-world').then((m) => m.AsciiWorld),
+  {
+    ssr: false,
+    loading: () => (
+      <div style={{ position: 'absolute', inset: 0, background: '#0c0b0a' }} />
+    ),
+  },
+)
+
+export type PortalPhase = 'idle' | 'traveling' | 'arriving'
 
 export interface PortalContextValue {
-  trigger: (href: string, label?: string) => void
-  state:   'idle' | 'opening' | 'closing'
+  trigger: (
+    href: string,
+    label?: string,
+    opts?: { mood?: number; fromCharge?: number },
+  ) => void
+  state: PortalPhase
+  landId: number
+  apiRef: React.MutableRefObject<AsciiWorldApi | null>
+  theme: PortalTheme
+  setTheme: React.Dispatch<React.SetStateAction<PortalTheme>>
+  /** Home registers Open chamber; wheel calls this when Open is held on `/` */
+  registerOpenLocal: (fn: (() => void) | null) => void
 }
 
 const PortalContext = React.createContext<PortalContextValue | null>(null)
@@ -37,149 +53,305 @@ export function usePortal(): PortalContextValue {
   return ctx
 }
 
-// ─── Internal state ──────────────────────────────────────────────────────────
-
-interface PortalState {
-  phase:     'idle' | 'opening' | 'closing'
-  progress:  number   // 0..1 within the 900ms window
-  label:     string   // scrambled route name
-  targetHref: string
+export function moodForHref(href: string): number {
+  if (href === '/') return 0
+  if (href.startsWith('/work') || href.startsWith('/notes')) return 0.2
+  if (href.startsWith('/lab')) return 0.45
+  if (href.startsWith('/about')) return 0.7
+  return 0.55
 }
 
-const IDLE: PortalState = {
-  phase: 'idle', progress: 0, label: '', targetHref: '',
+export function destFromPath(path: string): DestId {
+  if (path === '/') return 'home'
+  if (path.startsWith('/work') || path.startsWith('/notes')) return 'work'
+  if (path.startsWith('/lab')) return 'craft'
+  if (path.startsWith('/about')) return 'studio'
+  return 'home'
 }
-
-// Timing constants (all in ms, add to 900ms)
-const T_FADE_IN    = 120   // overlay fade-in
-const T_FIELD_IN   = 320   // ASCII field crossfade starts at 120ms
-const T_NAV_FIRE   = 800   // navigation fires
-const T_TOTAL      = 900   // full portal duration
-const T_RM_TOTAL   = 240   // reduced-motion: in + out
-
-// ─── Provider ────────────────────────────────────────────────────────────────
 
 export function PortalProvider({ children }: { children: React.ReactNode }) {
-  const router        = useRouter()
-  const rm            = useReducedMotion()
-  const [ps, setPs]   = React.useState<PortalState>(IDLE)
+  const router = useRouter()
+  const pathname = usePathname()
+  const rm = useReducedMotion()
+  const apiRef = React.useRef<AsciiWorldApi | null>(null)
+  const [theme, setTheme] = React.useState<PortalTheme>('dark')
+  const [phase, setPhase] = React.useState<PortalPhase>('idle')
+  const [landId, setLandId] = React.useState(0)
+  const [tripLabel, setTripLabel] = React.useState<string | null>(null)
+  const abortRef = React.useRef<(() => void) | null>(null)
+  const navFired = React.useRef(false)
+  const hrefRef = React.useRef('')
+  const openLocalRef = React.useRef<(() => void) | null>(null)
+  const phaseRef = React.useRef(phase)
+  phaseRef.current = phase
 
-  // Abort controller ref: cancel in-flight animation on double-nav
-  const abortRef      = React.useRef<(() => void) | null>(null)
-  const navFiredRef   = React.useRef(false)
+  const registerOpenLocal = React.useCallback((fn: (() => void) | null) => {
+    openLocalRef.current = fn
+  }, [])
 
-  const trigger = React.useCallback((href: string, label?: string) => {
-    // Cancel any in-flight transition
-    if (abortRef.current) {
-      abortRef.current()
+  const finish = React.useCallback((href: string) => {
+    const api = apiRef.current
+    const home = href === '/'
+    if (api) {
+      if (home) {
+        api.setLand(0)
+        api.setLandMood(0)
+      } else {
+        api.setLand(1)
+        api.setLandMood(moodForHref(href))
+      }
+    }
+    setTripLabel(null)
+    setLandId((n) => n + 1)
+    setPhase('arriving')
+    cue('ready')
+    const id = window.setTimeout(() => setPhase('idle'), 560)
+    abortRef.current = () => clearTimeout(id)
+  }, [])
+
+  const trigger = React.useCallback(
+    (
+      href: string,
+      label?: string,
+      opts?: { mood?: number; fromCharge?: number },
+    ) => {
+      if (typeof window !== 'undefined' && window.location.pathname === href) {
+        return
+      }
+      if (phaseRef.current === 'traveling') return
+
+      abortRef.current?.()
       abortRef.current = null
-    }
+      navFired.current = false
+      hrefRef.current = href
 
-    const routeLabel =
-      label ?? (href.replace(/^\//, '').replace(/-/g, ' ').toUpperCase() || 'HOME')
-    let cancelled = false
-    navFiredRef.current = false
+      const routeLabel =
+        label ??
+        (href.replace(/^\//, '').replace(/-/g, ' ').toUpperCase() || 'HOME')
+      const mood = opts?.mood ?? moodForHref(href)
+      const fromCharge = opts?.fromCharge ?? apiRef.current?.getTravel().charge ?? 0
+      const goingHome = href === '/'
 
-    abortRef.current = () => { cancelled = true }
+      cue('loading')
+      setPhase('traveling')
+      setTripLabel(routeLabel)
 
-    if (rm) {
-      // Reduced-motion: fast fade, no ASCII, navigate immediately
-      setPs({ phase: 'opening', progress: 0, label: routeLabel, targetHref: href })
-      const id = setTimeout(() => {
-        if (cancelled) return
-        router.push(href)
-        setPs(IDLE)
-      }, T_RM_TOTAL)
-      abortRef.current = () => { cancelled = true; clearTimeout(id) }
-      return
-    }
-
-    const start = performance.now()
-    const seed  = Math.floor(Math.random() * 100000)
-
-    function tick(now: number) {
-      if (cancelled) return
-      const elapsed  = now - start
-      const progress = Math.min(elapsed / T_TOTAL, 1)
-
-      // Fire navigation at 800ms
-      if (elapsed >= T_NAV_FIRE && !navFiredRef.current) {
-        navFiredRef.current = true
-        router.push(href)
+      if (rm) {
+        const id = window.setTimeout(() => {
+          router.push(href)
+          finish(href)
+        }, 160)
+        abortRef.current = () => clearTimeout(id)
+        return
       }
 
-      const scrambled = scrambleFrame(routeLabel, progress, seed)
+      const api = apiRef.current
+      if (!api) {
+        router.push(href)
+        finish(href)
+        return
+      }
 
-      setPs({
-        phase:      progress < 1 ? 'opening' : 'closing',
-        progress,
-        label:      scrambled,
-        targetHref: href,
+      api.cancelTravel()
+      api.startTravel({
+        duration: 900,
+        fromCharge,
+        landMood: mood,
+        returning: goingHome,
+        exitClear: goingHome,
+        onMid: () => {
+          if (navFired.current) return
+          navFired.current = true
+          router.push(href)
+        },
+        onDone: () => finish(href),
       })
 
-      if (progress < 1) {
-        requestAnimationFrame(tick)
-      } else {
-        setPs(IDLE)
-        abortRef.current = null
+      abortRef.current = () => api.cancelTravel()
+    },
+    [finish, rm, router],
+  )
+
+  // Persist landed ambient on non-home routes (refresh / soft land)
+  React.useEffect(() => {
+    if (phase === 'traveling') return
+    if (pathname === '/') return
+    let raf = 0
+    const apply = () => {
+      const api = apiRef.current
+      if (!api) {
+        raf = requestAnimationFrame(apply)
+        return
       }
+      api.setLand(1)
+      api.setLandMood(moodForHref(pathname))
     }
+    apply()
+    return () => cancelAnimationFrame(raf)
+  }, [pathname, phase])
 
-    setPs({ phase: 'opening', progress: 0, label: routeLabel, targetHref: href })
-    requestAnimationFrame(tick)
-  }, [rm, router])
-
-  const ctxValue = React.useMemo<PortalContextValue>(() => ({
-    trigger,
-    state: ps.phase === 'idle' ? 'idle' : ps.phase,
-  }), [trigger, ps.phase])
+  const ctxValue = React.useMemo<PortalContextValue>(
+    () => ({
+      trigger,
+      state: phase,
+      landId,
+      apiRef,
+      theme,
+      setTheme,
+      registerOpenLocal,
+    }),
+    [trigger, phase, landId, theme, registerOpenLocal],
+  )
 
   return (
     <PortalContext.Provider value={ctxValue}>
-      {children}
-      <PortalOverlay ps={ps} rm={rm} />
+      <div
+        className="portal-shell"
+        data-theme={theme}
+        data-portal-phase={phase}
+        data-portal-land={landId}
+      >
+        <AsciiWorld
+          theme={theme}
+          apiRef={apiRef}
+          cell={16}
+          className="absolute inset-0"
+        />
+
+        <AnimatedThemeToggler
+          className="portal-theme-btn"
+          data-cuelume-toggle
+          theme={theme}
+          onThemeChange={setTheme}
+          variant="circle"
+          duration={400}
+        />
+
+        {tripLabel && <p className="portal-transit-label">{tripLabel}</p>}
+
+        <div className="portal-shell-content">{children}</div>
+
+        <ShellWheel openLocalRef={openLocalRef} />
+      </div>
     </PortalContext.Provider>
   )
 }
 
-// ─── Overlay ─────────────────────────────────────────────────────────────────
+function ShellWheel({
+  openLocalRef,
+}: {
+  openLocalRef: React.MutableRefObject<(() => void) | null>
+}) {
+  const pathname = usePathname()
+  const { trigger, state, apiRef } = usePortal()
+  const active = destFromPath(pathname)
+  const [hover, setHover] = React.useState<DestId>(active)
+  const chargeRef = React.useRef(0)
+  const holdRef = React.useRef<DestId | null>(null)
+  const holdRaf = React.useRef(0)
+  const busy = state === 'traveling'
 
-function PortalOverlay({ ps, rm }: { ps: PortalState; rm: boolean }) {
-  if (ps.phase === 'idle') return null
+  React.useEffect(() => {
+    setHover(active)
+  }, [active])
 
-  const opacity = rm
-    ? ps.progress < 0.5 ? ps.progress * 2 : (1 - ps.progress) * 2
-    : ps.progress < T_FADE_IN / T_TOTAL
-      ? (ps.progress / (T_FADE_IN / T_TOTAL))
-      : ps.progress > 0.9
-        ? ((1 - ps.progress) / 0.1)
-        : 1
+  const clearCharge = React.useCallback(() => {
+    chargeRef.current = 0
+    apiRef.current?.setCharge(0)
+  }, [apiRef])
+
+  const commit = React.useCallback(
+    (id: DestId) => {
+      const dest = DESTINATIONS.find((d) => d.id === id)
+      if (!dest) return
+
+      if (id === 'home') {
+        if (pathname === '/') {
+          clearCharge()
+          return
+        }
+        trigger('/', 'HOME', { fromCharge: chargeRef.current, mood: 0 })
+        return
+      }
+
+      if (!dest.href) {
+        // Open — local chamber only on home
+        if (pathname === '/') {
+          clearCharge()
+          openLocalRef.current?.()
+        } else {
+          trigger('/', 'HOME', { fromCharge: chargeRef.current, mood: 0 })
+        }
+        return
+      }
+
+      trigger(dest.href, dest.label.toUpperCase(), {
+        mood: dest.mood,
+        fromCharge: chargeRef.current,
+      })
+    },
+    [apiRef, clearCharge, openLocalRef, pathname, trigger],
+  )
+
+  const holdStart = React.useCallback(
+    (id: DestId) => {
+      if (busy) return
+      holdRef.current = id
+      setHover(id)
+      const need = 340
+      const t0 = performance.now()
+      const tick = (now: number) => {
+        if (holdRef.current !== id) return
+        const p = Math.min(1, (now - t0) / need)
+        const eased = p * p * (3 - 2 * p)
+        chargeRef.current = eased
+        apiRef.current?.setCharge(eased)
+        if (p >= 1) {
+          holdRef.current = null
+          commit(id)
+          return
+        }
+        holdRaf.current = requestAnimationFrame(tick)
+      }
+      holdRaf.current = requestAnimationFrame(tick)
+    },
+    [apiRef, busy, commit],
+  )
+
+  const holdEnd = React.useCallback(() => {
+    if (chargeRef.current >= 0.98 || !holdRef.current) return
+    holdRef.current = null
+    cancelAnimationFrame(holdRaf.current)
+    const start = chargeRef.current
+    const t0 = performance.now()
+    const back = (now: number) => {
+      const u = Math.min(1, (now - t0) / 140)
+      const v = start * (1 - u)
+      chargeRef.current = v
+      apiRef.current?.setCharge(v)
+      if (u < 1) holdRaf.current = requestAnimationFrame(back)
+      else clearCharge()
+    }
+    holdRaf.current = requestAnimationFrame(back)
+  }, [apiRef, clearCharge])
+
+  React.useEffect(
+    () => () => cancelAnimationFrame(holdRaf.current),
+    [],
+  )
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center"
-      style={{
-        zIndex:          'var(--z-portal)',
-        backgroundColor: 'oklch(3% 0 0)',
-        opacity:         Math.max(0, Math.min(1, opacity)),
-        pointerEvents:   'all',
+    <HalfWheel
+      active={active}
+      hover={hover}
+      chargeRef={chargeRef}
+      disabled={busy}
+      onHover={(id) => {
+        if (hover !== id) cue('tick', 0.35)
+        setHover(id)
       }}
-      aria-live="assertive"
-      aria-label={`Navigating to ${ps.targetHref}`}
-    >
-      {!rm && (
-        <p
-          className="font-mono uppercase text-ax-signal"
-          style={{
-            fontSize:       'var(--text-xs)',
-            letterSpacing:  '0.18em',
-            opacity:        ps.progress > 0.2 ? Math.min(1, (ps.progress - 0.2) / 0.15) : 0,
-          }}
-          aria-hidden="true"
-        >
-          {ps.label}
-        </p>
-      )}
-    </div>
+      onHoldStart={holdStart}
+      onHoldEnd={holdEnd}
+    />
   )
 }

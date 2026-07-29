@@ -2,8 +2,8 @@
 import * as React from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Label } from '@/components/primitives/label'
-import { AsciiRule } from '@/lib/ascii/components/ascii-rule'
+import { PageHeading } from '@/components/site/page-heading'
+import { PortalPage } from '@/components/site/portal-page'
 import { listNoteSlugs, getNote } from '@/lib/notes'
 import { NoteBackLink } from './note-back-link'
 
@@ -38,36 +38,17 @@ export default async function NoteDetailPage({
   const { frontmatter, content } = note
 
   return (
-    <article
-      className="w-full max-w-[var(--max-grid)] mx-auto pt-24 pb-20"
-      style={{ paddingInline: 'var(--gutter)' }}
-    >
+    <PortalPage label={`Notes · ${frontmatter.date}`}>
       <NoteBackLink />
-
-      <header className="mt-8 mb-8 max-w-[58ch]">
-        <Label tone="dim" className="mb-4">
-          {frontmatter.date}
-        </Label>
-        <h1
-          className="font-sans font-semibold text-ax-bright mb-4"
-          style={{
-            fontSize: 'clamp(2rem, 5vw, 3.25rem)',
-            letterSpacing: '-0.035em',
-            lineHeight: 0.97,
-          }}
-        >
-          {frontmatter.title}
-        </h1>
-        <p className="font-sans text-ax-mid" style={{ fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
-          {frontmatter.excerpt}
-        </p>
-      </header>
-
-      <div className="mb-8 max-w-[58ch]">
-        <AsciiRule className="opacity-30" />
+      <PageHeading className="mt-6">
+        {frontmatter.title}
+      </PageHeading>
+      <p className="mb-8 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
+        {frontmatter.excerpt}
+      </p>
+      <div className="portal-mdx text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
+        {content}
       </div>
-
-      <div className="max-w-[58ch]">{content}</div>
-    </article>
+    </PortalPage>
   )
 }

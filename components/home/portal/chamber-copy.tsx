@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import Link from 'next/link'
+import { HighlightMark } from '@/components/ui/highlight-mark'
 import { IVAN, WORK_STUBS, NOTE_STUBS, DESTINATIONS, type DestId } from './content'
 
 export function ChamberCopy({
@@ -29,7 +30,7 @@ export function ChamberCopy({
           lineHeight: 0.95,
         }}
       >
-        {dest.label}
+        <HighlightMark>{dest.label}</HighlightMark>
       </h2>
       <p className="mt-4 text-[15px] leading-relaxed">{dest.body}</p>
 

@@ -4,6 +4,7 @@ import * as React from 'react'
 import { PortalLink } from '@/lib/portal/portal-link'
 import { WORK } from '@/content/work'
 import { AsciiRule } from '@/lib/ascii/components/ascii-rule'
+import { HighlightMark } from '@/components/ui/highlight-mark'
 
 export function HomeWork() {
   return (
@@ -26,7 +27,7 @@ export function HomeWork() {
               lineHeight: 0.98,
             }}
           >
-            Projects that stay in the buffer.
+            <HighlightMark>Projects that stay in the buffer.</HighlightMark>
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-ax-mid">
             Engine demos, agent surfaces, and edge UI — each entry is a real ship, not a mood board.

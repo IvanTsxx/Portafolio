@@ -4,6 +4,7 @@ import * as React from 'react'
 import dynamic from 'next/dynamic'
 import { PortalLink } from '@/lib/portal/portal-link'
 import { IDENTITY } from '@/content/identity'
+import { HighlightMark } from '@/components/ui/highlight-mark'
 
 const LexiconVortex = dynamic(
   () => import('./lexicon-vortex').then((m) => m.LexiconVortex),
@@ -46,7 +47,9 @@ export function HomeHero() {
               letterSpacing: '-0.035em',
             }}
           >
-            {IDENTITY.tagline}
+            <HighlightMark color="#FF4D00">
+              {IDENTITY.tagline}
+            </HighlightMark>
           </h1>
           <p className="max-w-[38ch] text-[15px] leading-relaxed text-[#2A2A2A]">
             {IDENTITY.summary}

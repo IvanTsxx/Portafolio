@@ -9,53 +9,81 @@
   --font-mono: var(--font-geist-mono, ui-monospace, 'Geist Mono', monospace);
 
   /* ── ax- color tokens ── */
-  /* #050505 */ --color-ax-void:   oklch(3% 0 0);
-  /* #0D0D0D */ --color-ax-ink:    oklch(7% 0 0);
-  /* #1F1F1F */ --color-ax-line:   oklch(14% 0 0);
-  /* #4A4A4A */ --color-ax-dim:    oklch(32% 0 0);
-  /* #8A8A8A */ --color-ax-mid:    oklch(57% 0 0);
-  /* #EDEDED */ --color-ax-bright: oklch(94% 0 0);
-  /* #F2EFE8 */ --color-ax-paper:  oklch(95% 0.008 88);
-  /* #FF4D00 */ --color-ax-signal: oklch(62% 0.225 32);
+  /* #050505 */
+  --color-ax-void: oklch(3% 0 0);
+  /* #0D0D0D */
+  --color-ax-ink: oklch(7% 0 0);
+  /* #1F1F1F */
+  --color-ax-line: oklch(14% 0 0);
+  /* #4A4A4A */
+  --color-ax-dim: oklch(32% 0 0);
+  /* #8A8A8A */
+  --color-ax-mid: oklch(57% 0 0);
+  /* #EDEDED */
+  --color-ax-bright: oklch(94% 0 0);
+  /* #F2EFE8 */
+  --color-ax-paper: oklch(95% 0.008 88);
+  /* #FF4D00 */
+  --color-ax-signal: oklch(62% 0.225 32);
 
   /* ── Duration scale (5 values, no others) ── */
-  --dur-micro:  90ms;   /* hover, press, focus, nav inversion */
-  --dur-state:  180ms;  /* local state changes, stagger entries */
-  --dur-enter:  320ms;  /* section entrances, AsciiImage crossfade */
-  --dur-fade:   120ms;  /* ONLY reduced-motion and portal initial degrade */
-  --dur-portal: 900ms;  /* ONLY the full portal sequence */
+  --dur-micro: 90ms;
+  /* hover, press, focus, nav inversion */
+  --dur-state: 180ms;
+  /* local state changes, stagger entries */
+  --dur-enter: 320ms;
+  /* section entrances, AsciiImage crossfade */
+  --dur-fade: 120ms;
+  /* ONLY reduced-motion and portal initial degrade */
+  --dur-portal: 900ms;
+  /* ONLY the full portal sequence */
 
   /* ── Easing curves (4 named, no others) ── */
-  --ease-portal: cubic-bezier(0.65, 0, 0.35, 1);  /* portal: symmetric, decisive */
-  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);    /* entrances: fast start, settle */
-  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);    /* exits */
-  --ease-mono:   linear;                            /* scramble, marquees, ASCII fields */
+  --ease-portal: cubic-bezier(0.65, 0, 0.35, 1);
+  /* portal: symmetric, decisive */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* entrances: fast start, settle */
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  /* exits */
+  --ease-mono: linear;
+  /* scramble, marquees, ASCII fields */
 
   /* ── Spacing scale (the only sizes used for type) ── */
-  --text-2xs: 0.6875rem;  /* 11px */
-  --text-xs:  0.8125rem;  /* 13px */
-  --text-sm:  0.9375rem;  /* 15px */
-  --text-base: 1rem;       /* 16px */
-  --text-lg:  1.125rem;   /* 18px */
-  --text-xl:  1.5rem;     /* 24px */
-  --text-2xl: 2.125rem;   /* 34px */
-  --text-3xl: 3.25rem;    /* 52px */
-  --text-4xl: 5.5rem;     /* 88px */
+  --text-2xs: 0.6875rem;
+  /* 11px */
+  --text-xs: 0.8125rem;
+  /* 13px */
+  --text-sm: 0.9375rem;
+  /* 15px */
+  --text-base: 1rem;
+  /* 16px */
+  --text-lg: 1.125rem;
+  /* 18px */
+  --text-xl: 1.5rem;
+  /* 24px */
+  --text-2xl: 2.125rem;
+  /* 34px */
+  --text-3xl: 3.25rem;
+  /* 52px */
+  --text-4xl: 5.5rem;
+  /* 88px */
 
   /* ── Border radius (sharp by default, ONE exception: navbar) ── */
   --radius-none: 0;
-  --radius-nav:  0.25rem;  /* 4px — only for the floating navbar */
+  --radius-nav: 0.25rem;
+  /* 4px — only for the floating navbar */
 
   /* ── Z-index scale ── */
-  --z-field:  10;
-  --z-nav:    50;
-  --z-panel:  80;
+  --z-field: 10;
+  --z-nav: 50;
+  --z-panel: 80;
   --z-portal: 100;
-  --z-debug:  200;
+  --z-debug: 200;
 
   /* ── Layout ── */
   --max-grid: 1440px;
-  --gutter:   1.5rem;  /* 24px */
+  --gutter: 1.5rem;
+  /* 24px */
   --max-prose: 58ch;
 }
 
@@ -71,7 +99,10 @@
 
 /* ─── Base layer ─── */
 @layer base {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     border-radius: 0;
     box-sizing: border-box;
   }
@@ -86,8 +117,10 @@
   }
 
   body {
-    background-color: oklch(3% 0 0);     /* ax-void */
-    color: oklch(94% 0 0);               /* ax-bright */
+    background-color: oklch(3% 0 0);
+    /* ax-void */
+    color: oklch(94% 0 0);
+    /* ax-bright */
     font-family: var(--font-sans);
     font-size: var(--text-sm);
     line-height: 1.55;
@@ -99,7 +132,8 @@
 
   /* Global focus ring: 1px signal color, no browser default */
   :focus-visible {
-    outline: 1px solid oklch(62% 0.225 32);  /* ax-signal */
+    outline: 1px solid oklch(62% 0.225 32);
+    /* ax-signal */
     outline-offset: 2px;
   }
 
@@ -108,19 +142,26 @@
     width: 6px;
     height: 6px;
   }
+
   ::-webkit-scrollbar-track {
-    background: oklch(7% 0 0);  /* ax-ink */
+    background: oklch(7% 0 0);
+    /* ax-ink */
   }
+
   ::-webkit-scrollbar-thumb {
-    background: oklch(32% 0 0);  /* ax-dim */
+    background: oklch(32% 0 0);
+    /* ax-dim */
   }
+
   ::-webkit-scrollbar-thumb:hover {
-    background: oklch(57% 0 0);  /* ax-mid */
+    background: oklch(57% 0 0);
+    /* ax-mid */
   }
 
   /* Selections */
   ::selection {
-    background-color: oklch(62% 0.225 32 / 0.3);  /* ax-signal transparent */
+    background-color: oklch(62% 0.225 32 / 0.3);
+    /* ax-signal transparent */
     color: oklch(94% 0 0);
   }
 }
@@ -143,6 +184,7 @@
 @utility clip-reveal {
   clip-path: inset(0 0 100% 0);
 }
+
 @utility clip-revealed {
   clip-path: inset(0 0 0% 0);
 }
@@ -159,9 +201,29 @@
   pointer-events: none;
 }
 
+/* ─── Theme toggler (Magic UI View Transitions) ─── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Scoped to AnimatedThemeToggler — flag + duration only while a theme toggle is in flight. */
+html[data-magicui-theme-vt='active']::view-transition-group(root) {
+  animation-duration: var(--magicui-theme-toggle-vt-duration);
+}
+
+/* Pin collapsed clip so Firefox does not flash the new theme unclipped before the WAAPI run. */
+html[data-magicui-theme-vt='active']::view-transition-new(root) {
+  clip-path: var(--magicui-theme-vt-clip-from);
+}
+
 /* ─── Reduced motion: freeze all CSS transitions and animations ─── */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: var(--dur-fade) !important;

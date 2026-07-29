@@ -1,8 +1,9 @@
-// app/lab/page.tsx — RSC shell
+// app/lab/page.tsx
 import * as React from 'react'
 import type { Metadata } from 'next'
-import { Label } from '@/components/primitives/label'
-import { LabExplorations } from './lab-explorations'
+import { PageHeading } from '@/components/site/page-heading'
+import { PortalPage } from '@/components/site/portal-page'
+import { LabStudies } from './lab-studies'
 
 export const metadata: Metadata = {
   title: 'Lab',
@@ -10,32 +11,28 @@ export const metadata: Metadata = {
 
 export default function LabPage() {
   return (
-    <div
-      className="w-full max-w-[var(--max-grid)] mx-auto pt-24 pb-20"
-      style={{ paddingInline: 'var(--gutter)' }}
-    >
-      <header className="mb-12 max-w-[52ch]">
-        <Label index="LAB" tone="signal" className="mb-4">
-          Explorations
-        </Label>
-        <h1
-          className="font-sans font-semibold text-ax-bright mb-4"
-          style={{
-            fontSize: 'clamp(2rem, 5vw, 3.25rem)',
-            letterSpacing: '-0.035em',
-            lineHeight: 0.97,
-          }}
-        >
-          Generative ASCII fields
-        </h1>
-        <p className="font-sans text-ax-mid" style={{ fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>
-          Live density fields rendered into a monospace{' '}
-          <code className="font-mono text-ax-bright">&lt;pre&gt;</code> grid. Cap: 9000 cells.
-          Press <kbd className="font-mono text-ax-signal">~</kbd> for debug HUD.
-        </p>
-      </header>
-
-      <LabExplorations />
-    </div>
+    <PortalPage label="Craft · image → ASCII">
+      <PageHeading>ASCII studies</PageHeading>
+      <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
+        Stills converted from images — not live fields. Drop{' '}
+        <code className="font-mono" style={{ color: 'var(--p-bright)' }}>
+          .txt
+        </code>{' '}
+        from the convert tool into{' '}
+        <code className="font-mono" style={{ color: 'var(--p-bright)' }}>
+          public/lab/
+        </code>{' '}
+        and point{' '}
+        <code className="font-mono" style={{ color: 'var(--p-bright)' }}>
+          asciiSrc
+        </code>{' '}
+        in{' '}
+        <code className="font-mono" style={{ color: 'var(--p-bright)' }}>
+          content/lab.ts
+        </code>
+        .
+      </p>
+      <LabStudies />
+    </PortalPage>
   )
 }

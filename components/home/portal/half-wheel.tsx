@@ -17,7 +17,15 @@ function arcPath(cx: number, cy: number, r: number, a0: number, a1: number) {
   return `M ${p0.x} ${p0.y} A ${r} ${r} 0 ${large} 1 ${p1.x} ${p1.y}`
 }
 
-/** Pin = active. Fill = hover. Charge painted from ref (no parent re-render). */
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t
+}
+
+/**
+ * Pin (orange) fills only to active.
+ * Hover (bright) is a separate soft fill.
+ * Both lerp — grow and shrink smoothly.
+ */
 export function HalfWheel({
   active,
   hover,
@@ -36,8 +44,14 @@ export function HalfWheel({
   disabled?: boolean
 }) {
   const svgRef = React.useRef<SVGSVGElement>(null)
+  const pinPath = React.useRef<SVGPathElement>(null)
+  const hoverPath = React.useRef<SVGPathElement>(null)
   const chargePath = React.useRef<SVGPathElement>(null)
   const hubLabel = React.useRef<SVGTextElement>(null)
+  const pinDisplay = React.useRef(destProgress(active))
+  const hoverDisplay = React.useRef(destProgress(hover))
+  const pinTarget = React.useRef(destProgress(active))
+  const hoverTarget = React.useRef(destProgress(hover))
   const holding = React.useRef(false)
   const onArcRef = React.useRef(false)
   const [hot, setHot] = React.useState(false)
@@ -49,7 +63,14 @@ export function HalfWheel({
   const band = 18
 
   const pinT = destProgress(active)
-  const fillT = Math.max(destProgress(hover), 0.02)
+
+  React.useEffect(() => {
+    pinTarget.current = destProgress(active)
+  }, [active])
+
+  React.useEffect(() => {
+    hoverTarget.current = destProgress(hover)
+  }, [hover])
 
   const idAtProgress = React.useCallback(
     (t: number): DestId => {
@@ -81,22 +102,55 @@ export function HalfWheel({
     [band, radius],
   )
 
-  // Paint charge from ref — isolates hold animation from React tree
+  // Smooth pin + hover fills + charge paint
   React.useEffect(() => {
     let raf = 0
-    let last = -1
+    let lastCharge = -1
     const tick = () => {
+      const ease = 0.14
+      pinDisplay.current = lerp(pinDisplay.current, pinTarget.current, ease)
+      hoverDisplay.current = lerp(hoverDisplay.current, hoverTarget.current, ease)
+
+      if (Math.abs(pinDisplay.current - pinTarget.current) < 0.001) {
+        pinDisplay.current = pinTarget.current
+      }
+      if (Math.abs(hoverDisplay.current - hoverTarget.current) < 0.001) {
+        hoverDisplay.current = hoverTarget.current
+      }
+
+      const pPin = Math.max(pinDisplay.current, 0.001)
+      const pHover = Math.max(hoverDisplay.current, 0.001)
+
+      if (pinPath.current) {
+        pinPath.current.setAttribute(
+          'd',
+          arcPath(cx, cy, radius, Math.PI, Math.PI - pPin * Math.PI),
+        )
+      }
+      if (hoverPath.current) {
+        hoverPath.current.setAttribute(
+          'd',
+          arcPath(cx, cy, radius, Math.PI, Math.PI - pHover * Math.PI),
+        )
+        // Hide hover stroke when it matches pin (avoid double-draw)
+        const overlap = Math.abs(pHover - pPin) < 0.02
+        hoverPath.current.style.opacity = overlap ? '0' : '1'
+      }
+
       const c = chargeRef.current
-      if (Math.abs(c - last) > 0.01) {
-        last = c
+      if (Math.abs(c - lastCharge) > 0.008) {
+        lastCharge = c
         const path = chargePath.current
         const hub = hubLabel.current
         if (path) {
-          path.setAttribute('d', arcPath(cx, cy, radius, Math.PI, Math.PI - Math.max(c, 0.001) * Math.PI))
+          // Charge grows toward the held hover target, not full arc
+          const span = Math.max(hoverDisplay.current * c, 0.001)
+          path.setAttribute('d', arcPath(cx, cy, radius, Math.PI, Math.PI - span * Math.PI))
           path.style.opacity = c > 0.02 ? '1' : '0'
         }
         if (hub) hub.textContent = c > 0.05 ? `${Math.round(c * 100)}` : 'HOLD'
       }
+
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -116,7 +170,11 @@ export function HalfWheel({
       onHover(idAtProgress(s.t))
       return
     }
-    if (onArcRef.current) setArcHot(false)
+    if (onArcRef.current) {
+      setArcHot(false)
+      // Ease hover fill back to pin
+      onHover(active)
+    }
   }
 
   const handleDown = (e: React.PointerEvent) => {
@@ -166,14 +224,26 @@ export function HalfWheel({
           onPointerUp={handleUp}
           onPointerCancel={handleUp}
           onPointerLeave={() => {
-            if (!holding.current) setArcHot(false)
+            if (!holding.current) {
+              setArcHot(false)
+              onHover(active)
+            }
           }}
           onPointerEnter={() => setArcHot(true)}
         />
         <path d={arcPath(cx, cy, radius, Math.PI, 0)} className="portal-wheel-track" fill="none" />
+        {/* Hover — soft bright, lerps */}
         <path
-          d={arcPath(cx, cy, radius, Math.PI, Math.PI - fillT * Math.PI)}
-          className="portal-wheel-progress"
+          ref={hoverPath}
+          d={arcPath(cx, cy, radius, Math.PI, Math.PI - 0.02 * Math.PI)}
+          className="portal-wheel-hover"
+          fill="none"
+        />
+        {/* Pin — orange accent only to active */}
+        <path
+          ref={pinPath}
+          d={arcPath(cx, cy, radius, Math.PI, Math.PI - Math.max(pinT, 0.02) * Math.PI)}
+          className="portal-wheel-pin"
           fill="none"
         />
         <path

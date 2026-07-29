@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { IDENTITY } from '@/content/identity'
 import { PortalLink } from '@/lib/portal/portal-link'
+import { HighlightMark } from '@/components/ui/highlight-mark'
 
 export function HomeClose() {
   return (
@@ -23,7 +24,9 @@ export function HomeClose() {
             lineHeight: 0.98,
           }}
         >
-          Say hello from anywhere — I&apos;m in {IDENTITY.location.region}.
+          <HighlightMark>
+            Say hello from anywhere — I&apos;m in {IDENTITY.location.region}.
+          </HighlightMark>
         </h2>
         <p className="mt-4 max-w-[44ch] text-[15px] leading-relaxed text-ax-mid">
           Use the + panel for contact. Bring a brief, a constraint, or a weird ASCII idea.

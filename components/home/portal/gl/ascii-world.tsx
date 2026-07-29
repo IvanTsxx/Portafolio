@@ -13,13 +13,20 @@ export type TravelJob = {
   startLand: number
   landMood: number
   returning: boolean
+  /** End with land=0 (route hop) instead of leaving landed ambient */
+  exitClear?: boolean
+  onMid?: () => void
   onDone: () => void
 }
 
 export type AsciiWorldApi = {
   setCharge: (v: number) => void
+  setLand: (v: number) => void
+  setLandMood: (v: number) => void
   getTravel: () => { worm: number; charge: number; land: number }
-  startTravel: (job: Omit<TravelJob, 'startLand'> & { startLand?: number }) => void
+  startTravel: (
+    job: Omit<TravelJob, 'startLand'> & { startLand?: number },
+  ) => void
   cancelTravel: () => void
   setPalette: (theme: PortalTheme) => void
 }
@@ -55,7 +62,7 @@ function FieldMesh({
 }) {
   const mat = React.useRef<THREE.ShaderMaterial>(null)
   const travel = React.useRef({ worm: 0, charge: 0, land: 0 })
-  const jobRef = React.useRef<(TravelJob & { t0: number }) | null>(null)
+  const jobRef = React.useRef<(TravelJob & { t0: number; midFired: boolean }) | null>(null)
   const { size, gl, pointer } = useThree()
   const reduced = React.useMemo(
     () =>
@@ -104,6 +111,13 @@ function FieldMesh({
         travel.current.charge = v
         if (mat.current) mat.current.uniforms.uCharge!.value = v
       },
+      setLand: (v) => {
+        travel.current.land = v
+        if (mat.current) mat.current.uniforms.uLand!.value = v
+      },
+      setLandMood: (v) => {
+        if (mat.current) mat.current.uniforms.uLandMood!.value = v
+      },
       getTravel: () => ({ ...travel.current }),
       startTravel: (opts) => {
         const startLand = opts.startLand ?? travel.current.land
@@ -114,8 +128,11 @@ function FieldMesh({
           startLand,
           landMood: opts.landMood,
           returning: opts.returning,
+          exitClear: opts.exitClear,
+          onMid: opts.onMid,
           onDone: opts.onDone,
           t0: performance.now(),
+          midFired: false,
         }
         apply(opts.fromCharge, opts.fromCharge, startLand)
       },
@@ -179,11 +196,17 @@ function FieldMesh({
       worm = 1
       charge = 0
       if (job.returning) land = job.startLand * 0.15
+      if (!job.midFired) {
+        job.midFired = true
+        job.onMid?.()
+      }
     } else {
       const e = easeInOut((p - 0.52) / 0.48)
       worm = 1 - e
       charge = 0
-      land = job.returning ? (1 - e) * 0.04 : Math.max(job.startLand, e)
+      land = job.returning || job.exitClear
+        ? (1 - e) * 0.04
+        : Math.max(job.startLand, e)
     }
 
     travel.current = { worm, charge, land }
@@ -193,13 +216,12 @@ function FieldMesh({
 
     if (p >= 1) {
       jobRef.current = null
-      const endLand = job.returning ? 0 : 1
+      const endLand = job.returning || job.exitClear ? 0 : 1
       travel.current = { worm: 0, charge: 0, land: endLand }
       u.uWorm!.value = 0
       u.uCharge!.value = 0
       u.uLand!.value = endLand
-      if (!job.returning) u.uLandMood!.value = job.landMood
-      // Defer React to next macrotask so this GPU frame finishes clean
+      if (!job.returning && !job.exitClear) u.uLandMood!.value = job.landMood
       const done = job.onDone
       queueMicrotask(done)
     }
