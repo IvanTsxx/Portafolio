@@ -1,5 +1,5 @@
 // components/site/sound-toggle.tsx
-// Mute control — persists via localStorage. Pair with theme toggle in chrome.
+// Mute control — persists via localStorage. Theme uses next-themes.
 'use client'
 
 import * as React from 'react'

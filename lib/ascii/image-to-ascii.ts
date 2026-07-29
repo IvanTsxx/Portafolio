@@ -10,6 +10,11 @@ export type ImageToAsciiOptions = {
   /** Match CSS object-fit: cover (default) vs stretch */
   fit?: 'cover' | 'fill'
   ramp?: string
+  /**
+   * Luminance below this → space (punch out black bg).
+   * Keeps classic dark→dense shading on the subject — no color invert.
+   */
+  knockout?: number
 }
 
 /** Draw image into cols×rows with object-fit:cover crop. */
@@ -48,6 +53,7 @@ export function imageToAscii(
     cellAspect = 0.55,
     fit = 'cover',
     ramp = RAMP_CLASSIC,
+    knockout,
   }: ImageToAsciiOptions = {},
 ): string {
   const srcW = img.naturalWidth || img.width
@@ -71,6 +77,7 @@ export function imageToAscii(
 
   const { data } = ctx.getImageData(0, 0, cols, rows)
   const lines: string[] = []
+  const ko = knockout ?? null
 
   for (let y = 0; y < rows; y++) {
     let line = ''
@@ -81,7 +88,16 @@ export function imageToAscii(
       const b = data[i + 2]!
       const a = data[i + 3]! / 255
       const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
-      const density = (1 - lum) * a
+
+      if (a < 0.08 || (ko !== null && lum < ko)) {
+        line += ' '
+        continue
+      }
+
+      // Stretch remaining tones so face midtones keep detail
+      const t =
+        ko !== null ? Math.min(1, Math.max(0, (lum - ko) / (1 - ko))) : lum
+      const density = (1 - t) * a
       line += densityToChar(density, ramp)
     }
     lines.push(line)

@@ -5,6 +5,7 @@
 import * as React from 'react'
 import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import { useReducedMotion } from '@/lib/ascii/hooks/use-reduced-motion'
 import { cue } from '@/lib/cuelume'
 import { WheelDock } from '@/components/home/portal/wheel-dock'
@@ -41,8 +42,8 @@ export interface PortalContextValue {
   state: PortalPhase
   landId: number
   apiRef: React.MutableRefObject<AsciiWorldApi | null>
+  /** Resolved portal palette (mirrors next-themes). */
   theme: PortalTheme
-  setTheme: React.Dispatch<React.SetStateAction<PortalTheme>>
   /** Home registers Open chamber; wheel calls this when Open is held on `/` */
   registerOpenLocal: (fn: (() => void) | null) => void
 }
@@ -77,8 +78,9 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const rm = useReducedMotion()
+  const { resolvedTheme } = useTheme()
+  const theme: PortalTheme = resolvedTheme === 'light' ? 'light' : 'dark'
   const apiRef = React.useRef<AsciiWorldApi | null>(null)
-  const [theme, setTheme] = React.useState<PortalTheme>('dark')
   const [phase, setPhase] = React.useState<PortalPhase>('idle')
   const [landId, setLandId] = React.useState(0)
   const [trip, setTrip] = React.useState<{ label: string; sub: string } | null>(
@@ -205,7 +207,6 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       landId,
       apiRef,
       theme,
-      setTheme,
       registerOpenLocal,
     }),
     [trigger, phase, landId, theme, registerOpenLocal],
@@ -231,8 +232,6 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
           <AnimatedThemeToggler
             className={portal.chromeBtn}
             data-cuelume-toggle
-            theme={theme}
-            onThemeChange={setTheme}
             variant="circle"
             duration={400}
           />

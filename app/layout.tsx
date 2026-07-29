@@ -7,6 +7,7 @@ import { RafProvider } from '@/lib/ascii/raf-provider'
 import { PortalProvider } from '@/lib/portal/portal-provider'
 import { DebugPanel } from '@/components/site/debug-panel'
 import { CuelumeBind } from '@/components/site/cuelume-bind'
+import { ThemeProvider } from '@/components/site/theme-provider'
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -70,8 +71,11 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
-  themeColor: '#050505',
+  colorScheme: 'dark light',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#e8e4dc' },
+    { media: '(prefers-color-scheme: dark)', color: '#050505' },
+  ],
   width: 'device-width',
   initialScale: 1,
 }
@@ -82,16 +86,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} bg-ax-void`}
+      className={`${geistSans.variable} ${geistMono.variable} bg-ax-void`}
+      suppressHydrationWarning
     >
       <body className="font-sans antialiased overflow-hidden">
-        <RafProvider>
-          <PortalProvider>
-            <CuelumeBind />
-            <DebugPanel />
-            {children}
-          </PortalProvider>
-        </RafProvider>
+        <ThemeProvider>
+          <RafProvider>
+            <PortalProvider>
+              <CuelumeBind />
+              <DebugPanel />
+              {children}
+            </PortalProvider>
+          </RafProvider>
+        </ThemeProvider>
 
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

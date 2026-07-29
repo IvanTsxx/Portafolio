@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { flushSync } from 'react-dom'
 
 import { cn } from '@/lib/utils'
@@ -21,13 +22,6 @@ interface AnimatedThemeTogglerProps
   variant?: TransitionVariant
   /** When true, the transition expands from the viewport center instead of the button center. */
   fromCenter?: boolean
-  /**
-   * Controlled theme value. When provided, the parent owns persistence
-   * (e.g. portal theme state) and this component will not write to localStorage.
-   */
-  theme?: 'light' | 'dark'
-  /** Called on toggle. Pair with `theme` for controlled usage. */
-  onThemeChange?: (theme: 'light' | 'dark') => void
 }
 
 function polygonCollapsed(point: string, vertexCount: number): string {
@@ -155,34 +149,18 @@ export const AnimatedThemeToggler = ({
   duration = 400,
   variant,
   fromCenter = false,
-  theme,
-  onThemeChange,
   ...props
 }: AnimatedThemeTogglerProps) => {
   const shape = variant ?? 'circle'
-  const isControlled = theme !== undefined
-  const [internalIsDark, setInternalIsDark] = useState(false)
-  const isDark = isControlled ? theme === 'dark' : internalIsDark
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  const isDark = resolvedTheme === 'dark'
   const buttonRef = useRef<HTMLButtonElement>(null)
   const isTransitioningRef = useRef(false)
 
   useEffect(() => {
-    if (isControlled) return
-
-    const updateTheme = () => {
-      setInternalIsDark(document.documentElement.classList.contains('dark'))
-    }
-
-    updateTheme()
-
-    const observer = new MutationObserver(updateTheme)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
-
-    return () => observer.disconnect()
-  }, [isControlled])
+    setMounted(true)
+  }, [])
 
   const toggleTheme = useCallback(() => {
     const button = buttonRef.current
@@ -215,16 +193,8 @@ export const AnimatedThemeToggler = ({
     )
 
     const applyTheme = () => {
-      const newTheme = !isDark
-      // Always toggle the class synchronously so the View Transitions API
-      // snapshots the new theme inside the startViewTransition callback.
-      document.documentElement.classList.toggle('dark')
-      if (isControlled) {
-        onThemeChange?.(newTheme ? 'dark' : 'light')
-      } else {
-        setInternalIsDark(newTheme)
-        localStorage.setItem('theme', newTheme ? 'dark' : 'light')
-      }
+      // next-themes applies the class synchronously + persists to localStorage.
+      setTheme(isDark ? 'light' : 'dark')
     }
 
     if (typeof document.startViewTransition !== 'function') {
@@ -286,7 +256,7 @@ export const AnimatedThemeToggler = ({
         })
         .catch(() => {})
     }
-  }, [shape, fromCenter, duration, isDark, isControlled, onThemeChange])
+  }, [shape, fromCenter, duration, isDark, setTheme])
 
   return (
     <button
@@ -295,6 +265,7 @@ export const AnimatedThemeToggler = ({
       onClick={toggleTheme}
       className={cn(className)}
       aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+      disabled={!mounted}
       {...props}
     >
       {isDark ? (

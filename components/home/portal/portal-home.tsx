@@ -115,9 +115,9 @@ export function PortalHome() {
   return (
     <>
       {showHero && (
-        <>
-          <div className={portal.hero} data-side={chamberSide('home')}>
-            <PortalStagger className="portal-float">
+        <div className={portal.hero} data-side={chamberSide('home')}>
+          <div className={portal.heroRow}>
+            <PortalStagger className={portal.heroCopy}>
               <p className={`${portal.label} ${portal.eyebrow} mb-4`}>
                 <EyebrowMark />
                 <span>{IDENTITY.role}</span>
@@ -144,22 +144,27 @@ export function PortalHome() {
 
               <SocialLinks className="mt-2" />
             </PortalStagger>
-          </div>
 
-          <motion.div
-            className={portal.heroPortraitDock}
-            initial={prefersReduced ? false : { opacity: 0, scale: 0.92, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: prefersReduced ? 0 : 0.58, ease, delay: prefersReduced ? 0 : 0.12 }}
-          >
-            <AsciiImage
-              src={IDENTITY.avatar}
-              alt={IDENTITY.displayName}
-              aspect="3 / 4"
-              className={portal.heroPortrait}
-            />
-          </motion.div>
-        </>
+            <motion.div
+              className={portal.heroPortraitDock}
+              initial={prefersReduced ? false : { opacity: 0, scale: 0.94, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{
+                duration: prefersReduced ? 0 : 0.58,
+                ease,
+                delay: prefersReduced ? 0 : 0.14,
+              }}
+            >
+              <AsciiImage
+                src={IDENTITY.avatar}
+                alt={IDENTITY.displayName}
+                aspect="3 / 4"
+                variant="field"
+                className={portal.heroPortrait}
+              />
+            </motion.div>
+          </div>
+        </div>
       )}
 
       <div className={portal.chamber} data-open={open ? 'true' : 'false'} data-side={openSide}>

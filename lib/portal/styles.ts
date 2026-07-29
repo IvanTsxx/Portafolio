@@ -104,20 +104,24 @@ export const portal = {
   ].join(' '),
 
   hero: [
-    'absolute top-[min(22vh,9rem)] z-20 max-w-[min(36rem,88vw)] md:top-[min(24vh,11rem)]',
+    'absolute top-[min(20vh,8rem)] z-20 max-w-[min(52rem,92vw)] md:top-[min(22vh,10rem)]',
     'data-[side=left]:left-[clamp(1.25rem,6vw,8%)] data-[side=left]:right-auto',
     'data-[side=right]:right-[clamp(1.25rem,6vw,8%)] data-[side=right]:left-auto',
   ].join(' '),
 
-  /** Portrait dock — right edge; clears chrome controls */
-  heroPortraitDock: [
-    'absolute z-20 pointer-events-auto',
-    'top-[min(18vh,7.5rem)] right-[clamp(1.25rem,5vw,7%)]',
-    'md:top-[min(22vh,10rem)]',
+  /** Copy + portrait as one composition */
+  heroRow: [
+    'flex flex-col items-start gap-5',
+    'sm:flex-row sm:items-start sm:gap-8 md:gap-10',
   ].join(' '),
 
-  /** Hero portrait — ASCII rest, photo on hover (same as lab) */
-  heroPortrait: 'w-[min(5.75rem,30vw)] md:w-[min(11rem,20vw)]',
+  heroCopy: 'portal-float min-w-0 max-w-[min(28rem,88vw)]',
+
+  /** Portrait sits beside copy — not viewport-edge */
+  heroPortraitDock: 'pointer-events-auto shrink-0 sm:pt-1',
+
+  /** Larger field portrait so ASCII reads as a face */
+  heroPortrait: 'w-[min(9.5rem,46vw)] sm:w-[min(12rem,28vw)] md:w-[min(15.5rem,26vw)]',
 
   eyebrow: 'inline-flex items-center gap-[0.55rem]',
   eyebrowMark: 'inline-flex shrink-0 text-p-signal',

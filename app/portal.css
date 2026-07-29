@@ -218,7 +218,7 @@
   }
 }
 
-/* AsciiImage — hover/focus/touched cascade */
+/* AsciiImage — card (lab) or field (hero silhouette) + matrix dissolve */
 @utility portal-ascii-image {
   position: relative;
   overflow: hidden;
@@ -230,6 +230,19 @@
   outline: none;
   cursor: crosshair;
 
+  &[data-variant='field'] {
+    border: 0;
+    background: transparent;
+    overflow: visible;
+    /* Soft falloff — keeps face readable, blends into cosmos */
+    -webkit-mask-image: radial-gradient(ellipse 88% 82% at 50% 36%,
+        #000 52%,
+        transparent 92%);
+    mask-image: radial-gradient(ellipse 88% 82% at 50% 36%,
+        #000 52%,
+        transparent 92%);
+  }
+
   &[data-static] {
     cursor: default;
   }
@@ -239,23 +252,23 @@
     outline-offset: 2px;
   }
 
+  &[data-variant='field']:focus-visible {
+    outline-offset: 4px;
+  }
+
   & .portal-ascii-image-photo,
   & .portal-ascii-image-glyphs {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    transition-property: opacity, filter;
-    transition-duration: 640ms;
-    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   & .portal-ascii-image-photo {
     display: block;
     object-fit: cover;
-    object-position: center center;
+    object-position: center 28%;
     opacity: 0;
-    filter: blur(4px);
     pointer-events: none;
     user-select: none;
   }
@@ -276,37 +289,30 @@
     pointer-events: none;
     user-select: none;
     opacity: 1;
-    filter: blur(0);
   }
 
-  &:not([data-static]):hover .portal-ascii-image-photo,
-  &:not([data-static]):focus-within .portal-ascii-image-photo,
-  &:not([data-static])[data-touched='true'] .portal-ascii-image-photo {
+  &[data-variant='field'] .portal-ascii-image-glyphs {
+    color: color-mix(in oklab, var(--color-p-bright) 88%, var(--color-p-mid));
+  }
+
+  /* Non-dissolve fallback (static / reduced-motion via CSS when no JS dissolve) */
+  &:not([data-dissolve]):not([data-static]):hover .portal-ascii-image-photo,
+  &:not([data-dissolve]):not([data-static]):focus-within .portal-ascii-image-photo,
+  &:not([data-dissolve]):not([data-static])[data-touched='true'] .portal-ascii-image-photo {
     opacity: 1;
-    filter: blur(0);
   }
 
-  &:not([data-static]):hover .portal-ascii-image-glyphs,
-  &:not([data-static]):focus-within .portal-ascii-image-glyphs,
-  &:not([data-static])[data-touched='true'] .portal-ascii-image-glyphs {
+  &:not([data-dissolve]):not([data-static]):hover .portal-ascii-image-glyphs,
+  &:not([data-dissolve]):not([data-static]):focus-within .portal-ascii-image-glyphs,
+  &:not([data-dissolve]):not([data-static])[data-touched='true'] .portal-ascii-image-glyphs {
     opacity: 0;
-    filter: blur(2px);
   }
 
   @media (prefers-reduced-motion: reduce) {
 
-    & .portal-ascii-image-photo,
-    & .portal-ascii-image-glyphs {
-      transition-duration: var(--dur-fade);
-      filter: none;
-    }
-
-    &:not([data-static]) .portal-ascii-image-photo {
-      opacity: 1;
-    }
-
-    &:not([data-static]) .portal-ascii-image-glyphs {
-      opacity: 0;
+    &[data-dissolve] .portal-ascii-image-photo,
+    &[data-dissolve] .portal-ascii-image-glyphs {
+      transition: opacity var(--dur-fade) ease;
     }
   }
 }
