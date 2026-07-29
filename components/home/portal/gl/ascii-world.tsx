@@ -47,7 +47,18 @@ type Uniforms = {
   uCell: { value: number }
   uAtlas: { value: THREE.Texture | null }
   uAtlasLen: { value: number }
+  /** Click starquakes: xy = uv, z = age (s), w = strength */
+  uRipple0: { value: THREE.Vector4 }
+  uRipple1: { value: THREE.Vector4 }
+  uRipple2: { value: THREE.Vector4 }
+  /** 1 = expand+warp, 0 = static flash (reduced motion) */
+  uRippleMotion: { value: number }
 }
+
+const RIPPLE_SLOTS = 3
+const RIPPLE_LIFE = 1.7
+const INTERACTIVE_SEL =
+  'button, a, input, textarea, select, [role="button"], [data-no-ripple]'
 
 function glyphGainFor(theme: PortalTheme) {
   return theme === 'dark' ? 0.58 : 0.32
@@ -70,6 +81,15 @@ function FieldMesh({
   const travel = React.useRef({ worm: 0, charge: 0, land: 0 })
   const jobRef = React.useRef<(TravelJob & { t0: number; midFired: boolean }) | null>(null)
   const pointerUv = React.useRef({ x: 0.5, y: 0.5, active: 0 })
+  const ripples = React.useRef(
+    Array.from({ length: RIPPLE_SLOTS }, () => ({
+      x: 0.5,
+      y: 0.5,
+      age: RIPPLE_LIFE,
+      strength: 0,
+    })),
+  )
+  const rippleCursor = React.useRef(0)
   const { size, gl } = useThree()
   const reduced = React.useMemo(
     () =>
@@ -100,6 +120,10 @@ function FieldMesh({
       uCell: { value: cell },
       uAtlas: { value: tex },
       uAtlasLen: { value: ASCII_RAMP.length },
+      uRipple0: { value: new THREE.Vector4(0.5, 0.5, RIPPLE_LIFE, 0) },
+      uRipple1: { value: new THREE.Vector4(0.5, 0.5, RIPPLE_LIFE, 0) },
+      uRipple2: { value: new THREE.Vector4(0.5, 0.5, RIPPLE_LIFE, 0) },
+      uRippleMotion: { value: reduced ? 0 : 1 },
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -166,36 +190,78 @@ function FieldMesh({
 
   React.useEffect(() => {
     // Content layer sits above the canvas — track pointer on the window
-    const onMove = (e: PointerEvent) => {
+    const uvFromEvent = (e: PointerEvent) => {
       const rect = gl.domElement.getBoundingClientRect()
-      if (rect.width < 1 || rect.height < 1) return
-      pointerUv.current = {
+      if (rect.width < 1 || rect.height < 1) return null
+      return {
         x: (e.clientX - rect.left) / rect.width,
         y: 1 - (e.clientY - rect.top) / rect.height,
-        active: 1,
       }
     }
+
+    const onMove = (e: PointerEvent) => {
+      const uv = uvFromEvent(e)
+      if (!uv) return
+      pointerUv.current = { ...uv, active: 1 }
+    }
+
+    const onDown = (e: PointerEvent) => {
+      if (e.button !== 0) return
+      const target = e.target
+      if (
+        target instanceof Element &&
+        target.closest(INTERACTIVE_SEL)
+      ) {
+        onMove(e)
+        return
+      }
+      const uv = uvFromEvent(e)
+      if (!uv) return
+      pointerUv.current = { ...uv, active: 1 }
+
+      const slot = rippleCursor.current % RIPPLE_SLOTS
+      rippleCursor.current = slot + 1
+      ripples.current[slot] = {
+        x: uv.x,
+        y: uv.y,
+        age: 0,
+        strength: reduced ? 0.72 : 1,
+      }
+    }
+
     const onLeave = () => {
       pointerUv.current.active = 0
     }
     window.addEventListener('pointermove', onMove, { passive: true })
-    window.addEventListener('pointerdown', onMove, { passive: true })
+    window.addEventListener('pointerdown', onDown, { passive: true })
     document.documentElement.addEventListener('pointerleave', onLeave)
     return () => {
       window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerdown', onMove)
+      window.removeEventListener('pointerdown', onDown)
       document.documentElement.removeEventListener('pointerleave', onLeave)
       uniforms.uAtlas.value?.dispose()
     }
-  }, [gl, uniforms])
+  }, [gl, reduced, uniforms])
 
   useFrame((_, dt) => {
     if (!mat.current) return
     const u = mat.current.uniforms
-    if (!reduced) u.uTime!.value += Math.min(dt, 0.033)
+    const step = Math.min(dt, 0.033)
+    if (!reduced) u.uTime!.value += step
     u.uRes!.value.set(size.width, size.height)
     u.uPointer!.value.set(pointerUv.current.x, pointerUv.current.y)
     u.uPointerActive!.value = pointerUv.current.active
+    u.uRippleMotion!.value = reduced ? 0 : 1
+
+    const keys = ['uRipple0', 'uRipple1', 'uRipple2'] as const
+    for (let i = 0; i < RIPPLE_SLOTS; i++) {
+      const r = ripples.current[i]!
+      if (r.strength > 0) {
+        r.age += step
+        if (r.age >= RIPPLE_LIFE) r.strength = 0
+      }
+      ;(u[keys[i]]!.value as THREE.Vector4).set(r.x, r.y, r.age, r.strength)
+    }
 
     const job = jobRef.current
     if (!job) return

@@ -6,6 +6,7 @@ import { IVAN, chamberSide } from './content'
 import { ChamberCopy } from './chamber-copy'
 import { PortalStagger } from '@/components/site/portal-arrive'
 import { SocialLinks } from '@/components/site/social-links'
+import { AsciiImage } from '@/components/ui/ascii-image'
 import { HighlightMark } from '@/components/ui/highlight-mark'
 import { IDENTITY } from '@/content/identity'
 import { usePortal } from '@/lib/portal'
@@ -109,39 +110,56 @@ export function PortalHome() {
   const showHero = !open && state !== 'traveling'
   const openSide = chamberSide('open')
   const statusLabel = IDENTITY.available ? 'Working' : 'Unavailable'
+  const prefersReduced = useReducedMotion()
 
   return (
     <>
       {showHero && (
-        <div className={portal.hero} data-side={chamberSide('home')}>
-          <PortalStagger className="portal-float">
-            <p className={`${portal.label} ${portal.eyebrow} mb-4`}>
-              <EyebrowMark />
-              <span>{IDENTITY.role}</span>
-            </p>
+        <>
+          <div className={portal.hero} data-side={chamberSide('home')}>
+            <PortalStagger className="portal-float">
+              <p className={`${portal.label} ${portal.eyebrow} mb-4`}>
+                <EyebrowMark />
+                <span>{IDENTITY.role}</span>
+              </p>
 
-            <h1
-              className="max-w-[12ch] font-semibold tracking-[-0.04em] text-[clamp(2rem,4.5vw,3.4rem)] leading-[0.92]"
-            >
-              <HighlightMark>{IDENTITY.name}</HighlightMark>
-            </h1>
+              <h1
+                className="max-w-[12ch] font-semibold tracking-[-0.04em] text-[clamp(2rem,4.5vw,3.4rem)] leading-[0.92]"
+              >
+                <HighlightMark>{IDENTITY.name}</HighlightMark>
+              </h1>
 
-            <p className={`${portal.label} mt-4`}>
-              Currently at {IDENTITY.studio}
-            </p>
+              <p className={`${portal.label} mt-4`}>
+                Currently at {IDENTITY.studio}
+              </p>
 
-            <p
-              className={`${portal.status} mt-4`}
-              data-available={IDENTITY.available ? 'true' : 'false'}
-              aria-label={`Status: ${statusLabel}`}
-            >
-              <span className={portal.statusDot} aria-hidden />
-              <span className={`${portal.mono} text-[10px]`}>{statusLabel}</span>
-            </p>
+              <p
+                className={`${portal.status} mt-4`}
+                data-available={IDENTITY.available ? 'true' : 'false'}
+                aria-label={`Status: ${statusLabel}`}
+              >
+                <span className={portal.statusDot} aria-hidden />
+                <span className={`${portal.mono} text-[10px]`}>{statusLabel}</span>
+              </p>
 
-            <SocialLinks className="mt-2" />
-          </PortalStagger>
-        </div>
+              <SocialLinks className="mt-2" />
+            </PortalStagger>
+          </div>
+
+          <motion.div
+            className={portal.heroPortraitDock}
+            initial={prefersReduced ? false : { opacity: 0, scale: 0.92, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: prefersReduced ? 0 : 0.58, ease, delay: prefersReduced ? 0 : 0.12 }}
+          >
+            <AsciiImage
+              src={IDENTITY.avatar}
+              alt={IDENTITY.displayName}
+              aspect="3 / 4"
+              className={portal.heroPortrait}
+            />
+          </motion.div>
+        </>
       )}
 
       <div className={portal.chamber} data-open={open ? 'true' : 'false'} data-side={openSide}>

@@ -25,6 +25,11 @@ uniform float uGlyphGain;
 uniform float uCell;
 uniform sampler2D uAtlas;
 uniform float uAtlasLen;
+/* Click starquakes: xy = uv, z = age (s), w = strength (0 = dead) */
+uniform vec4 uRipple0;
+uniform vec4 uRipple1;
+uniform vec4 uRipple2;
+uniform float uRippleMotion; /* 1 = expand+warp, 0 = static flash only */
 
 varying vec2 vUv;
 
@@ -88,12 +93,45 @@ float accentBolt(vec2 q, float t, float w) {
   return lines * rush * exp(-r * 0.9) * w * 0.35;
 }
 
+vec2 rippleOrigin(vec4 r, float aspect) {
+  return (r.xy * 2.0 - 1.0) * vec2(aspect, 1.0);
+}
+
+/* Expanding ring + core bloom. Also writes outward push into warpAccum. */
+float starquake(vec2 q, vec4 r, float aspect, float motion, inout vec2 warpAccum) {
+  if (r.w < 0.01) return 0.0;
+  vec2 toR = q - rippleOrigin(r, aspect);
+  float dist = length(toR);
+  float age = r.z;
+  float life = 1.0 - smoothstep(0.0, 1.65, age);
+  if (life < 0.01) return 0.0;
+
+  float core = exp(-dist * dist * 10.0) * exp(-age * 4.2) * 0.42;
+
+  float ring = 0.0;
+  if (motion > 0.5) {
+    float radius = age * 0.92;
+    ring = exp(-abs(dist - radius) * 16.0) * life;
+    /* Second harmonic — thinner trailing crest */
+    float radius2 = age * 0.92 * 0.55;
+    ring += exp(-abs(dist - radius2) * 22.0) * life * 0.35;
+    float push = ring * 0.028 * r.w;
+    if (dist > 1e-4) warpAccum += (toR / dist) * push;
+  }
+
+  /* Glyph scramble near the crest — denser ASCII cells */
+  float scatter = hash(floor(q * 40.0) + floor(age * 12.0)) * ring * 0.22;
+
+  return (core + ring * 0.62 + scatter) * r.w;
+}
+
 void main() {
   vec2 frag = gl_FragCoord.xy;
   float cell = max(uCell, 10.0);
   vec2 grid = floor(frag / cell);
   vec2 cellUv = fract(frag / cell);
   vec2 res = uRes;
+  float aspect = res.x / res.y;
   vec2 p = ((grid + 0.5) * cell - 0.5 * res) / res.y;
 
   float t = uTime;
@@ -105,6 +143,15 @@ void main() {
   vec2 warped = warpBolt(q, travel);
   vec2 samplePos = mix(q, warped, smoothstep(0.0, 0.75, travel));
 
+  vec2 rippleWarp = vec2(0.0);
+  float quake = 0.0;
+  if (travel < 0.55) {
+    quake += starquake(q, uRipple0, aspect, uRippleMotion, rippleWarp);
+    quake += starquake(q, uRipple1, aspect, uRippleMotion, rippleWarp);
+    quake += starquake(q, uRipple2, aspect, uRippleMotion, rippleWarp);
+    samplePos += rippleWarp;
+  }
+
   float d = cosmos(samplePos, t);
   if (land > 0.02) {
     float landMix = land * (1.0 - smoothstep(0.35, 0.85, travel));
@@ -114,11 +161,12 @@ void main() {
   }
 
   if (travel > 0.05) d += accentBolt(warped, t, travel);
-  d = clamp(d, 0.0, 0.82);
+  d += quake;
+  d = clamp(d, 0.0, 0.92);
 
-  // Pointer ripple — works on surface + landed (blocked only mid-tunnel)
+  // Pointer glow — surface + landed (blocked only mid-tunnel)
   if (travel < 0.45 && uPointerActive > 0.5) {
-    vec2 toP = q - (uPointer * 2.0 - 1.0) * vec2(uRes.x / uRes.y, 1.0);
+    vec2 toP = q - (uPointer * 2.0 - 1.0) * vec2(aspect, 1.0);
     float falloff = exp(-dot(toP, toP) * 3.2);
     d += falloff * 0.11;
   }

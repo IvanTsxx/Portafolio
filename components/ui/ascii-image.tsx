@@ -26,8 +26,8 @@ type FrameMetrics = {
 const MONO_ADVANCE = 0.6
 
 function metricsFromBox(width: number, height: number): FrameMetrics {
-  const cols = Math.max(32, Math.round(width / 7))
-  const rows = Math.max(16, Math.round(height / 8))
+  const cols = Math.max(18, Math.round(width / 7))
+  const rows = Math.max(12, Math.round(height / 8))
   return {
     cols,
     rows,

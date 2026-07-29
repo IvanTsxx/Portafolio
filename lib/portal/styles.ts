@@ -109,6 +109,16 @@ export const portal = {
     'data-[side=right]:right-[clamp(1.25rem,6vw,8%)] data-[side=right]:left-auto',
   ].join(' '),
 
+  /** Portrait dock — right edge; clears chrome controls */
+  heroPortraitDock: [
+    'absolute z-20 pointer-events-auto',
+    'top-[min(18vh,7.5rem)] right-[clamp(1.25rem,5vw,7%)]',
+    'md:top-[min(22vh,10rem)]',
+  ].join(' '),
+
+  /** Hero portrait — ASCII rest, photo on hover (same as lab) */
+  heroPortrait: 'w-[min(5.75rem,30vw)] md:w-[min(11rem,20vw)]',
+
   eyebrow: 'inline-flex items-center gap-[0.55rem]',
   eyebrowMark: 'inline-flex shrink-0 text-p-signal',
 
