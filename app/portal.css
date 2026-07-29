@@ -56,7 +56,7 @@ html.light .portal-shell {
 
 /* Inline code + fenced blocks → app/notes-code.css */
 
-/* GFM tables — monochrome hairline grid */
+/* GFM tables — ink-tint frame (no void/white slab) */
 .typeset-notes :where(table) {
   width: 100%;
   border-collapse: collapse;
@@ -64,10 +64,13 @@ html.light .portal-shell {
   font-size: 14px;
   display: block;
   overflow-x: auto;
+  border: 1px solid color-mix(in oklab, var(--color-p-bright) 14%, transparent);
+  background: color-mix(in oklab, var(--color-p-bright) 4%, transparent);
+  text-shadow: 0 0 12px var(--color-p-void);
 }
 
 .typeset-notes :where(thead) {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid color-mix(in oklab, var(--color-p-bright) 14%, transparent);
 }
 
 .typeset-notes :where(th) {
@@ -618,5 +621,937 @@ html.light .portal-shell .portal-signal-node {
   .portal-signal-link {
     animation: none;
     opacity: 0.9;
+  }
+}
+
+/* ─── Notes: cache entry life-cycle diagram ─── */
+.cache-flow {
+  --cf-line: color-mix(in oklab, var(--color-p-bright) 24%, transparent);
+  --cf-fill: color-mix(in oklab, var(--color-p-bright) 5%, transparent);
+  --cf-fill-hot: color-mix(in oklab, var(--color-p-bright) 11%, transparent);
+  --cf-signal-line: color-mix(in oklab, var(--color-p-signal) 70%, transparent);
+  --cf-signal-fill: color-mix(in oklab, var(--color-p-signal) 14%, transparent);
+  --cf-ink: var(--color-p-bright);
+  --cf-mid: var(--color-p-mid);
+  --cf-dim: var(--color-p-dim);
+}
+
+.cache-flow-track {
+  stroke: var(--cf-line);
+}
+
+.cache-flow-progress {
+  stroke: var(--cf-signal-line);
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  stroke-linecap: round;
+}
+
+.cache-flow-phase>rect {
+  fill: var(--cf-fill);
+  stroke: var(--cf-line);
+  transition:
+    fill 280ms cubic-bezier(0.16, 1, 0.3, 1),
+    stroke 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cache-flow-phase>text:first-of-type {
+  fill: var(--cf-ink);
+}
+
+.cache-flow-phase>text:last-of-type {
+  fill: var(--cf-mid);
+}
+
+.cache-flow-node {
+  fill: var(--cf-line);
+}
+
+.cache-flow-node-end {
+  fill: var(--cf-ink);
+}
+
+.cache-flow-tick {
+  stroke: var(--cf-line);
+}
+
+.cache-flow-label {
+  fill: var(--cf-dim);
+}
+
+.cache-flow-loop {
+  stroke: var(--cf-mid);
+  opacity: 0.55;
+}
+
+.cache-flow-loop-head {
+  fill: var(--cf-mid);
+  opacity: 0.55;
+}
+
+.cache-flow-loop-label {
+  fill: var(--cf-mid);
+  opacity: 0.85;
+}
+
+.cache-flow-token {
+  fill: var(--color-p-signal);
+  cx: 40px;
+  cy: 96px;
+}
+
+.cache-flow-token-ring {
+  stroke: color-mix(in oklab, var(--color-p-signal) 45%, transparent);
+  fill: none;
+  opacity: 0;
+  cx: 40px;
+  cy: 96px;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Lifecycle sequence — only while in view */
+.cache-flow[data-animating] .cache-flow-progress {
+  animation: cache-flow-progress 9s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.cache-flow[data-animating] .cache-flow-token {
+  animation: cache-flow-token 9s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.cache-flow[data-animating] .cache-flow-token-ring {
+  animation: cache-flow-ring 9s ease-out infinite;
+}
+
+.cache-flow[data-animating] .cache-flow-phase[data-phase='stale']>rect {
+  animation: cache-flow-phase-stale 9s ease-in-out infinite;
+}
+
+.cache-flow[data-animating] .cache-flow-phase[data-phase='revalidating']>rect {
+  animation: cache-flow-phase-revalidating 9s ease-in-out infinite;
+}
+
+.cache-flow[data-animating] .cache-flow-phase[data-phase='expired']>rect {
+  animation: cache-flow-phase-expired 9s ease-in-out infinite;
+}
+
+.cache-flow[data-animating] .cache-flow-loop,
+.cache-flow[data-animating] .cache-flow-loop-head,
+.cache-flow[data-animating] .cache-flow-loop-label {
+  animation: cache-flow-loop 9s ease-in-out infinite;
+}
+
+@keyframes cache-flow-progress {
+
+  0%,
+  8% {
+    stroke-dashoffset: 100;
+  }
+
+  28% {
+    stroke-dashoffset: 69;
+    /* ~stale boundary */
+  }
+
+  52% {
+    stroke-dashoffset: 32;
+    /* ~revalidate boundary */
+  }
+
+  72%,
+  88% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes cache-flow-token {
+
+  0%,
+  8% {
+    cx: 40px;
+    cy: 96px;
+    opacity: 1;
+  }
+
+  28% {
+    cx: 240px;
+    cy: 96px;
+  }
+
+  40%,
+  48% {
+    cx: 368px;
+    cy: 96px;
+  }
+
+  54% {
+    cx: 310px;
+    cy: 42px;
+  }
+
+  60% {
+    cx: 252px;
+    cy: 72px;
+  }
+
+  66% {
+    cx: 140px;
+    cy: 96px;
+  }
+
+  72% {
+    cx: 478px;
+    cy: 96px;
+  }
+
+  86% {
+    cx: 680px;
+    cy: 96px;
+    opacity: 1;
+  }
+
+  94%,
+  100% {
+    cx: 680px;
+    cy: 96px;
+    opacity: 0;
+  }
+}
+
+@keyframes cache-flow-ring {
+
+  0%,
+  38% {
+    cx: 368px;
+    cy: 96px;
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  42%,
+  48% {
+    cx: 368px;
+    cy: 96px;
+    opacity: 0.85;
+    transform: scale(1.15);
+  }
+
+  56% {
+    cx: 368px;
+    cy: 96px;
+    opacity: 0;
+    transform: scale(1.45);
+  }
+
+  66%,
+  100% {
+    cx: 368px;
+    cy: 96px;
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes cache-flow-phase-stale {
+
+  0%,
+  8%,
+  100% {
+    fill: var(--cf-fill);
+    stroke: var(--cf-line);
+  }
+
+  12%,
+  32%,
+  60%,
+  68% {
+    fill: var(--cf-fill-hot);
+    stroke: color-mix(in oklab, var(--color-p-bright) 40%, transparent);
+  }
+
+  40%,
+  52%,
+  74% {
+    fill: var(--cf-fill);
+    stroke: var(--cf-line);
+  }
+}
+
+@keyframes cache-flow-phase-revalidating {
+
+  0%,
+  28%,
+  66%,
+  100% {
+    fill: var(--cf-fill);
+    stroke: var(--cf-line);
+  }
+
+  34%,
+  58% {
+    fill: var(--cf-signal-fill);
+    stroke: var(--cf-signal-line);
+  }
+}
+
+@keyframes cache-flow-phase-expired {
+
+  0%,
+  68%,
+  100% {
+    fill: var(--cf-fill);
+    stroke: var(--cf-line);
+  }
+
+  74%,
+  90% {
+    fill: var(--cf-fill-hot);
+    stroke: color-mix(in oklab, var(--color-p-bright) 42%, transparent);
+  }
+}
+
+@keyframes cache-flow-loop {
+
+  0%,
+  38%,
+  66%,
+  100% {
+    opacity: 0.35;
+  }
+
+  44%,
+  56% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cache-flow[data-animating] .cache-flow-progress,
+  .cache-flow[data-animating] .cache-flow-token,
+  .cache-flow[data-animating] .cache-flow-token-ring,
+  .cache-flow[data-animating] .cache-flow-phase>rect,
+  .cache-flow[data-animating] .cache-flow-loop,
+  .cache-flow[data-animating] .cache-flow-loop-head,
+  .cache-flow[data-animating] .cache-flow-loop-label {
+    animation: none;
+  }
+
+  .cache-flow-token {
+    opacity: 0;
+  }
+
+  .cache-flow-progress {
+    stroke-dashoffset: 0;
+    opacity: 0.35;
+  }
+
+  .cache-flow-phase[data-phase='stale']>rect {
+    fill: var(--cf-fill-hot);
+  }
+
+  .cache-flow-phase[data-phase='revalidating']>rect {
+    fill: var(--cf-signal-fill);
+    stroke: var(--cf-signal-line);
+  }
+
+  .cache-flow-phase[data-phase='expired']>rect {
+    fill: var(--cf-fill-hot);
+  }
+
+  .cache-flow-loop,
+  .cache-flow-loop-head,
+  .cache-flow-loop-label {
+    opacity: 0.85;
+  }
+}
+
+/* ─── Notes: content types serve rails ─── */
+.content-types {
+  --ct-line: color-mix(in oklab, var(--color-p-bright) 22%, transparent);
+  --ct-ink: var(--color-p-bright);
+  --ct-dim: var(--color-p-dim);
+  --ct-signal: var(--color-p-signal);
+  --ct-signal-line: color-mix(in oklab, var(--color-p-signal) 72%, transparent);
+}
+
+.content-type-track {
+  stroke: var(--ct-line);
+}
+
+.content-type-fill {
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+.content-type-fill-static {
+  stroke: var(--ct-ink);
+}
+
+.content-type-fill-cached {
+  stroke: var(--ct-signal-line);
+}
+
+.content-type-fill-dynamic {
+  stroke: var(--ct-signal-line);
+  stroke-dasharray: 6 5;
+  stroke-dashoffset: 0;
+  opacity: 0.55;
+}
+
+.content-type-node {
+  fill: var(--ct-line);
+}
+
+.content-type-node-end {
+  fill: var(--ct-ink);
+}
+
+.content-type-node-cache {
+  fill: color-mix(in oklab, var(--color-p-signal) 55%, transparent);
+  stroke: var(--ct-signal);
+  stroke-width: 1;
+}
+
+.content-type-loop {
+  stroke: var(--ct-signal-line);
+  opacity: 0.4;
+}
+
+.content-type-token {
+  fill: var(--ct-signal);
+  opacity: 0;
+  cx: 16px;
+  cy: 22px;
+}
+
+.content-type-rail-label {
+  fill: var(--ct-dim);
+}
+
+.content-types[data-animating] .content-type-fill-static {
+  animation: content-type-static-fill 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.content-types[data-animating] .content-type-fill-cached {
+  animation: content-type-cached-fill 4.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.content-types[data-animating] .content-type-token-cached {
+  animation: content-type-cached-token 4.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.content-types[data-animating] .content-type-node-cache {
+  animation: content-type-cache-pulse 4.8s ease-in-out infinite;
+}
+
+.content-types[data-animating] .content-type-loop {
+  animation: content-type-loop 4.8s ease-in-out infinite;
+}
+
+.content-types[data-animating] .content-type-fill-dynamic {
+  animation: content-type-dynamic-dash 1.1s linear infinite;
+}
+
+.content-types[data-animating] .content-type-token-dynamic {
+  animation: content-type-dynamic-token 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes content-type-static-fill {
+
+  0%,
+  12% {
+    stroke-dashoffset: 100;
+  }
+
+  28%,
+  82% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes content-type-cached-fill {
+
+  0%,
+  10% {
+    stroke-dashoffset: 100;
+  }
+
+  28% {
+    stroke-dashoffset: 50;
+  }
+
+  42%,
+  58% {
+    stroke-dashoffset: 50;
+  }
+
+  72%,
+  88% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes content-type-cached-token {
+
+  0%,
+  10% {
+    cx: 16px;
+    opacity: 1;
+  }
+
+  28%,
+  42% {
+    cx: 140px;
+    opacity: 1;
+  }
+
+  50% {
+    cx: 118px;
+    opacity: 0.85;
+  }
+
+  58% {
+    cx: 140px;
+    opacity: 1;
+  }
+
+  72%,
+  88% {
+    cx: 264px;
+    opacity: 1;
+  }
+
+  96%,
+  100% {
+    cx: 264px;
+    opacity: 0;
+  }
+}
+
+@keyframes content-type-cache-pulse {
+
+  0%,
+  24%,
+  62%,
+  100% {
+    fill: color-mix(in oklab, var(--color-p-signal) 40%, transparent);
+  }
+
+  36%,
+  50% {
+    fill: color-mix(in oklab, var(--color-p-signal) 75%, transparent);
+  }
+}
+
+@keyframes content-type-loop {
+
+  0%,
+  28%,
+  62%,
+  100% {
+    opacity: 0.25;
+  }
+
+  40%,
+  54% {
+    opacity: 1;
+  }
+}
+
+@keyframes content-type-dynamic-dash {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+
+@keyframes content-type-dynamic-token {
+
+  0%,
+  8% {
+    cx: 16px;
+    opacity: 1;
+  }
+
+  45% {
+    cx: 140px;
+    opacity: 1;
+  }
+
+  82% {
+    cx: 264px;
+    opacity: 1;
+  }
+
+  92%,
+  100% {
+    cx: 264px;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .content-types[data-animating] .content-type-fill-static,
+  .content-types[data-animating] .content-type-fill-cached,
+  .content-types[data-animating] .content-type-fill-dynamic,
+  .content-types[data-animating] .content-type-token-cached,
+  .content-types[data-animating] .content-type-token-dynamic,
+  .content-types[data-animating] .content-type-node-cache,
+  .content-types[data-animating] .content-type-loop {
+    animation: none;
+  }
+
+  .content-type-token {
+    opacity: 0;
+  }
+
+  .content-type-fill-static,
+  .content-type-fill-cached {
+    stroke-dashoffset: 0;
+    opacity: 0.7;
+  }
+
+  .content-type-fill-dynamic {
+    opacity: 0.7;
+    stroke-dashoffset: 0;
+  }
+
+  .content-type-loop {
+    opacity: 0.75;
+  }
+
+  .content-type-node-cache {
+    fill: color-mix(in oklab, var(--color-p-signal) 65%, transparent);
+  }
+}
+
+/* ─── Notes: cacheLife profiles table ─── */
+.cache-life-rail-track {
+  fill: color-mix(in oklab, var(--color-p-bright) 10%, transparent);
+}
+
+.cache-life-rail-stale,
+.cache-life-rail-revalidate,
+.cache-life-rail-expire {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.cache-life-rail-stale {
+  fill: color-mix(in oklab, var(--color-p-bright) 35%, transparent);
+}
+
+.cache-life-rail-revalidate {
+  fill: color-mix(in oklab, var(--color-p-signal) 55%, transparent);
+}
+
+.cache-life-rail-expire {
+  fill: color-mix(in oklab, var(--color-p-bright) 18%, transparent);
+}
+
+.cache-life-profiles[data-animating] .cache-life-rail-stale {
+  animation: cache-life-grow 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards;
+}
+
+.cache-life-profiles[data-animating] .cache-life-rail-revalidate {
+  animation: cache-life-grow 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.22s forwards;
+}
+
+.cache-life-profiles[data-animating] .cache-life-rail-expire {
+  animation: cache-life-grow 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+}
+
+@keyframes cache-life-grow {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cache-life-profiles[data-animating] .cache-life-rail-stale,
+  .cache-life-profiles[data-animating] .cache-life-rail-revalidate,
+  .cache-life-profiles[data-animating] .cache-life-rail-expire {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+/* ─── Notes: invalidation compare rails ─── */
+.invalidation-compare {
+  --iv-line: color-mix(in oklab, var(--color-p-bright) 22%, transparent);
+  --iv-ink: var(--color-p-bright);
+  --iv-dim: var(--color-p-dim);
+  --iv-signal: var(--color-p-signal);
+  --iv-signal-line: color-mix(in oklab, var(--color-p-signal) 72%, transparent);
+}
+
+.invalidation-track {
+  stroke: var(--iv-line);
+}
+
+.invalidation-fill {
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+.invalidation-fill-eventual {
+  stroke: var(--iv-signal-line);
+}
+
+.invalidation-fill-strong {
+  stroke: var(--iv-ink);
+}
+
+.invalidation-cut {
+  stroke: var(--iv-signal-line);
+  opacity: 0.55;
+}
+
+.invalidation-node {
+  fill: var(--iv-line);
+}
+
+.invalidation-node-mid {
+  fill: color-mix(in oklab, var(--color-p-signal) 50%, transparent);
+  stroke: var(--iv-signal);
+  stroke-width: 1;
+}
+
+.invalidation-node-end {
+  fill: var(--iv-ink);
+}
+
+.invalidation-loop {
+  stroke: var(--iv-signal-line);
+  opacity: 0.35;
+}
+
+.invalidation-token {
+  fill: var(--iv-signal);
+  opacity: 0;
+  cx: 16px;
+  cy: 18px;
+}
+
+.invalidation-label {
+  fill: var(--iv-dim);
+}
+
+.invalidation-compare[data-animating] .invalidation-fill-eventual {
+  animation: invalidation-eventual-fill 4.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.invalidation-compare[data-animating] .invalidation-token-eventual {
+  animation: invalidation-eventual-token 4.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.invalidation-compare[data-animating] .invalidation-loop,
+.invalidation-compare[data-animating] .invalidation-node-mid {
+  animation: invalidation-loop 4.6s ease-in-out infinite;
+}
+
+.invalidation-compare[data-animating] .invalidation-fill-strong {
+  animation: invalidation-strong-fill 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.invalidation-compare[data-animating] .invalidation-token-strong {
+  animation: invalidation-strong-token 3.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.invalidation-compare[data-animating] .invalidation-cut {
+  animation: invalidation-cut 3.2s ease-in-out infinite;
+}
+
+@keyframes invalidation-eventual-fill {
+
+  0%,
+  12% {
+    stroke-dashoffset: 100;
+  }
+
+  32% {
+    stroke-dashoffset: 48;
+  }
+
+  48%,
+  58% {
+    stroke-dashoffset: 48;
+  }
+
+  78%,
+  90% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes invalidation-eventual-token {
+
+  0%,
+  12% {
+    cx: 16px;
+    opacity: 1;
+  }
+
+  32%,
+  48% {
+    cx: 150px;
+    opacity: 1;
+  }
+
+  54% {
+    cx: 128px;
+    opacity: 0.85;
+  }
+
+  60% {
+    cx: 150px;
+    opacity: 1;
+  }
+
+  78%,
+  90% {
+    cx: 264px;
+    opacity: 1;
+  }
+
+  96%,
+  100% {
+    cx: 264px;
+    opacity: 0;
+  }
+}
+
+@keyframes invalidation-loop {
+
+  0%,
+  28%,
+  62%,
+  100% {
+    opacity: 0.3;
+  }
+
+  40%,
+  54% {
+    opacity: 1;
+  }
+}
+
+@keyframes invalidation-strong-fill {
+
+  0%,
+  10% {
+    stroke-dashoffset: 100;
+  }
+
+  28% {
+    stroke-dashoffset: 50;
+  }
+
+  36%,
+  48% {
+    stroke-dashoffset: 50;
+  }
+
+  68%,
+  86% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes invalidation-strong-token {
+
+  0%,
+  10% {
+    cx: 16px;
+    opacity: 1;
+  }
+
+  28%,
+  42% {
+    cx: 140px;
+    opacity: 1;
+  }
+
+  68%,
+  86% {
+    cx: 264px;
+    opacity: 1;
+  }
+
+  94%,
+  100% {
+    cx: 264px;
+    opacity: 0;
+  }
+}
+
+@keyframes invalidation-cut {
+
+  0%,
+  22%,
+  100% {
+    opacity: 0.25;
+  }
+
+  30%,
+  48% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .invalidation-compare[data-animating] .invalidation-fill-eventual,
+  .invalidation-compare[data-animating] .invalidation-fill-strong,
+  .invalidation-compare[data-animating] .invalidation-token-eventual,
+  .invalidation-compare[data-animating] .invalidation-token-strong,
+  .invalidation-compare[data-animating] .invalidation-loop,
+  .invalidation-compare[data-animating] .invalidation-node-mid,
+  .invalidation-compare[data-animating] .invalidation-cut {
+    animation: none;
+  }
+
+  .invalidation-token {
+    opacity: 0;
+  }
+
+  .invalidation-fill-eventual,
+  .invalidation-fill-strong {
+    stroke-dashoffset: 0;
+    opacity: 0.7;
+  }
+
+  .invalidation-loop,
+  .invalidation-cut {
+    opacity: 0.75;
   }
 }

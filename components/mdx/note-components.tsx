@@ -37,7 +37,7 @@ function Callout({
 
   return (
     <aside
-      className={`not-typeset mt-[1.35em] border bg-p-void/88 p-4 text-p-mid [text-shadow:0_0_12px_var(--color-p-void)] ${border}`}
+      className={`not-typeset mt-[1.35em] border bg-p-bright/4 p-4 text-p-mid [text-shadow:0_0_12px_var(--color-p-void)] ${border}`}
       role="note"
     >
       {title ? (

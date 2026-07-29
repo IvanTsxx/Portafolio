@@ -1,6 +1,10 @@
 // components/mdx/cache-flow-diagram.tsx
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
+import { cn } from '@/lib/utils'
+import { portal } from '@/lib/portal/styles'
+
 export interface CacheFlowDiagramProps {
   title: string
   ariaLabel: string
@@ -13,6 +17,12 @@ export interface CacheFlowDiagramProps {
   legendExpire: string
 }
 
+const LEGEND = [
+  { key: 'stale', swatch: 'bg-p-bright/18 border-p-bright/40' },
+  { key: 'revalidate', swatch: 'bg-p-signal/25 border-p-signal/55' },
+  { key: 'expire', swatch: 'bg-p-bright/32 border-p-bright/55' },
+] as const
+
 export function CacheFlowDiagram({
   title,
   ariaLabel,
@@ -24,98 +34,275 @@ export function CacheFlowDiagram({
   legendRevalidate,
   legendExpire,
 }: CacheFlowDiagramProps) {
-  // Monochrome strokes — CSS currentColor inherits portal bright/dim via fill/stroke attrs.
-  const line = 'color-mix(in oklab, var(--color-p-bright) 22%, transparent)'
-  const fill = 'color-mix(in oklab, var(--color-p-bright) 6%, transparent)'
-  const bright = 'var(--color-p-bright)'
-  const mid = 'var(--color-p-mid)'
-  const dim = 'var(--color-p-dim)'
+  const rootRef = useRef<HTMLElement>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = rootRef.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.35 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  const legendLabels = [legendStale, legendRevalidate, legendExpire]
 
   return (
-    <div className="not-typeset my-6 overflow-x-auto border border-p-bright/14 bg-p-void/88 p-6">
-      <p className="mb-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-p-dim">
-        {title}
-      </p>
+    <figure
+      ref={rootRef}
+      data-animating={inView ? '' : undefined}
+      className={cn(
+        'cache-flow not-typeset my-6 overflow-x-auto',
+        'border border-p-bright/14 bg-p-bright/4 p-5 sm:p-6',
+        '[text-shadow:0_0_12px_var(--color-p-void)]',
+      )}
+    >
+      <figcaption className={cn(portal.label, 'mb-4')}>{title}</figcaption>
+
       <svg
-        viewBox="0 0 720 180"
+        viewBox="0 0 720 188"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full max-w-none"
+        className="cache-flow-svg w-full max-w-none"
         role="img"
         aria-label={ariaLabel}
       >
-        <line x1="40" y1="90" x2="680" y2="90" stroke={line} strokeWidth="1.5" />
+        {/* Baseline track */}
+        <line
+          className="cache-flow-track"
+          x1="40"
+          y1="96"
+          x2="680"
+          y2="96"
+          strokeWidth="1.5"
+        />
+        <line
+          className="cache-flow-progress"
+          x1="40"
+          y1="96"
+          x2="680"
+          y2="96"
+          strokeWidth="1.5"
+          pathLength={100}
+        />
 
-        <rect x="40" y="68" width="200" height="44" fill={fill} stroke={line} strokeWidth="1" strokeDasharray="4 2" />
-        <text x="140" y="86" textAnchor="middle" fontSize="11" fill={bright} fontFamily="monospace" fontWeight="600">
-          STALE
-        </text>
-        <text x="140" y="103" textAnchor="middle" fontSize="10" fill={mid} fontFamily="monospace">
-          {staleDesc}
-        </text>
+        {/* Phase panels */}
+        <g className="cache-flow-phase" data-phase="stale">
+          <rect
+            x="40"
+            y="72"
+            width="200"
+            height="48"
+            strokeWidth="1"
+            strokeDasharray="4 2"
+          />
+          <text
+            x="140"
+            y="92"
+            textAnchor="middle"
+            fontSize="11"
+            fontFamily="ui-monospace, monospace"
+            fontWeight="600"
+          >
+            STALE
+          </text>
+          <text
+            x="140"
+            y="108"
+            textAnchor="middle"
+            fontSize="10"
+            fontFamily="ui-monospace, monospace"
+          >
+            {staleDesc}
+          </text>
+        </g>
 
-        <rect x="258" y="68" width="220" height="44" fill={fill} stroke={line} strokeWidth="1" strokeDasharray="4 2" />
-        <text x="368" y="86" textAnchor="middle" fontSize="11" fill={bright} fontFamily="monospace" fontWeight="600">
-          REVALIDATING
-        </text>
-        <text x="368" y="103" textAnchor="middle" fontSize="10" fill={mid} fontFamily="monospace">
-          {revalidatingDesc}
-        </text>
+        <g className="cache-flow-phase" data-phase="revalidating">
+          <rect
+            x="258"
+            y="72"
+            width="220"
+            height="48"
+            strokeWidth="1"
+            strokeDasharray="4 2"
+          />
+          <text
+            x="368"
+            y="92"
+            textAnchor="middle"
+            fontSize="11"
+            fontFamily="ui-monospace, monospace"
+            fontWeight="600"
+          >
+            REVALIDATING
+          </text>
+          <text
+            x="368"
+            y="108"
+            textAnchor="middle"
+            fontSize="10"
+            fontFamily="ui-monospace, monospace"
+          >
+            {revalidatingDesc}
+          </text>
+        </g>
 
-        <rect x="496" y="68" width="184" height="44" fill={fill} stroke={line} strokeWidth="1" strokeDasharray="4 2" />
-        <text x="588" y="86" textAnchor="middle" fontSize="11" fill={bright} fontFamily="monospace" fontWeight="600">
-          EXPIRED
-        </text>
-        <text x="588" y="103" textAnchor="middle" fontSize="10" fill={mid} fontFamily="monospace">
-          {expiredDesc}
-        </text>
+        <g className="cache-flow-phase" data-phase="expired">
+          <rect
+            x="496"
+            y="72"
+            width="184"
+            height="48"
+            strokeWidth="1"
+            strokeDasharray="4 2"
+          />
+          <text
+            x="588"
+            y="92"
+            textAnchor="middle"
+            fontSize="11"
+            fontFamily="ui-monospace, monospace"
+            fontWeight="600"
+          >
+            EXPIRED
+          </text>
+          <text
+            x="588"
+            y="108"
+            textAnchor="middle"
+            fontSize="10"
+            fontFamily="ui-monospace, monospace"
+          >
+            {expiredDesc}
+          </text>
+        </g>
 
-        <circle cx="40" cy="90" r="5" fill={bright} />
-        <text x="40" y="140" textAnchor="middle" fontSize="9" fill={dim} fontFamily="monospace">
+        {/* Markers */}
+        <circle className="cache-flow-node-end" cx="40" cy="96" r="5" />
+        <text
+          className="cache-flow-label"
+          x="40"
+          y="146"
+          textAnchor="middle"
+          fontSize="9"
+          fontFamily="ui-monospace, monospace"
+        >
           First
         </text>
-        <text x="40" y="151" textAnchor="middle" fontSize="9" fill={dim} fontFamily="monospace">
+        <text
+          className="cache-flow-label"
+          x="40"
+          y="157"
+          textAnchor="middle"
+          fontSize="9"
+          fontFamily="ui-monospace, monospace"
+        >
           render
         </text>
 
-        <circle cx="240" cy="90" r="4" fill={line} />
-        <line x1="240" y1="62" x2="240" y2="90" stroke={line} strokeWidth="1" strokeDasharray="3 2" />
-        <text x="240" y="52" textAnchor="middle" fontSize="9" fill={dim} fontFamily="monospace">
+        <circle className="cache-flow-node" cx="240" cy="96" r="4" />
+        <line
+          className="cache-flow-tick"
+          x1="240"
+          y1="66"
+          x2="240"
+          y2="96"
+          strokeWidth="1"
+          strokeDasharray="3 2"
+        />
+        <text
+          className="cache-flow-label"
+          x="240"
+          y="56"
+          textAnchor="middle"
+          fontSize="9"
+          fontFamily="ui-monospace, monospace"
+        >
           stale
         </text>
 
-        <circle cx="478" cy="90" r="4" fill={line} />
-        <line x1="478" y1="62" x2="478" y2="90" stroke={line} strokeWidth="1" strokeDasharray="3 2" />
-        <text x="478" y="52" textAnchor="middle" fontSize="9" fill={dim} fontFamily="monospace">
+        <circle className="cache-flow-node" cx="478" cy="96" r="4" />
+        <line
+          className="cache-flow-tick"
+          x1="478"
+          y1="66"
+          x2="478"
+          y2="96"
+          strokeWidth="1"
+          strokeDasharray="3 2"
+        />
+        <text
+          className="cache-flow-label"
+          x="478"
+          y="56"
+          textAnchor="middle"
+          fontSize="9"
+          fontFamily="ui-monospace, monospace"
+        >
           revalidate
         </text>
 
-        <circle cx="680" cy="90" r="5" fill={bright} />
-        <text x="680" y="140" textAnchor="middle" fontSize="9" fill={dim} fontFamily="monospace">
+        <circle className="cache-flow-node-end" cx="680" cy="96" r="5" />
+        <text
+          className="cache-flow-label"
+          x="680"
+          y="146"
+          textAnchor="middle"
+          fontSize="9"
+          fontFamily="ui-monospace, monospace"
+        >
           expire
         </text>
 
+        {/* Feedback loop: new value → update cache */}
         <path
-          d="M368 68 Q368 28 310 28 Q252 28 252 68"
-          stroke={mid}
-          strokeWidth="1.2"
+          className="cache-flow-loop"
+          d="M368 72 Q368 30 310 30 Q252 30 252 72"
           fill="none"
+          strokeWidth="1.2"
           strokeDasharray="4 2"
-          opacity="0.85"
+          pathLength={100}
         />
-        <polygon points="252,68 248,58 256,60" fill={mid} opacity="0.85" />
-        <text x="310" y="22" textAnchor="middle" fontSize="9" fill={mid} fontFamily="monospace">
+        <polygon
+          className="cache-flow-loop-head"
+          points="252,72 248,62 256,64"
+        />
+        <text
+          className="cache-flow-loop-label"
+          x="310"
+          y="22"
+          textAnchor="middle"
+          fontSize="9"
+          fontFamily="ui-monospace, monospace"
+        >
           {arrowText}
         </text>
+
+        {/* Traveling request token */}
+        <circle className="cache-flow-token" cx="40" cy="96" r="4.5" />
+        <circle
+          className="cache-flow-token-ring"
+          cx="40"
+          cy="96"
+          r="8"
+          fill="none"
+          strokeWidth="1"
+        />
       </svg>
 
-      <div className="mt-4 flex flex-wrap gap-4">
-        {[legendStale, legendRevalidate, legendExpire].map((label) => (
-          <div key={label} className="flex items-center gap-2">
-            <span className="size-2 shrink-0 border border-p-bright/35 bg-p-bright/20" />
-            <span className="text-[11px] text-p-mid">{label}</span>
-          </div>
+      <ul className="mt-4 flex list-none flex-wrap gap-x-5 gap-y-2 p-0">
+        {LEGEND.map((item, i) => (
+          <li key={item.key} className="flex items-center gap-2">
+            <span
+              className={cn('size-2 shrink-0 border', item.swatch)}
+              aria-hidden
+            />
+            <span className="text-2xs text-p-mid">{legendLabels[i]}</span>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </figure>
   )
 }
