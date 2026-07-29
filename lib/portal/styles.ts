@@ -171,6 +171,9 @@ export const portal = {
     'relative z-[2] w-[min(440px,92vw)] border border-p-bright/12 bg-p-void/72',
     'px-2 pt-2.5 pb-1 will-change-[clip-path] backdrop-blur-[14px]',
     'shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-p-void)_50%,transparent),0_18px_48px_color-mix(in_oklab,var(--color-p-void)_55%,transparent)]',
+    // Light: paper slab + heavy blur flattens the ASCII field — keep glass thin
+    'p-light:border-p-bright/8 p-light:bg-p-void/22 p-light:backdrop-blur-[5px]',
+    'p-light:shadow-[0_0_0_1px_color-mix(in_oklab,var(--color-p-bright)_5%,transparent),0_10px_28px_color-mix(in_oklab,var(--color-p-bright)_6%,transparent)]',
   ].join(' '),
 
   wheelDismiss: [
