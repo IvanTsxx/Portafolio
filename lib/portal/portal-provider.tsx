@@ -18,7 +18,7 @@
 'use client'
 
 import * as React from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useReducedMotion } from '@/lib/ascii/hooks/use-reduced-motion'
 import { scrambleFrame }    from './scramble'
 
@@ -75,7 +75,8 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
       abortRef.current = null
     }
 
-    const routeLabel = label ?? href.replace(/^\//, '').replace(/-/g, ' ').toUpperCase() || 'HOME'
+    const routeLabel =
+      label ?? (href.replace(/^\//, '').replace(/-/g, ' ').toUpperCase() || 'HOME')
     let cancelled = false
     navFiredRef.current = false
 

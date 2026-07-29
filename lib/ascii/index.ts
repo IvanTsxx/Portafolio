@@ -9,6 +9,8 @@ export { useAsciiPointer }                    from './hooks/use-ascii-pointer'
 export { useReducedMotion }                   from './hooks/use-reduced-motion'
 export { AsciiCanvas }                        from './components/ascii-canvas'
 export { AsciiRule }                          from './components/ascii-rule'
+export { PhyllotaxisCanvas }                  from './components/phyllotaxis-canvas'
+export { BarnsleyCanvas }                     from './components/barnsley-canvas'
 
 export {
   RAMP_CLASSIC,

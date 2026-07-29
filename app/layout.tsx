@@ -9,6 +9,8 @@ import { Navbar } from '@/components/site/navbar'
 import { Footer } from '@/components/site/footer'
 import { StatusBar } from '@/components/site/status-bar'
 import { ContactPanel } from '@/components/site/contact-panel'
+import { DebugPanel } from '@/components/site/debug-panel'
+import { ChromeGate } from '@/components/site/chrome-gate'
 
 // ─── Fonts ───────────────────────────────────────────────────────────────────
 const geistSans = Geist({
@@ -73,22 +75,23 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} bg-ax-void`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} bg-ax-void`}
     >
       <body className="font-sans antialiased min-h-screen flex flex-col">
         <RafProvider>
           <PortalProvider>
-            {/* Global chrome — RSC, no client boundary at layout level */}
-            <Navbar />
-            <StatusBar />
-            <ContactPanel />
+            <ChromeGate>
+              <Navbar />
+              <StatusBar />
+              <ContactPanel />
+            </ChromeGate>
+            <DebugPanel />
 
-            {/* Page content */}
-            <main className="flex-1">
-              {children}
-            </main>
+            <main className="flex-1">{children}</main>
 
-            <Footer />
+            <ChromeGate>
+              <Footer />
+            </ChromeGate>
           </PortalProvider>
         </RafProvider>
 

@@ -1,7 +1,7 @@
 # AX Portfolio — Frozen Plan
 
 > Source of truth. If code and plan differ, update the plan (or fix the code to match).
-> Last updated: Step 1 complete.
+> Last updated: Steps 1–6 complete · notes switched to MDX RSC.
 
 ---
 
@@ -71,82 +71,105 @@ Portal reparto (sums to ≤ 900ms):
 
 ---
 
-## File Inventory
+## Architecture rules
 
-### Base (Step 1)
-
-- [x] `app/globals.css` — all tokens, @theme, utilities, reduced-motion
-- [x] `app/layout.tsx` — fonts, metadata, site chrome
-- [x] `components/primitives/text.tsx` — polymorphic body text
-- [x] `components/primitives/heading.tsx` — h1/h2/h3 with decoupled visual size
-- [x] `components/primitives/label.tsx` — mono uppercase with index/tone
-- [x] `components/primitives/container.tsx` — max-width, gutter, bleed
-- [x] `components/primitives/stack.tsx` — Stack (col) + Row (row)
-- [x] `components/primitives/frame.tsx` — 1px border card with header/footer slots
-- [x] `components/primitives/field.tsx` — 1px box CTA / kbd
-- [x] `components/primitives/index.ts` — barrel
-- [x] `components/site/navbar.tsx` — floating centered nav
-- [x] `components/site/footer.tsx` — ASCII name + links
-- [x] `components/site/status-bar.tsx` — bottom-left time indicator
-- [x] `components/site/contact-panel.tsx` — bottom-right + panel
-- [x] `components/site/index.ts` — barrel
-- [x] `app/page.tsx` — placeholder (replaced in Step 3)
-
-### ASCII Engine (Step 2)
-
-- [ ] `lib/ascii/utils/mulberry32.ts` — seeded RNG
-- [ ] `lib/ascii/utils/ramps.ts` — all ramp functions
-- [ ] `lib/ascii/hooks/use-raf-provider.tsx` — shared rAF context
-- [ ] `lib/ascii/hooks/use-ascii-grid.ts` — grid dimensions (cols/rows)
-- [ ] `lib/ascii/hooks/use-ascii-field.ts` — field hook (snapshot + rAF mutation)
-- [ ] `lib/ascii/components/ascii-canvas.tsx` — `<pre>` renderer
-- [ ] `lib/ascii/components/ascii-rule.tsx` — 1-row horizontal divider
-- [ ] `lib/ascii/index.ts` — barrel
-- [ ] `docs/ascii-engine.md` — full engine docs
-- [ ] `docs/fase-3.md`
-
-### Phyllotaxis + Index (Step 3)
-
-- [ ] `lib/ascii/fields/phyllotaxis.ts` — buffer algorithm, correct O(cols*rows) per frame
-- [ ] `app/page.tsx` — final home with clip-reveal h1, phyllotaxis background
-- [ ] `docs/fase-4.md`
-
-### Portal (Step 4)
-
-- [ ] `app/_portal-test/page.tsx` — isolated prototype
-- [ ] `components/site/portal-provider.tsx` — PortalProvider + router integration
-- [ ] Portal cancelation on double navigation
-- [ ] Reduced-motion: 120ms crossfade only
-- [ ] `docs/fase-5.md`
-
-### Lab + Explorations (Step 5)
-
-- [ ] `lib/ascii/fields/flow.ts`
-- [ ] `lib/ascii/fields/wave.ts`
-- [ ] `lib/ascii/fields/moire.ts`
-- [ ] `lib/ascii/fields/lissajous.ts`
-- [ ] `lib/ascii/fields/barnsley.ts`
-- [ ] `app/lab/page.tsx` — all explorations
-- [ ] `components/site/debug-panel.tsx` — `~` key toggle
-- [ ] `docs/fase-6.md`
-
-### Content Pages (Step 6)
-
-- [ ] `app/work/page.tsx`
-- [ ] `app/notes/page.tsx`
-- [ ] `app/about/page.tsx`
-- [ ] `content/notes/` — typed block content
+1. **RSC first.** Pages and lists are Server Components. Client only for: portal, ASCII rAF fields, clip-reveal, contact dialog, debug HUD, `PortalLink` leaves.
+2. **Notes = MDX.** `content/notes/*.mdx` + `next-mdx-remote/rsc` (`compileMDX`) + `components/mdx/note-components.tsx`. Custom components stay RSC unless they need interactivity.
+3. **ASCII for live fields, SVG for static marks.** See `docs/ascii-vs-svg.md`.
+4. **Bun** as package manager.
 
 ---
 
-## The Nine Corrections Applied
+## File Inventory
 
-1. Duration scale consolidated to exactly 5 values. 400ms dropped, 200ms → 180ms, 320ms used for wave.
-2. `useAsciiField` returns `{ ref, snapshot, controls }` — no string, no React re-render per frame.
-3. Phyllotaxis uses buffer precalculation: one O(cols×rows) pass per frame after resize.
-4. Scramble reverted from h1. h1 uses clip-path reveal (clip-reveal utility). Scramble: portal route name only.
-5. Renderer scope: `<pre>` only. `MAX_CELLS = 9000`. Canvas branch deferred, documented in ascii-engine.md.
-6. No MDX. Article content is a typed `.tsx` with `{ type, content }` block array.
-7. Hex is source of truth in @theme; OKLCH computed. No OKLCH-only tokens without hex comment.
-8. Documentation uses "chose Motion because…" framing; no framework comparisons.
-9. Added to checklist: debug-panel.tsx, mulberry32, staticFrame() on each field, portal double-navigation cancel.
+### Base (Step 1) — DONE
+
+- [x] `app/globals.css` — all tokens, @theme, utilities, reduced-motion
+- [x] `app/layout.tsx` — fonts, metadata, site chrome, `className="dark"`, providers
+- [x] `components/primitives/*` — Text, Heading, Label, Container, Stack, Row, Frame, Field
+- [x] `components/site/navbar.tsx` — PortalLink nav
+- [x] `components/site/footer.tsx` — ASCII name + PortalLink
+- [x] `components/site/status-bar.tsx`
+- [x] `components/site/contact-panel.tsx`
+
+### ASCII Engine (Step 2) — DONE
+
+- [x] `lib/ascii/utils/mulberry32.ts`
+- [x] `lib/ascii/ramps.ts`
+- [x] `lib/ascii/raf-provider.tsx`
+- [x] `lib/ascii/hooks/*`
+- [x] `lib/ascii/components/ascii-canvas.tsx`
+- [x] `lib/ascii/components/ascii-rule.tsx`
+- [x] `lib/ascii/index.ts`
+- [x] `docs/ascii-engine.md`
+
+### Phyllotaxis + Index (Step 3) — DONE
+
+- [x] `lib/ascii/fields/phyllotaxis.ts`
+- [x] `lib/ascii/components/phyllotaxis-canvas.tsx`
+- [x] `components/transitions/clip-reveal-heading.tsx`
+- [x] `app/page.tsx` — home with clip-reveal + phyllotaxis
+- [x] `docs/fase-4.md`
+
+### Portal (Step 4) — DONE
+
+- [x] `app/portal-test/page.tsx` — harness at `/portal-test` (not `_` private folder)
+- [x] `lib/portal/portal-provider.tsx` — cancelation + reduced-motion
+- [x] `lib/portal/portal-link.tsx` — wired into navbar, footer, home, lists
+- [x] `docs/fase-5.md`
+
+### Lab + Explorations (Step 5) — DONE
+
+- [x] `lib/ascii/fields/{flow,wave,moire,lissajous,barnsley}.ts`
+- [x] `app/lab/page.tsx` (RSC) + `lab-explorations.tsx` (client island)
+- [x] `components/site/debug-panel.tsx` — `~` toggle
+- [x] `docs/fase-6.md`
+
+### Content Pages (Step 6) — DONE
+
+- [x] `app/work/page.tsx` + `app/work/[slug]/page.tsx`
+- [x] `app/notes/page.tsx` + `app/notes/[slug]/page.tsx` (MDX RSC)
+- [x] `app/about/page.tsx` — paper theme
+- [x] `content/notes/*.mdx`
+- [x] `content/work.ts`
+
+### Audit (Fase 3) — PENDING
+
+- [ ] review-animations pass
+- [ ] 12 principles table
+- [ ] acceptance criteria checklist
+
+### Prototype — ASCII home directions (2026-07-28) — SUPERSEDED BY HOME
+
+Round 2 picker kept for reference. **Shipping home** is documented in `docs/home.md`.
+
+- [x] Round 1 rejected · Round 2 reactive
+- [x] Promoted: Horizon + lexicon vortex + multi-section home
+- [x] `content/identity.ts` (Tucumán + agent card)
+- [x] `docs/home.md`
+- [ ] Optional: delete `app/prototypes/ascii-home/` when no longer needed
+
+### Home (2026-07-28) — DONE
+
+- [x] `app/page.tsx` — hero + work + origin + agents + close
+- [x] `components/home/*`
+- [x] About page location/agents fields updated
+- [x] `docs/home.md`
+
+---
+
+## Corrections log
+
+1. Duration scale consolidated to exactly 5 values.
+2. `useAsciiField` returns `{ ref, snapshot, controls }` — no React re-render per frame.
+3. Phyllotaxis uses buffer precalculation: O(cols×rows) per frame after resize.
+4. h1 uses clip-path reveal; scramble is portal route name only.
+5. Renderer: `<pre>` only. `MAX_CELLS = 9000`. Canvas deferred.
+6. **Notes use MDX** (`next-mdx-remote/rsc` + custom RSC components). Typed block arrays superseded.
+7. Hex is source of truth in @theme; OKLCH computed.
+8. Documentation uses "chose Motion because…" framing.
+9. debug-panel, mulberry32, staticFrame(), portal double-nav cancel shipped.
+10. `/_portal-test` renamed to `/portal-test` — Next.js `_` folders are private and 404.
+11. Home redesign explored via `/prototypes/ascii-home`. Round 1 (Horizon/Stub/Nebula) rejected. Round 2: Vortex (R3F) / Ripple (Canvas2D) / Chamber (reactive fields). Production home untouched until `keep <variant>`.
+12. Prototype may use Canvas/R3F; production renderer policy still `<pre>` until a promote updates `ascii-vs-svg.md`.
+13. Home promoted (2026-07-28): Horizon split + R3F lexicon vortex (personal words: Tucumán, stack) + full sections. Identity in `content/identity.ts`. WebGL exception for hero spiral only — see `docs/home.md` + `ascii-vs-svg.md`.

@@ -43,9 +43,8 @@ COMPLETA
 
 ## Pendiente en esta fase
 
-- [ ] `components/site/debug-panel.tsx` — ~ key toggle (added to Step 5 checklist)
-- [ ] Dark mode class actually needs to be applied to `<html>` — currently body has no `.dark` class. In Step 1 we chose "always dark" but the @custom-variant uses class-based dark. Add `className="dark"` to `<html>` in layout.tsx.
+- [x] Dark mode class on `<html>` — `className="dark …"` in `layout.tsx`
 
 ## Para el que siga (Cursor)
 
-The design language is set: void/ink/line/dim/mid/bright/paper/signal — 8 colors total, all in `@theme`. Duration scale is 5 values only: micro(90)/state(180)/enter(320)/fade(120)/portal(900). No other values. All primitives are in `components/primitives/` and exported from `index.ts`. The site chrome (Navbar, Footer, StatusBar, ContactPanel) is in `components/site/`. The next step is the ASCII engine in `lib/ascii/`.
+Steps 2–6 are complete. Next optional work: **Fase 3 Audit** (review-animations, 12 principles table, acceptance criteria). Notes use MDX RSC — see `docs/fase-6.md`.

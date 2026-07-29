@@ -1,33 +1,42 @@
 # ascii-generative-portfolio
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+Portfolio AX — generative ASCII engine, portal transitions, MDX notes.
 
-## Built with v0
+## Stack
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+- Next.js 16 (App Router) · React 19 · Tailwind v4 · Motion · Bun
+- ASCII fields via shared rAF + `<pre>` mutation
+- Notes: `next-mdx-remote/rsc` + custom RSC components
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_jVWAUH421SJNfQeLpJ3yeF6TkpOd)
-
-## Getting Started
-
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+bun install
+bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Route | Purpose |
+|-------|---------|
+| `/` | Home — Horizon hero + lexicon vortex + sections |
+| `/lab` | All ASCII explorations |
+| `/work` | Projects |
+| `/notes` | MDX writing |
+| `/about` | Paper theme profile (Tucumán) |
+| `/portal-test` | Portal sequence harness |
+| `/` | Portal home — hold wheel → wormhole chambers |
+| `~` key | Debug HUD |
 
-## Learn More
+## Docs
 
-To learn more, take a look at the following resources:
+- [`docs/plan.md`](docs/plan.md) — source of truth
+- [`docs/home.md`](docs/home.md) — shipping home structure
+- [`docs/ascii-engine.md`](docs/ascii-engine.md) — engine contract
+- [`docs/ascii-vs-svg.md`](docs/ascii-vs-svg.md) — renderer decision
+- [`docs/prototype-ascii-home.md`](docs/prototype-ascii-home.md) — archived exploration notes
+- [`docs/fase-*.md`](docs/) — phase notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+## Originally bootstrapped with v0
+
+Continue on v0 if needed: [v0 project](https://v0.app/chat/projects/prj_jVWAUH421SJNfQeLpJ3yeF6TkpOd)

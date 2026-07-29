@@ -1,0 +1,34 @@
+---
+title: Why the fields stay ASCII
+date: "2026-07-28"
+excerpt: Generative density belongs in a character grid. SVG stays for static marks.
+---
+
+The portfolio identity is a generative terminal surface — seeded math written into a monospace grid at rAF. That contract is why backgrounds stay ASCII `<pre>`, not SVG paths.
+
+## What ASCII wins
+
+- **O(cells) buffers** map cleanly to `textContent` mutation — zero React re-renders per frame.
+- **Character ramps** encode density with typographic texture that reads as system, not illustration.
+- **SSR snapshot + reduced-motion** freeze share the same string pipeline.
+- **Brand test:** replace the field with a soft SVG blob and the site could belong to anyone.
+
+## Where SVG still belongs
+
+Static marks: Bayer dither tiles, icons, and fixed chrome ornaments. Those do not need per-frame density evaluation.
+
+<Callout tone="signal" title="Rule">
+Mix both — SVG for fixed geometry, ASCII for live fields. Do not redraw generative backgrounds as path art.
+</Callout>
+
+```ts
+// Keep fields on <pre>
+pre.textContent = frame
+
+// Keep static ornament on SVG / CSS
+// (see dither-bg utility)
+```
+
+---
+
+The engine cap stays at **9000 cells**. Canvas/WebGL is deferred until a field proves the `<pre>` path is the bottleneck.

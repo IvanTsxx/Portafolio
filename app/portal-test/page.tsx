@@ -1,7 +1,6 @@
-// app/_portal-test/page.tsx
-// Isolated portal test — verify the full 900ms sequence in isolation
-// before connecting to the live router.
-// Accessible at /_portal-test in development only.
+// app/portal-test/page.tsx
+// Isolated portal test — verify the full 900ms sequence in isolation.
+// Accessible at /portal-test (dev helper; not linked from chrome).
 'use client'
 
 import * as React from 'react'
@@ -22,7 +21,7 @@ export default function PortalTestPage() {
         className="font-mono uppercase text-ax-dim mb-8"
         style={{ fontSize: 'var(--text-2xs)', letterSpacing: '0.12em' }}
       >
-        /_portal-test — dev only
+        /portal-test — portal sequence harness
       </p>
 
       <h1

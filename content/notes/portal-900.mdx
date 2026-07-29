@@ -1,0 +1,23 @@
+---
+title: "Portal timing: 900ms and no more"
+date: "2026-07-20"
+excerpt: One named duration owns the route transition. Everything else is smaller.
+---
+
+Navigation uses a single `--dur-portal` window. Scramble, crossfade, and page paint are slices inside that budget — not independent timelines fighting each other.
+
+## Reparto
+
+- **0–120ms** — overlay fade-in (`--dur-fade`)
+- **200–700ms** — route-name scramble
+- **800ms** — `router.push`
+- **900ms** — overlay idle
+- **Reduced-motion** — 240ms fade only, no scramble
+
+<Callout tone="dim" title="Cancelation">
+Double-navigation aborts the in-flight portal. The second destination wins — no stacked overlays.
+</Callout>
+
+## Why not Motion timelines for everything
+
+Chose Motion for interruption-safe portal orchestration (`AnimatePresence` / programmatic control). Local chrome (nav invert, clip-reveal) stays CSS tokens so LCP text does not depend on JS.
