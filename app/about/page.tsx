@@ -3,6 +3,7 @@ import * as React from 'react'
 import type { Metadata } from 'next'
 import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
+import { chamberSide } from '@/components/home/portal/content'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <PortalPage label="Studio · basement + origin">
+    <PortalPage label="Studio · basement + origin" side={chamberSide('about')}>
       <PageHeading>AX builds generative systems from Tucumán.</PageHeading>
       <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
         Frontend developer based in San Miguel de Tucumán, Argentina. Specializing in

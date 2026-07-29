@@ -7,7 +7,6 @@ import { RafProvider } from '@/lib/ascii/raf-provider'
 import { PortalProvider } from '@/lib/portal/portal-provider'
 import { DebugPanel } from '@/components/site/debug-panel'
 import { CuelumeBind } from '@/components/site/cuelume-bind'
-import { SoundToggle } from '@/components/site/sound-toggle'
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -75,7 +74,6 @@ export default function RootLayout({
         <RafProvider>
           <PortalProvider>
             <CuelumeBind />
-            <SoundToggle />
             <DebugPanel />
             {children}
           </PortalProvider>

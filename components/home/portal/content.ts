@@ -1,6 +1,29 @@
 // content for portal home — destinations + short stubs (routes wired next)
 export type PortalTheme = 'dark' | 'light'
-export type DestId = 'home' | 'work' | 'craft' | 'studio' | 'open'
+/** Wheel spokes = Home + site pages. `open` is chamber-only — not on the arc. */
+export type DestId = 'home' | 'work' | 'notes' | 'lab' | 'about' | 'open'
+export type ChamberSide = 'left' | 'right'
+
+/**
+ * Alternate chamber float: home left → work right → notes left → …
+ * Mirrors the spoke order so consecutive pages flip sides.
+ */
+export function chamberSide(id: DestId): ChamberSide {
+  switch (id) {
+    case 'home':
+    case 'notes':
+    case 'about':
+      return 'left'
+    case 'work':
+    case 'lab':
+    case 'open':
+      return 'right'
+    default: {
+      const _exhaustive: never = id
+      return _exhaustive
+    }
+  }
+}
 
 export const IVAN = {
   name: 'Ivan Bongiovanni',
@@ -43,8 +66,8 @@ export const DESTINATIONS: {
   sub: string
   mood: number
   body: string
-  /** Real route — wheel will portal-navigate here next */
-  href: string | null
+  /** Real route — wheel portals here on hold */
+  href: string
 }[] = [
   {
     id: 'home',
@@ -63,30 +86,39 @@ export const DESTINATIONS: {
     href: '/work',
   },
   {
-    id: 'craft',
-    label: 'Craft',
+    id: 'notes',
+    label: 'Notes',
+    sub: 'Writing · process',
+    mood: 0.4,
+    body: 'Notas sobre craft, ASCII vs SVG, portales y detalles invisibles. Pensar en público, con el mismo rigor que el shipping.',
+    href: '/notes',
+  },
+  {
+    id: 'lab',
+    label: 'Lab',
     sub: 'Next · shadcn · Motion',
-    mood: 0.45,
+    mood: 0.6,
     body: 'App Router en serio, componentes con shadcn, Motion con bounce 0 y timing que se siente. Invisible Details y animations.dev no fueron turismo — fueron oficio.',
     href: '/lab',
   },
   {
-    id: 'studio',
-    label: 'Studio',
+    id: 'about',
+    label: 'About',
     sub: 'basement + origin',
-    mood: 0.7,
+    mood: 0.8,
     body: 'Trabajo en basement studio. Eso ya dice mucho del listón. Soy de Tucumán; traigo predisposición a aprender y a demostrar valor en el siguiente nivel.',
     href: '/about',
   },
-  {
-    id: 'open',
-    label: 'Open',
-    sub: 'Let’s talk',
-    mood: 0.9,
-    body: 'Product teams y collabs focalizados. Brief claro, constraints honestos. El CV ya tiene basement — lo que falta es el problema correcto.',
-    href: null,
-  },
 ]
+
+/** Contact chamber on home — not a wheel spoke. */
+export const OPEN_DEST = {
+  id: 'open' as const,
+  label: 'Open',
+  sub: 'Let’s talk',
+  mood: 0.9,
+  body: 'Product teams y collabs focalizados. Brief claro, constraints honestos. El CV ya tiene basement — lo que falta es el problema correcto.',
+}
 
 export const WORK_STUBS = [
   {

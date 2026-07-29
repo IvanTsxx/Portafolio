@@ -1,11 +1,13 @@
 // components/site/sound-toggle.tsx
-// Bottom-left mute control — persists via localStorage.
+// Mute control — persists via localStorage. Pair with theme toggle in chrome.
 'use client'
 
 import * as React from 'react'
+import { Volume2, VolumeX } from 'lucide-react'
 import { cue, isCuelumeMuted, setCuelumeMuted } from '@/lib/cuelume'
+import { cn } from '@/lib/utils'
 
-export function SoundToggle() {
+export function SoundToggle({ className }: { className?: string }) {
   const [muted, setMuted] = React.useState(false)
   const [ready, setReady] = React.useState(false)
 
@@ -19,8 +21,7 @@ export function SoundToggle() {
   return (
     <button
       type="button"
-      className="fixed bottom-4 left-4 z-[51] font-mono uppercase tracking-[0.12em] text-ax-dim hover:text-ax-bright transition-colors duration-[90ms] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ax-signal"
-      style={{ fontSize: 'var(--text-2xs)', marginBottom: '1.75rem' }}
+      className={cn(className)}
       data-cuelume-press
       data-cuelume-release
       aria-pressed={muted}
@@ -32,7 +33,11 @@ export function SoundToggle() {
         if (!next) cue('tick')
       }}
     >
-      {muted ? 'SND OFF' : 'SND'}
+      {muted ? (
+        <VolumeX aria-hidden strokeWidth={1.5} />
+      ) : (
+        <Volume2 aria-hidden strokeWidth={1.5} />
+      )}
     </button>
   )
 }

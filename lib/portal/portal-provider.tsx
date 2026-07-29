@@ -14,6 +14,7 @@ import {
   type PortalTheme,
 } from '@/components/home/portal/content'
 import type { AsciiWorldApi } from '@/components/home/portal/gl/ascii-world'
+import { SoundToggle } from '@/components/site/sound-toggle'
 import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler'
 import '@/components/site/portal-shell.css'
 
@@ -55,17 +56,19 @@ export function usePortal(): PortalContextValue {
 
 export function moodForHref(href: string): number {
   if (href === '/') return 0
-  if (href.startsWith('/work') || href.startsWith('/notes')) return 0.2
-  if (href.startsWith('/lab')) return 0.45
-  if (href.startsWith('/about')) return 0.7
+  if (href.startsWith('/work')) return 0.2
+  if (href.startsWith('/notes')) return 0.4
+  if (href.startsWith('/lab')) return 0.6
+  if (href.startsWith('/about')) return 0.8
   return 0.55
 }
 
 export function destFromPath(path: string): DestId {
   if (path === '/') return 'home'
-  if (path.startsWith('/work') || path.startsWith('/notes')) return 'work'
-  if (path.startsWith('/lab')) return 'craft'
-  if (path.startsWith('/about')) return 'studio'
+  if (path.startsWith('/work')) return 'work'
+  if (path.startsWith('/notes')) return 'notes'
+  if (path.startsWith('/lab')) return 'lab'
+  if (path.startsWith('/about')) return 'about'
   return 'home'
 }
 
@@ -218,30 +221,29 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
           className="absolute inset-0"
         />
 
-        <AnimatedThemeToggler
-          className="portal-theme-btn"
-          data-cuelume-toggle
-          theme={theme}
-          onThemeChange={setTheme}
-          variant="circle"
-          duration={400}
-        />
+        <div className="portal-chrome-controls" role="group" aria-label="Display controls">
+          <SoundToggle className="portal-chrome-btn" />
+          <AnimatedThemeToggler
+            className="portal-chrome-btn"
+            data-cuelume-toggle
+            theme={theme}
+            onThemeChange={setTheme}
+            variant="circle"
+            duration={400}
+          />
+        </div>
 
         {tripLabel && <p className="portal-transit-label">{tripLabel}</p>}
 
         <div className="portal-shell-content">{children}</div>
 
-        <ShellWheel openLocalRef={openLocalRef} />
+        <ShellWheel />
       </div>
     </PortalContext.Provider>
   )
 }
 
-function ShellWheel({
-  openLocalRef,
-}: {
-  openLocalRef: React.MutableRefObject<(() => void) | null>
-}) {
+function ShellWheel() {
   const pathname = usePathname()
   const { trigger, state, apiRef } = usePortal()
   const active = destFromPath(pathname)
@@ -264,33 +266,16 @@ function ShellWheel({
     (id: DestId) => {
       const dest = DESTINATIONS.find((d) => d.id === id)
       if (!dest) return
-
-      if (id === 'home') {
-        if (pathname === '/') {
-          clearCharge()
-          return
-        }
-        trigger('/', 'HOME', { fromCharge: chargeRef.current, mood: 0 })
+      if (pathname === dest.href || (id === 'home' && pathname === '/')) {
+        clearCharge()
         return
       }
-
-      if (!dest.href) {
-        // Open — local chamber only on home
-        if (pathname === '/') {
-          clearCharge()
-          openLocalRef.current?.()
-        } else {
-          trigger('/', 'HOME', { fromCharge: chargeRef.current, mood: 0 })
-        }
-        return
-      }
-
       trigger(dest.href, dest.label.toUpperCase(), {
         mood: dest.mood,
         fromCharge: chargeRef.current,
       })
     },
-    [apiRef, clearCharge, openLocalRef, pathname, trigger],
+    [clearCharge, pathname, trigger],
   )
 
   const holdStart = React.useCallback(

@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { IVAN } from './content'
+import { IVAN, chamberSide } from './content'
 import { ChamberCopy } from './chamber-copy'
 import { PortalStagger } from '@/components/site/portal-arrive'
 import { HighlightMark } from '@/components/ui/highlight-mark'
@@ -74,11 +74,12 @@ export function PortalHome() {
   }, [openChamber, registerOpenLocal])
 
   const showHero = !open && state !== 'traveling'
+  const openSide = chamberSide('open')
 
   return (
     <>
       {showHero && (
-        <div className="absolute left-[6%] top-[min(22vh,9rem)] z-20 md:left-[8%] md:top-[min(24vh,11rem)]">
+        <div className="portal-hero" data-side={chamberSide('home')}>
           <PortalStagger className="portal-float">
             <p className="portal-mono mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
               {IVAN.name} · {IVAN.studio}
@@ -102,7 +103,7 @@ export function PortalHome() {
         </div>
       )}
 
-      <div className="portal-chamber" data-open={open ? 'true' : 'false'}>
+      <div className="portal-chamber" data-open={open ? 'true' : 'false'} data-side={openSide}>
         {open && (
           <>
             <button

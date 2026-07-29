@@ -3,6 +3,7 @@ import * as React from 'react'
 import type { Metadata } from 'next'
 import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
+import { chamberSide } from '@/components/home/portal/content'
 import { LabStudies } from './lab-studies'
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function LabPage() {
   return (
-    <PortalPage label="Craft · image → ASCII">
+    <PortalPage label="Craft · image → ASCII" side={chamberSide('lab')}>
       <PageHeading>ASCII studies</PageHeading>
       <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
         Stills converted from images — not live fields. Drop{' '}

@@ -3,7 +3,14 @@
 import * as React from 'react'
 import Link from 'next/link'
 import { HighlightMark } from '@/components/ui/highlight-mark'
-import { IVAN, WORK_STUBS, NOTE_STUBS, DESTINATIONS, type DestId } from './content'
+import {
+  IVAN,
+  WORK_STUBS,
+  NOTE_STUBS,
+  DESTINATIONS,
+  OPEN_DEST,
+  type DestId,
+} from './content'
 
 export function ChamberCopy({
   id,
@@ -15,7 +22,9 @@ export function ChamberCopy({
   copied?: boolean
 }) {
   if (id === 'home') return null
-  const dest = DESTINATIONS.find((d) => d.id === id)!
+  const dest =
+    id === 'open' ? OPEN_DEST : DESTINATIONS.find((d) => d.id === id)
+  if (!dest) return null
 
   return (
     <div className="portal-float portal-emerge portal-chamber-scroll">
@@ -39,7 +48,7 @@ export function ChamberCopy({
           <p className="portal-mono mt-8 mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             Projects · scroll · open for full page
           </p>
-          <ul className="space-y-6 pb-8">
+          <ul className="space-y-6 pb-16">
             {WORK_STUBS.map((w) => (
               <li key={w.title}>
                 <Link href={w.href} className="font-semibold tracking-[-0.02em]" style={{ color: 'var(--p-bright)' }}>
@@ -52,7 +61,12 @@ export function ChamberCopy({
               </li>
             ))}
           </ul>
-          <p className="portal-mono mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
+        </>
+      )}
+
+      {id === 'notes' && (
+        <>
+          <p className="portal-mono mt-8 mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             Notes / blog
           </p>
           <ul className="space-y-6 pb-16">
@@ -71,7 +85,7 @@ export function ChamberCopy({
         </>
       )}
 
-      {id === 'craft' && (
+      {id === 'lab' && (
         <div className="mt-8 pb-16">
           <p className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             Core stack
@@ -90,7 +104,7 @@ export function ChamberCopy({
         </div>
       )}
 
-      {id === 'studio' && (
+      {id === 'about' && (
         <ul className="mt-8 space-y-5 pb-16">
           {IVAN.cv.map((e) => (
             <li key={e.place}>

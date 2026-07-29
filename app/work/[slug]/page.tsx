@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
+import { chamberSide } from '@/components/home/portal/content'
 import { getWork, WORK } from '@/content/work'
 import { WorkBackLink } from './work-back-link'
 
@@ -32,7 +33,7 @@ export default async function WorkDetailPage({
   if (!project) notFound()
 
   return (
-    <PortalPage label={`Work · ${project.index}`}>
+    <PortalPage label={`Work · ${project.index}`} side={chamberSide('work')}>
       <WorkBackLink />
       <PageHeading className="mt-6">{project.title}</PageHeading>
       <p className="mb-8 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>

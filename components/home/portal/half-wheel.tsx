@@ -6,7 +6,9 @@ import { DESTINATIONS, type DestId } from './content'
 function destProgress(id: DestId): number {
   const i = DESTINATIONS.findIndex((d) => d.id === id)
   const n = DESTINATIONS.length
-  return n <= 1 ? 0.5 : Math.max(0, i) / (n - 1)
+  // `open` is not a spoke — pin rests at home
+  if (i < 0) return 0
+  return n <= 1 ? 0.5 : i / (n - 1)
 }
 
 function arcPath(cx: number, cy: number, r: number, a0: number, a1: number) {

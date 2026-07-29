@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
+import { chamberSide } from '@/components/home/portal/content'
 import { listNoteSlugs, getNote } from '@/lib/notes'
 import { NoteBackLink } from './note-back-link'
 
@@ -38,7 +39,7 @@ export default async function NoteDetailPage({
   const { frontmatter, content } = note
 
   return (
-    <PortalPage label={`Notes · ${frontmatter.date}`}>
+    <PortalPage label={`Notes · ${frontmatter.date}`} side={chamberSide('notes')}>
       <NoteBackLink />
       <PageHeading className="mt-6">
         {frontmatter.title}

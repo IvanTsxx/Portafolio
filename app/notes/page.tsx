@@ -3,6 +3,7 @@ import * as React from 'react'
 import type { Metadata } from 'next'
 import { PageHeading } from '@/components/site/page-heading'
 import { PortalPage } from '@/components/site/portal-page'
+import { chamberSide } from '@/components/home/portal/content'
 import { PortalLink } from '@/lib/portal/portal-link'
 import { listNotes } from '@/lib/notes'
 
@@ -14,7 +15,7 @@ export default async function NotesPage() {
   const notes = await listNotes()
 
   return (
-    <PortalPage label="Notes · writing">
+    <PortalPage label="Notes · writing" side={chamberSide('notes')}>
       <PageHeading>Notes on systems and motion</PageHeading>
       <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
         MDX with custom components — compiled on the server.
