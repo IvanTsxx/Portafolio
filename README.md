@@ -1,4 +1,4 @@
-# bongi.dev — ascii-generative-portfolio
+# bongi.dev — Portafolio
 
 Portfolio de Ivan Bongiovanni: un **cosmos ASCII WebGL persistente** detrás de todas las rutas, navegación por wormhole (half-wheel), y notes en MDX RSC.
 

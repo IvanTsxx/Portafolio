@@ -24,7 +24,7 @@ export const LAB: LabStudy[] = [
     year: '2026',
     note: 'Shared rAF provider, density buffers, and character ramps — engine for this site.',
     tags: ['Next.js', 'ASCII', 'Math'],
-    repoHref: 'https://github.com/IvanTsxx/ascii-generative-portfolio/tree/main/lib/ascii',
+    repoHref: 'https://github.com/IvanTsxx/Portafolio/tree/main/lib/ascii',
   },
   {
     slug: 'portal-cosmos',
@@ -33,7 +33,7 @@ export const LAB: LabStudy[] = [
     year: '2026',
     note: 'Wormhole navigation: 900ms contract, ASCII world, half-wheel destinations.',
     tags: ['Three', 'R3F', 'Motion'],
-    repoHref: 'https://github.com/IvanTsxx/ascii-generative-portfolio/tree/main/lib/portal',
+    repoHref: 'https://github.com/IvanTsxx/Portafolio/tree/main/lib/portal',
   },
   {
     slug: 'better-auth-mp',
