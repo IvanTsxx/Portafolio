@@ -12,26 +12,11 @@ export const metadata: Metadata = {
 
 export default function LabPage() {
   return (
-    <PortalPage label="Craft · image → ASCII" side={chamberSide('lab')}>
-      <PageHeading>ASCII studies</PageHeading>
+    <PortalPage label="Lab · projects & explorations" side={chamberSide('lab')} wide>
+      <PageHeading>Personal projects</PageHeading>
       <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
-        Stills converted from images — not live fields. Drop{' '}
-        <code className="font-mono" style={{ color: 'var(--p-bright)' }}>
-          .txt
-        </code>{' '}
-        from the convert tool into{' '}
-        <code className="font-mono" style={{ color: 'var(--p-bright)' }}>
-          public/lab/
-        </code>{' '}
-        and point{' '}
-        <code className="font-mono" style={{ color: 'var(--p-bright)' }}>
-          asciiSrc
-        </code>{' '}
-        in{' '}
-        <code className="font-mono" style={{ color: 'var(--p-bright)' }}>
-          content/lab.ts
-        </code>
-        .
+        Explorations, engines, and side builds. Frames with a photo dissolve on hover —
+        ASCII-only entries stay as glyphs. Professional experience lives in Work.
       </p>
       <LabStudies />
     </PortalPage>

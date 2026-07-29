@@ -1,16 +1,21 @@
-// app/work/work-list.tsx — RSC; PortalLink is the only client leaf
+// app/work/work-list.tsx — experience timeline (RSC)
 import * as React from 'react'
 import { PortalLink } from '@/lib/portal/portal-link'
-import type { WorkProject } from '@/content/work'
+import type { WorkExperience } from '@/content/work'
 
-export function WorkList({ items }: { items: WorkProject[] }) {
+export function WorkList({ items }: { items: WorkExperience[] }) {
   return (
     <ul className="flex flex-col gap-8" role="list">
       {items.map((item) => (
         <li key={item.slug}>
-          <PortalLink href={`/work/${item.slug}`} label={item.title.toUpperCase()} className="block group">
+          <PortalLink
+            href={`/work/${item.slug}`}
+            label={item.company.toUpperCase()}
+            className="block group"
+          >
             <span className="portal-mono block mb-1" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-              {item.index} · {item.year}
+              {item.index} · {item.when}
+              {item.current ? ' · Now' : ''}
             </span>
             <span
               className="block font-semibold"
@@ -20,10 +25,10 @@ export function WorkList({ items }: { items: WorkProject[] }) {
                 letterSpacing: '-0.02em',
               }}
             >
-              {item.title}
+              {item.company}
             </span>
             <span className="block mt-1 text-[14px]" style={{ color: 'var(--p-mid)' }}>
-              {item.summary}
+              {item.role} — {item.summary}
             </span>
             <span className="portal-mono mt-2 block" style={{ fontSize: 9, color: 'var(--p-dim)' }}>
               {item.tags.join(' · ')}

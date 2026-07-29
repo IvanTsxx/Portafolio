@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 
 export default function WorkPage() {
   return (
-    <PortalPage label="Work · selected shipping" side={chamberSide('work')}>
-      <PageHeading>Projects that ship systems</PageHeading>
+    <PortalPage label="Work · experience" side={chamberSide('work')}>
+      <PageHeading>Where I&apos;ve shipped</PageHeading>
       <p className="mb-10 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
-        Generative interfaces, agent tooling, and edge UI — indexed, not marketed.
+        Professional experience — roles, teams, and delivery. Personal projects live in Lab.
       </p>
       <WorkList items={WORK} />
     </PortalPage>

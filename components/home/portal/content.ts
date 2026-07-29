@@ -103,9 +103,9 @@ export const DESTINATIONS: {
   {
     id: 'work',
     label: 'Work',
-    sub: 'Selected shipping',
+    sub: 'Experience',
     mood: 0.2,
-    body: 'Sistemas generativos, surfaces de producto, transiciones con contrato claro. Lo que ya está en el mundo — no demos sueltas.',
+    body: 'Roles, equipos y delivery — basement, producto, performance. La trayectoria profesional, no demos sueltas.',
     href: '/work',
   },
   {
@@ -119,9 +119,9 @@ export const DESTINATIONS: {
   {
     id: 'lab',
     label: 'Lab',
-    sub: 'Next · shadcn · Motion',
+    sub: 'Projects · explorations',
     mood: 0.6,
-    body: 'App Router en serio, componentes con shadcn, Motion con bounce 0 y timing que se siente. Invisible Details y animations.dev no fueron turismo — fueron oficio.',
+    body: 'Proyectos personales, motores ASCII, portales y exploraciones. Lo que construyo por oficio y curiosidad.',
     href: '/lab',
   },
   {
@@ -145,22 +145,22 @@ export const OPEN_DEST = {
 
 export const WORK_STUBS = [
   {
-    title: 'Generative Field System',
-    year: '2026',
-    note: 'Motor compartido de density/rAF — base para lab y home.',
-    href: '/work/generative-fields',
+    title: 'basement studio',
+    year: '2026 — Present',
+    note: 'Frontend · product UI, motion, delivery con equipos de craft alto.',
+    href: '/work/basement-studio',
   },
   {
-    title: 'Product UI at basement',
-    year: '2025',
-    note: 'Interfaces de producto con equipos de craft alto — delivery, no slides.',
-    href: '/work',
+    title: 'Aliva Shop',
+    year: '2025 — 2026',
+    note: 'Frontend · modernización Q-commerce Angular → Signals + Ionic.',
+    href: '/work/aliva-shop',
   },
   {
-    title: 'Portal transitions',
-    year: '2025',
-    note: 'Navegación como evento: 900ms, un ease, scramble — Motion con reglas.',
-    href: '/notes/portal-900',
+    title: 'Tensolite SA',
+    year: '2023',
+    note: 'Full stack · tools internos, Excel/PDF, automatización operativa.',
+    href: '/work/tensolite',
   },
 ] as const
 

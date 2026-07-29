@@ -18,9 +18,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const project = getWork(slug)
-  if (!project) return { title: 'Work' }
-  return { title: project.title }
+  const job = getWork(slug)
+  if (!job) return { title: 'Work' }
+  return { title: `${job.company} · Work` }
 }
 
 export default async function WorkDetailPage({
@@ -29,36 +29,52 @@ export default async function WorkDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const project = getWork(slug)
-  if (!project) notFound()
+  const job = getWork(slug)
+  if (!job) notFound()
 
   return (
-    <PortalPage label={`Work · ${project.index}`} side={chamberSide('work')}>
+    <PortalPage label={`Work · ${job.index}`} side={chamberSide('work')}>
       <WorkBackLink />
-      <PageHeading className="mt-6">{project.title}</PageHeading>
+      <PageHeading className="mt-6">{job.company}</PageHeading>
       <p className="mb-8 text-[15px] leading-relaxed" style={{ color: 'var(--p-mid)' }}>
-        {project.summary}
+        {job.summary}
       </p>
       <dl className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div>
           <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             ROLE
           </dt>
-          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{project.role}</dd>
+          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{job.role}</dd>
         </div>
         <div>
           <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            YEAR
+            WHEN
           </dt>
-          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{project.year}</dd>
+          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{job.when}</dd>
         </div>
         <div>
+          <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
+            TYPE
+          </dt>
+          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{job.type}</dd>
+        </div>
+        <div className="sm:col-span-3">
           <dt className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
             STACK
           </dt>
-          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{project.tags.join(' · ')}</dd>
+          <dd style={{ color: 'var(--p-bright)', fontSize: 14 }}>{job.tags.join(' · ')}</dd>
         </div>
       </dl>
+      {job.website && (
+        <a
+          href={job.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="portal-link"
+        >
+          Visit →
+        </a>
+      )}
     </PortalPage>
   )
 }

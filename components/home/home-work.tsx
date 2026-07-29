@@ -1,5 +1,5 @@
 // components/home/home-work.tsx
-// Selected work — RSC list for humans; index + tags for agents.
+// Experience strip — RSC list; PortalLink client leaf.
 import * as React from 'react'
 import { PortalLink } from '@/lib/portal/portal-link'
 import { WORK } from '@/content/work'
@@ -16,7 +16,7 @@ export function HomeWork() {
       <div className="mx-auto w-full max-w-[var(--max-grid)]">
         <header className="mb-10 max-w-[48ch]">
           <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-ax-dim">
-            Selected work
+            Experience
           </p>
           <h2
             id="work-heading"
@@ -27,10 +27,10 @@ export function HomeWork() {
               lineHeight: 0.98,
             }}
           >
-            <HighlightMark>Projects that stay in the buffer.</HighlightMark>
+            <HighlightMark>Where I&apos;ve shipped.</HighlightMark>
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-ax-mid">
-            Engine demos, agent surfaces, and edge UI — each entry is a real ship, not a mood board.
+            Roles and teams. Personal projects and explorations live in Lab.
           </p>
         </header>
 
@@ -43,7 +43,7 @@ export function HomeWork() {
             <li key={entry.slug}>
               <PortalLink
                 href={`/work/${entry.slug}`}
-                label={entry.title.toUpperCase()}
+                label={entry.company.toUpperCase()}
                 className="group flex flex-col gap-2 border-t border-ax-line py-5 transition-colors hover:border-ax-mid sm:flex-row sm:items-baseline sm:gap-6"
                 style={{ transitionDuration: 'var(--dur-micro)' }}
               >
@@ -59,17 +59,17 @@ export function HomeWork() {
                     className="font-sans text-ax-bright transition-colors group-hover:text-ax-signal"
                     style={{ fontSize: 'var(--text-sm)', transitionDuration: 'var(--dur-micro)' }}
                   >
-                    {entry.title}
+                    {entry.company}
                   </span>
                   <p className="mt-1 max-w-[52ch] text-[13px] leading-relaxed text-ax-dim">
-                    {entry.summary}
+                    {entry.role} — {entry.summary}
                   </p>
                 </div>
                 <span
                   className="shrink-0 font-mono text-ax-dim"
                   style={{ fontSize: 'var(--text-2xs)', letterSpacing: '0.12em' }}
                 >
-                  {entry.year}
+                  {entry.when}
                 </span>
               </PortalLink>
             </li>
@@ -87,7 +87,7 @@ export function HomeWork() {
           }}
         >
           <span aria-hidden="true">→</span>
-          <span>All work</span>
+          <span>All experience</span>
         </PortalLink>
       </div>
     </section>

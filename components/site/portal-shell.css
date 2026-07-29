@@ -20,8 +20,9 @@
 .portal-shell[data-theme='light'] {
   --p-void: #e8e4dc;
   --p-bright: #1a1816;
-  --p-dim: #6e6860;
-  --p-mid: #3d3934;
+  /* Dim must clear ~4.5:1 over paper + ASCII wash (was #6e6860 — lost in canvas) */
+  --p-dim: #3a3530;
+  --p-mid: #2a2622;
   --p-signal: #c44a1f;
 }
 
@@ -177,6 +178,10 @@
   width: 100%;
 }
 
+.portal-page-scroll[data-wide] {
+  max-width: min(52rem, 94vw);
+}
+
 .portal-page[data-side='right'] .portal-page-scroll {
   padding-right: 0;
   padding-left: 8px;
@@ -214,7 +219,25 @@
 }
 
 .portal-page-scroll :is(p, li, dd, dt, span, label) {
-  text-shadow: 0 0 16px var(--p-void);
+  text-shadow:
+    0 0 16px var(--p-void),
+    0 0 32px var(--p-void);
+}
+
+/* Meta labels (STACK, STUDIO, …) — denser halo so ASCII canvas cannot erase them */
+.portal-page-scroll .portal-mono,
+.portal-chamber-scroll .portal-mono {
+  text-shadow:
+    0 0 12px var(--p-void),
+    0 0 28px var(--p-void),
+    0 0 48px var(--p-void),
+    0 1px 0 var(--p-void);
+}
+
+.portal-shell[data-theme='light'] .portal-page-scroll .portal-mono,
+.portal-shell[data-theme='light'] .portal-chamber-scroll .portal-mono {
+  color: var(--p-dim);
+  font-weight: 600;
 }
 
 .portal-emerge {
@@ -265,16 +288,184 @@
   }
 }
 
-.portal-wheel {
+/* Collapsible destination wheel dock */
+.portal-wheel-dock {
   position: absolute;
-  left: 50%;
-  bottom: 10px;
+  left: 0;
+  right: 0;
+  bottom: max(10px, env(safe-area-inset-bottom, 0px));
   z-index: 50;
-  width: min(440px, 86vw);
-  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.portal-wheel-dock[data-open] {
+  z-index: 70;
+}
+
+.portal-wheel-dock> :not(.portal-wheel-scrim) {
+  pointer-events: auto;
+}
+
+.portal-wheel-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px 8px 12px;
+  border: 1px solid color-mix(in oklab, var(--p-bright) 14%, transparent);
+  border-radius: 0;
+  background: color-mix(in oklab, var(--p-void) 62%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--p-mid);
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--p-void) 40%, transparent),
+    0 8px 28px color-mix(in oklab, var(--p-void) 45%, transparent);
+  transition-property: color, background-color, border-color;
+  transition-duration: 160ms;
+  transition-timing-function: ease;
+}
+
+.portal-wheel-trigger:hover {
+  color: var(--p-bright);
+  background: color-mix(in oklab, var(--p-void) 48%, transparent);
+  border-color: color-mix(in oklab, var(--p-bright) 28%, transparent);
+}
+
+.portal-wheel-trigger:focus-visible {
+  outline: 1px solid var(--p-signal);
+  outline-offset: 2px;
+  color: var(--p-bright);
+}
+
+.portal-wheel-trigger:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.portal-wheel-trigger-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--p-signal);
+}
+
+.portal-wheel-trigger-glyph svg {
+  width: 16px;
+  height: 16px;
+}
+
+.portal-wheel-trigger-label {
+  font-family: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: inherit;
+  text-wrap: balance;
+}
+
+.portal-wheel-trigger-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--p-signal);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--p-signal) 18%, transparent);
+}
+
+.portal-wheel-panel {
+  position: relative;
+  z-index: 2;
+  width: min(440px, 92vw);
+  padding: 10px 8px 4px;
+  border: 1px solid color-mix(in oklab, var(--p-bright) 12%, transparent);
+  background: color-mix(in oklab, var(--p-void) 72%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--p-void) 50%, transparent),
+    0 18px 48px color-mix(in oklab, var(--p-void) 55%, transparent);
+  /* clip reveal needs a box — keep overflow hidden only during anim via Motion clipPath */
+  will-change: clip-path;
+}
+
+.portal-wheel-dismiss {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--p-dim);
+  cursor: pointer;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+
+.portal-wheel-dismiss svg {
+  width: 16px;
+  height: 16px;
+}
+
+.portal-wheel-dismiss:hover {
+  color: var(--p-bright);
+  background: color-mix(in oklab, var(--p-bright) 8%, transparent);
+}
+
+.portal-wheel-dismiss:active {
+  transform: scale(0.96);
+}
+
+.portal-wheel-dismiss:focus-visible {
+  outline: 1px solid var(--p-signal);
+  outline-offset: -1px;
+  color: var(--p-bright);
+}
+
+.portal-wheel-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 65;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: color-mix(in oklab, var(--p-void) 48%, transparent);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.portal-wheel {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  z-index: auto;
+  width: 100%;
+  transform: none;
   pointer-events: none;
   display: flex;
   justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .portal-wheel-dock,
+  .portal-wheel-trigger,
+  .portal-wheel-panel {
+    will-change: auto;
+  }
 }
 
 .portal-wheel-svg {
@@ -389,7 +580,7 @@
   justify-content: flex-start;
   padding: clamp(24px, 5vw, 56px);
   padding-top: clamp(72px, 12vh, 120px);
-  padding-bottom: 120px;
+  padding-bottom: 72px;
   pointer-events: none;
   overflow: hidden;
 }
@@ -481,4 +672,98 @@
   color: var(--p-dim);
   text-shadow: 0 0 20px var(--p-void);
   pointer-events: none;
+}
+
+/* AsciiImage — fixed frame; ASCII metrics fill the same box as the photo */
+.portal-ascii-image {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid color-mix(in oklab, var(--p-bright) 12%, transparent);
+  background: color-mix(in oklab, var(--p-void) 70%, transparent);
+  outline: none;
+  cursor: crosshair;
+}
+
+.portal-ascii-image[data-static] {
+  cursor: default;
+}
+
+.portal-ascii-image:focus-visible {
+  outline: 1px solid var(--p-signal);
+  outline-offset: 2px;
+}
+
+.portal-ascii-image-photo,
+.portal-ascii-image-glyphs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition-property: opacity, filter;
+  transition-duration: 640ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.portal-ascii-image-photo {
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0;
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.portal-ascii-image-glyphs {
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: var(--p-mid);
+  font-family: var(--font-geist-mono, ui-monospace, monospace);
+  font-size: var(--ascii-fs, 7px);
+  line-height: var(--ascii-lh, 8px);
+  letter-spacing: 0;
+  white-space: pre;
+  text-align: left;
+  pointer-events: none;
+  user-select: none;
+  opacity: 1;
+  filter: blur(0);
+}
+
+/* Reveal only when a photo exists (no [data-static]) */
+.portal-ascii-image:not([data-static]):hover .portal-ascii-image-photo,
+.portal-ascii-image:not([data-static]):focus-within .portal-ascii-image-photo,
+.portal-ascii-image:not([data-static])[data-touched='true'] .portal-ascii-image-photo {
+  opacity: 1;
+  filter: blur(0);
+}
+
+.portal-ascii-image:not([data-static]):hover .portal-ascii-image-glyphs,
+.portal-ascii-image:not([data-static]):focus-within .portal-ascii-image-glyphs,
+.portal-ascii-image:not([data-static])[data-touched='true'] .portal-ascii-image-glyphs {
+  opacity: 0;
+  filter: blur(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .portal-ascii-image-photo,
+  .portal-ascii-image-glyphs {
+    transition-duration: var(--dur-fade, 120ms);
+    filter: none;
+  }
+
+  .portal-ascii-image:not([data-static]) .portal-ascii-image-photo {
+    opacity: 1;
+  }
+
+  .portal-ascii-image:not([data-static]) .portal-ascii-image-glyphs {
+    opacity: 0;
+  }
 }

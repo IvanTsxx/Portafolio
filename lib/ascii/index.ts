@@ -57,6 +57,8 @@ export {
 export { mulberry32, seededFloat, seededInt } from './utils/mulberry32'
 export { noise2, noise3, curl2, initPerlin }  from './utils/perlin'
 export { bayerThreshold, ditherChar, ditherLine } from './utils/dither'
+export { imageToAscii, placeholderAscii } from './image-to-ascii'
+export type { ImageToAsciiOptions } from './image-to-ascii'
 
 export type {
   Density,

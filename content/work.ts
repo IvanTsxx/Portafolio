@@ -1,47 +1,73 @@
-// content/work.ts
-export interface WorkProject {
+// content/work.ts — professional experience (not personal projects)
+export interface WorkExperience {
   slug: string
   index: string
-  title: string
-  year: string
-  tags: string[]
-  summary: string
+  company: string
   role: string
+  when: string
+  type: string
+  summary: string
+  tags: string[]
+  website?: string
+  logo?: string
+  current?: boolean
 }
 
-export const WORK: WorkProject[] = [
+export const WORK: WorkExperience[] = [
   {
-    slug: 'generative-fields',
+    slug: 'basement-studio',
     index: '001',
-    title: 'Generative Field System',
-    year: '2026',
-    tags: ['Next.js', 'ASCII', 'Math'],
+    company: 'basement studio',
+    role: 'Frontend Developer',
+    when: '04.2026 — Present',
+    type: 'Full-time',
     summary:
-      'Shared rAF provider, density buffers, and character ramps that power the portfolio lab and home phyllotaxis field.',
-    role: 'Design + engineering',
+      'Product UI, design systems adjacent work, motion, and delivery with high-craft teams.',
+    tags: ['Next.js', 'React', 'TypeScript', 'Motion'],
+    website: 'https://basement.studio',
+    logo: '/logos/basement.webp',
+    current: true,
   },
   {
-    slug: 'agent-dashboard',
+    slug: 'aliva-shop',
     index: '002',
-    title: 'Agent Orchestration Dashboard',
-    year: '2025',
-    tags: ['eve', 'AI SDK', 'TypeScript'],
+    company: 'Aliva Shop',
+    role: 'Frontend Developer',
+    when: '06.2025 — 04.2026',
+    type: 'Full-time',
     summary:
-      'Operator surface for multi-agent runs — timelines, tool traces, and interruption-safe UI state.',
-    role: 'Frontend lead',
+      'Led Q-commerce modernization: Angular → standalone + Signals; Ionic + Capacitor for iOS/Android.',
+    tags: ['Angular', 'Ionic', 'Signals', 'Capacitor'],
+    website: 'https://www.linkedin.com/company/alivashop',
+    logo: '/logos/aliva-shop.webp',
   },
   {
-    slug: 'edge-toolkit',
+    slug: 'tensolite',
     index: '003',
-    title: 'Edge-computed UI Toolkit',
-    year: '2025',
-    tags: ['Next.js', 'Vercel', 'Performance'],
+    company: 'Tensolite SA',
+    role: 'Full Stack Developer',
+    when: '07.2023 — 11.2023',
+    type: 'Full-time',
     summary:
-      'Primitives and patterns for shipping interactive UI at the edge without sacrificing typography control.',
-    role: 'Library author',
+      'Internal ops tools — Excel import/export, PDF generation, workflow automation.',
+    tags: ['React', 'Node.js', 'Automation'],
+    website: 'https://tensolite.com',
+    logo: '/logos/tensolite.webp',
+  },
+  {
+    slug: 'doctor-qali',
+    index: '004',
+    company: 'Doctor Qali',
+    role: 'Frontend Developer',
+    when: '01.2023 — 06.2023',
+    type: 'Contract',
+    summary:
+      'HealthTech performance: render bottlenecks, bundle size, Lighthouse, modern React patterns.',
+    tags: ['React', 'Performance', 'Architecture'],
+    logo: '/logos/doctor-qali.webp',
   },
 ]
 
-export function getWork(slug: string): WorkProject | undefined {
+export function getWork(slug: string): WorkExperience | undefined {
   return WORK.find((w) => w.slug === slug)
 }

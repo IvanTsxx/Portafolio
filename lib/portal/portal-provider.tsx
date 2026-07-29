@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import { usePathname, useRouter } from 'next/navigation'
 import { useReducedMotion } from '@/lib/ascii/hooks/use-reduced-motion'
 import { cue } from '@/lib/cuelume'
-import { HalfWheel } from '@/components/home/portal/half-wheel'
+import { WheelDock } from '@/components/home/portal/wheel-dock'
 import {
   DESTINATIONS,
   type DestId,
@@ -248,6 +248,7 @@ function ShellWheel() {
   const { trigger, state, apiRef } = usePortal()
   const active = destFromPath(pathname)
   const [hover, setHover] = React.useState<DestId>(active)
+  const [holding, setHolding] = React.useState(false)
   const chargeRef = React.useRef(0)
   const holdRef = React.useRef<DestId | null>(null)
   const holdRaf = React.useRef(0)
@@ -266,6 +267,7 @@ function ShellWheel() {
     (id: DestId) => {
       const dest = DESTINATIONS.find((d) => d.id === id)
       if (!dest) return
+      setHolding(false)
       if (pathname === dest.href || (id === 'home' && pathname === '/')) {
         clearCharge()
         return
@@ -283,6 +285,7 @@ function ShellWheel() {
       if (busy) return
       cue('press')
       holdRef.current = id
+      setHolding(true)
       setHover(id)
       const need = 340
       const t0 = performance.now()
@@ -308,6 +311,7 @@ function ShellWheel() {
     if (chargeRef.current >= 0.98 || !holdRef.current) return
     cue('release')
     holdRef.current = null
+    setHolding(false)
     cancelAnimationFrame(holdRaf.current)
     const start = chargeRef.current
     const t0 = performance.now()
@@ -328,11 +332,12 @@ function ShellWheel() {
   )
 
   return (
-    <HalfWheel
+    <WheelDock
       active={active}
       hover={hover}
       chargeRef={chargeRef}
       disabled={busy}
+      locked={holding}
       onHover={(id) => {
         if (hover !== id) cue('tick', 0.35)
         setHover(id)

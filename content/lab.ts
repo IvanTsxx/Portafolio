@@ -1,62 +1,58 @@
-// content/lab.ts — static ASCII studies (image → ASCII via external tool)
+// content/lab.ts — personal projects, explorations, experiments
 export interface LabStudy {
   slug: string
   index: string
   title: string
   year: string
   note: string
-  /** Path under /public — converted ASCII .txt from image tool */
-  asciiSrc: string | null
-  /** Inline fallback while asciiSrc is empty / missing */
-  placeholder: string
+  tags: string[]
+  /** Optional photo — hover reveals. Omit / null for ASCII-only. */
+  imageSrc?: string | null
+  /** Optional precomputed ASCII under /public */
+  asciiSrc?: string | null
+  href?: string
 }
-
-const FRAME = `
-┌──────────────────────────┐
-│                          │
-│     ·  ·    ·   ·        │
-│   ·    ASCII    ·        │
-│     ·  study  ·          │
-│   drop image→txt here    │
-│                          │
-└──────────────────────────┘
-`.trim()
 
 export const LAB: LabStudy[] = [
   {
-    slug: 'portal-still',
+    slug: 'generative-fields',
     index: '001',
-    title: 'Portal still',
+    title: 'Generative Field System',
     year: '2026',
-    note: 'Frame from the wormhole — converted still, not a live field.',
-    asciiSrc: null,
-    placeholder: FRAME,
+    note: 'Shared rAF provider, density buffers, and character ramps — engine for this site.',
+    tags: ['Next.js', 'ASCII', 'Math'],
+    imageSrc: '/images/avatar.webp',
   },
   {
-    slug: 'basement-desk',
+    slug: 'portal-cosmos',
     index: '002',
-    title: 'Basement desk',
+    title: 'Portal cosmos',
     year: '2026',
-    note: 'Photo → ASCII. Swap in content when the convert tool runs.',
-    asciiSrc: null,
-    placeholder: FRAME,
+    note: 'Wormhole navigation: 900ms contract, ASCII world, half-wheel destinations.',
+    tags: ['Three', 'R3F', 'Motion'],
+    imageSrc: '/logos/basement.webp',
   },
   {
-    slug: 'tucuman-night',
+    slug: 'agent-dashboard',
     index: '003',
-    title: 'Tucumán night',
+    title: 'Agent Orchestration',
     year: '2025',
-    note: 'City light density as glyph ramp.',
-    asciiSrc: null,
-    placeholder: FRAME,
+    note: 'Operator surface for multi-agent runs — timelines, tool traces, interruption-safe UI.',
+    tags: ['eve', 'AI SDK', 'TypeScript'],
+    // ASCII-only for now — drop imageSrc when a shot exists
+    imageSrc: null,
   },
   {
-    slug: 'glyph-portrait',
+    slug: 'edge-toolkit',
     index: '004',
-    title: 'Glyph portrait',
+    title: 'Edge UI Toolkit',
     year: '2025',
-    note: 'Portrait pass through the image→ASCII pipeline.',
-    asciiSrc: null,
-    placeholder: FRAME,
+    note: 'Primitives for interactive UI at the edge without losing typography control.',
+    tags: ['Next.js', 'Vercel', 'Performance'],
+    imageSrc: null,
   },
 ]
+
+export function getLab(slug: string): LabStudy | undefined {
+  return LAB.find((l) => l.slug === slug)
+}

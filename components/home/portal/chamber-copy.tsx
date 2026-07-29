@@ -46,7 +46,7 @@ export function ChamberCopy({
       {id === 'work' && (
         <>
           <p className="portal-mono mt-8 mb-3" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            Projects · scroll · open for full page
+            Experience · open for full page
           </p>
           <ul className="space-y-6 pb-16">
             {WORK_STUBS.map((w) => (
@@ -88,16 +88,16 @@ export function ChamberCopy({
       {id === 'lab' && (
         <div className="mt-8 pb-16">
           <p className="portal-mono mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            Core stack
+            Personal projects · explorations
+          </p>
+          <p className="text-[14px] leading-relaxed">
+            Motores ASCII, portales, agent surfaces y side builds. Frames en glifos —
+            hover para revelar la foto.
+          </p>
+          <p className="portal-mono mt-5 mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
+            Stack in play
           </p>
           <p style={{ color: 'var(--p-bright)' }}>{IVAN.stack.join(' · ')}</p>
-          <p className="portal-mono mt-5 mb-2" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            Also learning
-          </p>
-          <p>{IVAN.learning.join(' · ')}</p>
-          <p className="portal-mono mt-5" style={{ fontSize: 10, color: 'var(--p-dim)' }}>
-            courses · {IVAN.courses.join(' · ')}
-          </p>
           <Link href="/lab" className="portal-link">
             Open lab →
           </Link>
