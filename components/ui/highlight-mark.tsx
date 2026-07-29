@@ -27,12 +27,13 @@ export type HighlightMarkProps = {
 /** Site-wide Magic UI highlight defaults (signal marker on enter). */
 export const HIGHLIGHT_MARK = {
   action: 'highlight',
-  color: '#FF4D00',
+  color: '#FF4D0099',
   strokeWidth: 1.5,
   animationDuration: 600,
   iterations: 2,
+  padding: 1,
   isView: true,
-} as const satisfies HighlightMarkProps
+} as const satisfies Omit<HighlightMarkProps, 'children'>
 
 /** Marker stroke wrapper — use inside any heading. */
 export function HighlightMark({
@@ -43,7 +44,7 @@ export function HighlightMark({
   animationDuration = HIGHLIGHT_MARK.animationDuration,
   iterations = HIGHLIGHT_MARK.iterations,
   isView = HIGHLIGHT_MARK.isView,
-  padding,
+  padding = HIGHLIGHT_MARK.padding,
   multiline,
 }: HighlightMarkProps) {
   return (

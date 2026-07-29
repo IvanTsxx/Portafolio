@@ -63,7 +63,8 @@ function FieldMesh({
   const mat = React.useRef<THREE.ShaderMaterial>(null)
   const travel = React.useRef({ worm: 0, charge: 0, land: 0 })
   const jobRef = React.useRef<(TravelJob & { t0: number; midFired: boolean }) | null>(null)
-  const { size, gl, pointer } = useThree()
+  const pointerUv = React.useRef({ x: 0.5, y: 0.5, active: 0 })
+  const { size, gl } = useThree()
   const reduced = React.useMemo(
     () =>
       typeof window !== 'undefined' &&
@@ -156,18 +157,26 @@ function FieldMesh({
   }, [apiRef, theme])
 
   React.useEffect(() => {
-    const el = gl.domElement
-    const enter = () => {
-      if (mat.current) mat.current.uniforms.uPointerActive!.value = 1
+    // Content layer sits above the canvas — track pointer on the window
+    const onMove = (e: PointerEvent) => {
+      const rect = gl.domElement.getBoundingClientRect()
+      if (rect.width < 1 || rect.height < 1) return
+      pointerUv.current = {
+        x: (e.clientX - rect.left) / rect.width,
+        y: 1 - (e.clientY - rect.top) / rect.height,
+        active: 1,
+      }
     }
-    const leave = () => {
-      if (mat.current) mat.current.uniforms.uPointerActive!.value = 0
+    const onLeave = () => {
+      pointerUv.current.active = 0
     }
-    el.addEventListener('pointerenter', enter)
-    el.addEventListener('pointerleave', leave)
+    window.addEventListener('pointermove', onMove, { passive: true })
+    window.addEventListener('pointerdown', onMove, { passive: true })
+    document.documentElement.addEventListener('pointerleave', onLeave)
     return () => {
-      el.removeEventListener('pointerenter', enter)
-      el.removeEventListener('pointerleave', leave)
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerdown', onMove)
+      document.documentElement.removeEventListener('pointerleave', onLeave)
       uniforms.uAtlas.value?.dispose()
     }
   }, [gl, uniforms])
@@ -177,7 +186,8 @@ function FieldMesh({
     const u = mat.current.uniforms
     if (!reduced) u.uTime!.value += Math.min(dt, 0.033)
     u.uRes!.value.set(size.width, size.height)
-    u.uPointer!.value.set(pointer.x * 0.5 + 0.5, pointer.y * 0.5 + 0.5)
+    u.uPointer!.value.set(pointerUv.current.x, pointerUv.current.y)
+    u.uPointerActive!.value = pointerUv.current.active
 
     const job = jobRef.current
     if (!job) return

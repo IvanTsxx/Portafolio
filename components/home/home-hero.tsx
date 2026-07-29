@@ -47,7 +47,7 @@ export function HomeHero() {
               letterSpacing: '-0.035em',
             }}
           >
-            <HighlightMark color="#FF4D00">
+            <HighlightMark>
               {IDENTITY.tagline}
             </HighlightMark>
           </h1>

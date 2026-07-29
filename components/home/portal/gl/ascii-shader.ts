@@ -115,9 +115,11 @@ void main() {
   if (travel > 0.05) d += accentBolt(warped, t, travel);
   d = clamp(d, 0.0, 0.82);
 
-  if (travel < 0.08 && uPointerActive > 0.5) {
+  // Pointer ripple — works on surface + landed (blocked only mid-tunnel)
+  if (travel < 0.45 && uPointerActive > 0.5) {
     vec2 toP = q - (uPointer * 2.0 - 1.0) * vec2(uRes.x / uRes.y, 1.0);
-    d += exp(-dot(toP, toP) * 4.0) * 0.07;
+    float falloff = exp(-dot(toP, toP) * 3.2);
+    d += falloff * 0.11;
   }
 
   float idx = floor(clamp(d, 0.0, 1.0) * (uAtlasLen - 1.0) + 0.5);

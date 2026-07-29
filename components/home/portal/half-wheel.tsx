@@ -56,11 +56,17 @@ export function HalfWheel({
   const onArcRef = React.useRef(false)
   const [hot, setHot] = React.useState(false)
   const n = DESTINATIONS.length
-  const radius = 152
-  const cx = 200
-  const cy = 198
-  const vbH = 215
-  const band = 18
+  /** Compact arc — less vertical footprint */
+  const radius = 96
+  const cx = 160
+  const cy = 112
+  const vbW = 320
+  const vbH = 128
+  const band = 14
+  const labelR = radius + 16
+  const tickInner = radius - 10
+  const hubR = 18
+  const caretR = 4.5
 
   const pinT = destProgress(active)
 
@@ -209,7 +215,7 @@ export function HalfWheel({
     <div className="portal-wheel" aria-label="Destination wheel">
       <svg
         ref={svgRef}
-        viewBox={`0 0 400 ${vbH}`}
+        viewBox={`0 0 ${vbW} ${vbH}`}
         className="portal-wheel-svg"
         style={{ touchAction: 'none', userSelect: 'none', cursor: hot ? 'pointer' : 'default' }}
       >
@@ -232,14 +238,12 @@ export function HalfWheel({
           onPointerEnter={() => setArcHot(true)}
         />
         <path d={arcPath(cx, cy, radius, Math.PI, 0)} className="portal-wheel-track" fill="none" />
-        {/* Hover — soft bright, lerps */}
         <path
           ref={hoverPath}
           d={arcPath(cx, cy, radius, Math.PI, Math.PI - 0.02 * Math.PI)}
           className="portal-wheel-hover"
           fill="none"
         />
-        {/* Pin — orange accent only to active */}
         <path
           ref={pinPath}
           d={arcPath(cx, cy, radius, Math.PI, Math.PI - Math.max(pinT, 0.02) * Math.PI)}
@@ -256,7 +260,7 @@ export function HalfWheel({
         <circle
           cx={cx + Math.cos(pinAngle) * radius}
           cy={cy - Math.sin(pinAngle) * radius}
-          r={6}
+          r={caretR}
           className="portal-wheel-caret"
         />
         {DESTINATIONS.map((item, i) => {
@@ -265,32 +269,31 @@ export function HalfWheel({
           const x = cx + Math.cos(angle) * radius
           const y = cy - Math.sin(angle) * radius
           const isActive = active === item.id
-          const inner = radius - 14
           return (
             <g key={item.id}>
               <line
                 x1={x}
                 y1={y}
-                x2={cx + Math.cos(angle) * inner}
-                y2={cy - Math.sin(angle) * inner}
+                x2={cx + Math.cos(angle) * tickInner}
+                y2={cy - Math.sin(angle) * tickInner}
                 className="portal-wheel-tick"
                 data-active={isActive ? '' : undefined}
               />
               <circle
                 cx={x}
                 cy={y}
-                r={isActive ? 4.5 : 3}
+                r={isActive ? 3.5 : 2.5}
                 className="portal-wheel-dot"
                 data-active={isActive ? '' : undefined}
               />
             </g>
           )
         })}
-        <circle cx={cx} cy={cy} r={26} className="portal-wheel-hub" />
+        <circle cx={cx} cy={cy} r={hubR} className="portal-wheel-hub" />
         <text
           ref={hubLabel}
           x={cx}
-          y={cy + 4}
+          y={cy + 3}
           textAnchor="middle"
           className="portal-wheel-hub-label"
           style={{ userSelect: 'none' }}
@@ -303,8 +306,8 @@ export function HalfWheel({
           return (
             <text
               key={`l-${item.id}`}
-              x={cx + Math.cos(angle) * (radius + 22)}
-              y={cy - Math.sin(angle) * (radius + 22)}
+              x={cx + Math.cos(angle) * labelR}
+              y={cy - Math.sin(angle) * labelR}
               textAnchor="middle"
               dominantBaseline="middle"
               className="portal-wheel-svg-label"

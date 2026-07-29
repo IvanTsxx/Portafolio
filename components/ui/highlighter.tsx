@@ -1,19 +1,19 @@
-"use client"
+'use client'
 
-import { useLayoutEffect, useRef } from "react"
-import type React from "react"
-import { useInView } from "motion/react"
-import { annotate } from "rough-notation"
-import { type RoughAnnotation } from "rough-notation/lib/model"
+import { useLayoutEffect, useRef } from 'react'
+import type React from 'react'
+import { useInView } from 'motion/react'
+import { annotate } from 'rough-notation'
+import { type RoughAnnotation } from 'rough-notation/lib/model'
 
 type AnnotationAction =
-  | "highlight"
-  | "underline"
-  | "box"
-  | "circle"
-  | "strike-through"
-  | "crossed-off"
-  | "bracket"
+  | 'highlight'
+  | 'underline'
+  | 'box'
+  | 'circle'
+  | 'strike-through'
+  | 'crossed-off'
+  | 'bracket'
 
 interface HighlighterProps {
   children: React.ReactNode
@@ -29,8 +29,8 @@ interface HighlighterProps {
 
 export function Highlighter({
   children,
-  action = "highlight",
-  color = "#ffd1dc",
+  action = 'highlight',
+  color = '#ffd1dc',
   strokeWidth = 1.5,
   animationDuration = 600,
   iterations = 2,
@@ -42,7 +42,7 @@ export function Highlighter({
 
   const isInView = useInView(elementRef, {
     once: true,
-    margin: "-10%",
+    margin: '-10%',
   })
 
   // If isView is false, always show. If isView is true, wait for inView
@@ -52,6 +52,7 @@ export function Highlighter({
     const element = elementRef.current
     let annotation: RoughAnnotation | null = null
     let resizeObserver: ResizeObserver | null = null
+    let redrawTimer: ReturnType<typeof setTimeout> | null = null
 
     if (shouldShow && element) {
       const annotationConfig = {
@@ -68,20 +69,23 @@ export function Highlighter({
       annotation = currentAnnotation
       currentAnnotation.show()
 
+      // Only watch the text node — body observers remeasure against full-width
+      // line boxes during layout thrash and overdraw the highlight.
       resizeObserver = new ResizeObserver(() => {
-        currentAnnotation.hide()
-        currentAnnotation.show()
+        if (redrawTimer) clearTimeout(redrawTimer)
+        redrawTimer = setTimeout(() => {
+          currentAnnotation.hide()
+          currentAnnotation.show()
+        }, 50)
       })
 
       resizeObserver.observe(element)
-      resizeObserver.observe(document.body)
     }
 
     return () => {
+      if (redrawTimer) clearTimeout(redrawTimer)
       annotation?.remove()
-      if (resizeObserver) {
-        resizeObserver.disconnect()
-      }
+      resizeObserver?.disconnect()
     }
   }, [
     shouldShow,
@@ -94,8 +98,10 @@ export function Highlighter({
     multiline,
   ])
 
+  // `inline` (not inline-block): getClientRects() hugs each line of text
+  // instead of stretching to the heading's full content width.
   return (
-    <span ref={elementRef} className="relative inline-block bg-transparent">
+    <span ref={elementRef} className="relative bg-transparent [box-decoration-break:clone]">
       {children}
     </span>
   )
