@@ -2,9 +2,12 @@
 import * as React from 'react'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { ExternalLink } from 'lucide-react'
 import { LAB, type LabStudy } from '@/content/lab'
 import { AsciiImage } from '@/components/ui/ascii-image'
+import { Github } from '@/components/ui/svgs/github'
 import { portal } from '@/lib/portal/styles'
+import { cn } from '@/lib/utils'
 
 async function loadAscii(src: string | null | undefined): Promise<string | null> {
   if (!src) return null
@@ -36,6 +39,32 @@ async function LabCard({ study }: { study: LabStudy }) {
       <h2 className={`${portal.titleLg} mb-1`}>{study.title}</h2>
       <p className={portal.bodySm}>{study.note}</p>
       <p className={`${portal.meta} mt-2`}>{study.tags.join(' · ')}</p>
+      {(study.repoHref || study.demoHref) && (
+        <p className="mt-2 flex gap-4">
+          {study.repoHref && (
+            <a
+              href={study.repoHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(portal.link, 'inline-flex items-center gap-1.5')}
+            >
+              <Github aria-hidden className="size-3.5 shrink-0" />
+              Repo
+            </a>
+          )}
+          {study.demoHref && (
+            <a
+              href={study.demoHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(portal.link, 'inline-flex items-center gap-1.5')}
+            >
+              <ExternalLink aria-hidden className="size-3.5 shrink-0" />
+              Demo
+            </a>
+          )}
+        </p>
+      )}
     </li>
   )
 }
