@@ -172,3 +172,11 @@
     }
   }
 }
+
+@utility min-h-below-header {
+  min-height: calc(100svh - --spacing(12));
+}
+
+@utility h-below-header {
+  height: calc(100svh - --spacing(12));
+}
