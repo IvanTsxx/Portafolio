@@ -22,7 +22,7 @@ export const MobileNav = () => {
         render={
           <Button
             aria-label="Open menu"
-            className="md:hidden"
+            className="lg:hidden"
             size="icon-sm"
             variant="ghost"
           />

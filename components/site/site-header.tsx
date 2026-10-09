@@ -19,13 +19,13 @@ export const SiteHeader = () => (
       </Link>
       <nav
         aria-label="Primary"
-        className="hidden flex-1 justify-center md:flex"
+        className="hidden flex-1 justify-center lg:flex"
       >
         <NavLinks />
       </nav>
-      <div className="ml-auto flex items-center gap-4 md:ml-0">
+      <div className="ml-auto flex items-center gap-4 lg:ml-0">
         <Link
-          className="label border-rule-strong text-foreground hover:border-clay hover:text-clay hidden border px-3 py-1.5 transition-colors md:inline-flex"
+          className="label border-rule-strong text-foreground hover:border-clay hover:text-clay hidden border px-3 py-1.5 transition-colors lg:inline-flex"
           href="/#contact"
         >
           Contact
