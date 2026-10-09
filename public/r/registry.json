@@ -1,0 +1,731 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "ivan",
+  "homepage": "https://bongi.dev",
+  "items": [
+    {
+      "name": "technical-grid",
+      "type": "registry:ui",
+      "title": "Animated Technical Grid",
+      "description": "Hairline engineering grid with major lines, corner registration marks, a scanning line and pulsing intersection nodes. Reads as a calm blueprint with motion off.",
+      "categories": ["backgrounds", "motion"],
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/technical-grid.tsx",
+          "type": "registry:ui",
+          "target": "@ui/technical-grid.tsx"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "color-clay": "var(--clay)"
+        },
+        "light": {
+          "clay": "oklch(0.56 0.12 42)"
+        },
+        "dark": {
+          "clay": "oklch(0.7 0.14 45)"
+        }
+      },
+      "css": {
+        "@keyframes technical-grid-scan-y": {
+          "0%": { "transform": "translateY(-100%)", "opacity": "0" },
+          "8%": { "opacity": "1" },
+          "92%": { "opacity": "1" },
+          "100%": { "transform": "translateY(0)", "opacity": "0" }
+        },
+        "@keyframes technical-grid-scan-x": {
+          "0%": { "transform": "translateX(-100%)", "opacity": "0" },
+          "8%": { "opacity": "1" },
+          "92%": { "opacity": "1" },
+          "100%": { "transform": "translateX(0)", "opacity": "0" }
+        },
+        "@keyframes technical-grid-ping": {
+          "0%": { "transform": "scale(1)", "opacity": "0.7" },
+          "70%": { "transform": "scale(4)", "opacity": "0" },
+          "100%": { "transform": "scale(4)", "opacity": "0" }
+        }
+      },
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "TechnicalGrid",
+              "description": "A div that paints the grid behind its children. Extends every div prop.",
+              "props": [
+                {
+                  "name": "tone",
+                  "type": "\"muted\" | \"strong\" | \"clay\"",
+                  "default": "\"muted\"",
+                  "description": "Line intensity and ink color. clay tints lines, scan line and nodes with the accent."
+                },
+                {
+                  "name": "fade",
+                  "type": "\"none\" | \"edges\" | \"top\" | \"bottom\"",
+                  "default": "\"none\"",
+                  "description": "Masks the field so the grid dissolves toward the edges or one side."
+                },
+                {
+                  "name": "cellSize",
+                  "type": "number",
+                  "default": "32",
+                  "description": "Minor cell size in px. Clamped between 8 and 160."
+                },
+                {
+                  "name": "majorEvery",
+                  "type": "number",
+                  "default": "4",
+                  "description": "Every Nth line is drawn stronger. 0 or 1 disables major lines."
+                },
+                {
+                  "name": "scan",
+                  "type": "\"none\" | \"horizontal\" | \"vertical\" | \"both\"",
+                  "default": "\"horizontal\"",
+                  "description": "Direction of the sweeping scan line."
+                },
+                {
+                  "name": "scanDuration",
+                  "type": "number",
+                  "default": "8",
+                  "description": "Seconds per sweep. Clamped between 1 and 60."
+                },
+                {
+                  "name": "nodes",
+                  "type": "number",
+                  "default": "5",
+                  "description": "Count of pulsing intersection nodes, snapped to grid lines. Maximum 24."
+                },
+                {
+                  "name": "markers",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Draws registration marks in the four corners."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "description": "Mono caption pinned to the top left."
+                },
+                {
+                  "name": "caption",
+                  "type": "string",
+                  "description": "Mono caption pinned to the bottom right."
+                },
+                {
+                  "name": "animated",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Turns the scan line and node pulses off while keeping the static grid."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "tone",
+              "default": "muted",
+              "options": ["muted", "strong", "clay"],
+              "description": "Foreground ink at 6 and 12 percent, 10 and 22 percent, or the clay accent."
+            },
+            {
+              "name": "fade",
+              "default": "none",
+              "options": ["none", "edges", "top", "bottom"],
+              "description": "Radial or linear mask applied to the grid field only, never to children."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Grid as a framed field",
+              "description": "Content sits above the grid in a relatively positioned wrapper.",
+              "file": "registry/ivan/examples/technical-grid/basic.tsx"
+            },
+            {
+              "title": "Grid as a section background",
+              "description": "Absolutely positioned behind content with an edge fade and both scan axes.",
+              "file": "registry/ivan/examples/technical-grid/background.tsx"
+            }
+          ],
+          "accessibility": [
+            "The grid, scan line, nodes and corner marks are aria-hidden and ignore pointer events, so they never enter the accessibility tree or block clicks.",
+            "Nothing meaningful is encoded in the grid. label and caption are real text in text-muted-foreground, which stays above 4.5:1 on the card and background tokens.",
+            "Children render above the grid in normal DOM order and keep their own semantics and focus order.",
+            "With prefers-reduced-motion the scan line and node pulses are hidden. The static grid, nodes and marks remain, so the composition is complete with all motion off."
+          ],
+          "animation": [
+            {
+              "target": "Scan line",
+              "properties": "transform (translate) and opacity, composited on the GPU",
+              "timing": "scanDuration seconds, linear, infinite. Vertical scan starts half a cycle later so both axes never align.",
+              "trigger": "Starts on mount and loops without interaction.",
+              "reducedMotion": "Hidden."
+            },
+            {
+              "target": "Node pulse ring",
+              "properties": "transform (scale 1 to 4) and opacity",
+              "timing": "3 to 5 seconds per node, ease-out, infinite, delays staggered up to 4 seconds.",
+              "trigger": "Starts on mount and loops without interaction.",
+              "reducedMotion": "Ring hidden. The solid node dot stays."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "agent-status-card",
+      "type": "registry:ui",
+      "title": "Agent Status Card",
+      "description": "Status card for an agent run with a designation, role, live status, task line, segmented progress and mono metadata. Status is always text, never color alone.",
+      "categories": ["cards", "data"],
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/agent-status-card.tsx",
+          "type": "registry:ui",
+          "target": "@ui/agent-status-card.tsx"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "color-clay": "var(--clay)",
+          "color-signal-moss": "var(--signal-moss)",
+          "color-signal-steel": "var(--signal-steel)"
+        },
+        "light": {
+          "clay": "oklch(0.56 0.12 42)",
+          "signal-moss": "oklch(0.5 0.09 150)",
+          "signal-steel": "oklch(0.5 0.07 240)"
+        },
+        "dark": {
+          "clay": "oklch(0.7 0.14 45)",
+          "signal-moss": "oklch(0.72 0.09 150)",
+          "signal-steel": "oklch(0.7 0.05 240)"
+        }
+      },
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "AgentStatusCard",
+              "description": "An article with a header, a body and optional metadata and footer. Extends every article prop except title.",
+              "props": [
+                {
+                  "name": "agentId",
+                  "type": "string",
+                  "required": true,
+                  "description": "Designation shown above the name, for example AG-03."
+                },
+                {
+                  "name": "name",
+                  "type": "string",
+                  "required": true,
+                  "description": "Role or agent name. Labels the article and truncates when long."
+                },
+                {
+                  "name": "task",
+                  "type": "string",
+                  "required": true,
+                  "description": "One line describing what the agent is doing."
+                },
+                {
+                  "name": "status",
+                  "type": "\"idle\" | \"running\" | \"review\" | \"blocked\" | \"done\"",
+                  "default": "\"idle\"",
+                  "description": "Drives the tone color, the status dot and the default status label."
+                },
+                {
+                  "name": "statusLabel",
+                  "type": "string",
+                  "description": "Overrides the default status text, for localisation or a more specific phrase."
+                },
+                {
+                  "name": "progress",
+                  "type": "number",
+                  "description": "0 to 100. Renders the segmented progress bar. Omit to hide it."
+                },
+                {
+                  "name": "meta",
+                  "type": "{ label: string; value: string }[]",
+                  "description": "Mono key and value pairs rendered as equal columns under the body."
+                },
+                {
+                  "name": "footer",
+                  "type": "ReactNode",
+                  "description": "Slot under a hairline for actions such as approve or inspect."
+                },
+                {
+                  "name": "announce",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Makes the status text a polite live region so screen readers hear status changes."
+                },
+                {
+                  "name": "children",
+                  "type": "ReactNode",
+                  "description": "Extra content rendered in the body under the progress bar."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "status",
+              "default": "idle",
+              "options": ["idle", "running", "review", "blocked", "done"],
+              "description": "idle is muted, running is clay, review is steel, blocked is destructive and done is moss. The same tone paints the top hairline, the cube, the dot and the filled progress segments."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Running agent",
+              "description": "Progress, metadata and a live status announcement.",
+              "file": "registry/ivan/examples/agent-status-card/basic.tsx"
+            },
+            {
+              "title": "Awaiting a human decision",
+              "description": "The review status with an action footer. The agent proposes, a person decides.",
+              "file": "registry/ivan/examples/agent-status-card/review.tsx"
+            }
+          ],
+          "accessibility": [
+            "Renders an article labelled by the name heading, so each card is a named landmark-like region in the reading order.",
+            "Status is always written out as text. The dot and tone color are redundant cues, never the only one.",
+            "Progress uses role progressbar with aria-valuenow, aria-valuemin, aria-valuemax and a readable aria-valuetext.",
+            "Set announce on cards whose status changes live. It turns the status text into a polite status region. It is off by default to avoid noisy pages.",
+            "Tone colors keep at least 4.5:1 against the card in both themes. The cube and dot are aria-hidden."
+          ],
+          "animation": [
+            {
+              "target": "Running status dot",
+              "properties": "transform (scale) and opacity, a ping ring behind the dot",
+              "timing": "Tailwind animate-ping, 1 second, infinite.",
+              "trigger": "Only while status is running.",
+              "reducedMotion": "Ring removed with motion-safe. The solid dot stays."
+            },
+            {
+              "target": "Active progress segment",
+              "properties": "opacity",
+              "timing": "Tailwind animate-pulse, 2 seconds, infinite.",
+              "trigger": "The first unfilled segment while status is running.",
+              "reducedMotion": "Rendered steady at 60 percent opacity."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "magnetic-button",
+      "type": "registry:ui",
+      "title": "Industrial Magnetic Button",
+      "description": "Hairline button that leans toward the pointer, sweeps a clay fill in from the left and extends corner marks on hover. Ships as a button and as a link.",
+      "categories": ["buttons", "motion"],
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/magnetic-button.tsx",
+          "type": "registry:ui",
+          "target": "@ui/magnetic-button.tsx"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "color-clay": "var(--clay)",
+          "ease-out-expo": "cubic-bezier(0.16, 1, 0.3, 1)"
+        },
+        "light": {
+          "clay": "oklch(0.56 0.12 42)"
+        },
+        "dark": {
+          "clay": "oklch(0.7 0.14 45)"
+        }
+      },
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "MagneticButton",
+              "description": "A native button. Extends every button prop except children, which is required.",
+              "props": [
+                {
+                  "name": "variant",
+                  "type": "\"outline\" | \"solid\" | \"accent\" | \"ghost\"",
+                  "default": "\"outline\"",
+                  "description": "Surface treatment. Every variant except ghost fills with clay on hover."
+                },
+                {
+                  "name": "size",
+                  "type": "\"sm\" | \"md\" | \"lg\"",
+                  "default": "\"md\"",
+                  "description": "Visual height of 36, 44 or 56 px. The touch target is at least 44 px for every size."
+                },
+                {
+                  "name": "strength",
+                  "type": "number",
+                  "default": "8",
+                  "description": "Maximum pull toward the pointer in px. Clamped between 0 and 24. 0 turns the magnet off."
+                },
+                {
+                  "name": "index",
+                  "type": "string",
+                  "description": "Optional mono index shown before the label, for example 01. Decorative and hidden from assistive tech."
+                },
+                {
+                  "name": "type",
+                  "type": "\"button\" | \"submit\" | \"reset\"",
+                  "default": "\"button\"",
+                  "description": "Native button type. Defaults to button so it never submits a form by accident."
+                }
+              ]
+            },
+            {
+              "component": "MagneticLink",
+              "description": "The same surface as a native anchor. Extends every anchor prop except children, which is required.",
+              "props": [
+                {
+                  "name": "href",
+                  "type": "string",
+                  "required": true,
+                  "description": "Destination. Every other prop matches MagneticButton."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "default": "outline",
+              "options": ["outline", "solid", "accent", "ghost"],
+              "description": "outline is a hairline, solid is a filled foreground, accent is clay text and border, ghost has no border and fills with the accent surface."
+            },
+            {
+              "name": "size",
+              "default": "md",
+              "options": ["sm", "md", "lg"],
+              "description": "Height, horizontal padding and label size."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Variants and sizes",
+              "description": "All four variants side by side with a disabled state.",
+              "file": "registry/ivan/examples/magnetic-button/basic.tsx"
+            },
+            {
+              "title": "Link with an index",
+              "description": "A call to action rendered as an anchor.",
+              "file": "registry/ivan/examples/magnetic-button/link.tsx"
+            }
+          ],
+          "accessibility": [
+            "Renders a native button or anchor, so keyboard activation, focus order, disabled handling and the accessible name come from the platform.",
+            "The interactive element is at least 44 by 44 px for every size. Smaller visual sizes pad the hit area without changing how the button looks.",
+            "Hover effects are pointer-only through Tailwind's hover media query and are mirrored on focus-visible, so keyboard users get the same fill, color and corner marks.",
+            "Focus uses a 2 px ring with an offset that follows the visible surface, not the larger hit area.",
+            "The label contrast holds at 4.5:1 or more on the clay fill in both themes.",
+            "Only mouse and pen pointers pull the button. Touch never moves it."
+          ],
+          "animation": [
+            {
+              "target": "Surface magnet",
+              "properties": "translate on the surface. Label translates a further 50 percent for depth.",
+              "timing": "100 ms while the pointer moves, 500 ms release, both on ease-out-expo. Pull is 30 percent of the offset from the center, clamped to strength.",
+              "trigger": "Pointer move over the button. Values are written as CSS variables, so React never re-renders per frame.",
+              "reducedMotion": "No magnet and no label shift."
+            },
+            {
+              "target": "Fill sweep",
+              "properties": "transform (scaleX, origin left)",
+              "timing": "300 ms, ease-out-expo.",
+              "trigger": "Hover, keyboard focus and press.",
+              "reducedMotion": "Transitions are removed. The fill appears instantly."
+            },
+            {
+              "target": "Corner marks and press",
+              "properties": "opacity and translate on the marks. scale 0.97 on press.",
+              "timing": "300 ms, ease-out-expo.",
+              "trigger": "Hover and focus-visible for the marks. Pointer down for the press.",
+              "reducedMotion": "Transitions are removed."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "text-scramble",
+      "type": "registry:ui",
+      "title": "Text Scramble Reveal",
+      "description": "Monospace text that resolves out of noise glyphs, left to right. The real text is always in the DOM, and reduced motion renders it plain.",
+      "categories": ["text", "motion"],
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/text-scramble.tsx",
+          "type": "registry:ui",
+          "target": "@ui/text-scramble.tsx"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "color-clay": "var(--clay)"
+        },
+        "light": {
+          "clay": "oklch(0.56 0.12 42)"
+        },
+        "dark": {
+          "clay": "oklch(0.7 0.14 45)"
+        }
+      },
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "TextScramble",
+              "description": "An inline-grid element that animates its text. Extends every span prop except children.",
+              "props": [
+                {
+                  "name": "text",
+                  "type": "string",
+                  "required": true,
+                  "description": "The final text. Always rendered in the DOM for assistive tech, search and copy."
+                },
+                {
+                  "name": "trigger",
+                  "type": "\"mount\" | \"visible\" | \"hover\" | \"manual\"",
+                  "default": "\"visible\"",
+                  "description": "When the scramble runs. visible waits until half of the text is on screen. manual runs when replayKey changes."
+                },
+                {
+                  "name": "duration",
+                  "type": "number",
+                  "default": "900",
+                  "description": "Milliseconds until the last glyph resolves."
+                },
+                {
+                  "name": "charset",
+                  "type": "\"technical\" | \"alpha\" | \"binary\" | \"hex\" | \"blocks\"",
+                  "default": "\"technical\"",
+                  "description": "Preset noise alphabet."
+                },
+                {
+                  "name": "characters",
+                  "type": "string",
+                  "description": "Custom noise alphabet. Overrides charset."
+                },
+                {
+                  "name": "once",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "With the visible trigger, stop observing after the first reveal."
+                },
+                {
+                  "name": "replayKey",
+                  "type": "number | string",
+                  "description": "Change it to replay the animation, for example from a button."
+                },
+                {
+                  "name": "as",
+                  "type": "\"span\" | \"p\" | \"div\" | \"h1\" | \"h2\" | \"h3\" | \"h4\"",
+                  "default": "\"span\"",
+                  "description": "Element to render, so headings keep their semantics."
+                },
+                {
+                  "name": "variant",
+                  "type": "\"label\" | \"heading\" | \"body\"",
+                  "default": "\"label\"",
+                  "description": "Type treatment. All three are monospace so glyph swaps never change the layout."
+                },
+                {
+                  "name": "tone",
+                  "type": "\"default\" | \"muted\" | \"accent\"",
+                  "default": "\"default\"",
+                  "description": "Resolved text color. Unresolved glyphs use clay, or the foreground color when the tone is accent."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "default": "label",
+              "options": ["label", "heading", "body"],
+              "description": "label is 12 px uppercase and tracked, heading is 24 px medium, body is 14 px."
+            },
+            {
+              "name": "tone",
+              "default": "default",
+              "options": ["default", "muted", "accent"],
+              "description": "Foreground, muted foreground or clay for the resolved text."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Heading revealed on scroll",
+              "description": "The default visible trigger on a real h2.",
+              "file": "registry/ivan/examples/text-scramble/basic.tsx"
+            },
+            {
+              "title": "Hover and manual replay",
+              "description": "A hex label that rescrambles on hover and a button that replays a heading.",
+              "file": "registry/ivan/examples/text-scramble/interactive.tsx"
+            }
+          ],
+          "accessibility": [
+            "The final text is always present as the element's real content, so screen readers, find in page, translation tools and copy all see it. The animated copy is aria-hidden.",
+            "Both copies share one grid cell. The final copy reserves the box, so the scramble never shifts the layout.",
+            "With prefers-reduced-motion no scramble runs for any trigger and the final text is shown immediately.",
+            "No JavaScript renders the final text statically from the server.",
+            "Use as to render real headings. The animated copy never changes the heading level or the reading order."
+          ],
+          "animation": [
+            {
+              "target": "Glyph resolve",
+              "properties": "text content of one span per glyph. No layout or style properties are animated.",
+              "timing": "One requestAnimationFrame loop. Noise glyphs reshuffle every 45 ms. 70 percent of the duration is a left to right stagger and 30 percent is random jitter.",
+              "trigger": "mount, first time half of the text is visible, pointer enter or focus, or replayKey change.",
+              "reducedMotion": "Skipped. Final text is shown immediately."
+            },
+            {
+              "target": "Unresolved glyph color",
+              "properties": "color",
+              "timing": "Switches the instant a glyph resolves.",
+              "trigger": "Per glyph as it resolves.",
+              "reducedMotion": "Not applicable. Nothing is unresolved."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "blueprint-panel",
+      "type": "registry:ui",
+      "title": "Blueprint Panel",
+      "description": "Hairline panel with registration marks outside the corners, a mono header with an index and meta slot, and a footer. A calm frame for anything that should read as a drawing sheet.",
+      "categories": ["layout", "cards"],
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/blueprint-panel.tsx",
+          "type": "registry:ui",
+          "target": "@ui/blueprint-panel.tsx"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "color-clay": "var(--clay)"
+        },
+        "light": {
+          "clay": "oklch(0.56 0.12 42)"
+        },
+        "dark": {
+          "clay": "oklch(0.7 0.14 45)"
+        }
+      },
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "BlueprintPanel",
+              "description": "The frame. A section that extends every section prop.",
+              "props": [
+                {
+                  "name": "tone",
+                  "type": "\"default\" | \"inset\" | \"clay\"",
+                  "default": "\"default\"",
+                  "description": "default and clay sit on the card surface, inset sits on a recessed muted surface. clay tints the corner marks."
+                },
+                {
+                  "name": "markers",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Draws registration marks outside the four corners."
+                }
+              ]
+            },
+            {
+              "component": "BlueprintPanelHeader",
+              "description": "A 40 px mono header row with a bottom hairline.",
+              "props": [
+                {
+                  "name": "index",
+                  "type": "string",
+                  "description": "Muted index before the title, for example 02 or SH-01."
+                },
+                {
+                  "name": "meta",
+                  "type": "ReactNode",
+                  "description": "Right aligned muted content such as a revision."
+                },
+                {
+                  "name": "headingLevel",
+                  "type": "\"h2\" | \"h3\" | \"h4\"",
+                  "default": "\"h3\"",
+                  "description": "Heading element used for the title."
+                }
+              ]
+            },
+            {
+              "component": "BlueprintPanelContent",
+              "description": "Padded body that grows to fill the panel. Extends every div prop.",
+              "props": [
+                {
+                  "name": "className",
+                  "type": "string",
+                  "description": "Merged with the base padding, so p-0 or a grid layout can replace it."
+                }
+              ]
+            },
+            {
+              "component": "BlueprintPanelFooter",
+              "description": "Mono footer row with a top hairline. Extends every footer prop.",
+              "props": [
+                {
+                  "name": "className",
+                  "type": "string",
+                  "description": "Merged with the base layout."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "tone",
+              "default": "default",
+              "options": ["default", "inset", "clay"],
+              "description": "Surface and registration mark color."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Spec sheet",
+              "description": "Header with index and revision, a definition list and a footer.",
+              "file": "registry/ivan/examples/blueprint-panel/basic.tsx"
+            }
+          ],
+          "accessibility": [
+            "Renders a section. Give it aria-label or aria-labelledby when the header title should name it.",
+            "The header title is a real heading and headingLevel keeps the document outline correct.",
+            "Registration marks are aria-hidden and ignore pointer events.",
+            "Header and footer text use foreground and muted foreground tokens, which stay above 4.5:1 on the card surface."
+          ],
+          "animation": []
+        }
+      }
+    }
+  ]
+}
