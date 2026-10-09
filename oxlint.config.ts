@@ -10,7 +10,7 @@ const jsPlugins = selectJsPlugins(["react-doctor"]);
 
 export default defineConfig({
   extends: [core, react, next, nextJsPlugins, antiSlop, jsPlugins],
-  ignorePatterns: [...(core.ignorePatterns ?? []), "components/ui/**"],
+  ignorePatterns: [...(core.ignorePatterns ?? []), "components/ui/**", ".claude/**"],
   jsPlugins: jsPlugins.jsPlugins,
   settings: jsPluginSettings,
 });
