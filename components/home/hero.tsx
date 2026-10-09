@@ -13,7 +13,6 @@ import { siteConfig } from "@/lib/site/config";
 
 const heroSpecs = [
   { term: "Based in", value: `${siteConfig.location} · UTC−03` },
-  { term: "Studio", value: siteConfig.studio },
   { term: "Builds with", value: "Next.js, R3F, GSAP, Tailwind v4" },
   { term: "Ships through", value: "Linear → Conductor → worktrees" },
 ] as const;
@@ -35,7 +34,7 @@ export const Hero = () => (
             data-hero-reveal
           >
             <StatusDot />
-            {siteConfig.role} · {siteConfig.studio}
+            {siteConfig.role} · {siteConfig.location}
           </p>
           <h1
             className="display mt-6 text-6xl sm:text-7xl 2xl:text-8xl"
@@ -64,10 +63,10 @@ export const Hero = () => (
             className="text-muted-foreground mt-8 max-w-md text-base text-pretty motion-safe:invisible"
             data-hero-reveal
           >
-            I&apos;m {siteConfig.name}, a frontend engineer at{" "}
-            {siteConfig.studio}. I build interfaces, motion and real-time 3D for
-            the web, and orchestrate AI agents across isolated worktrees to ship
-            them. They assist. I design the system and own every decision.
+            I&apos;m {siteConfig.name}, a frontend engineer. I build interfaces,
+            motion and real-time 3D for the web, and orchestrate AI agents
+            across isolated worktrees to ship them. They assist. I design the
+            system and own every decision.
           </p>
           <div
             className="mt-10 flex flex-wrap items-center gap-3 motion-safe:invisible"

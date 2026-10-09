@@ -8,10 +8,21 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-display);
-  --font-display: var(--font-display);
+  --font-sans:
+    var(--font-zen-kaku), "Hiragino Sans", "Yu Gothic", ui-sans-serif,
+    sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-heading: var(--font-sans);
+  --font-display: var(--font-sans);
+  --font-jp:
+    var(--font-noto-jp), "Hiragino Sans", "Yu Gothic", ui-sans-serif, sans-serif;
+  --font-wordmark: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-ink: var(--ink);
+  --color-mist: var(--mist);
+  --ease-mechanical: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -56,58 +67,83 @@
 }
 
 :root {
-  --background: oklch(0.145 0.003 67);
-  --foreground: oklch(0.955 0.006 85);
-  --card: oklch(0.178 0.003 67);
-  --card-foreground: oklch(0.955 0.006 85);
-  --popover: oklch(0.195 0.003 67);
-  --popover-foreground: oklch(0.955 0.006 85);
-  --primary: oklch(0.955 0.006 85);
-  --primary-foreground: oklch(0.165 0.003 67);
-  --secondary: oklch(0.225 0.003 67);
-  --secondary-foreground: oklch(0.955 0.006 85);
-  --muted: oklch(0.205 0.003 67);
-  --muted-foreground: oklch(0.66 0.006 75);
-  --accent: oklch(0.235 0.004 67);
-  --accent-foreground: oklch(0.955 0.006 85);
-  --destructive: oklch(0.64 0.17 32);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 13%);
-  --ring: oklch(0.7 0.14 45);
-  --chart-1: oklch(0.7 0.14 45);
-  --chart-2: oklch(0.68 0.05 240);
-  --chart-3: oklch(0.7 0.08 150);
-  --chart-4: oklch(0.55 0.006 75);
-  --chart-5: oklch(0.38 0.004 67);
-  --radius: 0.25rem;
-  --graphite: oklch(0.205 0.003 67);
-  --rule: oklch(1 0 0 / 7%);
-  --rule-strong: oklch(1 0 0 / 16%);
-  --faint: oklch(0.585 0.005 70);
-  --clay: oklch(0.7 0.14 45);
-  --clay-deep: oklch(0.56 0.12 42);
-  --signal-steel: oklch(0.7 0.05 240);
-  --signal-moss: oklch(0.72 0.09 150);
-  --signal-rust: oklch(0.62 0.13 38);
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  color-scheme: dark;
+  --paper: oklch(0.94 0.003 106);
+  --paper-deep: oklch(0.905 0.004 100);
+  --ink: oklch(0.18 0 0);
+  --graphite: oklch(0.36 0.003 106);
+  --mist: oklch(0.5 0.004 100);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: oklch(0.975 0.002 106);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--paper-deep);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--graphite);
+  --accent: var(--paper-deep);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.55 0.2 29);
+  --border: oklch(0.18 0 0 / 14%);
+  --input: oklch(0.18 0 0 / 22%);
+  --ring: var(--ink);
+  --chart-1: var(--ink);
+  --chart-2: oklch(0.36 0.003 106);
+  --chart-3: oklch(0.5 0.004 100);
+  --chart-4: oklch(0.66 0.004 100);
+  --chart-5: oklch(0.8 0.003 100);
+  --radius: 0;
+  --rule: oklch(0.18 0 0 / 14%);
+  --rule-strong: oklch(0.18 0 0 / 70%);
+  --faint: var(--mist);
+  --clay: oklch(0.66 0.15 45);
+  --clay-deep: oklch(0.52 0.13 42);
+  --signal-steel: oklch(0.45 0.06 240);
+  --signal-moss: oklch(0.48 0.09 150);
+  --signal-rust: oklch(0.52 0.15 35);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: light;
 }
 
 @utility label {
   font-family: var(--font-mono);
-  font-size: var(--text-label);
-  line-height: var(--text-label--line-height);
-  letter-spacing: var(--text-label--letter-spacing);
+  font-size: 0.625rem;
+  line-height: 0.875rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 @utility display {
-  font-family: var(--font-display);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 0.9;
-  font-stretch: 72%;
+  font-family: var(--font-sans);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  line-height: 0.88;
   text-wrap: balance;
+}
+
+@utility jp {
+  font-family: var(--font-jp);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@utility hazard-stripe {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    currentColor 0 2px,
+    transparent 2px 6px
+  );
+}
+
+@utility hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--rule) 0 1px,
+    transparent 1px 6px
+  );
 }
 
 @utility blueprint-grid {
@@ -119,23 +155,12 @@
 }
 
 @utility blueprint-dots {
-  background-image: radial-gradient(var(--rule-strong) 1px, transparent 1px);
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
   background-size: var(--grid-size, 24px) var(--grid-size, 24px);
 }
 
 @utility grain {
-  position: relative;
-  isolation: isolate;
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: var(--grain);
-    opacity: 0.035;
-    mix-blend-mode: overlay;
-  }
+  background-image: var(--grain);
 }
 
 @utility hairline {

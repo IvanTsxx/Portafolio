@@ -59,7 +59,7 @@ export const Contact = () => (
             ))}
           </ul>
           <p className="label text-faint" data-assembly-content>
-            {siteConfig.location} · UTC−03 · {siteConfig.studio}
+            {siteConfig.location} · UTC−03
           </p>
         </div>
       </div>

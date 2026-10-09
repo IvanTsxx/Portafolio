@@ -1,20 +1,37 @@
-import { Archivo, Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist_Mono,
+  Instrument_Serif,
+  Noto_Sans_JP,
+  Zen_Kaku_Gothic_New,
+} from "next/font/google";
 
-const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
+const zenKaku = Zen_Kaku_Gothic_New({
+  subsets: ["latin"],
+  variable: "--font-zen-kaku",
+  weight: ["300", "400", "500", "700"],
+});
+
+const notoJp = Noto_Sans_JP({
+  preload: false,
+  variable: "--font-noto-jp",
+  weight: ["300", "400", "500"],
+});
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
 });
 
-const archivo = Archivo({
-  axes: ["wdth"],
+const instrumentSerif = Instrument_Serif({
+  style: ["italic"],
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-instrument-serif",
+  weight: "400",
 });
 
 export const fontClassNames = [
-  geistSans.variable,
+  zenKaku.variable,
+  notoJp.variable,
   geistMono.variable,
-  archivo.variable,
+  instrumentSerif.variable,
 ].join(" ");

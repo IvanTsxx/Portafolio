@@ -7,7 +7,7 @@ export const contentType = "image/png";
 
 const OpenGraphImage = () =>
   renderOgImage({
-    eyebrow: `${siteConfig.role} · ${siteConfig.studio}`,
+    eyebrow: `${siteConfig.role} · ${siteConfig.location}`,
     title: "Agent Workshop",
   });
 

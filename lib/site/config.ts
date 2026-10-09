@@ -1,12 +1,13 @@
 export const siteConfig = {
   description:
-    "Ivan Bongiovanni, frontend engineer at Basement Studio. Interfaces, motion, 3D on the web, and AI-assisted development orchestrated with Conductor, git worktrees, skills and MCPs.",
-  email: "ivan@basement.studio",
+    "Ivan Bongiovanni, frontend engineer. Interfaces, motion, real-time 3D and AI-assisted development with Conductor, git worktrees, agents, skills and MCPs.",
+  email: "bongiovannidev@gmail.com",
+  github: "IvanTsxx",
   handle: "IvanTsxx",
-  location: "Tucumán, AR",
+  location: "Tucumán, Argentina",
   name: "Ivan Bongiovanni",
   registryNamespace: "@ivan",
-  role: "Creative frontend engineer",
+  role: "Frontend engineer",
   shortName: "Ivan",
   socials: [
     { href: "https://github.com/IvanTsxx", label: "GitHub" },
@@ -16,7 +17,6 @@ export const siteConfig = {
       label: "LinkedIn",
     },
   ],
-  studio: "Basement Studio",
   url: "https://bongi.dev",
 } as const;
 

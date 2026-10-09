@@ -5,7 +5,6 @@ import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { fontClassNames } from "@/lib/fonts";
 import { siteConfig } from "@/lib/site/config";
-import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   description: siteConfig.description,
@@ -25,12 +24,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: "dark",
-  themeColor: "#121110",
+  colorScheme: "light",
+  themeColor: "#ededeb",
 };
 
 const RootLayout = ({ children }: LayoutProps<"/">) => (
-  <html className={cn("dark", fontClassNames)} lang="en">
+  <html className={fontClassNames} lang="en">
     <body className="flex min-h-svh flex-col">
       <a
         className="label bg-clay text-primary-foreground fixed top-2 left-2 z-100 -translate-y-20 px-3 py-2 focus:translate-y-0"
