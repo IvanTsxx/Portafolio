@@ -83,7 +83,7 @@
   --graphite: oklch(0.205 0.003 67);
   --rule: oklch(1 0 0 / 7%);
   --rule-strong: oklch(1 0 0 / 16%);
-  --faint: oklch(0.46 0.005 70);
+  --faint: oklch(0.585 0.005 70);
   --clay: oklch(0.7 0.14 45);
   --clay-deep: oklch(0.56 0.12 42);
   --signal-steel: oklch(0.7 0.05 240);
