@@ -7,7 +7,7 @@ import type { Group } from "three";
 
 import { Agent } from "@/components/agents/agent";
 import { CameraRig } from "@/components/home/scene/camera-rig";
-import { scenePalette, sceneSkyLight } from "@/components/home/scene/palette";
+import { scenePalette } from "@/components/home/scene/palette";
 import { SceneReady } from "@/components/home/scene/scene-ready";
 import type { SceneRenderProps } from "@/components/home/scene/scene-slot";
 import { WorkshopFloor } from "@/components/home/scene/workshop-props";
@@ -48,14 +48,18 @@ const DebuggerScene = ({
   reducedMotion,
 }: SceneRenderProps) => (
   <Stage
-    camera={{ fov: 30, position: debuggerCameraBase }}
+    camera={{
+      fov: 30,
+      position: debuggerCameraBase,
+      target: debuggerCameraTarget,
+    }}
     className="absolute inset-0"
     frameloop={frameloop}
+    shadowExtent={3.5}
     label="Debugger agent inspecting a broken route blueprint with a magnifying glass"
   >
     <SceneReady onReady={onReady} />
     <CameraRig base={debuggerCameraBase} target={debuggerCameraTarget} />
-    <hemisphereLight args={sceneSkyLight} />
     <WorkshopFloor fadeDistance={12} />
     {brokenSegments.map((segment) => (
       <mesh

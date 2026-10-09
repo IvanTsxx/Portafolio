@@ -2,7 +2,7 @@
 
 import { Agent } from "@/components/agents/agent";
 import { CameraRig } from "@/components/home/scene/camera-rig";
-import { scenePalette, sceneSkyLight } from "@/components/home/scene/palette";
+import { scenePalette } from "@/components/home/scene/palette";
 import { TagLayer, TagProjector } from "@/components/home/scene/projected-tags";
 import { SceneReady } from "@/components/home/scene/scene-ready";
 import type { SceneRenderProps } from "@/components/home/scene/scene-slot";
@@ -26,15 +26,15 @@ import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 const heroCrew = [
   {
     action: "direct",
-    position: [0, 0, 1.6],
+    position: [1, 0, 2.1],
     role: "orchestrator",
-    rotationY: 0,
+    rotationY: -0.35,
   },
   {
     action: "type",
-    position: [-1.7, 0, 0.35],
+    position: [-1.3, 0, 0.6],
     role: "builder",
-    rotationY: Math.PI,
+    rotationY: Math.PI - 0.6,
   },
   {
     action: "point",
@@ -44,13 +44,13 @@ const heroCrew = [
   },
   {
     action: "read",
-    position: [2.8, 0, 1.2],
+    position: [3, 0, 0.9],
     role: "researcher",
     rotationY: -0.6,
   },
   {
     action: "inspect",
-    position: [-3.4, 0, 1.6],
+    position: [-3.2, 0, 1.5],
     role: "debugger",
     rotationY: 0.7,
   },
@@ -61,8 +61,8 @@ const heroCrew = [
   rotationY: number;
 }[];
 
-const heroCameraBase: [number, number, number] = [7.5, 5.6, 10.5];
-const heroCameraTarget: [number, number, number] = [0, 0.7, 0];
+const heroCameraBase: [number, number, number] = [7, 5.2, 10];
+const heroCameraTarget: [number, number, number] = [-0.2, 0.9, 0];
 
 const HeroScene = ({ frameloop, onReady, reducedMotion }: SceneRenderProps) => {
   const anchors = useTagAnchors();
@@ -76,9 +76,10 @@ const HeroScene = ({ frameloop, onReady, reducedMotion }: SceneRenderProps) => {
   return (
     <>
       <Stage
-        camera={{ fov: 30, position: heroCameraBase }}
+        camera={{ fov: 30, position: heroCameraBase, target: heroCameraTarget }}
         className="absolute inset-0"
         frameloop={frameloop}
+        shadowExtent={5}
         label="Isometric workstation where five agents direct, type, point, read and inspect"
       >
         <SceneReady onReady={onReady} />
@@ -87,7 +88,6 @@ const HeroScene = ({ frameloop, onReady, reducedMotion }: SceneRenderProps) => {
           pointerSway={reducedMotion ? 0 : 0.6}
           target={heroCameraTarget}
         />
-        <hemisphereLight args={sceneSkyLight} />
         <WorkshopFloor />
         <Desk depth={1.1} position={[-1.2, 0, -0.4]} width={3.2} />
         <Monitor position={[-1.9, 0.94, -0.65]} />
@@ -112,11 +112,11 @@ const HeroScene = ({ frameloop, onReady, reducedMotion }: SceneRenderProps) => {
               focused={member.role === "orchestrator"}
               role={member.role}
               rotation-y={member.rotationY}
-              scale={0.7}
+              scale={0.65}
             />
           </group>
         ))}
-        <TagProjector anchors={anchors} elements={tagElements} lift={1.3} />
+        <TagProjector anchors={anchors} elements={tagElements} lift={1.65} />
       </Stage>
       <TagLayer elements={tagElements} tags={tags} />
     </>

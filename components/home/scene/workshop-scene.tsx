@@ -9,7 +9,7 @@ import type { Group, MeshStandardMaterial } from "three";
 
 import { Agent } from "@/components/agents/agent";
 import { CameraRig } from "@/components/home/scene/camera-rig";
-import { scenePalette, sceneSkyLight } from "@/components/home/scene/palette";
+import { scenePalette } from "@/components/home/scene/palette";
 import { TagLayer, TagProjector } from "@/components/home/scene/projected-tags";
 import { SceneReady } from "@/components/home/scene/scene-ready";
 import type { SceneRenderProps } from "@/components/home/scene/scene-slot";
@@ -45,8 +45,8 @@ const reducedMotionStageProgress = 3.7;
 const { smoothstep, lerp, damp } = MathUtils;
 const draftColor = new Color(scenePalette.graphite);
 const finishedColor = new Color(scenePalette.clay);
-const workshopCameraBase: [number, number, number] = [0, 7.5, 10];
-const workshopCameraTarget: [number, number, number] = [0, 0, 0];
+const workshopCameraBase: [number, number, number] = [0, 10.5, 7.4];
+const workshopCameraTarget: [number, number, number] = [0, 0, -0.3];
 
 const stationXAt = (stagePosition: number) => {
   const stageIndex = Math.min(
@@ -63,13 +63,13 @@ const splitAmountAt = (stagePosition: number) =>
   smoothstep(stagePosition, 2, 2.45) * (1 - smoothstep(stagePosition, 5, 5.45));
 
 const crewLayout = {
-  analyst: { position: [3.4, 0, 2.5], rotationY: Math.PI },
+  analyst: { position: [4.4, 0, 1.8], rotationY: -Math.PI / 2 - 0.5 },
   architect: { position: [-3, 0, 1.3], rotationY: Math.PI * 0.85 },
-  builder: { position: [1.95, 0, laneZ[1]], rotationY: -Math.PI / 2 },
-  debugger: { position: [1.95, 0, laneZ[2]], rotationY: -Math.PI / 2 },
-  inspector: { position: [3.4, 0, -2.5], rotationY: 0 },
+  builder: { position: [2.35, 0, laneZ[1]], rotationY: -Math.PI / 2 },
+  debugger: { position: [2.35, 0, laneZ[2]], rotationY: -Math.PI / 2 },
+  inspector: { position: [4.4, 0, -1.8], rotationY: -Math.PI / 2 + 0.5 },
   orchestrator: { position: [-3, 0, -1.3], rotationY: Math.PI * 0.15 },
-  researcher: { position: [1.95, 0, laneZ[0]], rotationY: -Math.PI / 2 },
+  researcher: { position: [2.35, 0, laneZ[0]], rotationY: -Math.PI / 2 },
 } as const satisfies Record<
   AgentRole,
   { position: [number, number, number]; rotationY: number }
@@ -316,12 +316,12 @@ const WorkshopRig = ({
               focused={isActive}
               role={role}
               rotation-y={layout.rotationY}
-              scale={0.55}
+              scale={0.5}
             />
           </group>
         );
       })}
-      <TagProjector anchors={anchors} elements={tagElements} lift={1.1} />
+      <TagProjector anchors={anchors} elements={tagElements} lift={1.2} />
     </>
   );
 };
@@ -343,13 +343,17 @@ const WorkshopScene = ({
   return (
     <>
       <Stage
-        camera={{ fov: 30, position: workshopCameraBase }}
+        camera={{
+          fov: 30,
+          position: workshopCameraBase,
+          target: workshopCameraTarget,
+        }}
         className="absolute inset-0"
         frameloop={frameloop}
+        shadowExtent={7}
         label="Workbench where an issue card splits into three worktree lanes, gets built and reviewed, then merges into one finished module"
       >
         <SceneReady onReady={onReady} />
-        <hemisphereLight args={sceneSkyLight} />
         <WorkshopFloor fadeDistance={26} />
         <WorkshopRig
           activeStage={activeStage}

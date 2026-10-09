@@ -8,5 +8,3 @@ export const scenePalette = {
   surface: "#3a3734",
   surfaceLight: "#4a4642",
 } as const;
-
-export const sceneSkyLight = ["#f3ede6", "#1a1816", 0.4] as const;

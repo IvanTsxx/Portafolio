@@ -10,24 +10,18 @@ export const WorkshopFloor = ({
 }: {
   fadeDistance?: number;
 }) => (
-  <>
-    <Grid
-      cellColor={scenePalette.floorCell}
-      cellSize={0.5}
-      cellThickness={0.6}
-      fadeDistance={fadeDistance}
-      fadeStrength={1.4}
-      infiniteGrid
-      position={[0, -0.001, 0]}
-      sectionColor={scenePalette.floorSection}
-      sectionSize={2.5}
-      sectionThickness={1}
-    />
-    <mesh receiveShadow rotation-x={-Math.PI / 2}>
-      <planeGeometry args={[40, 40]} />
-      <shadowMaterial opacity={0.35} />
-    </mesh>
-  </>
+  <Grid
+    cellColor={scenePalette.floorCell}
+    cellSize={0.5}
+    cellThickness={0.6}
+    fadeDistance={fadeDistance}
+    fadeStrength={1.4}
+    infiniteGrid
+    position={[0, 0.003, 0]}
+    sectionColor={scenePalette.floorSection}
+    sectionSize={2.5}
+    sectionThickness={1}
+  />
 );
 
 export const Desk = ({
