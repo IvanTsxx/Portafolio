@@ -1,0 +1,196 @@
+export const meta = {
+  title: "Worktrees as lanes: how I run parallel agents in Conductor",
+  date: "2026-10-09",
+  summary:
+    "Two agents in one checkout collide on files, branches and ports. A git worktree gives each agent its own lane. This is how I cut lanes, what they isolate, and what they still share.",
+  tags: ["Conductor", "Git worktrees", "AI agents", "Workflow"],
+  sample: true,
+};
+
+Two agents in one checkout will eventually edit the same file. Even when they do not, they fight over the branch, the dev server port and `node_modules`. A git worktree removes that fight by giving each agent its own directory. I call each one a lane.
+
+<Callout tone="sample" title="Sample draft">
+  This note is an editable draft that ships with the template. It describes a
+  workflow and makes no claims about measured results. Edit it in
+  `content/blog/worktrees-as-lanes.mdx`.
+</Callout>
+
+## What a lane is
+
+A worktree is a second working directory attached to the same repository. It has its own checked-out branch, its own files and its own untracked state. It shares the object database, the remotes and the config with the main checkout.
+
+Conductor creates one worktree per workspace. That makes the lane the unit of delegation: one workspace, one branch, one agent and one diff to review.
+
+<Diagram
+  caption="Every lane has its own files and branch. The repository underneath is shared."
+  label="One shared git repository with three lanes attached: main, lane hero and lane nav. Each lane has an agent."
+>
+  <svg
+    className="h-auto w-full max-w-xl"
+    fill="none"
+    viewBox="0 0 560 220"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect
+      className="stroke-rule-strong"
+      height="44"
+      width="240"
+      x="160"
+      y="8"
+    />
+    <text
+      className="fill-muted-foreground font-mono text-xs"
+      textAnchor="middle"
+      x="280"
+      y="35"
+    >
+      {"shared .git"}
+    </text>
+    <path
+      className="stroke-rule-strong"
+      d="M280 52 V84 M80 84 H480 M80 84 V116 M280 84 V116 M480 84 V116"
+    />
+    <rect
+      className="stroke-rule-strong"
+      height="96"
+      width="160"
+      x="0"
+      y="116"
+    />
+    <rect
+      className="stroke-rule-strong"
+      height="96"
+      width="160"
+      x="200"
+      y="116"
+    />
+    <rect
+      className="stroke-rule-strong"
+      height="96"
+      width="160"
+      x="400"
+      y="116"
+    />
+    <text
+      className="fill-foreground font-mono text-xs"
+      textAnchor="middle"
+      x="80"
+      y="144"
+    >
+      {"main"}
+    </text>
+    <text
+      className="fill-foreground font-mono text-xs"
+      textAnchor="middle"
+      x="280"
+      y="144"
+    >
+      {"lane/hero"}
+    </text>
+    <text
+      className="fill-foreground font-mono text-xs"
+      textAnchor="middle"
+      x="480"
+      y="144"
+    >
+      {"lane/nav"}
+    </text>
+    <text
+      className="fill-muted-foreground font-mono text-xs"
+      textAnchor="middle"
+      x="80"
+      y="176"
+    >
+      {"me"}
+    </text>
+    <text
+      className="fill-muted-foreground font-mono text-xs"
+      textAnchor="middle"
+      x="280"
+      y="176"
+    >
+      {"agent"}
+    </text>
+    <text
+      className="fill-muted-foreground font-mono text-xs"
+      textAnchor="middle"
+      x="480"
+      y="176"
+    >
+      {"agent"}
+    </text>
+  </svg>
+</Diagram>
+
+## What is isolated and what is shared
+
+| Thing | Scope | What it means |
+| --- | --- | --- |
+| Working files | Per lane | An agent cannot overwrite another lane's edits |
+| Checked-out branch | Per lane | A branch can be checked out in only one worktree |
+| `node_modules` and build output | Per lane | Install dependencies in every new lane |
+| Dev server port | Per lane, if you choose it | Two servers on one port will fail to start |
+| Git objects and remotes | Shared | A fetch in one lane is visible in all of them |
+| Stash stack | Shared | See the warning below |
+| Git config and hooks | Shared | One setup covers every lane |
+
+<Callout tone="warning" title="The stash is shared">
+  `git stash` in one lane is visible from every other lane. A bare `git stash
+  pop` can apply another lane's work. Commit a work-in-progress instead and
+  amend it later.
+</Callout>
+
+## Setting up a lane
+
+<Steps>
+  <Step title="Create the worktree">
+    Branch from the remote default so the lane starts from known code.
+  </Step>
+  <Step title="Install dependencies">
+    The lane has no `node_modules` yet. Install before anything runs.
+  </Step>
+  <Step title="Pick a port">
+    Give each dev server its own port so lanes can run side by side.
+  </Step>
+  <Step title="Write the brief">
+    State the goal, the files in scope and how to verify the result.
+  </Step>
+  <Step title="Review the diff">
+    Read the change before it merges. This step is not delegated.
+  </Step>
+</Steps>
+
+```bash title="new-lane.sh"
+git worktree add ../lane-hero -b lane/hero origin/main
+cd ../lane-hero
+bun install
+bun dev --port 3105
+```
+
+Conductor runs the first command for you when it creates a workspace. The rest is the same.
+
+## Cut lanes along files, not features
+
+A lane works when its files do not overlap with another lane's files. Two lanes that edit the same layout file will conflict at merge time, however clean the worktrees are.
+
+Before I fan out, I list the files each lane owns. Shared files such as config, route registries and the global stylesheet get one owner. Other lanes ask that owner for changes instead of editing the file.
+
+```txt
+lane/hero   app/page.tsx, components/hero/**
+lane/nav    components/site/**
+owner       app/layout.tsx, app/globals.css
+```
+
+## Merge and clean up
+
+Merge one lane at a time in dependency order. Run typecheck, lint and tests after each merge, not once at the end. When a lane has merged, remove it.
+
+```bash title="finish-lane.sh"
+git worktree list
+git worktree remove ../lane-hero
+git branch -d lane/hero
+```
+
+## What lanes do not do
+
+Worktrees isolate files. They do not isolate decisions. An agent in a lane can still make a wrong call, and the diff will look tidy while it does. Reading the diff is the part I keep.

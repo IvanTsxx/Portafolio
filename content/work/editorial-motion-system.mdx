@@ -1,0 +1,136 @@
+export const meta = {
+  title: "Editorial motion system",
+  year: 2026,
+  context: "Sample entry for a marketing site. No real client.",
+  role: "Frontend engineer",
+  summary:
+    "A sample case study showing how a scroll and hover motion layer for an editorial site gets documented: constraints, timing tokens, choreography and the reduced-motion composition.",
+  technologies: ["Next.js", "GSAP", "Tailwind CSS", "TypeScript"],
+  responsibilities: [
+    "Timing and easing tokens shared by CSS and GSAP",
+    "Scroll-linked sequences with ScrollTrigger",
+    "Reduced-motion composition for every sequence",
+    "Motion notes for design handoff",
+  ],
+  previews: [],
+  links: [],
+  motionNotes: [
+    "Every entrance uses one exponential ease-out curve and a short duration scale.",
+    "Hover and focus states are CSS transitions. GSAP is reserved for scroll-linked sequences.",
+    "Reduced motion renders the final composition with no transforms and no pinned sections.",
+  ],
+  aiWorkflowNotes: [
+    "An agent audits existing animations against the timing scale and lists the outliers.",
+    "A subagent drafts the reduced-motion variants in its own worktree. The diff is reviewed before it merges.",
+    "Every timing decision is made and signed off by a person.",
+  ],
+  featured: true,
+  sample: true,
+  related: ["composable-page-builder", "product-configurator"],
+};
+
+import placeholder from "./media/blueprint-placeholder.png";
+
+<Callout tone="sample" title="Sample case study">
+  Everything on this page is placeholder text that demonstrates the template.
+  Replace the meta block and the sections with a real project. The file is
+  `content/work/editorial-motion-system.mdx`.
+</Callout>
+
+## Context
+
+Describe who the project was for, what shipped and which constraints shaped it. For a motion layer the useful constraints are the target devices, the performance budget and the content that moves.
+
+<Figure
+  alt="Blueprint grid with an orange box and a dashed target frame, used as a placeholder image"
+  caption="Placeholder image. Import real screenshots next to the MDX file and pass them to Figure."
+  src={placeholder}
+/>
+
+## Challenges
+
+- Motion that reads well with every animation switched off.
+- One timing scale shared by CSS transitions and GSAP timelines.
+- Scroll effects that never hijack scrolling on touch devices.
+
+## Contribution
+
+State plainly what you owned and what the team owned. Keep each responsibility specific enough that a reviewer could ask about it.
+
+### Motion tokens
+
+Durations and easings live in one place so a designer can change them without reading a timeline.
+
+### Choreography
+
+Sequences are written once and reused. Each one declares its reduced-motion composition up front.
+
+## Architecture
+
+<Diagram
+  caption="Illustrative architecture. One token set feeds both animation layers."
+  label="Motion tokens feed CSS transitions and GSAP timelines, which both fall back to a static composition"
+>
+  <div className="grid w-full max-w-2xl gap-4 text-center text-sm sm:grid-cols-3 sm:items-center">
+    <div className="border-rule-strong border p-4">{"Motion tokens"}</div>
+    <div className="grid gap-4">
+      <div className="border-rule-strong border p-4">{"CSS transitions"}</div>
+      <div className="border-rule-strong border p-4">{"GSAP timelines"}</div>
+    </div>
+    <div className="border-rule-strong text-muted-foreground border border-dashed p-4">
+      {"Static composition"}
+    </div>
+  </div>
+</Diagram>
+
+## Implementation
+
+<Steps>
+  <Step title="Define the tokens">
+    Name every duration and easing once. Reference the names everywhere else.
+  </Step>
+  <Step title="Build the sequence">
+    Scope each timeline to a container ref so cleanup is automatic.
+  </Step>
+  <Step title="Write the fallback">
+    Render the final state when the visitor asks for reduced motion.
+  </Step>
+</Steps>
+
+```ts title="motion-tokens.ts"
+export const durations = {
+  fast: 0.2,
+  base: 0.4,
+  slow: 0.8,
+} as const;
+
+export const easings = {
+  outQuart: "power3.out",
+  outExpo: "expo.out",
+} as const;
+```
+
+| Token  | Value | Used for                 |
+| ------ | ----- | ------------------------ |
+| `fast` | 0.2 s | Hover and focus feedback |
+| `base` | 0.4 s | Entrances                |
+| `slow` | 0.8 s | Scroll-linked reveals    |
+
+<Demo title="Live demo slot">
+  Embed a Codesandbox, a Storybook story or an interactive component here.
+</Demo>
+
+## Motion and interaction
+
+<NoteList items={meta.motionNotes} />
+
+## AI collaboration
+
+<NoteList items={meta.aiWorkflowNotes} />
+
+## Outcomes
+
+<Callout tone="warning" title="No outcomes recorded">
+  This is a sample entry. Add measured results such as Core Web Vitals, launch
+  date or adoption only when they are real.
+</Callout>
