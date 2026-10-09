@@ -1,0 +1,160 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "magnetic-button",
+  "title": "Industrial Magnetic Button",
+  "description": "Hairline button that leans toward the pointer, sweeps a clay fill in from the left and extends corner marks on hover. Ships as a button and as a link.",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/ivan/ui/magnetic-button.tsx",
+      "content": "\"use client\";\n\nimport { cva } from \"class-variance-authority\";\nimport type { VariantProps } from \"class-variance-authority\";\nimport type {\n  ComponentProps,\n  CSSProperties,\n  PointerEvent,\n  ReactNode,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { usePrefersReducedMotion } from \"@/registry/ivan/hooks/use-prefers-reduced-motion\";\n\nconst magneticButtonVariants = cva(\n  \"ease-out-expo group-focus-visible/mb:ring-ring group-focus-visible/mb:ring-offset-background relative flex translate-x-(--mb-x) translate-y-(--mb-y) items-center justify-center border font-mono tracking-widest whitespace-nowrap uppercase transition-[translate,scale,color,border-color] duration-500 group-focus-visible/mb:ring-2 group-focus-visible/mb:ring-offset-2 group-active/mb:scale-97 group-disabled/mb:opacity-50 group-aria-disabled/mb:opacity-50 group-data-[tracking=true]/mb:duration-100 motion-reduce:transition-none\",\n  {\n    defaultVariants: { size: \"md\", variant: \"outline\" },\n    variants: {\n      size: {\n        lg: \"h-14 gap-3 px-8 text-sm\",\n        md: \"h-11 gap-2 px-6 text-xs\",\n        sm: \"h-9 gap-2 px-4 text-xs\",\n      },\n      variant: {\n        accent:\n          \"border-clay text-clay group-hover/mb:text-primary-foreground group-focus-visible/mb:text-primary-foreground\",\n        ghost:\n          \"text-muted-foreground group-hover/mb:text-foreground group-focus-visible/mb:text-foreground border-transparent\",\n        outline:\n          \"border-border text-foreground group-hover/mb:border-clay group-hover/mb:text-primary-foreground group-focus-visible/mb:border-clay group-focus-visible/mb:text-primary-foreground\",\n        solid:\n          \"border-foreground bg-foreground text-background group-hover/mb:border-clay group-hover/mb:text-primary-foreground group-focus-visible/mb:border-clay group-focus-visible/mb:text-primary-foreground\",\n      },\n    },\n  }\n);\n\nconst fieldClassName =\n  \"group/mb relative inline-flex min-h-11 min-w-11 cursor-pointer touch-manipulation items-center justify-center outline-none select-none disabled:pointer-events-none aria-disabled:pointer-events-none\";\n\nconst fillClassName =\n  \"absolute inset-0 origin-left scale-x-0 transition-transform duration-300 ease-out-expo group-hover/mb:scale-x-100 group-focus-visible/mb:scale-x-100 group-active/mb:scale-x-100 motion-reduce:transition-none\";\n\nconst markerClassNames = [\n  \"-top-1.5 -left-1.5 border-t border-l group-hover/mb:-translate-x-0.5 group-hover/mb:-translate-y-0.5\",\n  \"-top-1.5 -right-1.5 border-t border-r group-hover/mb:translate-x-0.5 group-hover/mb:-translate-y-0.5\",\n  \"-bottom-1.5 -left-1.5 border-b border-l group-hover/mb:-translate-x-0.5 group-hover/mb:translate-y-0.5\",\n  \"-right-1.5 -bottom-1.5 border-r border-b group-hover/mb:translate-x-0.5 group-hover/mb:translate-y-0.5\",\n] as const;\n\ntype MagnetStyle = CSSProperties & {\n  \"--mb-label-x\": string;\n  \"--mb-label-y\": string;\n  \"--mb-x\": string;\n  \"--mb-y\": string;\n};\n\nconst restStyle: MagnetStyle = {\n  \"--mb-label-x\": \"0px\",\n  \"--mb-label-y\": \"0px\",\n  \"--mb-x\": \"0px\",\n  \"--mb-y\": \"0px\",\n};\n\nconst pullFactor = 0.3;\nconst labelParallax = 0.5;\n\nconst clamp = (value: number, limit: number) =>\n  Math.min(limit, Math.max(-limit, value));\n\nconst isFinePointer = (event: PointerEvent<HTMLElement>) =>\n  event.pointerType === \"mouse\" || event.pointerType === \"pen\";\n\nconst setOffset = (element: HTMLElement, x: number, y: number) => {\n  element.style.setProperty(\"--mb-x\", `${x.toFixed(2)}px`);\n  element.style.setProperty(\"--mb-y\", `${y.toFixed(2)}px`);\n  element.style.setProperty(\n    \"--mb-label-x\",\n    `${(x * labelParallax).toFixed(2)}px`\n  );\n  element.style.setProperty(\n    \"--mb-label-y\",\n    `${(y * labelParallax).toFixed(2)}px`\n  );\n};\n\nconst releaseMagnet = (event: PointerEvent<HTMLElement>) => {\n  delete event.currentTarget.dataset.tracking;\n  setOffset(event.currentTarget, 0, 0);\n};\n\nconst useMagnet = (strength: number) => {\n  const reducedMotion = usePrefersReducedMotion();\n  const limit = Math.min(24, Math.max(0, strength));\n\n  const onPointerEnter = (event: PointerEvent<HTMLElement>) => {\n    if (reducedMotion || !isFinePointer(event)) {\n      return;\n    }\n    event.currentTarget.dataset.tracking = \"true\";\n  };\n\n  const onPointerMove = (event: PointerEvent<HTMLElement>) => {\n    if (reducedMotion || !isFinePointer(event)) {\n      return;\n    }\n    const element = event.currentTarget;\n    const rect = element.getBoundingClientRect();\n    const offsetX = event.clientX - (rect.left + rect.width / 2);\n    const offsetY = event.clientY - (rect.top + rect.height / 2);\n    setOffset(\n      element,\n      clamp(offsetX * pullFactor, limit),\n      clamp(offsetY * pullFactor, limit)\n    );\n  };\n\n  return { onPointerEnter, onPointerLeave: releaseMagnet, onPointerMove };\n};\n\ninterface MagneticOwnProps extends VariantProps<typeof magneticButtonVariants> {\n  index?: string;\n  strength?: number;\n}\n\nconst MagneticSurface = ({\n  children,\n  index,\n  size,\n  variant,\n}: MagneticOwnProps & { children: ReactNode }) => (\n  <span\n    className={magneticButtonVariants({ size, variant })}\n    data-slot=\"magnetic-button-surface\"\n  >\n    <span\n      aria-hidden=\"true\"\n      className={cn(\n        fillClassName,\n        variant === \"ghost\" ? \"bg-accent\" : \"bg-clay\"\n      )}\n    />\n    {markerClassNames.map((marker) => (\n      <span\n        aria-hidden=\"true\"\n        className={cn(\n          \"border-clay ease-out-expo pointer-events-none absolute size-1.5 opacity-0 transition-[opacity,translate] duration-300 group-hover/mb:opacity-100 group-focus-visible/mb:opacity-100 motion-reduce:transition-none\",\n          marker\n        )}\n        key={marker}\n      />\n    ))}\n    <span className=\"ease-out-expo relative flex translate-x-(--mb-label-x) translate-y-(--mb-label-y) items-center gap-2 transition-transform duration-500 group-data-[tracking=true]/mb:duration-100 motion-reduce:transition-none\">\n      {index ? (\n        <span aria-hidden=\"true\" className=\"tabular-nums opacity-60\">\n          {index}\n        </span>\n      ) : null}\n      {children}\n    </span>\n  </span>\n);\n\nconst composeHandler =\n  <Event,>(first: (event: Event) => void, second?: (event: Event) => void) =>\n  (event: Event) => {\n    first(event);\n    second?.(event);\n  };\n\ntype MagneticButtonProps = Omit<ComponentProps<\"button\">, \"children\"> &\n  MagneticOwnProps & { children: ReactNode };\n\nconst MagneticButton = ({\n  children,\n  className,\n  index,\n  onPointerEnter,\n  onPointerLeave,\n  onPointerMove,\n  size,\n  strength = 8,\n  style,\n  variant,\n  ...props\n}: MagneticButtonProps) => {\n  const magnet = useMagnet(strength);\n\n  return (\n    <button\n      className={cn(fieldClassName, className)}\n      data-slot=\"magnetic-button\"\n      onPointerEnter={composeHandler(magnet.onPointerEnter, onPointerEnter)}\n      onPointerLeave={composeHandler(magnet.onPointerLeave, onPointerLeave)}\n      onPointerMove={composeHandler(magnet.onPointerMove, onPointerMove)}\n      style={{ ...restStyle, ...style }}\n      type=\"button\"\n      {...props}\n    >\n      <MagneticSurface index={index} size={size} variant={variant}>\n        {children}\n      </MagneticSurface>\n    </button>\n  );\n};\n\ntype MagneticLinkProps = Omit<ComponentProps<\"a\">, \"children\"> &\n  MagneticOwnProps & { children: ReactNode; href: string };\n\nconst MagneticLink = ({\n  children,\n  className,\n  index,\n  onPointerEnter,\n  onPointerLeave,\n  onPointerMove,\n  size,\n  strength = 8,\n  style,\n  variant,\n  ...props\n}: MagneticLinkProps) => {\n  const magnet = useMagnet(strength);\n\n  return (\n    <a\n      className={cn(fieldClassName, className)}\n      data-slot=\"magnetic-link\"\n      onPointerEnter={composeHandler(magnet.onPointerEnter, onPointerEnter)}\n      onPointerLeave={composeHandler(magnet.onPointerLeave, onPointerLeave)}\n      onPointerMove={composeHandler(magnet.onPointerMove, onPointerMove)}\n      style={{ ...restStyle, ...style }}\n      {...props}\n    >\n      <MagneticSurface index={index} size={size} variant={variant}>\n        {children}\n      </MagneticSurface>\n    </a>\n  );\n};\n\nexport { MagneticButton, MagneticLink };\nexport type { MagneticButtonProps, MagneticLinkProps };\n",
+      "type": "registry:ui",
+      "target": "@ui/magnetic-button.tsx"
+    },
+    {
+      "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nconst reducedMotionQuery = \"(prefers-reduced-motion: reduce)\";\n\nconst subscribe = (onChange: () => void) => {\n  const mediaQuery = window.matchMedia(reducedMotionQuery);\n  mediaQuery.addEventListener(\"change\", onChange);\n  return () => mediaQuery.removeEventListener(\"change\", onChange);\n};\n\nconst getSnapshot = () => window.matchMedia(reducedMotionQuery).matches;\n\nconst getServerSnapshot = () => false;\n\nexport const usePrefersReducedMotion = () =>\n  useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-prefers-reduced-motion.ts"
+    }
+  ],
+  "cssVars": {
+    "theme": {
+      "color-clay": "var(--clay)",
+      "ease-out-expo": "cubic-bezier(0.16, 1, 0.3, 1)"
+    },
+    "light": {
+      "clay": "oklch(0.56 0.12 42)"
+    },
+    "dark": {
+      "clay": "oklch(0.7 0.14 45)"
+    }
+  },
+  "meta": {
+    "docs": {
+      "props": [
+        {
+          "component": "MagneticButton",
+          "description": "A native button. Extends every button prop except children, which is required.",
+          "props": [
+            {
+              "name": "variant",
+              "type": "\"outline\" | \"solid\" | \"accent\" | \"ghost\"",
+              "default": "\"outline\"",
+              "description": "Surface treatment. Every variant except ghost fills with clay on hover."
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | \"lg\"",
+              "default": "\"md\"",
+              "description": "Visual height of 36, 44 or 56 px. The touch target is at least 44 px for every size."
+            },
+            {
+              "name": "strength",
+              "type": "number",
+              "default": "8",
+              "description": "Maximum pull toward the pointer in px. Clamped between 0 and 24. 0 turns the magnet off."
+            },
+            {
+              "name": "index",
+              "type": "string",
+              "description": "Optional mono index shown before the label, for example 01. Decorative and hidden from assistive tech."
+            },
+            {
+              "name": "type",
+              "type": "\"button\" | \"submit\" | \"reset\"",
+              "default": "\"button\"",
+              "description": "Native button type. Defaults to button so it never submits a form by accident."
+            }
+          ]
+        },
+        {
+          "component": "MagneticLink",
+          "description": "The same surface as a native anchor. Extends every anchor prop except children, which is required.",
+          "props": [
+            {
+              "name": "href",
+              "type": "string",
+              "required": true,
+              "description": "Destination. Every other prop matches MagneticButton."
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "name": "variant",
+          "default": "outline",
+          "options": [
+            "outline",
+            "solid",
+            "accent",
+            "ghost"
+          ],
+          "description": "outline is a hairline, solid is a filled foreground, accent is clay text and border, ghost has no border and fills with the accent surface."
+        },
+        {
+          "name": "size",
+          "default": "md",
+          "options": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Height, horizontal padding and label size."
+        }
+      ],
+      "examples": [
+        {
+          "title": "Variants and sizes",
+          "description": "All four variants side by side with a disabled state.",
+          "file": "registry/ivan/examples/magnetic-button/basic.tsx"
+        },
+        {
+          "title": "Link with an index",
+          "description": "A call to action rendered as an anchor.",
+          "file": "registry/ivan/examples/magnetic-button/link.tsx"
+        }
+      ],
+      "accessibility": [
+        "Renders a native button or anchor, so keyboard activation, focus order, disabled handling and the accessible name come from the platform.",
+        "The interactive element is at least 44 by 44 px for every size. Smaller visual sizes pad the hit area without changing how the button looks.",
+        "Hover effects are pointer-only through Tailwind's hover media query and are mirrored on focus-visible, so keyboard users get the same fill, color and corner marks.",
+        "Focus uses a 2 px ring with an offset that follows the visible surface, not the larger hit area.",
+        "The label contrast holds at 4.5:1 or more on the clay fill in both themes.",
+        "Only mouse and pen pointers pull the button. Touch never moves it."
+      ],
+      "animation": [
+        {
+          "target": "Surface magnet",
+          "properties": "translate on the surface. Label translates a further 50 percent for depth.",
+          "timing": "100 ms while the pointer moves, 500 ms release, both on ease-out-expo. Pull is 30 percent of the offset from the center, clamped to strength.",
+          "trigger": "Pointer move over the button. Values are written as CSS variables, so React never re-renders per frame.",
+          "reducedMotion": "No magnet and no label shift."
+        },
+        {
+          "target": "Fill sweep",
+          "properties": "transform (scaleX, origin left)",
+          "timing": "300 ms, ease-out-expo.",
+          "trigger": "Hover, keyboard focus and press.",
+          "reducedMotion": "Transitions are removed. The fill appears instantly."
+        },
+        {
+          "target": "Corner marks and press",
+          "properties": "opacity and translate on the marks. scale 0.97 on press.",
+          "timing": "300 ms, ease-out-expo.",
+          "trigger": "Hover and focus-visible for the marks. Pointer down for the press.",
+          "reducedMotion": "Transitions are removed."
+        }
+      ]
+    }
+  },
+  "categories": [
+    "buttons",
+    "motion"
+  ],
+  "type": "registry:ui"
+}
