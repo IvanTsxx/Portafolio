@@ -2,72 +2,11 @@ import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 
 export type BlueprintKind = "scene" | "scroll" | "system";
 
-export interface FeaturedProject {
-  slug: string;
-  code: string;
-  title: string;
-  summary: string;
-  year: string;
-  role: string;
-  stack: readonly string[];
-  buildNotes: readonly string[];
-  blueprint: BlueprintKind;
-  sample: boolean;
-}
-
-export const featuredProjects = [
-  {
-    blueprint: "scene",
-    buildNotes: [
-      "One shared Canvas, paused offscreen",
-      "Static fallback renders before WebGL loads",
-      "Pointer parallax disabled under reduced motion",
-    ],
-    code: "BLD-01",
-    role: "Frontend, 3D",
-    sample: true,
-    slug: "sample-product-configurator",
-    stack: ["Next.js", "R3F", "drei", "Zustand"],
-    summary:
-      "A product configurator where material and camera changes stay under one frame budget on mid-range phones.",
-    title: "Product configurator",
-    year: "2026",
-  },
-  {
-    blueprint: "scroll",
-    buildNotes: [
-      "One pinned timeline, under three viewports long",
-      "Mobile drops the pin for a stepped sequence",
-      "Every chapter readable with motion off",
-    ],
-    code: "BLD-02",
-    role: "Frontend, motion",
-    sample: true,
-    slug: "sample-editorial-launch",
-    stack: ["Next.js", "GSAP", "Sanity"],
-    summary:
-      "An editorial launch page driven by scroll, with chapters authored in the CMS instead of hard-coded.",
-    title: "Editorial launch",
-    year: "2026",
-  },
-  {
-    blueprint: "system",
-    buildNotes: [
-      "Tokens shared between Figma and Tailwind v4",
-      "cva variants instead of near-duplicate components",
-      "Distributed as a shadcn registry",
-    ],
-    code: "BLD-03",
-    role: "Design systems",
-    sample: true,
-    slug: "sample-design-system",
-    stack: ["Tailwind v4", "shadcn", "Base UI"],
-    summary:
-      "A component system rebuilt around tokens and variants, so new pages assemble instead of fork.",
-    title: "Component system",
-    year: "2025",
-  },
-] as const satisfies readonly FeaturedProject[];
+export const blueprintSequence = [
+  "scene",
+  "scroll",
+  "system",
+] as const satisfies readonly BlueprintKind[];
 
 export interface Capability {
   id: string;
@@ -181,68 +120,3 @@ export const capabilities = [
 ] as const satisfies readonly Capability[];
 
 export type CapabilityId = (typeof capabilities)[number]["id"];
-
-export interface Experiment {
-  slug: string;
-  code: string;
-  title: string;
-  medium: string;
-  note: string;
-  sample: boolean;
-}
-
-export const experiments = [
-  {
-    code: "EXP-01",
-    medium: "GLSL",
-    note: "Dithered light falloff on a flat-shaded agent.",
-    sample: true,
-    slug: "sample-dither-shader",
-    title: "Dither shader",
-  },
-  {
-    code: "EXP-02",
-    medium: "GSAP",
-    note: "Text that reflows along a moving path without layout thrash.",
-    sample: true,
-    slug: "sample-path-type",
-    title: "Path type",
-  },
-  {
-    code: "EXP-03",
-    medium: "R3F",
-    note: "Instanced crates stacking under simple rigid-body rules.",
-    sample: true,
-    slug: "sample-crate-stack",
-    title: "Crate stack",
-  },
-] as const satisfies readonly Experiment[];
-
-export interface RegistryTeaser {
-  name: string;
-  kind: "block" | "component" | "hook";
-  description: string;
-  sample: boolean;
-}
-
-export const registryTeasers = [
-  {
-    description: "Lazy R3F Canvas with a static fallback and offscreen pause.",
-    kind: "component",
-    name: "lazy-stage",
-    sample: true,
-  },
-  {
-    description:
-      "Pinned ScrollTrigger sequence with mobile and reduced variants.",
-    kind: "block",
-    name: "pinned-sequence",
-    sample: true,
-  },
-  {
-    description: "Reduced-motion preference as a synced external store.",
-    kind: "hook",
-    name: "use-reduced-motion",
-    sample: true,
-  },
-] as const satisfies readonly RegistryTeaser[];

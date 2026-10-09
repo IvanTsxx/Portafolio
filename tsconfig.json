@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,16 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     },
-    "types": [
-      "node",
-      "react",
-      "react-dom",
-      "bun"
-    ],
+    "types": ["node", "react", "react-dom", "bun"],
     "noUncheckedIndexedAccess": true
   },
   "include": [
@@ -43,9 +32,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": [
-    "node_modules",
-    ".tmp",
-    ".claude"
-  ]
+  "exclude": ["node_modules", ".tmp", ".claude"]
 }

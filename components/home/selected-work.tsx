@@ -8,15 +8,58 @@ import {
   SampleTag,
   SectionHeading,
 } from "@/components/home/primitives";
-import { featuredProjects } from "@/lib/home/content";
-import type { FeaturedProject } from "@/lib/home/content";
+import { getProjects } from "@/lib/content/work";
+import type { WorkProject } from "@/lib/content/work";
+import { blueprintSequence } from "@/lib/home/content";
+import type { BlueprintKind } from "@/lib/home/content";
 import { cn } from "@/lib/utils";
+
+const featuredBuildCount = 3;
+const stackPreviewCount = 4;
+const buildNoteCount = 3;
+
+interface BuildPanelProject {
+  blueprint: BlueprintKind;
+  buildNotes: readonly string[];
+  code: string;
+  role: string;
+  sample: boolean;
+  slug: string;
+  stack: readonly string[];
+  summary: string;
+  title: string;
+  year: number;
+}
+
+const toBuildPanelProject = (
+  project: WorkProject,
+  position: number
+): BuildPanelProject => ({
+  blueprint: blueprintSequence[position % blueprintSequence.length] ?? "system",
+  buildNotes: project.responsibilities.slice(0, buildNoteCount),
+  code: `BLD-${String(position + 1).padStart(2, "0")}`,
+  role: project.role,
+  sample: project.sample,
+  slug: project.slug,
+  stack: project.technologies.slice(0, stackPreviewCount),
+  summary: project.summary,
+  title: project.title,
+  year: project.year,
+});
+
+const pickFeaturedBuilds = (projects: readonly WorkProject[]) =>
+  [
+    ...projects.filter((project) => project.featured),
+    ...projects.filter((project) => !project.featured),
+  ]
+    .slice(0, featuredBuildCount)
+    .map(toBuildPanelProject);
 
 const BuildPanel = ({
   project,
   featured,
 }: {
-  project: FeaturedProject;
+  project: BuildPanelProject;
   featured: boolean;
 }) => (
   <Link
@@ -87,8 +130,11 @@ const BuildPanel = ({
   </Link>
 );
 
-export const SelectedWork = () => {
-  const [lead, ...rest] = featuredProjects;
+export const SelectedWork = async () => {
+  const [lead, ...rest] = pickFeaturedBuilds(await getProjects());
+  if (!lead) {
+    return null;
+  }
   return (
     <HomeSectionShell className="py-24 md:py-32" id="work">
       <SectionHeading

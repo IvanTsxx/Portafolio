@@ -4,11 +4,12 @@ import Link from "next/link";
 import {
   CornerMarks,
   HomeSectionShell,
-  SampleTag,
   SectionHeading,
 } from "@/components/home/primitives";
-import { registryTeasers } from "@/lib/home/content";
+import { registryItems } from "@/lib/registry/registry";
 import { siteConfig } from "@/lib/site/config";
+
+const [leadRegistryItem] = registryItems;
 
 export const RegistryTeaser = () => (
   <HomeSectionShell className="py-24 md:py-32" id="registry">
@@ -24,7 +25,8 @@ export const RegistryTeaser = () => (
         <pre className="bg-background border-rule overflow-x-auto border p-4 font-mono text-sm">
           <code>
             <span className="text-faint select-none">$ </span>
-            bunx shadcn add {siteConfig.registryNamespace}/lazy-stage
+            bunx shadcn add {siteConfig.registryNamespace}/
+            {leadRegistryItem?.name}
           </code>
         </pre>
         <p className="text-muted-foreground text-sm text-pretty">
@@ -47,23 +49,22 @@ export const RegistryTeaser = () => (
         </Link>
       </div>
       <ul className="border-rule border-t lg:col-span-7">
-        {registryTeasers.map((item) => (
-          <li
-            className="border-rule grid grid-cols-12 items-baseline gap-4 border-b py-5"
-            key={item.name}
-          >
-            <span className="label text-faint col-span-3 md:col-span-2">
-              {item.kind}
-            </span>
-            <code className="text-foreground col-span-9 font-mono text-sm md:col-span-4">
-              {item.name}
-            </code>
-            <span className="text-muted-foreground col-span-12 text-sm md:col-span-5">
-              {item.description}
-            </span>
-            <span className="col-span-12 md:col-span-1 md:justify-self-end">
-              {item.sample ? <SampleTag /> : null}
-            </span>
+        {registryItems.map((item) => (
+          <li key={item.name}>
+            <Link
+              className="group border-rule hover:bg-card/60 grid grid-cols-12 items-baseline gap-4 border-b py-5 transition-colors md:px-2"
+              href={`/registry/${item.name}`}
+            >
+              <span className="label text-faint group-hover:text-clay col-span-3 transition-colors md:col-span-2">
+                {item.categories[0]}
+              </span>
+              <code className="text-foreground col-span-9 font-mono text-sm md:col-span-4">
+                {item.name}
+              </code>
+              <span className="text-muted-foreground col-span-12 text-sm md:col-span-6">
+                {item.description}
+              </span>
+            </Link>
           </li>
         ))}
       </ul>
