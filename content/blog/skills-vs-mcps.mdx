@@ -1,0 +1,77 @@
+export const meta = {
+  title: "Skills vs MCPs",
+  date: "2026-10-02",
+  summary:
+    "A skill teaches an agent how to do something. An MCP server gives it something to do it with. How I decide which one to write, what each costs, and how they work together.",
+  tags: ["Skills", "MCP", "AI agents"],
+  sample: true,
+};
+
+A skill teaches an agent how to do something. An MCP server gives an agent something to do it with. Most confusion comes from treating them as alternatives when they answer different questions.
+
+<Callout tone="sample" title="Sample draft">
+  This note is an editable draft that ships with the template. It describes a
+  way of working and makes no claims about measured results. Edit it in
+  `content/blog/skills-vs-mcps.mdx`.
+</Callout>
+
+## Skills carry procedure and taste
+
+A skill is a folder with a `SKILL.md` file and optional references or scripts. The frontmatter holds a name and a description. The agent reads the description up front and loads the rest only when the task matches.
+
+```md title=".claude/skills/ui-states/SKILL.md"
+---
+name: ui-states
+description: Trigger when writing or reviewing UI code. Apply the states and accessibility checklist.
+---
+
+# UI states
+
+1. List the states before writing code.
+2. Resolve combinations: disabled, loading, focus, selected, hover.
+3. Make states explicit with data attributes.
+```
+
+A skill costs tokens when it loads and nothing when it does not. It needs no network and no running process.
+
+## MCP servers carry access
+
+The Model Context Protocol lets a server expose tools and resources to an agent over a standard interface. The agent connects, sees the list of tools and calls them. Design tools, issue trackers and content systems are typical examples.
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "docs": {
+      "type": "http",
+      "url": "https://example.com/mcp"
+    }
+  }
+}
+```
+
+An MCP server adds its tool definitions to the context. It also needs credentials and, for local servers, a running process.
+
+## How I decide
+
+| Question | Reach for |
+| --- | --- |
+| The agent keeps making the same mistake | A skill |
+| The information lives in another system | An MCP server |
+| The task needs a procedure or a point of view | A skill |
+| The task needs to read or write somewhere else | An MCP server |
+| The task needs both | A skill that names the MCP tools to call |
+
+<Callout tone="tip" title="A rule of thumb for skills">
+  Write a skill the second time you correct the same mistake. The first time is
+  a one-off. The second time is a pattern.
+</Callout>
+
+## Using them together
+
+The best setups pair the two. A design-to-code skill can say: call the design tool to read the frame, map its values to the repository tokens, round to the spacing scale, then verify the result. The skill carries the judgment. The server carries the access.
+
+Keeping the roles separate also keeps each one small. The skill stays readable because it does not describe an API. The server stays reusable because it does not encode one team's taste.
+
+## What I keep connected
+
+I connect only the servers a task needs and prefer a skill when plain instructions are enough. Fewer tools in context means fewer wrong turns, and a skill that is never loaded costs nothing.
