@@ -184,7 +184,7 @@
     color: var(--primary-foreground);
   }
   :focus-visible {
-    @apply outline-clay outline-2 outline-offset-2;
+    @apply outline-ink outline-1 outline-offset-2;
   }
   @media (prefers-reduced-motion: reduce) {
     *,
