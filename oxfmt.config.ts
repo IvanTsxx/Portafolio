@@ -6,6 +6,7 @@ export default defineConfig({
   ignorePatterns: [
     ...(ultracite.ignorePatterns ?? []),
     "public/r/**",
+    "docs/design.md",
     ".claude/**",
   ],
 });
