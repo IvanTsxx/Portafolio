@@ -19,9 +19,10 @@ Ivan Bongiovanni's portfolio. The visual language comes from his GitHub-profile 
 ## 3D contract
 
 - One shared Canvas for the whole site, mounted once in `app/layout.tsx`, rendering into DOM-tracked views (drei `View`). Never a second Canvas.
-- `components/scene/agent-spot.tsx`: `<AgentSpot role action edge align size />`, an absolutely positioned slot inside a `relative` card. A small agent peeks from that card edge, appears on scroll, animates its role action while visible.
-- `components/scene/agent-scene.tsx`: `<AgentScene scene label className />`, a box where a full scene plays while visible. Scenes: `debugging`, `figma-to-code`, `feature`, `code-search` (`lib/agents/scenes.ts`).
-- Static, meaningful fallback when WebGL is off; reduced motion freezes poses.
+- One companion agent per view. Sections mark where it goes with `<AgentWaypoint role action side />` from `components/scene/agent-waypoint.tsx`, an invisible span (`absolute inset-0` by default) inside a `relative` section. The companion walks to the waypoint most in view, settles on that box's bottom edge at the given side, loops the role's action, and swaps outfit with a spin, paper poof and hat toss when the role changes. Narrow the box with `className` to aim it at a gutter. Pages without waypoints load no three.js.
+- `components/scene/agent-scene.tsx`: `<AgentScene scene label className />`, a box where a full scene plays while visible. The companion steps aside while a scene is at least half visible, so a view holds one agent cast. Scenes: `debugging`, `figma-to-code`, `feature`, `code-search` (`lib/agents/scenes.ts`).
+- Every agent reacts to hover with a reaction from a pool (wave, jump, spin, look, salute, shuffle, surprised, peek), never the same one twice in a row.
+- Static, meaningful fallback when WebGL is off; reduced motion freezes poses and the companion cuts between waypoints.
 
 ## Engineering rules
 

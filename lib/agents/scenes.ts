@@ -6,7 +6,3 @@ export const agentScenes = [
 ] as const;
 
 export type AgentSceneId = (typeof agentScenes)[number];
-
-export const agentSpotEdges = ["top", "right", "bottom", "left"] as const;
-
-export type AgentSpotEdge = (typeof agentSpotEdges)[number];

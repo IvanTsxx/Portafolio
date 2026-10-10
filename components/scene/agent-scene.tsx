@@ -6,7 +6,7 @@ import type { AgentSceneId } from "@/lib/agents/scenes";
 import { cn } from "@/lib/utils";
 
 import { StageFallback } from "./stage-fallback";
-import { useViewSlot } from "./view-registry";
+import { useAgentCast, useViewSlot } from "./view-registry";
 import { useWebGLSupport } from "./webgl-support";
 
 const AgentSceneContent = lazy(() => import("./agent-scene-content"));
@@ -23,6 +23,7 @@ export const AgentScene = ({ scene, label, className }: AgentSceneProps) => {
   const hasWebGL = useWebGLSupport();
 
   useViewSlot(id, track, <AgentSceneContent scene={scene} />, hasWebGL);
+  useAgentCast(track, hasWebGL);
 
   return (
     <figure

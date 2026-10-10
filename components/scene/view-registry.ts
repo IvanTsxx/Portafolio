@@ -3,11 +3,24 @@
 import type { ReactNode, RefObject } from "react";
 import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
 
+import type { AgentAction, AgentRole } from "@/lib/agents/roles";
+
+export const viewPriority = { overlay: 3, scene: 2 } as const;
+
 export interface ViewSlot {
   id: string;
   node: ReactNode;
+  priority: number;
   track: RefObject<HTMLElement>;
-  hasEntered: boolean;
+}
+
+export type WaypointSide = "left" | "right";
+
+export interface Waypoint {
+  action?: AgentAction;
+  element: HTMLElement;
+  role: AgentRole;
+  side: WaypointSide;
 }
 
 interface SlotRecord extends ViewSlot {
@@ -15,6 +28,8 @@ interface SlotRecord extends ViewSlot {
 }
 
 const slots = new Map<string, SlotRecord>();
+const waypoints = new Map<string, Waypoint>();
+const agentCasts = new Set<HTMLElement>();
 const listeners = new Set<() => void>();
 let nearSnapshot: readonly ViewSlot[] = [];
 let observer: IntersectionObserver | null = null;
@@ -29,17 +44,21 @@ export const requestSceneFrame = () => {
   frameRequester?.();
 };
 
-const rebuildSnapshot = () => {
-  const near: ViewSlot[] = [];
-  for (const { hasEntered, id, isNear, node, track } of slots.values()) {
-    if (isNear) {
-      near.push({ hasEntered, id, node, track });
-    }
-  }
-  nearSnapshot = near;
+const notify = () => {
   for (const listener of listeners) {
     listener();
   }
+};
+
+const rebuildSnapshot = () => {
+  const near: ViewSlot[] = [];
+  for (const { id, isNear, node, priority, track } of slots.values()) {
+    if (isNear) {
+      near.push({ id, node, priority, track });
+    }
+  }
+  nearSnapshot = near.toSorted((a, b) => a.priority - b.priority);
+  notify();
 };
 
 const slotForElement = (element: Element) => {
@@ -56,9 +75,6 @@ const handleIntersections = (entries: IntersectionObserverEntry[]) => {
   for (const entry of entries) {
     const slot = slotForElement(entry.target);
     if (slot && slot.isNear !== entry.isIntersecting) {
-      if (slot.isNear) {
-        slot.hasEntered = true;
-      }
       slot.isNear = entry.isIntersecting;
       changed = true;
     }
@@ -75,12 +91,17 @@ const getObserver = () => {
   return observer;
 };
 
-const registerSlot = (id: string, element: HTMLElement, node: ReactNode) => {
+const registerSlot = (
+  id: string,
+  element: HTMLElement,
+  node: ReactNode,
+  priority: number
+) => {
   slots.set(id, {
-    hasEntered: false,
     id,
     isNear: false,
     node,
+    priority,
     track: { current: element },
   });
   getObserver().observe(element);
@@ -114,6 +135,45 @@ const getNearSnapshot = () => nearSnapshot;
 const getServerNearSnapshot = (): readonly ViewSlot[] => [];
 const getHasSlots = () => slots.size > 0;
 const getServerHasSlots = () => false;
+const getHasWaypoints = () => waypoints.size > 0;
+
+export const getWaypoints = () => waypoints.values();
+
+export const getAgentCasts = () => agentCasts;
+
+export const registerWaypoint = (id: string, waypoint: Waypoint) => {
+  const isFirst = waypoints.size === 0;
+  waypoints.set(id, waypoint);
+  if (isFirst) {
+    notify();
+  }
+  requestSceneFrame();
+  return () => {
+    waypoints.delete(id);
+    if (waypoints.size === 0) {
+      notify();
+    }
+  };
+};
+
+export const useHasWaypoints = () =>
+  useSyncExternalStore(subscribe, getHasWaypoints, getServerHasSlots);
+
+export const useAgentCast = (
+  track: RefObject<HTMLElement | null>,
+  enabled: boolean
+) => {
+  useLayoutEffect(() => {
+    const element = track.current;
+    if (!(element && enabled)) {
+      return;
+    }
+    agentCasts.add(element);
+    return () => {
+      agentCasts.delete(element);
+    };
+  }, [enabled, track]);
+};
 
 export const useNearViewSlots = () =>
   useSyncExternalStore(subscribe, getNearSnapshot, getServerNearSnapshot);
@@ -125,15 +185,16 @@ export const useViewSlot = (
   id: string,
   track: RefObject<HTMLElement | null>,
   node: ReactNode,
-  enabled = true
+  enabled = true,
+  priority: number = viewPriority.scene
 ) => {
   useLayoutEffect(() => {
     const element = track.current;
     if (!(element && enabled)) {
       return;
     }
-    return registerSlot(id, element, null);
-  }, [enabled, id, track]);
+    return registerSlot(id, element, null, priority);
+  }, [enabled, id, priority, track]);
 
   useEffect(() => {
     updateSlot(id, node);
