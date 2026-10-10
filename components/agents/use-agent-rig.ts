@@ -4,15 +4,22 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { RefObject } from "react";
 import type { Group } from "three";
-import { MathUtils, Vector3 } from "three";
+import { MathUtils } from "three";
 
-import type { AgentAction } from "@/lib/agents/roles";
+import type { AgentAction, AgentReaction } from "@/lib/agents/roles";
 
-import { actionClips } from "./actions";
+import { actionClips, reactionClips } from "./actions";
+import { createReactionDeck } from "./reaction-deck";
 import type { Pose } from "./rig";
 import { blendPoses, createPose } from "./rig";
 
 export type AgentMotion = "full" | "reduced";
+
+export interface AgentPointer {
+  hovered: boolean;
+  x: number;
+  y: number;
+}
 
 export interface RigNodes {
   armLeft: Group | null;
@@ -27,22 +34,31 @@ export interface RigNodes {
 interface RigOptions {
   action: AgentAction;
   actionRef?: RefObject<AgentAction>;
-  focused: boolean;
+  pointer: RefObject<AgentPointer>;
   motion: AgentMotion;
   seed: number;
 }
 
+interface Playback {
+  blendFrom: AgentAction;
+  blendStart: number;
+  current: AgentAction;
+  dealReaction: (() => AgentReaction) | null;
+  reaction: AgentReaction | null;
+  reactionStart: number;
+  wasHovered: boolean;
+}
+
 const blendSeconds = 0.38;
-const hopSeconds = 0.42;
 const blinkSeconds = 0.13;
-const maxFocusYaw = 0.5;
+const reactionInSeconds = 0.16;
+const reactionOutSeconds = 0.28;
+const reactionRetrigger = 0.55;
 
 const smoothstep = (value: number) => {
   const clamped = MathUtils.clamp(value, 0, 1);
   return clamped * clamped * (3 - 2 * clamped);
 };
-
-const cameraLocal = new Vector3();
 
 const applyPose = (nodes: RigNodes, pose: Pose, blink: number) => {
   const { armLeft, armRight, body, eyes, legs, root, shadow } = nodes;
@@ -73,7 +89,7 @@ const applyPose = (nodes: RigNodes, pose: Pose, blink: number) => {
   if (eyes) {
     eyes.position.x = pose.gazeX;
     eyes.position.y = pose.gazeY;
-    eyes.scale.y = blink;
+    eyes.scale.set(Math.max(1, pose.eyeOpen), blink * pose.eyeOpen, 1);
   }
 };
 
@@ -92,7 +108,7 @@ const blinkAmount = (time: number, seed: number) => {
 export const useAgentRig = ({
   action: actionProp,
   actionRef,
-  focused,
+  pointer,
   motion,
   seed,
 }: RigOptions) => {
@@ -106,32 +122,59 @@ export const useAgentRig = ({
     root: null,
     shadow: null,
   });
-  const playback = useRef({
+  const playback = useRef<Playback>({
     blendFrom: actionProp,
     blendStart: Number.NEGATIVE_INFINITY,
     current: actionProp,
-    focusStart: Number.NEGATIVE_INFINITY,
-    focusWeight: 0,
-    wasFocused: false,
+    dealReaction: null,
+    reaction: null,
+    reactionStart: Number.NEGATIVE_INFINITY,
+    wasHovered: false,
   });
   const poses = useRef({
     from: createPose(),
     out: createPose(),
+    reaction: createPose(),
     to: createPose(),
   });
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const time = state.clock.elapsedTime;
-    const step = Math.min(delta, 0.1);
     const track = playback.current;
-    const { from, out, to } = poses.current;
+    const { from, out, reaction, to } = poses.current;
     const action = actionRef?.current ?? actionProp;
+    const look = pointer.current;
     liveAction.current = action;
 
+    if (look.hovered && !track.wasHovered) {
+      const playing = track.reaction
+        ? (time - track.reactionStart) / reactionClips[track.reaction].duration
+        : 1;
+      if (playing >= reactionRetrigger) {
+        const deal = track.dealReaction ?? createReactionDeck();
+        track.dealReaction = deal;
+        track.reaction = deal();
+        track.reactionStart = time;
+      }
+    }
+    track.wasHovered = look.hovered;
+    const reactionTime = time - track.reactionStart;
+    if (
+      track.reaction &&
+      reactionTime >= reactionClips[track.reaction].duration
+    ) {
+      track.reaction = null;
+    }
+
     if (motion === "reduced") {
-      const clip = actionClips[action];
-      clip.pose(clip.keyTime, out);
-      out.bodyTiltX += focused ? 0.08 : 0;
+      if (track.reaction) {
+        const clip = reactionClips[track.reaction];
+        clip.pose(clip.keyTime, out, look);
+        state.invalidate();
+      } else {
+        const clip = actionClips[action];
+        clip.pose(clip.keyTime, out);
+      }
       applyPose(nodes.current, out, 1);
       return;
     }
@@ -141,10 +184,6 @@ export const useAgentRig = ({
       track.current = action;
       track.blendStart = time;
     }
-    if (focused && !track.wasFocused) {
-      track.focusStart = time;
-    }
-    track.wasFocused = focused;
 
     actionClips[track.current].pose(time, to);
     const blend = smoothstep((time - track.blendStart) / blendSeconds);
@@ -155,29 +194,13 @@ export const useAgentRig = ({
       blendPoses(to, to, 0, out);
     }
 
-    track.focusWeight = MathUtils.damp(
-      track.focusWeight,
-      focused ? 1 : 0,
-      7,
-      step
-    );
-    const { root } = nodes.current;
-    if (track.focusWeight > 0.001 && root?.parent) {
-      cameraLocal.copy(state.camera.position);
-      root.parent.worldToLocal(cameraLocal);
-      const yawToCamera = MathUtils.clamp(
-        Math.atan2(cameraLocal.x, cameraLocal.z),
-        -maxFocusYaw,
-        maxFocusYaw
-      );
-      out.bodyYaw += (yawToCamera - out.bodyYaw * 0.5) * track.focusWeight;
-      out.bodyTiltX += 0.07 * track.focusWeight;
-      out.gazeY += 0.012 * track.focusWeight;
-    }
-    const hopProgress = (time - track.focusStart) / hopSeconds;
-    if (hopProgress >= 0 && hopProgress < 1) {
-      out.rootY += Math.sin(hopProgress * Math.PI) * 0.12;
-      out.bodySquash *= 1 - Math.sin(hopProgress * Math.PI * 2) * 0.04;
+    if (track.reaction) {
+      const clip = reactionClips[track.reaction];
+      clip.pose(reactionTime, reaction, look);
+      const weight =
+        smoothstep(reactionTime / reactionInSeconds) *
+        smoothstep((clip.duration - reactionTime) / reactionOutSeconds);
+      blendPoses(out, reaction, weight, out);
     }
 
     applyPose(nodes.current, out, blinkAmount(time, seed));

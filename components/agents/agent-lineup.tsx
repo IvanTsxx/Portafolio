@@ -33,7 +33,6 @@ export const AgentLineup = ({
 }: AgentLineupProps) => {
   const [actionChoice, setActionChoice] = useState<ActionChoice>(initialAction);
   const [motion, setMotion] = useState<AgentMotion>(initialMotion);
-  const [focusedRole, setFocusedRole] = useState<AgentRole | null>(null);
   const stage = useRef<HTMLElement>(null);
   const slotId = useId();
   const hasWebGL = useWebGLSupport();
@@ -49,12 +48,7 @@ export const AgentLineup = ({
   useViewSlot(
     slotId,
     stage,
-    <AgentLineupScene
-      entries={entries}
-      focusedRole={focusedRole}
-      motion={motion}
-      onFocusRole={setFocusedRole}
-    />,
+    <AgentLineupScene entries={entries} motion={motion} />,
     hasWebGL
   );
 

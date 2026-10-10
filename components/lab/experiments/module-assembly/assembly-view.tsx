@@ -281,7 +281,6 @@ const Modules = ({
 
 const builderAgent = {
   action: "carry",
-  focused: true,
   position: [-2.15, -1.25, 0.6],
   role: "builder",
   rotation: [0, 0.55, 0],
