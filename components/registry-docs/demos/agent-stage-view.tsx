@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useRef } from "react";
 
 import { useViewSlot } from "@/components/scene/view-registry";
 import { useWebGLSupport } from "@/components/scene/webgl-support";
@@ -13,7 +13,6 @@ import { agentRoleLabels } from "@/registry/ivan/components/agent/types";
 export const AgentStage = ({
   role,
   action,
-  focused,
   motion,
   shadow,
   label,
@@ -22,7 +21,6 @@ export const AgentStage = ({
 }: AgentStageProps) => {
   const track = useRef<HTMLElement>(null);
   const id = useId();
-  const [isHovered, setIsHovered] = useState(false);
   const hasWebGL = useWebGLSupport();
 
   useViewSlot(
@@ -30,7 +28,6 @@ export const AgentStage = ({
     track,
     <AgentStageScene
       action={action}
-      focused={focused ?? isHovered}
       motion={motion}
       role={role}
       shadow={shadow}
@@ -42,8 +39,6 @@ export const AgentStage = ({
     <figure
       aria-label={label ?? agentRoleLabels[role]}
       className={cn("relative m-0 aspect-4/3 w-full", className)}
-      onPointerEnter={() => setIsHovered(true)}
-      onPointerLeave={() => setIsHovered(false)}
       ref={track}
     >
       {hasWebGL

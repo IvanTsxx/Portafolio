@@ -14,7 +14,6 @@ import type {
 
 interface AgentPlaygroundValues {
   action: AgentAction;
-  focused: boolean;
   reducedMotion: boolean;
   role: AgentRole;
   shadow: boolean;
@@ -27,30 +26,16 @@ const sharedControls: readonly Control<keyof AgentPlaygroundValues>[] = [
   { key: "shadow", kind: "toggle", label: "Contact shadow" },
 ];
 
-const focusedControl: Control<keyof AgentPlaygroundValues> = {
-  key: "focused",
-  kind: "toggle",
-  label: "Focused",
-};
-
 export const AgentPlayground = ({
-  controlFocus,
   initialValues,
 }: {
-  controlFocus: boolean;
   initialValues: AgentPlaygroundValues;
 }) => (
-  <Playground
-    controls={
-      controlFocus ? [...sharedControls, focusedControl] : sharedControls
-    }
-    initialValues={initialValues}
-  >
+  <Playground controls={sharedControls} initialValues={initialValues}>
     {(values, { runId }) => (
       <AgentStage
         action={values.action}
         className="h-80 w-full max-w-md"
-        focused={controlFocus ? values.focused : undefined}
         key={runId}
         motion={values.reducedMotion ? "reduced" : undefined}
         role={values.role}

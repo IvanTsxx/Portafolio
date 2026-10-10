@@ -23,6 +23,7 @@ export const listAgentSourceFiles = async (projectRoot: string) => {
       const relativePath = entry.split(path.sep).join("/");
       const isSource =
         sourceExtensions.has(path.extname(relativePath)) &&
+        !relativePath.endsWith(".test.ts") &&
         !excludedFiles.has(relativePath);
       return isSource ? [relativePath] : [];
     })

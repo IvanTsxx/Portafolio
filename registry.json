@@ -779,6 +779,11 @@
           "target": "@components/agent/use-agent-rig.ts"
         },
         {
+          "path": "registry/ivan/components/agent/reaction-deck.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/reaction-deck.ts"
+        },
+        {
           "path": "registry/ivan/components/agent/held-pose.ts",
           "type": "registry:lib",
           "target": "@components/agent/held-pose.ts"
@@ -882,12 +887,6 @@
                   "name": "actionRef",
                   "type": "RefObject<AgentAction>",
                   "description": "Drives the action from a ref that is read every frame, so switching never re-renders. Wins over action."
-                },
-                {
-                  "name": "focused",
-                  "type": "boolean",
-                  "default": "false",
-                  "description": "Turns toward the camera, leans in and hops once. Drive it from hover or focus."
                 },
                 {
                   "name": "motion",
@@ -1003,8 +1002,7 @@
             "The mascot is decorative. Wrap the Canvas in an element with role=img and a label, or mark it aria-hidden.",
             "Put anything the agent communicates in text next to the canvas.",
             "motion=reduced, or the prefers-reduced-motion query when motion is omitted, holds each action's key pose. No blink, breathing, bobbing or loops.",
-            "The agent adds no focusable elements and never captures focus. Pointer handlers pass through to the group.",
-            "Pass focused from hover and focus state so keyboard users get the same reaction as pointer users."
+            "The agent adds no focusable elements and never captures focus. Pointer handlers pass through to the group."
           ],
           "animation": [
             {
@@ -1013,13 +1011,6 @@
               "timing": "One useFrame per agent. 0.38 second smoothstep crossfade between clips.",
               "trigger": "action or actionRef changes",
               "reducedMotion": "Holds the clip's key pose."
-            },
-            {
-              "target": "Focus reaction",
-              "properties": "Body yaw, tilt, root height, squash",
-              "timing": "Damped turn at rate 7, one 0.42 second hop.",
-              "trigger": "focused becomes true",
-              "reducedMotion": "Leans in slightly. No turn or hop."
             },
             {
               "target": "Blink",
@@ -1095,12 +1086,6 @@
                   "description": "Clip to play. debugger inspects, builder types, architect measures."
                 },
                 {
-                  "name": "focused",
-                  "type": "boolean",
-                  "default": "pointer hover",
-                  "description": "Set it to control the reaction yourself. Left unset, hovering the stage focuses the agent."
-                },
-                {
                   "name": "motion",
                   "type": "\"full\" | \"reduced\"",
                   "default": "prefers-reduced-motion",
@@ -1147,12 +1132,6 @@
                   "type": "AgentAction",
                   "default": "the role's signature action",
                   "description": "Clip to play."
-                },
-                {
-                  "name": "focused",
-                  "type": "boolean",
-                  "default": "false",
-                  "description": "Turns toward the camera and hops once."
                 },
                 {
                   "name": "motion",
@@ -1241,8 +1220,7 @@
             "The stage is a figure with an accessible name. Override it with label.",
             "The Canvas is decorative. Put anything the agent communicates in text beside it.",
             "Without WebGL the poster replaces the Canvas. A custom fallback should keep the same name.",
-            "Reduced motion holds the key pose and stops continuous rendering.",
-            "Hover focuses the agent by default. Pass focused to mirror keyboard focus."
+            "Reduced motion holds the key pose and stops continuous rendering."
           ],
           "animation": [
             {

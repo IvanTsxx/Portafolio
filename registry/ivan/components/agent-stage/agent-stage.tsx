@@ -20,7 +20,6 @@ import { AgentStageScene } from "./agent-stage-scene";
 export interface AgentStageProps {
   role: AgentRole;
   action?: AgentAction;
-  focused?: boolean;
   motion?: AgentMotion;
   shadow?: boolean;
   label?: string;
@@ -77,7 +76,6 @@ const useIsInView = (target: RefObject<Element | null>) => {
 export const AgentStage = ({
   role,
   action,
-  focused,
   motion,
   shadow,
   label,
@@ -85,7 +83,6 @@ export const AgentStage = ({
   className,
 }: AgentStageProps) => {
   const frame = useRef<HTMLElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
   const hasWebGL = useWebGLSupport();
   const isInView = useIsInView(frame);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -100,8 +97,6 @@ export const AgentStage = ({
     <figure
       aria-label={label ?? agentRoleLabels[role]}
       className={cn("relative m-0 aspect-4/3 w-full", className)}
-      onPointerEnter={() => setIsHovered(true)}
-      onPointerLeave={() => setIsHovered(false)}
       ref={frame}
     >
       {hasWebGL ? (
@@ -117,7 +112,6 @@ export const AgentStage = ({
         >
           <AgentStageScene
             action={action}
-            focused={focused ?? isHovered}
             motion={resolvedMotion}
             role={role}
             shadow={shadow}

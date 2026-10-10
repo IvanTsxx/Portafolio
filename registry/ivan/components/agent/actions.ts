@@ -1,6 +1,6 @@
 import type { Pose } from "./rig";
 import { resetPose, restArmRaise } from "./rig";
-import type { AgentAction } from "./types";
+import type { AgentAction, AgentReaction } from "./types";
 
 interface ActionClip {
   keyTime: number;
@@ -223,3 +223,166 @@ export const actionClips = {
     },
   },
 } as const satisfies Record<AgentAction, ActionClip>;
+
+export interface ReactionLook {
+  x: number;
+  y: number;
+}
+
+interface ReactionClip {
+  duration: number;
+  keyTime: number;
+  pose: (time: number, out: Pose, look: ReactionLook) => void;
+}
+
+const window01 = (time: number, from: number, to: number) =>
+  Math.min(1, Math.max(0, (time - from) / (to - from)));
+
+const easeInOut = (value: number) =>
+  value < 0.5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 3 / 2;
+
+const wrapAngle = (angle: number) =>
+  ((((angle + Math.PI) % tau) + tau) % tau) - Math.PI;
+
+const blinkAt = (time: number, at: number) => {
+  const local = (time - at) / 0.12;
+  return local > 0 && local < 1 ? 1 - Math.sin(local * Math.PI) * 0.92 : 1;
+};
+
+export const reactionClips = {
+  jump: {
+    duration: 1.05,
+    keyTime: 0.45,
+    pose: (time, out) => {
+      resetPose(out);
+      const crouch = Math.sin(window01(time, 0, 0.22) * Math.PI);
+      const air = window01(time, 0.2, 0.72);
+      const land = Math.sin(window01(time, 0.72, 1) * Math.PI);
+      const lift = Math.sin(air * Math.PI);
+      out.rootY = lift * 0.6;
+      out.bodySquash = 1 - crouch * 0.12 - land * 0.1 + lift * 0.05;
+      out.armLeftRaise = restArmRaise + (lift + crouch * 0.2) * 1.25;
+      out.armRightRaise = restArmRaise + (lift + crouch * 0.2) * 1.25;
+      out.armLeftForward = lift * 0.3;
+      out.armRightForward = lift * 0.3;
+      out.leg0 = lift * 0.35;
+      out.leg1 = -lift * 0.35;
+      out.leg2 = lift * 0.35;
+      out.leg3 = -lift * 0.35;
+      out.gazeY = 0.02 * lift;
+    },
+  },
+  look: {
+    duration: 1.7,
+    keyTime: 0.4,
+    pose: (time, out, look) => {
+      resetPose(out);
+      breathe(time, out);
+      const turn = easeInOut(window01(time, 0, 0.3));
+      out.bodyYaw = look.x * 0.55 * turn;
+      out.bodyTiltX = -look.y * 0.12 * turn;
+      out.bodyTiltZ = -look.x * 0.04 * turn;
+      out.gazeX = look.x * 0.045 * turn;
+      out.gazeY = look.y * 0.035 * turn;
+      out.eyeOpen = blinkAt(time, 0.55) * blinkAt(time, 0.8);
+    },
+  },
+  peek: {
+    duration: 1.7,
+    keyTime: 0.7,
+    pose: (time, out, look) => {
+      resetPose(out);
+      breathe(time, out);
+      const side = look.x < 0 ? -1 : 1;
+      const lean =
+        easeInOut(window01(time, 0, 0.35)) *
+        (1 - easeInOut(window01(time, 1.25, 1.7)));
+      out.bodyTiltZ = -side * 0.42 * lean;
+      out.rootY = lean * 0.04;
+      out.gazeX = side * 0.05 * lean;
+      out.gazeY = 0.01 * lean;
+      if (side > 0) {
+        out.armRightRaise = restArmRaise + lean * 0.5;
+      } else {
+        out.armLeftRaise = restArmRaise + lean * 0.5;
+      }
+      out.eyeOpen = blinkAt(time, 0.9);
+    },
+  },
+  salute: {
+    duration: 1.5,
+    keyTime: 0.6,
+    pose: (time, out) => {
+      resetPose(out);
+      const raise =
+        easeInOut(window01(time, 0, 0.25)) *
+        (1 - easeInOut(window01(time, 1.15, 1.4)));
+      out.armRightRaise = restArmRaise + raise * 1.45;
+      out.armRightForward = raise * 1.05;
+      out.bodyTiltX = -0.06 * raise;
+      out.bodySquash = 1 + raise * 0.035;
+      out.gazeY = 0.015 * raise;
+    },
+  },
+  shuffle: {
+    duration: 1.9,
+    keyTime: 0.2,
+    pose: (time, out) => {
+      resetPose(out);
+      const beat = time * tau * 2.2;
+      const step = Math.sin(beat);
+      out.leg0 = step * 0.4;
+      out.leg1 = step * 0.4;
+      out.leg2 = -step * 0.4;
+      out.leg3 = -step * 0.4;
+      out.rootY = Math.abs(step) * 0.07;
+      out.bodyTiltZ = step * 0.12;
+      out.bodyYaw = Math.sin(beat / 2) * 0.32;
+      out.armLeftRaise = restArmRaise + 0.5 + step * 0.45;
+      out.armRightRaise = restArmRaise + 0.5 - step * 0.45;
+      out.armLeftForward = 0.3;
+      out.armRightForward = 0.3;
+      out.bodySquash = 1 - Math.abs(Math.cos(beat)) * 0.04;
+    },
+  },
+  spin: {
+    duration: 1.15,
+    keyTime: 0.3,
+    pose: (time, out) => {
+      resetPose(out);
+      const turn = window01(time, 0.05, 1.05);
+      const lift = Math.sin(turn * Math.PI);
+      out.bodyYaw = wrapAngle(easeInOut(turn) * tau);
+      out.rootY = lift * 0.18;
+      out.armLeftRaise = restArmRaise + lift * 0.85;
+      out.armRightRaise = restArmRaise + lift * 0.85;
+      out.bodySquash = 1 + lift * 0.03;
+    },
+  },
+  surprised: {
+    duration: 1,
+    keyTime: 0.3,
+    pose: (time, out) => {
+      resetPose(out);
+      const hop = Math.sin(window01(time, 0, 0.36) * Math.PI);
+      const startle = Math.min(1, time / 0.08) * (1 - window01(time, 0.7, 1));
+      out.rootY = hop * 0.34;
+      out.armLeftRaise = restArmRaise + startle * 1.2;
+      out.armRightRaise = restArmRaise + startle * 1.2;
+      out.armLeftForward = startle * 0.2;
+      out.armRightForward = startle * 0.2;
+      out.bodyTiltX = -0.14 * startle;
+      out.bodySquash = 1 + hop * 0.06 - startle * 0.02;
+      out.eyeOpen = 1 + startle * 0.4;
+      out.gazeY = 0.02 * startle;
+    },
+  },
+  wave: {
+    duration: 1.6,
+    keyTime: 0.3,
+    pose: (time, out) => {
+      actionClips.wave.pose(time, out);
+      out.gazeY = 0.02;
+    },
+  },
+} as const satisfies Record<AgentReaction, ReactionClip>;

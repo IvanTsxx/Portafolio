@@ -5,10 +5,8 @@ import { AgentPoster } from "@/registry/ivan/components/agent-stage/agent-poster
 
 export const Demo = () => (
   <AgentPlayground
-    controlFocus
     initialValues={{
       action: "inspect",
-      focused: false,
       reducedMotion: false,
       role: "debugger",
       shadow: true,

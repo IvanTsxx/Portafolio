@@ -27,6 +27,19 @@ export const agentActions = [
 
 export type AgentAction = (typeof agentActions)[number];
 
+export const agentReactions = [
+  "wave",
+  "jump",
+  "spin",
+  "look",
+  "salute",
+  "shuffle",
+  "surprised",
+  "peek",
+] as const;
+
+export type AgentReaction = (typeof agentReactions)[number];
+
 export const agentRoleLabels = {
   analyst: "Analyst agent",
   architect: "Architect agent",

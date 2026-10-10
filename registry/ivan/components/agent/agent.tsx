@@ -1,9 +1,9 @@
 "use client";
 
-import type { ThreeElements } from "@react-three/fiber";
-import { useId } from "react";
+import type { ThreeElements, ThreeEvent } from "@react-three/fiber";
+import { useEffect, useId, useRef } from "react";
 import type { RefObject } from "react";
-import { MeshBasicMaterial } from "three";
+import { BoxGeometry, MathUtils, MeshBasicMaterial, Vector3 } from "three";
 
 import { usePrefersReducedMotion } from "@/registry/ivan/hooks/use-prefers-reduced-motion";
 
@@ -24,16 +24,16 @@ import {
 } from "./rig";
 import { createRadialFadeTexture } from "./textures";
 import type { AgentAction, AgentRole } from "./types";
-import type { AgentMotion } from "./use-agent-rig";
+import type { AgentMotion, AgentPointer } from "./use-agent-rig";
 import { useAgentRig } from "./use-agent-rig";
 
-export type { AgentMotion } from "./use-agent-rig";
+export type { AgentMotion, AgentPointer } from "./use-agent-rig";
 
 export interface AgentProps extends Omit<ThreeElements["group"], "children"> {
   role: AgentRole;
   action?: AgentAction;
   actionRef?: RefObject<AgentAction>;
-  focused?: boolean;
+  pointer?: RefObject<AgentPointer>;
   motion?: AgentMotion;
   shadow?: boolean;
 }
@@ -85,6 +85,65 @@ const shadowMaterial = new MeshBasicMaterial({
   transparent: true,
 });
 
+const hitSize = { depth: 1.3, height: 1.9, width: 1.8 };
+const hitGeometry = new BoxGeometry(
+  hitSize.width,
+  hitSize.height,
+  hitSize.depth
+);
+const hitMaterial = new MeshBasicMaterial({ visible: false });
+const hitLocal = new Vector3();
+
+const pointerAt = (
+  event: ThreeEvent<PointerEvent>,
+  hovered: boolean
+): AgentPointer => {
+  hitLocal.copy(event.point);
+  event.object.worldToLocal(hitLocal);
+  return {
+    hovered,
+    x: MathUtils.clamp(hitLocal.x / (hitSize.width / 2), -1, 1),
+    y: MathUtils.clamp(hitLocal.y / (hitSize.height / 2), -1, 1),
+  };
+};
+
+const HitProxy = ({
+  onPointer,
+}: {
+  onPointer: (pointer: AgentPointer) => void;
+}) => {
+  const isHovering = useRef(false);
+
+  useEffect(
+    () => () => {
+      if (isHovering.current) {
+        document.body.style.cursor = "";
+      }
+    },
+    []
+  );
+
+  return (
+    <mesh
+      geometry={hitGeometry}
+      material={hitMaterial}
+      onPointerMove={(event) => onPointer(pointerAt(event, isHovering.current))}
+      onPointerOut={(event) => {
+        isHovering.current = false;
+        onPointer(pointerAt(event, false));
+        document.body.style.cursor = "";
+      }}
+      onPointerOver={(event) => {
+        event.stopPropagation();
+        isHovering.current = true;
+        onPointer(pointerAt(event, true));
+        document.body.style.cursor = "pointer";
+      }}
+      position={[0, hitSize.height / 2, 0]}
+    />
+  );
+};
+
 const Eye = ({ side }: { side: 1 | -1 }) => (
   <group position={[side * eyeSize.spacing, 0, 0]}>
     <Part geometry={eyeGeometry} material="eye" />
@@ -101,7 +160,7 @@ export const Agent = ({
   role,
   action = "idle",
   actionRef,
-  focused = false,
+  pointer,
   motion,
   shadow = true,
   ...groupProps
@@ -109,11 +168,12 @@ export const Agent = ({
   const prefersReducedMotion = usePrefersReducedMotion();
   const resolvedMotion = motion ?? (prefersReducedMotion ? "reduced" : "full");
   const seed = seedFromId(useId());
+  const ownPointer = useRef<AgentPointer>({ hovered: false, x: 0, y: 0 });
   const { attach, attachLeg, liveAction } = useAgentRig({
     action,
     actionRef,
-    focused,
     motion: resolvedMotion,
+    pointer: pointer ?? ownPointer,
     seed,
   });
   const kit: AccessoryKit = accessoryKits[role];
@@ -128,11 +188,14 @@ export const Agent = ({
 
   return (
     <AgentLiveContext value={{ liveAction, motion: resolvedMotion }}>
-      <group
-        {...groupProps}
-        dispose={null}
-        name={`agent-${role}-${action}${focused ? "-focused" : ""}`}
-      >
+      <group {...groupProps} dispose={null} name={`agent-${role}-${action}`}>
+        {pointer ? null : (
+          <HitProxy
+            onPointer={(next) => {
+              ownPointer.current = next;
+            }}
+          />
+        )}
         {shadow ? (
           <group ref={attach("shadow")}>
             <mesh

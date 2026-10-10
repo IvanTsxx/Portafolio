@@ -5,10 +5,8 @@ import { AgentPoster } from "@/registry/ivan/components/agent-stage/agent-poster
 
 export const Demo = () => (
   <AgentPlayground
-    controlFocus={false}
     initialValues={{
       action: "measure",
-      focused: false,
       reducedMotion: false,
       role: "architect",
       shadow: true,

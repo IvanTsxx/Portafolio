@@ -18,7 +18,6 @@ import { StageLights } from "./stage-lights";
 export interface AgentStageSceneProps {
   role: AgentRole;
   action?: AgentAction;
-  focused?: boolean;
   motion?: AgentMotion;
   shadow?: boolean;
 }
@@ -68,7 +67,6 @@ const FrameInvalidator = () => {
 export const AgentStageScene = ({
   role,
   action = agentSignatureActions[role],
-  focused = false,
   motion,
   shadow = true,
 }: AgentStageSceneProps) => (
@@ -79,7 +77,6 @@ export const AgentStageScene = ({
     <FrameInvalidator />
     <Agent
       action={action}
-      focused={focused}
       motion={motion}
       role={role}
       rotation-y={agentYaw}
