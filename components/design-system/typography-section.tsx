@@ -1,17 +1,12 @@
 import { DocumentSection } from "@/components/site/document-section";
+import { padCount } from "@/lib/design-system/format";
 import type { FontFamily, TextLabelToken } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import { typeScaleSpecs } from "@/lib/design-system/specs";
 import type { FontClassName } from "@/lib/design-system/specs";
 import { cn } from "@/lib/utils";
 
-import {
-  ClassTag,
-  SpecCell,
-  SpecGrid,
-  SubHeading,
-  padCount,
-} from "./spec-frame";
+import { ClassTag, SpecCell, SpecGrid, SubHeading } from "./spec-frame";
 
 const familySampleClassNames = {
   "font-jp": "jp text-3xl font-light",

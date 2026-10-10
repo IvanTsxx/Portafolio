@@ -218,8 +218,8 @@ describe("component catalog", () => {
       ...allComponentSpecs.map((spec) => spec.name),
     ]);
     const unknown = allComponentSpecs.flatMap((spec) =>
-      [...spec.usage.matchAll(/<(?<tag>[A-Z][A-Za-z]*)/gu)]
-        .map((match) => match.groups?.tag ?? "")
+      [...spec.usage.matchAll(/<[A-Z][A-Za-z]*/gu)]
+        .map((match) => match[0].slice(1))
         .filter((tag) => !known.has(tag))
         .map((tag) => `${spec.name}: <${tag}>`)
     );

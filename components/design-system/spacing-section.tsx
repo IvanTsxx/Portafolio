@@ -1,4 +1,5 @@
 import { DocumentSection } from "@/components/site/document-section";
+import { padCount } from "@/lib/design-system/format";
 import type { DesignSystem } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import {
@@ -8,7 +9,7 @@ import {
 } from "@/lib/design-system/specs";
 import type { RadiusStepName } from "@/lib/design-system/specs";
 
-import { ClassTag, SubHeading, padCount } from "./spec-frame";
+import { ClassTag, SubHeading } from "./spec-frame";
 
 const radiusClassNames = {
   "2xl": "rounded-2xl",

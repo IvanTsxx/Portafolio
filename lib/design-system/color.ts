@@ -10,20 +10,21 @@ export type Rgb = readonly [number, number, number];
 export type ContrastGrade = "AAA" | "AA" | "AA-large" | "non-text";
 
 const oklchPattern =
-  /^oklch\(\s*(?<lightness>[\d.]+%?)\s+(?<chroma>[\d.]+)\s+(?<hue>[\d.]+)(?:\s*\/\s*(?<alpha>[\d.]+%?))?\s*\)$/u;
+  /^oklch\(\s*[\d.]+%?\s+[\d.]+\s+[\d.]+(?:\s*\/\s*[\d.]+%?)?\s*\)$/u;
 
 const percentOrUnit = (value: string) =>
   value.endsWith("%") ? Number(value.slice(0, -1)) / 100 : Number(value);
 
 export const parseOklch = (value: string): Oklch | null => {
-  const groups = oklchPattern.exec(value.trim())?.groups;
-  if (!groups) {
+  const trimmed = value.trim();
+  if (!oklchPattern.test(trimmed)) {
     return null;
   }
-  const { alpha, chroma, hue, lightness } = groups;
-  if (lightness === undefined || chroma === undefined || hue === undefined) {
-    return null;
-  }
+  const [channels = "", alpha] = trimmed
+    .slice("oklch(".length, -1)
+    .split("/")
+    .map((part) => part.trim());
+  const [lightness = "", chroma = "", hue = ""] = channels.split(/\s+/u);
   return {
     alpha: alpha === undefined ? 1 : percentOrUnit(alpha),
     chroma: Number(chroma),

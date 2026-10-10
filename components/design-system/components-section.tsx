@@ -17,11 +17,12 @@ import type {
   ComponentSpec,
   SiteComponentId,
 } from "@/lib/design-system/catalog";
+import { padCount } from "@/lib/design-system/format";
 import { documentCode, sectionById } from "@/lib/design-system/sections";
 import { cn } from "@/lib/utils";
 
 import { Barcode } from "./barcode";
-import { PreviewBox, SpecCell, SpecGrid, padCount } from "./spec-frame";
+import { PreviewBox, SpecCell, SpecGrid } from "./spec-frame";
 
 const technicalTones = ["outline", "selected", "solid"] as const;
 

@@ -1,4 +1,5 @@
 import type { Heading } from "@/lib/content/text";
+import { sectionSpecs as designSystemSectionSpecs } from "@/lib/design-system/sections";
 import { getExperiment } from "@/lib/lab/experiments";
 import type { getRegistryItem } from "@/lib/registry/registry";
 
@@ -57,3 +58,5 @@ export const experimentSectionsOf = (experiment: Experiment): Heading[] =>
       ? [{ id: "related", label: "Related" }]
       : []),
   ]);
+
+export const designSystemHeadings = toHeadings(designSystemSectionSpecs);

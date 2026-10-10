@@ -1,11 +1,12 @@
 import { DocumentSection } from "@/components/site/document-section";
 import type { ContrastGrade } from "@/lib/design-system/color";
+import { padCount } from "@/lib/design-system/format";
 import type { ColorToken } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import { colorGroupLabels } from "@/lib/design-system/specs";
 import type { ColorGroup } from "@/lib/design-system/specs";
 
-import { SpecCell, SpecGrid, SubHeading, padCount } from "./spec-frame";
+import { SpecCell, SpecGrid, SubHeading } from "./spec-frame";
 
 const swatchGroups = [
   "surface",

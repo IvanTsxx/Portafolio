@@ -161,7 +161,10 @@ export const findMissingTokens = (
     }
   });
 
-const varReference = /^var\((--[\w-]+)\)$/u;
+const varReference = /^var\(--[\w-]+\)$/u;
+
+const referencedVariable = (value: string) =>
+  varReference.test(value) ? value.slice("var(".length, -1) : null;
 
 interface ResolvedValue {
   alias: string | null;
@@ -172,18 +175,18 @@ const resolveRootValue = (
   root: ReadonlyMap<string, string>,
   declared: string
 ): ResolvedValue => {
-  const first = varReference.exec(declared);
+  const alias = referencedVariable(declared);
   let resolved = declared;
-  let match = varReference.exec(resolved);
-  while (match?.[1] !== undefined) {
-    const next = root.get(match[1]);
+  let name = alias;
+  while (name !== null) {
+    const next = root.get(name);
     if (next === undefined) {
-      throw new Error(`Unresolved CSS variable ${match[1]}`);
+      throw new Error(`Unresolved CSS variable ${name}`);
     }
     resolved = next;
-    match = varReference.exec(resolved);
+    name = referencedVariable(resolved);
   }
-  return { alias: first?.[1] ?? null, resolved };
+  return { alias, resolved };
 };
 
 const rgbOfOpaque = (value: string): Rgb => {
@@ -266,19 +269,24 @@ const buildFonts = (globals: GlobalsCss): FontFamily[] =>
     stack: globals.theme.get(spec.cssVar) ?? "",
   }));
 
+const lengthPattern = /^[\d.]+(?:px|rem)?$/u;
+
 const lengthToPx = (value: string) => {
-  const match = /^([\d.]+)(px|rem)?$/u.exec(value.trim());
-  if (!match?.[1]) {
+  const trimmed = value.trim();
+  if (!lengthPattern.test(trimmed)) {
     return 0;
   }
-  const amount = Number(match[1]);
-  return match[2] === "rem" ? amount * 16 : amount;
+  return trimmed.endsWith("rem")
+    ? Number(trimmed.slice(0, -"rem".length)) * 16
+    : Number(trimmed.replace("px", ""));
 };
 
-const radiusFactor = (declared: string) => {
-  const match = /calc\(var\(--radius\)\s*\*\s*([\d.]+)\)/u.exec(declared);
-  return match?.[1] ? Number(match[1]) : 1;
-};
+const radiusFactorPrefix = "calc(var(--radius) *";
+
+const radiusFactor = (declared: string) =>
+  declared.startsWith(radiusFactorPrefix)
+    ? Number(declared.slice(radiusFactorPrefix.length, -1))
+    : 1;
 
 const buildRadius = (globals: GlobalsCss): DesignSystem["radius"] => {
   const base = globals.root.get(radiusBaseVar) ?? "0";

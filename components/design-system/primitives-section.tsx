@@ -21,9 +21,10 @@ import {
   primitiveSpecs,
 } from "@/lib/design-system/catalog";
 import type { ComponentSpec, PrimitiveId } from "@/lib/design-system/catalog";
+import { padCount } from "@/lib/design-system/format";
 import { sectionById } from "@/lib/design-system/sections";
 
-import { ClassTag, SpecCell, SpecGrid, padCount } from "./spec-frame";
+import { ClassTag, SpecCell, SpecGrid } from "./spec-frame";
 
 const buttonVariants = [
   "default",

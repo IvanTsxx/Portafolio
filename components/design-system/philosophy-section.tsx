@@ -2,11 +2,10 @@ import type { ReactNode } from "react";
 
 import { CornerMarks } from "@/components/site/corner-marks";
 import { DocumentSection } from "@/components/site/document-section";
+import { padCount } from "@/lib/design-system/format";
 import { principles } from "@/lib/design-system/philosophy";
 import type { PrincipleId } from "@/lib/design-system/philosophy";
 import { sectionById } from "@/lib/design-system/sections";
-
-import { padCount } from "./spec-frame";
 
 const inkCells = [
   "ink-1",

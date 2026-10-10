@@ -128,30 +128,30 @@ The `label` utility is the annotation style (see utilities). Pair every section 
 
 Tailwind's 4px scale (`--spacing: 0.25rem`). Spacing, sizes and positions are multiples of 4px.
 
-| Step | Example class | Px  | Use                           |
-| ---- | ------------- | --- | ----------------------------- |
-| 1    | `p-1`         | 4   | Hairline gaps, icon nudges    |
-| 2    | `p-2`         | 8   | Chip gaps, label to value     |
-| 3    | `p-3`         | 12  | Inner stacks, hit-area growth |
-| 4    | `p-4`         | 16  | Cell padding, page gutter     |
-| 5    | `p-5`         | 20  | Cell padding from md          |
-| 6    | `p-6`         | 24  | Panel stack, column gutter    |
-| 8    | `p-8`         | 32  | Page gutter from md           |
-| 11   | `p-11`        | 44  | Minimum touch target          |
-| 16   | `p-16`        | 64  | Gap between sections          |
-| 24   | `p-24`        | 96  | Page bottom padding           |
+| Step | Example class | Px | Use |
+| --- | --- | --- | --- |
+| 1 | `p-1` | 4 | Hairline gaps, icon nudges |
+| 2 | `p-2` | 8 | Chip gaps, label to value |
+| 3 | `p-3` | 12 | Inner stacks, hit-area growth |
+| 4 | `p-4` | 16 | Cell padding, page gutter |
+| 5 | `p-5` | 20 | Cell padding from md |
+| 6 | `p-6` | 24 | Panel stack, column gutter |
+| 8 | `p-8` | 32 | Page gutter from md |
+| 11 | `p-11` | 44 | Minimum touch target |
+| 16 | `p-16` | 64 | Gap between sections |
+| 24 | `p-24` | 96 | Page bottom padding |
 
 ### Radius
 
 Radius is `--radius: 0`. Every step derives from it, so every corner is square.
 
-| Class         | Variable       | Factor | Px  |
-| ------------- | -------------- | ------ | --- |
-| `rounded-sm`  | `--radius-sm`  | 0.5    | 0   |
-| `rounded-md`  | `--radius-md`  | 0.75   | 0   |
-| `rounded-lg`  | `--radius-lg`  | 1      | 0   |
-| `rounded-xl`  | `--radius-xl`  | 1.5    | 0   |
-| `rounded-2xl` | `--radius-2xl` | 2      | 0   |
+| Class | Variable | Factor | Px |
+| --- | --- | --- | --- |
+| `rounded-sm` | `--radius-sm` | 0.5 | 0 |
+| `rounded-md` | `--radius-md` | 0.75 | 0 |
+| `rounded-lg` | `--radius-lg` | 1 | 0 |
+| `rounded-xl` | `--radius-xl` | 1.5 | 0 |
+| `rounded-2xl` | `--radius-2xl` | 2 | 0 |
 
 ### Document grid
 
@@ -363,32 +363,30 @@ Import: `import { Button, buttonVariants } from "@/components/ui/button"`
 
 Variant axis `variant`:
 
-| Value         | Meaning                                  |
-| ------------- | ---------------------------------------- |
-| `default`     | Primary action. Ink fill.                |
+| Value | Meaning |
+| --- | --- |
+| `default` | Primary action. Ink fill. |
 | `destructive` | Irreversible action. Tinted destructive. |
-| `ghost`       | Quiet action inside dense rows.          |
-| `link`        | Inline text action.                      |
-| `outline`     | Secondary action. Hairline border.       |
-| `secondary`   | Paper-deep fill.                         |
+| `ghost` | Quiet action inside dense rows. |
+| `link` | Inline text action. |
+| `outline` | Secondary action. Hairline border. |
+| `secondary` | Paper-deep fill. |
 
 Variant axis `size`:
 
-| Value     | Meaning     |
-| --------- | ----------- |
-| `default` | 32px high   |
-| `icon`    | 32px square |
+| Value | Meaning |
+| --- | --- |
+| `default` | 32px high |
+| `icon` | 32px square |
 | `icon-lg` | 36px square |
 | `icon-sm` | 28px square |
 | `icon-xs` | 24px square |
-| `lg`      | 36px high   |
-| `sm`      | 28px high   |
-| `xs`      | 24px high   |
+| `lg` | 36px high |
+| `sm` | 28px high |
+| `xs` | 24px high |
 
 ```tsx
-<Button variant="outline" size="sm">
-  Copy
-</Button>
+<Button variant="outline" size="sm">Copy</Button>
 ```
 
 ### Badge バッジ
@@ -399,14 +397,14 @@ Import: `import { Badge, badgeVariants } from "@/components/ui/badge"`
 
 Variant axis `variant`:
 
-| Value         | Meaning             |
-| ------------- | ------------------- |
-| `default`     | Ink fill            |
-| `destructive` | Blocked or invalid  |
-| `ghost`       | No fill until hover |
-| `link`        | Inline link         |
-| `outline`     | Hairline border     |
-| `secondary`   | Paper-deep fill     |
+| Value | Meaning |
+| --- | --- |
+| `default` | Ink fill |
+| `destructive` | Blocked or invalid |
+| `ghost` | No fill until hover |
+| `link` | Inline link |
+| `outline` | Hairline border |
+| `secondary` | Paper-deep fill |
 
 ```tsx
 <Badge variant="outline">Sample</Badge>
@@ -420,10 +418,10 @@ Import: `import { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants } f
 
 Variant axis `variant`:
 
-| Value     | Meaning                                               |
-| --------- | ----------------------------------------------------- |
-| `default` | Muted track with a raised active tab                  |
-| `line`    | Transparent track with an underline on the active tab |
+| Value | Meaning |
+| --- | --- |
+| `default` | Muted track with a raised active tab |
+| `line` | Transparent track with an underline on the active tab |
 
 ```tsx
 <Tabs defaultValue="preview">
@@ -444,18 +442,18 @@ Import: `import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-gr
 
 Variant axis `variant`:
 
-| Value     | Meaning                   |
-| --------- | ------------------------- |
+| Value | Meaning |
+| --- | --- |
 | `default` | Transparent until pressed |
-| `outline` | Hairline border           |
+| `outline` | Hairline border |
 
 Variant axis `size`:
 
-| Value     | Meaning   |
-| --------- | --------- |
+| Value | Meaning |
+| --- | --- |
 | `default` | 32px high |
-| `lg`      | 36px high |
-| `sm`      | 28px high |
+| `lg` | 36px high |
+| `sm` | 28px high |
 
 ```tsx
 <ToggleGroup defaultValue={["grid"]} variant="outline">
@@ -472,10 +470,10 @@ Import: `import { Switch } from "@/components/ui/switch"`
 
 Variant axis `size`:
 
-| Value     | Meaning          |
-| --------- | ---------------- |
+| Value | Meaning |
+| --- | --- |
 | `default` | 32 by 18px track |
-| `sm`      | 24 by 14px track |
+| `sm` | 24 by 14px track |
 
 ```tsx
 <Switch defaultChecked size="sm" aria-label="Reduced motion" />
@@ -533,10 +531,7 @@ Keyboard key cap.
 Import: `import { Kbd, KbdGroup } from "@/components/ui/kbd"`
 
 ```tsx
-<KbdGroup>
-  <Kbd>⌘</Kbd>
-  <Kbd>K</Kbd>
-</KbdGroup>
+<KbdGroup><Kbd>⌘</Kbd><Kbd>K</Kbd></KbdGroup>
 ```
 
 ## DS-07 Site components 構成部品
@@ -588,13 +583,7 @@ Page header: doc code and meta strip, display title, jp glyph and hazard stripe.
 Import: `import { DocumentHero } from "@/components/site/document-hero"`
 
 ```tsx
-<DocumentHero
-  code="DS-00"
-  jp="設計"
-  lede="Tokens, parts, motion"
-  meta={[{ label: "Tokens", value: "36" }]}
-  title="Design system"
-/>
+<DocumentHero code="DS-00" jp="設計" lede="Tokens, parts, motion" meta={[{ label: "Tokens", value: "36" }]} title="Design system" />
 ```
 
 ### CompactDossier 身元
@@ -605,9 +594,7 @@ Import: `import { CompactDossier, DossierPanel, DossierStrip } from "@/component
 
 ```tsx
 <CompactDossier code="DS-00">
-  <DossierPanel collapsible jp="目次" label="On this page">
-    {toc}
-  </DossierPanel>
+  <DossierPanel collapsible jp="目次" label="On this page">{toc}</DossierPanel>
 </CompactDossier>
 ```
 
@@ -619,15 +606,13 @@ Import: `import { CornerMarks } from "@/components/site/corner-marks"`
 
 Variant axis `reveal`:
 
-| Value    | Meaning                                                     |
-| -------- | ----------------------------------------------------------- |
-| `always` | Marks always visible                                        |
-| `hover`  | Marks fade in on hover or focus inside a group/marks parent |
+| Value | Meaning |
+| --- | --- |
+| `always` | Marks always visible |
+| `hover` | Marks fade in on hover or focus inside a group/marks parent |
 
 ```tsx
-<div className="group/marks relative">
-  <CornerMarks reveal="hover" />
-</div>
+<div className="group/marks relative"><CornerMarks reveal="hover" /></div>
 ```
 
 ### LeaderList 仕様
@@ -638,9 +623,7 @@ Import: `import { LeaderList, LeaderRow } from "@/components/site/leader-list"`
 
 ```tsx
 <LeaderList>
-  <LeaderRow jp="役割" label="Role">
-    Frontend engineer
-  </LeaderRow>
+  <LeaderRow jp="役割" label="Role">Frontend engineer</LeaderRow>
 </LeaderList>
 ```
 
@@ -652,26 +635,21 @@ Import: `import { technicalButtonVariants } from "@/components/site/styles"`
 
 Variant axis `tone`:
 
-| Value      | Meaning                                  |
-| ---------- | ---------------------------------------- |
-| `outline`  | Hairline border, inverts to ink on hover |
-| `selected` | Graphite fill for the current choice     |
-| `solid`    | Ink fill, inverts to paper on hover      |
+| Value | Meaning |
+| --- | --- |
+| `outline` | Hairline border, inverts to ink on hover |
+| `selected` | Graphite fill for the current choice |
+| `solid` | Ink fill, inverts to paper on hover |
 
 Variant axis `size`:
 
-| Value | Meaning                             |
-| ----- | ----------------------------------- |
-| `md`  | 44px minimum height                 |
-| `sm`  | 32px high with an extended hit area |
+| Value | Meaning |
+| --- | --- |
+| `md` | 44px minimum height |
+| `sm` | 32px high with an extended hit area |
 
 ```tsx
-<button
-  className={technicalButtonVariants({ size: "sm", tone: "solid" })}
-  type="button"
->
-  Copy
-</button>
+<button className={technicalButtonVariants({ size: "sm", tone: "solid" })} type="button">Copy</button>
 ```
 
 ### chipClassName 札
@@ -681,9 +659,7 @@ Filter chip recipe. Pressed state inverts to ink.
 Import: `import { chipClassName } from "@/components/site/styles"`
 
 ```tsx
-<button aria-pressed className={chipClassName} type="button">
-  Motion
-</button>
+<button aria-pressed className={chipClassName} type="button">Motion</button>
 ```
 
 ### specimenVariants 見本
@@ -694,16 +670,14 @@ Import: `import { specimenVariants } from "@/components/profile/specimen-variant
 
 Variant axis `surface`:
 
-| Value   | Meaning             |
-| ------- | ------------------- |
-| `deep`  | Paper-deep wash     |
+| Value | Meaning |
+| --- | --- |
+| `deep` | Paper-deep wash |
 | `hatch` | Diagonal hatch fill |
-| `plain` | Paper               |
+| `plain` | Paper |
 
 ```tsx
-<li className={specimenVariants({ interactive: true, surface: "hatch" })}>
-  {content}
-</li>
+<li className={specimenVariants({ interactive: true, surface: "hatch" })}>{content}</li>
 ```
 
 ### SampleBadge 見本
@@ -724,17 +698,15 @@ Import: `import { Callout } from "@/components/content/callout"`
 
 Variant axis `tone`:
 
-| Value     | Meaning                              |
-| --------- | ------------------------------------ |
-| `note`    | Plain note                           |
-| `sample`  | Dashed frame for placeholder content |
-| `tip`     | Hint                                 |
-| `warning` | Hatch fill with corner marks         |
+| Value | Meaning |
+| --- | --- |
+| `note` | Plain note |
+| `sample` | Dashed frame for placeholder content |
+| `tip` | Hint |
+| `warning` | Hatch fill with corner marks |
 
 ```tsx
-<Callout tone="warning" title="Watch out">
-  Text
-</Callout>
+<Callout tone="warning" title="Watch out">Text</Callout>
 ```
 
 ### Module 枠
@@ -744,9 +716,7 @@ Module frame with a corner tick, id, title and jp annotation.
 Import: `import { Module, TickMark } from "@/components/profile/module"`
 
 ```tsx
-<Module id="M-01" jp="見本" title="Specimen">
-  {content}
-</Module>
+<Module id="M-01" jp="見本" title="Specimen">{content}</Module>
 ```
 
 ### REDACTED block 秘匿
@@ -861,12 +831,12 @@ Tailwind duration utilities. Hover, focus and press flip in 100ms.
 
 ### Scenes
 
-| Code  | Scene         | Id              | Cast               |
-| ----- | ------------- | --------------- | ------------------ |
-| SC-01 | Feature       | `feature`       | builder, inspector |
-| SC-02 | Code search   | `code-search`   | researcher         |
-| SC-03 | Figma to code | `figma-to-code` | builder            |
-| SC-04 | Debugging     | `debugging`     | debugger           |
+| Code | Scene | Id | Cast |
+| --- | --- | --- | --- |
+| SC-01 | Feature | `feature` | builder, inspector |
+| SC-02 | Code search | `code-search` | researcher |
+| SC-03 | Figma to code | `figma-to-code` | builder |
+| SC-04 | Debugging | `debugging` | debugger |
 
 ### Usage
 

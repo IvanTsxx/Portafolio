@@ -1,17 +1,12 @@
 import type { ReactNode } from "react";
 
 import { DocumentSection } from "@/components/site/document-section";
+import { padCount } from "@/lib/design-system/format";
 import type { UtilityDoc } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import type { UtilityName } from "@/lib/design-system/specs";
 
-import {
-  ClassTag,
-  PreviewBox,
-  SpecCell,
-  SpecGrid,
-  padCount,
-} from "./spec-frame";
+import { ClassTag, PreviewBox, SpecCell, SpecGrid } from "./spec-frame";
 
 const previews = {
   "blueprint-dots": (

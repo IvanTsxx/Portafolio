@@ -6,11 +6,12 @@ import {
   agentRoleSpecs,
   agentSceneSpecs,
 } from "@/lib/design-system/agents";
+import { padCount } from "@/lib/design-system/format";
 import { sectionById } from "@/lib/design-system/sections";
 import { AgentPoster } from "@/registry/ivan/components/agent-stage/agent-poster";
 
 import { SceneStage } from "./scene-stage";
-import { ClassTag, SubHeading, padCount } from "./spec-frame";
+import { ClassTag, SubHeading } from "./spec-frame";
 
 const RolesTable = () => (
   <table className="label w-full border-collapse">

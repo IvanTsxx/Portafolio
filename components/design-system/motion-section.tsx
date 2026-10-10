@@ -1,13 +1,14 @@
 import { CodeBlock } from "@/components/registry-docs/code-block";
 import { DocumentSection } from "@/components/site/document-section";
 import { LeaderList, LeaderRow } from "@/components/site/leader-list";
+import { padCount } from "@/lib/design-system/format";
 import type { DesignSystem } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import { agentMotionSpecs } from "@/lib/design-system/specs";
 import { highlightCode } from "@/lib/registry/highlight";
 
 import { MotionLab } from "./motion-lab";
-import { SubHeading, padCount } from "./spec-frame";
+import { SubHeading } from "./spec-frame";
 
 export const MotionSection = async ({ system }: { system: DesignSystem }) => {
   const section = sectionById("motion");
