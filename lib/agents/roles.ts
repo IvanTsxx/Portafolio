@@ -21,6 +21,8 @@ export const agentActions = [
   "carry",
   "direct",
   "celebrate",
+  "measure",
+  "check",
 ] as const;
 
 export type AgentAction = (typeof agentActions)[number];
@@ -56,7 +58,7 @@ export const agentProfiles = {
       "Keeps the design system coherent",
     ],
     role: "architect",
-    signatureActions: ["point", "inspect", "read"],
+    signatureActions: ["measure", "point", "inspect"],
     title: "Architect",
   },
   builder: {
@@ -92,7 +94,7 @@ export const agentProfiles = {
       "Compares the render against the intent",
     ],
     role: "inspector",
-    signatureActions: ["inspect", "celebrate", "idle"],
+    signatureActions: ["check", "inspect", "celebrate"],
     title: "QA Inspector",
   },
   orchestrator: {

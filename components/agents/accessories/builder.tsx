@@ -1,6 +1,13 @@
 "use client";
 
+import { useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import type { Group } from "three";
+
+import type { AgentAction } from "@/lib/agents/roles";
+
 import { roundedBox } from "../geometry";
+import { useAgentLive } from "../held-pose";
 import { Part } from "../part";
 import { bodySize } from "../rig";
 import { HardHat } from "./shapes";
@@ -53,33 +60,46 @@ export const SafetyVest = () => (
   </group>
 );
 
-export const Laptop = () => (
-  <group position={[0, -0.16, 0.3]}>
-    <Part
-      geometry={roundedBox(0.62, 0.035, 0.4, 0.015, 2)}
-      material="aluminum"
-    />
-    <Part
-      geometry={roundedBox(0.54, 0.01, 0.22, 0.004, 1)}
-      material="ink"
-      position={[0, 0.018, -0.04]}
-    />
-    <group position={[0, 0.0175, 0.19]} rotation={[0.5, 0, 0]}>
+const stowedActions = new Set<AgentAction>(["carry", "walk"]);
+
+export const Laptop = () => {
+  const laptop = useRef<Group>(null);
+  const { liveAction } = useAgentLive();
+
+  useFrame(() => {
+    if (laptop.current) {
+      laptop.current.visible = !stowedActions.has(liveAction.current);
+    }
+  });
+
+  return (
+    <group position={[0, -0.16, 0.34]} ref={laptop} rotation={[0, Math.PI, 0]}>
       <Part
-        geometry={roundedBox(0.62, 0.34, 0.03, 0.015, 2)}
+        geometry={roundedBox(0.62, 0.035, 0.4, 0.015, 2)}
         material="aluminum"
-        position={[0, 0.17, 0]}
       />
       <Part
-        geometry={roundedBox(0.08, 0.08, 0.01, 0.02, 2)}
+        geometry={roundedBox(0.54, 0.01, 0.22, 0.004, 1)}
         material="ink"
-        position={[0, 0.17, 0.016]}
+        position={[0, 0.018, -0.04]}
       />
-      <Part
-        geometry={roundedBox(0.56, 0.28, 0.006, 0.004, 1)}
-        material="screenGlow"
-        position={[0, 0.17, -0.016]}
-      />
+      <group position={[0, 0.0175, 0.19]} rotation={[0.22, 0, 0]}>
+        <Part
+          geometry={roundedBox(0.62, 0.34, 0.03, 0.015, 2)}
+          material="aluminum"
+          position={[0, 0.17, 0]}
+        />
+        <Part
+          geometry={roundedBox(0.08, 0.08, 0.01, 0.02, 2)}
+          material="ink"
+          position={[0, 0.17, 0.016]}
+        />
+        <Part
+          geometry={roundedBox(0.56, 0.28, 0.006, 0.004, 1)}
+          material="screenGlow"
+          position={[0, 0.17, -0.016]}
+        />
+      </group>
     </group>
-  </group>
-);
+  );
+};

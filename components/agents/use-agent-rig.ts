@@ -2,6 +2,7 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
+import type { RefObject } from "react";
 import type { Group } from "three";
 import { MathUtils, Vector3 } from "three";
 
@@ -20,10 +21,12 @@ export interface RigNodes {
   eyes: Group | null;
   legs: (Group | null)[];
   root: Group | null;
+  shadow: Group | null;
 }
 
 interface RigOptions {
   action: AgentAction;
+  actionRef?: RefObject<AgentAction>;
   focused: boolean;
   motion: AgentMotion;
   seed: number;
@@ -42,7 +45,10 @@ const smoothstep = (value: number) => {
 const cameraLocal = new Vector3();
 
 const applyPose = (nodes: RigNodes, pose: Pose, blink: number) => {
-  const { armLeft, armRight, body, eyes, legs, root } = nodes;
+  const { armLeft, armRight, body, eyes, legs, root, shadow } = nodes;
+  if (shadow) {
+    shadow.scale.setScalar(MathUtils.clamp(1 - pose.rootY * 1.6, 0.45, 1));
+  }
   if (root) {
     root.position.y = pose.rootY;
     root.rotation.y = pose.bodyYaw;
@@ -83,7 +89,14 @@ const blinkAmount = (time: number, seed: number) => {
   return 1 - Math.sin((local / blinkSeconds) * Math.PI) * 0.9;
 };
 
-export const useAgentRig = ({ action, focused, motion, seed }: RigOptions) => {
+export const useAgentRig = ({
+  action: actionProp,
+  actionRef,
+  focused,
+  motion,
+  seed,
+}: RigOptions) => {
+  const liveAction = useRef<AgentAction>(actionProp);
   const nodes = useRef<RigNodes>({
     armLeft: null,
     armRight: null,
@@ -91,11 +104,12 @@ export const useAgentRig = ({ action, focused, motion, seed }: RigOptions) => {
     eyes: null,
     legs: [null, null, null, null],
     root: null,
+    shadow: null,
   });
   const playback = useRef({
-    blendFrom: action,
+    blendFrom: actionProp,
     blendStart: Number.NEGATIVE_INFINITY,
-    current: action,
+    current: actionProp,
     focusStart: Number.NEGATIVE_INFINITY,
     focusWeight: 0,
     wasFocused: false,
@@ -111,6 +125,8 @@ export const useAgentRig = ({ action, focused, motion, seed }: RigOptions) => {
     const step = Math.min(delta, 0.1);
     const track = playback.current;
     const { from, out, to } = poses.current;
+    const action = actionRef?.current ?? actionProp;
+    liveAction.current = action;
 
     if (motion === "reduced") {
       const clip = actionClips[action];
@@ -175,5 +191,5 @@ export const useAgentRig = ({ action, focused, motion, seed }: RigOptions) => {
     nodes.current.legs[index] = node;
   };
 
-  return { attach, attachLeg };
+  return { attach, attachLeg, liveAction };
 };

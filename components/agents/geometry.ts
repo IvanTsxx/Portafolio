@@ -1,5 +1,6 @@
 import type { BufferGeometry } from "three";
 import {
+  BoxGeometry,
   CircleGeometry,
   CylinderGeometry,
   SphereGeometry,
@@ -57,3 +58,5 @@ export const torus = (tubeRatio: number, arc = Math.PI * 2) =>
   );
 
 export const disc = () => shared("disc", () => new CircleGeometry(1, 64));
+
+export const box = () => shared("box", () => new BoxGeometry(1, 1, 1));
