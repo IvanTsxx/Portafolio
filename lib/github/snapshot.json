@@ -1986,7 +1986,11 @@
             "date": "2026-10-09",
             "level": 2
           },
-          null
+          {
+            "count": 0,
+            "date": "2026-10-10",
+            "level": 0
+          }
         ]
       ],
       "year": 2026
@@ -9772,8 +9776,9 @@
       "year": 2022
     }
   ],
-  "fetchedAt": "2026-10-10T00:31:01.395Z",
+  "fetchedAt": "2026-10-10T05:01:55.352Z",
   "identity": {
+    "avatarUrl": "https://avatars.githubusercontent.com/u/104214911?s=640&u=24e150b207d007e4b8e4ee4601011d4fd8fc31a2&v=4",
     "bio": "Full Stack Developer · Argentina 🇦🇷 👩🏻‍💻 Next.js · Vercel ▲ ❤️",
     "company": "@basementstudio",
     "createdAt": "2022-04-22T14:59:10Z",

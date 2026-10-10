@@ -60,6 +60,7 @@ const pinnedNode = (
 
 const rawUser = (overrides: Partial<z.input<typeof rawUserSchema>> = {}) =>
   rawUserSchema.parse({
+    avatarUrl: "https://avatars.githubusercontent.com/u/104214911?v=4",
     bio: "Frontend engineer",
     company: "@basementstudio",
     contributionsCollection: emptyCollection,
@@ -100,6 +101,19 @@ const pullRequestNode = (
 });
 
 describe("parseIdentity", () => {
+  test("keeps the GitHub avatar and rejects avatars from other hosts", () => {
+    const github = parseIdentity(rawUser(), rawRest(null), ALLOWED_EMAIL);
+    expect(github.avatarUrl).toBe(
+      "https://avatars.githubusercontent.com/u/104214911?v=4"
+    );
+    const foreign = parseIdentity(
+      rawUser({ avatarUrl: "https://example.com/avatar.png" }),
+      rawRest(null),
+      ALLOWED_EMAIL
+    );
+    expect(foreign.avatarUrl).toBeNull();
+  });
+
   test("keeps the company affiliation and the company organization", () => {
     const identity = parseIdentity(rawUser(), rawRest(null), ALLOWED_EMAIL);
 

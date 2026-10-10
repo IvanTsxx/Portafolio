@@ -4,7 +4,7 @@ import { PanelHeading } from "@/components/site/panel-heading";
 import { focusRingClassName } from "@/components/site/styles";
 import { cn } from "@/lib/utils";
 
-export const PORTRAIT_SRC = "/profile/portrait.jpg";
+export const PORTRAIT_SRC = "/avatar";
 
 export const DossierStrip = ({
   code,

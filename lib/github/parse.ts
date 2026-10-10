@@ -85,11 +85,17 @@ const sumCounts = (rows: readonly RepositoryCount[]) => {
 
 const publicText = (value: string | null) => (isRedacted(value) ? null : value);
 
+const githubAvatarHost = "avatars.githubusercontent.com";
+
+const githubAvatarUrl = (url: string) =>
+  new URL(url).hostname === githubAvatarHost ? url : null;
+
 export const parseIdentity = (
   user: RawUser,
   rest: RawRestUser,
   allowedEmail: string
 ): GithubIdentity => ({
+  avatarUrl: githubAvatarUrl(user.avatarUrl),
   bio: publicText(user.bio),
   company: publicAffiliation(user.company),
   createdAt: rest.created_at,

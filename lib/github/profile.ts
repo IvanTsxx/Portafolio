@@ -34,7 +34,7 @@ const repositoryCountFields =
 
 const profileQuery = `query($login: String!) {
   user(login: $login) {
-    login name bio company location websiteUrl twitterUsername
+    login name bio company location websiteUrl twitterUsername avatarUrl(size: 640)
     followers { totalCount }
     following { totalCount }
     repositories(ownerAffiliations: OWNER) { totalCount }

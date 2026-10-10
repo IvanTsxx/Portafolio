@@ -36,6 +36,7 @@ export type ContributionCalendar = z.infer<typeof contributionCalendarSchema>;
 export type ContributionRange = ContributionCalendar["range"];
 
 const githubIdentitySchema = z.object({
+  avatarUrl: z.url().nullable(),
   bio: z.string().nullable(),
   company: z.string().nullable(),
   createdAt: z.string(),
