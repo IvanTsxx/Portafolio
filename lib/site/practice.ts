@@ -4,7 +4,7 @@ export const workSteps = [
   {
     id: "orchestrate",
     jp: "指揮",
-    scene: "feature",
+    scene: "orchestrate",
     summary:
       "Each Linear issue gets a Conductor workspace on its own git worktree. Agents take the tasks, subagents only when the task needs them.",
     title: "Orchestrate",
@@ -25,9 +25,24 @@ export const workSteps = [
     title: "Design to code",
   },
   {
+    id: "build",
+    jp: "実装",
+    scene: "feature",
+    summary:
+      "Features built with Next.js, TypeScript, Tailwind and shadcn, animated with GSAP, Motion and R3F.",
+    title: "Build",
+  },
+  {
+    id: "debug",
+    jp: "診断",
+    scene: "debugging",
+    summary: "Reproduce first, then trace the root cause before any fix.",
+    title: "Debug",
+  },
+  {
     id: "review",
     jp: "判断",
-    scene: "debugging",
+    scene: "review",
     summary:
       "I set the criteria, review every change and own the decision before it merges.",
     title: "Review",

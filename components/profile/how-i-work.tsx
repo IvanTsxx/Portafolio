@@ -6,7 +6,6 @@ import type { RefObject } from "react";
 
 import { AgentScene } from "@/components/scene/agent-scene";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import type { AgentSceneId } from "@/lib/agents/scenes";
 import { workSteps } from "@/lib/site/practice";
 import type { WorkStep } from "@/lib/site/practice";
 import { cn } from "@/lib/utils";
@@ -58,35 +57,40 @@ const StepTab = ({
   onComplete: () => void;
 }) => (
   <Tabs.Tab
-    className="group/step border-rule data-[active]:bg-paper-deep/40 focus-visible:outline-ink relative flex w-full flex-col gap-2 border-b px-4 pt-4 pb-5 text-left transition-colors duration-200 focus-visible:outline-1 focus-visible:-outline-offset-4 md:px-5"
+    className="group/step border-rule data-[active]:bg-paper-deep/40 pointer-fine:hover:not-data-[active]:bg-paper-deep/20 focus-visible:outline-ink relative flex w-full cursor-pointer flex-col gap-1.5 border-b px-4 pt-4 pb-5 text-left transition-colors duration-200 focus-visible:outline-1 focus-visible:-outline-offset-4 md:px-5"
     value={step.id}
   >
     <span className="label flex items-baseline justify-between">
       <span
         className={cn(
-          "tabular-nums transition-colors",
-          isActive ? "text-ink" : "text-mist"
+          "flex items-center gap-1.5 tabular-nums transition-colors duration-200",
+          isActive
+            ? "text-ink"
+            : "text-mist pointer-fine:group-hover/step:text-graphite"
         )}
       >
+        <span
+          aria-hidden
+          className={cn(
+            "bg-ink h-px w-2 origin-left transition-transform duration-200 ease-out motion-reduce:transition-none",
+            isActive
+              ? "scale-x-100"
+              : "scale-x-0 pointer-fine:group-hover/step:scale-x-100"
+          )}
+        />
         {`ST-${padIndex(index)}`}
       </span>
       <span className="jp text-mist">{step.jp}</span>
     </span>
     <span
       className={cn(
-        "text-xl leading-tight font-light tracking-tight transition-colors",
-        isActive ? "text-ink" : "text-graphite"
+        "text-xl leading-tight font-light tracking-tight transition-colors duration-200",
+        isActive
+          ? "text-ink"
+          : "text-graphite pointer-fine:group-hover/step:text-ink"
       )}
     >
       {step.title}
-    </span>
-    <span
-      className={cn(
-        "text-graphite grid text-sm leading-relaxed text-pretty transition-[grid-template-rows,opacity] duration-300 motion-reduce:transition-none",
-        isActive ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-      )}
-    >
-      <span className="overflow-hidden">{step.summary}</span>
     </span>
     <span aria-hidden className="bg-rule absolute inset-x-0 bottom-0 h-px">
       {isActive && showsProgress ? (
@@ -103,13 +107,13 @@ const StepTab = ({
   </Tabs.Tab>
 );
 
-const SceneStage = ({ scene }: { scene: AgentSceneId }) => (
-  <div className="animate-in fade-in ease-out-quint relative h-full duration-500 motion-reduce:animate-none">
+const SceneStage = ({ step }: { step: WorkStep }) => (
+  <div className="animate-in fade-in ease-out-quint relative duration-500 motion-reduce:animate-none">
     <AgentScene
-      className="lg:aspect-auto lg:h-full lg:min-h-96"
-      label={`${scene} scene: agents at work`}
-      scene={scene}
+      label={`${step.title} scene: agents at work`}
+      scene={step.scene}
     />
+    <p className="sr-only">{step.summary}</p>
   </div>
 );
 
@@ -167,15 +171,33 @@ export const HowIWork = () => {
             ))}
           </Tabs.List>
         </div>
-        {workSteps.map((step) => (
-          <Tabs.Panel
-            className="bg-paper-deep/40 relative max-lg:order-1 lg:col-span-7"
-            key={step.id}
-            value={step.id}
+        <div className="flex flex-col max-lg:order-1 lg:col-span-7">
+          {workSteps.map((step) => (
+            <Tabs.Panel
+              className="bg-paper-deep/40 relative"
+              key={step.id}
+              value={step.id}
+            >
+              {step.id === activeId ? <SceneStage step={step} /> : null}
+            </Tabs.Panel>
+          ))}
+          <div
+            aria-hidden
+            className="border-rule grid flex-1 border-t px-4 py-5 md:px-5"
           >
-            {step.id === activeId ? <SceneStage scene={step.scene} /> : null}
-          </Tabs.Panel>
-        ))}
+            {workSteps.map((step) => (
+              <p
+                className={cn(
+                  "text-graphite col-start-1 row-start-1 max-w-prose text-base leading-relaxed text-pretty transition-opacity duration-300 motion-reduce:transition-none",
+                  step.id === activeId ? "opacity-100" : "opacity-0"
+                )}
+                key={step.id}
+              >
+                {step.summary}
+              </p>
+            ))}
+          </div>
+        </div>
       </Tabs.Root>
     </SectionFrame>
   );
