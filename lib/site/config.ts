@@ -45,6 +45,7 @@ export const primaryRoutes = [
   { href: "/notes", index: "01", label: "Notes" },
   { href: "/lab", index: "02", label: "Lab" },
   { href: "/registry", index: "03", label: "Registry" },
+  { href: "/design-system", index: "04", label: "Design system" },
 ] as const;
 
 export type Social = (typeof siteConfig.socials)[number];

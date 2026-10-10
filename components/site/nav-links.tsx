@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 const routeAnnotations = {
   "/": "ホーム",
+  "/design-system": "設計",
   "/lab": "実験",
   "/notes": "手記",
   "/registry": "登録簿",

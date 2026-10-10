@@ -1,20 +1,10 @@
 import type { ReactNode } from "react";
 
-import { PortraitPlate } from "@/components/profile/portrait-plate";
-import { LeaderList, LeaderRow } from "@/components/site/leader-list";
 import { PanelHeading } from "@/components/site/panel-heading";
 import { focusRingClassName } from "@/components/site/styles";
-import { siteConfig } from "@/lib/site/config";
-import { experience } from "@/lib/site/experience";
 import { cn } from "@/lib/utils";
 
 export const PORTRAIT_SRC = "/profile/portrait.jpg";
-
-const monogram = siteConfig.name
-  .split(/\s+/u)
-  .map((part) => part[0])
-  .join("")
-  .toUpperCase();
 
 export const DossierStrip = ({
   code,
@@ -76,49 +66,3 @@ export const DossierPanel = ({
     </>
   );
 };
-
-const currentRole = experience.find((entry) => entry.end === null);
-
-export const CompactDossier = ({
-  children,
-  code,
-}: {
-  children?: ReactNode;
-  code: string;
-}) => (
-  <section aria-label="Dossier" className="flex flex-col gap-6">
-    <div className="hidden flex-col gap-6 lg:flex">
-      <DossierStrip code={code} />
-      <div className="grid grid-cols-[8rem_1fr] items-end gap-4">
-        <PortraitPlate
-          label={`Dithered portrait of ${siteConfig.name}`}
-          monogram={monogram}
-          size="compact"
-          src={PORTRAIT_SRC}
-        />
-        <div className="flex min-w-0 flex-col gap-1 pb-2">
-          <p className="text-ink text-2xl leading-tight font-light tracking-tight text-balance">
-            {siteConfig.name}
-          </p>
-          <p className="label text-graphite normal-case">
-            @{siteConfig.handle}
-          </p>
-        </div>
-      </div>
-      <LeaderList>
-        <LeaderRow jp="役割" label="Role">
-          {siteConfig.role}
-        </LeaderRow>
-        {currentRole ? (
-          <LeaderRow jp="所属" label="Company">
-            {currentRole.company}
-          </LeaderRow>
-        ) : null}
-        <LeaderRow jp="所在地" label="Location">
-          {siteConfig.location}
-        </LeaderRow>
-      </LeaderList>
-    </div>
-    {children}
-  </section>
-);
