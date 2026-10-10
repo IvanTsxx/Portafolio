@@ -6,6 +6,8 @@ import {
   companionFrame,
   hopOffset,
   ownVisibleShare,
+  perchCandidates,
+  perchPoint,
   pickWaypoint,
   stepTravel,
 } from "./companion-path";
@@ -128,5 +130,75 @@ describe("ownVisibleShare", () => {
     expect(
       ownVisibleShare({ bottom: 1200, left: 0, right: 400, top: 600 }, desktop)
     ).toBe(0.5);
+  });
+});
+
+describe("perchCandidates", () => {
+  const frame = companionFrame(desktop);
+  const narrow = { bottom: 800, left: 300, right: 900, top: 100 };
+
+  test("never offers the spot the companion stands on", () => {
+    const current = { shift: 0, side: "right" } as const;
+    const from = perchPoint(narrow, current, desktop, frame);
+    const options = perchCandidates(narrow, current, from, desktop, frame);
+    expect(options.length).toBeGreaterThan(0);
+    for (const option of options) {
+      const point = perchPoint(narrow, option, desktop, frame);
+      expect(Math.abs(point.x - from.x)).toBeGreaterThanOrEqual(
+        frame.agentWidth * 0.8
+      );
+    }
+    expect(options).toContainEqual({ shift: 0, side: "left" });
+  });
+
+  test("keeps every option inside the viewport", () => {
+    const current = { shift: 0, side: "right" } as const;
+    const wide = section(100, 800);
+    const from = perchPoint(wide, current, desktop, frame);
+    for (const option of perchCandidates(wide, current, from, desktop, frame)) {
+      const point = perchPoint(wide, option, desktop, frame);
+      expect(point.x - frame.agentWidth / 2).toBeGreaterThanOrEqual(0);
+      expect(point.x + frame.agentWidth / 2).toBeLessThanOrEqual(desktop.width);
+    }
+  });
+
+  test("stays on the waypoint's own stretch of rule", () => {
+    const current = { shift: 0, side: "right" } as const;
+    const from = perchPoint(narrow, current, desktop, frame);
+    for (const option of perchCandidates(
+      narrow,
+      current,
+      from,
+      desktop,
+      frame
+    )) {
+      const point = perchPoint(narrow, option, desktop, frame);
+      expect(point.x - frame.agentWidth / 2).toBeGreaterThanOrEqual(
+        narrow.left
+      );
+      expect(point.x + frame.agentWidth / 2).toBeLessThanOrEqual(narrow.right);
+    }
+  });
+
+  test("skips the far side of a page-wide waypoint", () => {
+    const current = { shift: 0, side: "right" } as const;
+    const wide = section(100, 800);
+    const from = perchPoint(wide, current, desktop, frame);
+    const options = perchCandidates(wide, current, from, desktop, frame);
+    expect(options).not.toContainEqual({ shift: 0, side: "left" });
+  });
+
+  test("hops along the bottom edge on phones", () => {
+    const compact = companionFrame(phone);
+    const current = { shift: 0, side: "right" } as const;
+    const rect = { bottom: 2000, left: 0, right: phone.width, top: -400 };
+    const from = perchPoint(rect, current, phone, compact);
+    const options = perchCandidates(rect, current, from, phone, compact);
+    expect(options.length).toBeGreaterThan(0);
+    for (const option of options) {
+      const point = perchPoint(rect, option, phone, compact);
+      expect(point.y).toBe(from.y);
+      expect(point.x).toBeLessThan(from.x);
+    }
   });
 });

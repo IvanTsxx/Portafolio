@@ -42,7 +42,9 @@ export const poseKeys = [
   "leg1",
   "leg2",
   "leg3",
+  "rootX",
   "rootY",
+  "rootZ",
 ] as const;
 
 export type PoseKey = (typeof poseKeys)[number];
@@ -67,7 +69,9 @@ export const createPose = (): Pose => ({
   leg1: 0,
   leg2: 0,
   leg3: 0,
+  rootX: 0,
   rootY: 0,
+  rootZ: 0,
 });
 
 const neutralPose = createPose();

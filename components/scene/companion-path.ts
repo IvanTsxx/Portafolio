@@ -169,3 +169,83 @@ export const stepTravel = (
 
 export const hopOffset = (state: TravelState) =>
   state.isTraveling ? Math.abs(Math.sin(state.hopPhase * Math.PI)) : 0;
+
+export interface Perch {
+  side: WaypointSide;
+  shift: number;
+}
+
+const perchShifts = [1.3, 2.2, 3.2, 4.4] as const;
+const minLeapWidths = 0.8;
+const maxLeapShare = 0.45;
+
+export const perchPoint = (
+  rect: ScreenRect,
+  perch: Perch,
+  viewport: Viewport,
+  frame: CompanionFrame
+): ScreenPoint => {
+  const anchor = anchorFor(rect, perch.side, viewport, frame);
+  const halfWidth = frame.agentWidth / 2;
+  const left = frame.isCompact ? 0 : Math.max(rect.left, 0);
+  const right = frame.isCompact
+    ? viewport.width
+    : Math.min(rect.right, viewport.width);
+  const minX = left + edgeInset + halfWidth;
+  const maxX = right - edgeInset - halfWidth;
+  if (minX > maxX) {
+    return anchor;
+  }
+  return {
+    x: Math.min(maxX, Math.max(minX, anchor.x + perch.shift)),
+    y: anchor.y,
+  };
+};
+
+export const perchBox = (
+  point: ScreenPoint,
+  frame: CompanionFrame
+): ScreenRect => ({
+  bottom: point.y,
+  left: point.x - frame.agentWidth / 2,
+  right: point.x + frame.agentWidth / 2,
+  top: point.y - frame.agentHeight,
+});
+
+export const perchCandidates = (
+  rect: ScreenRect,
+  current: Perch,
+  from: ScreenPoint,
+  viewport: Viewport,
+  frame: CompanionFrame
+): Perch[] => {
+  const opposite: WaypointSide = current.side === "left" ? "right" : "left";
+  const options: Perch[] = [{ shift: 0, side: opposite }];
+  for (const widths of perchShifts) {
+    const shift = widths * frame.agentWidth;
+    options.push(
+      { shift: current.shift + shift, side: current.side },
+      { shift: current.shift - shift, side: current.side }
+    );
+  }
+  const minDistance = minLeapWidths * frame.agentWidth;
+  const maxDistance = Math.max(
+    viewport.width * maxLeapShare,
+    perchShifts[1] * frame.agentWidth * 1.5
+  );
+  const picked: Perch[] = [];
+  const points: ScreenPoint[] = [];
+  for (const option of options) {
+    const point = perchPoint(rect, option, viewport, frame);
+    const distance = Math.hypot(point.x - from.x, point.y - from.y);
+    const isNearby = distance >= minDistance && distance <= maxDistance;
+    const isDistinct = points.every(
+      (other) => Math.abs(other.x - point.x) >= minDistance
+    );
+    if (isNearby && isDistinct) {
+      picked.push(option);
+      points.push(point);
+    }
+  }
+  return picked;
+};
