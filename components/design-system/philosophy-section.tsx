@@ -89,6 +89,7 @@ export const PhilosophySection = () => {
       index={section.index}
       jp={section.jp}
       label={section.label}
+      waypoint={{ action: "measure", role: "architect", side: "right" }}
     >
       <ol className="border-rule border-t">
         {principles.map((principle, index) => (

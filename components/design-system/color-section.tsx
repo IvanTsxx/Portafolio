@@ -52,8 +52,8 @@ const Swatch = ({ index, token }: { index: number; token: ColorToken }) => (
   <SpecCell
     code={`C-${padCount(index + 1)}`}
     footer={
-      <span className="flex items-baseline justify-between gap-2">
-        <span>{token.tailwind}</span>
+      <span className="flex flex-col gap-0.5 break-normal">
+        <span className="break-words">{token.tailwind}</span>
         <span className="tabular-nums">{token.hex}</span>
       </span>
     }
@@ -61,11 +61,13 @@ const Swatch = ({ index, token }: { index: number; token: ColorToken }) => (
   >
     <Chip className="border-rule-strong block h-16 border" token={token} />
     <div className="flex flex-col gap-1">
-      <p className="label flex items-baseline justify-between gap-2">
-        <span className="text-graphite normal-case">{token.cssVar}</span>
+      <p className="label text-graphite break-words normal-case">
+        {token.cssVar}
+      </p>
+      <p className="label">
         <ContrastMark token={token} />
       </p>
-      <p className="label text-mist break-all normal-case">{token.oklch}</p>
+      <p className="label text-mist break-words normal-case">{token.oklch}</p>
       <p className="text-graphite text-sm leading-snug text-pretty">
         {token.role}
       </p>

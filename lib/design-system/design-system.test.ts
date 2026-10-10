@@ -118,9 +118,11 @@ describe("documented values match the source", () => {
     expect(labelStep?.size).toBe("10");
   });
 
-  test("the document grid spec matches DocumentLayout", async () => {
-    const layout = await readProjectFile("components/site/document-layout.tsx");
-    expect(layout).toContain(documentGridSpec.container);
+  test("the document grid spec matches DocumentShell", async () => {
+    const layout = await readProjectFile("components/site/document-shell.tsx");
+    for (const className of documentGridSpec.containerClasses) {
+      expect(layout.split(/[\s"]+/u)).toContain(className);
+    }
     expect(layout).toContain(`lg:grid-cols-${documentGridSpec.columns}`);
     expect(layout).toContain(`lg:col-span-${documentGridSpec.dossierSpan}`);
     expect(layout).toContain(`lg:col-span-${documentGridSpec.contentSpan}`);
@@ -214,6 +216,7 @@ describe("component catalog", () => {
       "Agent",
       "AgentScene",
       "AgentWaypoint",
+      "IdentityDossier",
       ...allComponentSpecs.flatMap((spec) => spec.exports),
       ...allComponentSpecs.map((spec) => spec.name),
     ]);

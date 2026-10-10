@@ -22,6 +22,7 @@ import { documentCode, sectionById } from "@/lib/design-system/sections";
 import { cn } from "@/lib/utils";
 
 import { Barcode } from "./barcode";
+import { fullWidthClassName, fullWidthFlags } from "./grid-spans";
 import { PreviewBox, SpecCell, SpecGrid } from "./spec-frame";
 
 const technicalTones = ["outline", "selected", "solid"] as const;
@@ -80,14 +81,6 @@ const demos = {
       </button>
     </div>
   ),
-  "compact-dossier": (
-    <Wireframe className="gap-2 p-2">
-      <span className="hatch border-rule-strong h-10 w-full border" />
-      <span className="bg-ink h-px w-2/3" />
-      <span className="bg-rule-strong h-px w-full" />
-      <span className="bg-rule-strong h-px w-full" />
-    </Wireframe>
-  ),
   "corner-marks": (
     <div className="grid w-full grid-cols-2 gap-3">
       <div className="relative flex h-20 items-center justify-center">
@@ -113,21 +106,6 @@ const demos = {
       <span className="hazard-stripe text-ink block h-1.5 w-12" />
     </Wireframe>
   ),
-  "document-layout": (
-    <Wireframe>
-      <span className="hatch border-rule-strong flex h-5 items-center justify-center border">
-        Hero
-      </span>
-      <div className="grid grid-cols-12 gap-1">
-        <span className="border-rule-strong text-mist col-span-4 flex h-14 items-center justify-center border border-dashed">
-          Dossier
-        </span>
-        <span className="border-ink text-ink col-span-8 flex h-14 items-center justify-center border">
-          Content
-        </span>
-      </div>
-    </Wireframe>
-  ),
   "document-section": (
     <div className="flex w-full flex-col gap-3">
       <PanelHeading
@@ -139,6 +117,27 @@ const demos = {
       />
       <span className="hatch border-rule-strong block h-8 border border-dashed" />
     </div>
+  ),
+  "document-shell": (
+    <Wireframe>
+      <div className="grid grid-cols-12 gap-1">
+        <span className="border-rule-strong text-mist col-span-4 flex h-20 flex-col gap-1 border border-dashed p-1">
+          <span className="hatch border-rule-strong h-8 w-full border" />
+          <span>Aside</span>
+        </span>
+        <span className="border-ink text-ink col-span-8 flex h-20 flex-col gap-1 border p-1">
+          <span className="hatch border-rule-strong h-5 w-full border" />
+          <span>Content</span>
+        </span>
+      </div>
+    </Wireframe>
+  ),
+  "dossier-panel": (
+    <Wireframe className="gap-2 p-2">
+      <span className="text-mist">Filter</span>
+      <span className="bg-rule-strong h-px w-full" />
+      <span className="hatch border-rule-strong h-6 w-full border border-dashed" />
+    </Wireframe>
   ),
   "leader-list": (
     <LeaderList className="w-full">
@@ -159,6 +158,12 @@ const demos = {
         <span className="hatch border-rule-strong block h-8 border border-dashed" />
       </Module>
     </div>
+  ),
+  "page-aside": (
+    <Wireframe className="gap-2 p-2">
+      <PanelHeading as="p" index="DS-00" jp="頁" label="Index" />
+      <span className="hatch border-rule-strong h-6 w-full border border-dashed" />
+    </Wireframe>
   ),
   "panel-heading": (
     <div className="w-full">
@@ -221,12 +226,20 @@ const demos = {
   ),
 } as const satisfies Record<SiteComponentId, ReactNode>;
 
-const wideIds = new Set(["technical-button", "redacted-block", "callout"]);
+const wideIds = new Set<SiteComponentId>([
+  "technical-button",
+  "redacted-block",
+  "callout",
+]);
 
 const footerOf = (spec: ComponentSpec) =>
   spec.kind === "pattern"
     ? `Pattern · ${spec.file}`
     : `@/${spec.file.replace(/\.tsx?$/u, "")}`;
+
+const fullWidth = fullWidthFlags(
+  siteComponentSpecs.map((spec) => wideIds.has(spec.id))
+);
 
 export const ComponentsSection = () => {
   const section = sectionById("components");
@@ -241,7 +254,7 @@ export const ComponentsSection = () => {
       <SpecGrid className="grid-cols-1 @3xl:grid-cols-2">
         {siteComponentSpecs.map((spec, index) => (
           <SpecCell
-            className={wideIds.has(spec.id) ? "@3xl:col-span-2" : undefined}
+            className={fullWidth[index] ? fullWidthClassName : undefined}
             code={`S-${padCount(index + 1)}`}
             footer={footerOf(spec)}
             jp={spec.jp}

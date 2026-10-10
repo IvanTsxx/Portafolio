@@ -152,7 +152,9 @@ export const SpacingSection = ({
       </div>
       <div className="flex flex-col gap-3">
         <SubHeading
-          aside={<ClassTag>{documentGridSpec.container}</ClassTag>}
+          aside={
+            <ClassTag>{documentGridSpec.containerClasses.join(" ")}</ClassTag>
+          }
           jp="格子"
           label="Document grid"
         />

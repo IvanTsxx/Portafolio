@@ -24,6 +24,7 @@ import type { ComponentSpec, PrimitiveId } from "@/lib/design-system/catalog";
 import { padCount } from "@/lib/design-system/format";
 import { sectionById } from "@/lib/design-system/sections";
 
+import { fullWidthClassName, fullWidthFlags } from "./grid-spans";
 import { ClassTag, SpecCell, SpecGrid } from "./spec-frame";
 
 const buttonVariants = [
@@ -184,6 +185,10 @@ const variantSummary = (spec: ComponentSpec) =>
 const importLine = (spec: ComponentSpec) =>
   `@/${spec.file.replace(/\.tsx?$/u, "")}`;
 
+const fullWidth = fullWidthFlags(
+  primitiveSpecs.map((spec) => spec.id === "button")
+);
+
 export const PrimitivesSection = () => {
   const section = sectionById("primitives");
   return (
@@ -200,7 +205,7 @@ export const PrimitivesSection = () => {
           const summary = variantSummary(spec);
           return (
             <SpecCell
-              className={spec.id === "button" ? "@3xl:col-span-2" : undefined}
+              className={fullWidth[index] ? fullWidthClassName : undefined}
               code={`P-${padCount(index + 1)}`}
               footer={importLine(spec)}
               jp={spec.jp}

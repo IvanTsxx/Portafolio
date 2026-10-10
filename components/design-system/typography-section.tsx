@@ -68,7 +68,7 @@ export const TypographySection = ({
               key={`${step.className}-${step.use}`}
             >
               <p className="label flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <span className="text-graphite break-all normal-case">
+                <span className="text-graphite break-words normal-case">
                   {step.className}
                 </span>
                 <span className="text-mist normal-case tabular-nums">

@@ -501,13 +501,13 @@ export const utilitySpecs = [
   },
   {
     name: "blueprint-grid",
-    summary: "Square hairline grid. Size through --grid-size.",
+    summary: "Square hairline grid. Cell size is a CSS variable.",
     usage: '<div className="blueprint-grid [--grid-size:24px]" />',
     variable: "--grid-size",
   },
   {
     name: "blueprint-dots",
-    summary: "Dot grid in rule color. Size through --grid-size.",
+    summary: "Dot grid in rule color. Spacing is a CSS variable.",
     usage: '<div className="blueprint-dots [--grid-size:16px]" />',
     variable: "--grid-size",
   },
@@ -586,7 +586,13 @@ export const breakpointSpecs = [
 
 export const documentGridSpec = {
   columns: 12,
-  container: "mx-auto w-full max-w-screen-2xl px-4 md:px-8",
+  containerClasses: [
+    "mx-auto",
+    "w-full",
+    "max-w-screen-2xl",
+    "px-4",
+    "md:px-8",
+  ],
   contentSpan: 8,
   dossierSpan: 4,
   gutter: "gap-x-6",

@@ -38,7 +38,6 @@ const DesignSystemPage = async () => {
           { label: "Parts", value: padCount(allComponentSpecs.length) },
         ]}
         title="Design system"
-        waypoint={{ action: "measure", role: "architect", side: "right" }}
       />
       <PhilosophySection />
       <ColorSection colors={system.colors} />

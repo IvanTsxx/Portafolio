@@ -47,7 +47,9 @@ export const SpecCell = ({
     </p>
     {children}
     {footer ? (
-      <p className="label text-mist mt-auto break-all normal-case">{footer}</p>
+      <p className="label text-mist mt-auto break-words normal-case">
+        {footer}
+      </p>
     ) : null}
   </li>
 );
@@ -79,7 +81,7 @@ export const ClassTag = ({
 }) => (
   <code
     className={cn(
-      "label border-rule-strong text-graphite inline-block max-w-full border border-dashed px-1.5 py-0.5 break-all normal-case",
+      "label border-rule-strong text-graphite inline-block max-w-full border border-dashed px-1.5 py-0.5 break-words normal-case",
       className
     )}
   >

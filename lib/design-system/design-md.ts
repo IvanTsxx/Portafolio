@@ -10,6 +10,7 @@ import {
 } from "./agents";
 import {
   allComponentSpecs,
+  pageRecipe,
   primitiveSpecs,
   siteComponentSpecs,
 } from "./catalog";
@@ -165,7 +166,7 @@ const spacing = (system: DesignSystem) => [
   ),
   "### Document grid",
   bullets([
-    `Container: ${code(documentGridSpec.container)}.`,
+    `Container: ${code(documentGridSpec.containerClasses.join(" "))}.`,
     `${documentGridSpec.columns} columns from lg. Dossier spans ${documentGridSpec.dossierSpan} and is sticky. Content spans ${documentGridSpec.contentSpan}.`,
     `Column gutter ${code(documentGridSpec.gutter)}. Sections stack with ${code(documentGridSpec.sectionGap)}. Panels stack with ${code("gap-6")}.`,
     "Cells use hairline right and bottom borders inside a container with top and left borders.",
@@ -219,7 +220,9 @@ const primitives = () => [
 
 const siteComponents = () => [
   sectionHeading("components"),
-  "Site-level parts in `components/site`, `components/profile` and `components/content`. Compose pages from `DocumentLayout`, `DocumentHero` and `DocumentSection`.",
+  "Site-level parts in `components/site`, `components/profile` and `components/content`. Every document page sits inside the persistent `DocumentShell` and is a `DocumentHero` followed by `DocumentSection`s. Its left panels live in the route's `@aside` slot.",
+  "### Page recipe",
+  fence("tsx", pageRecipe),
   ...siteComponentSpecs.flatMap(componentBlock),
 ];
 

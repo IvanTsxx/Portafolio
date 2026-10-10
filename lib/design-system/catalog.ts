@@ -40,9 +40,10 @@ export type PrimitiveId = (typeof primitiveIds)[number];
 export const siteComponentIds = [
   "panel-heading",
   "document-section",
-  "document-layout",
+  "document-shell",
   "document-hero",
-  "compact-dossier",
+  "page-aside",
+  "dossier-panel",
   "corner-marks",
   "leader-list",
   "technical-button",
@@ -363,24 +364,25 @@ export const siteComponentSpecs: readonly ComponentSpec<SiteComponentId>[] = [
   }),
   siteComponent({
     description:
-      "Page frame: hero, a sticky 4-column dossier and an 8-column content stack.",
-    exports: ["DocumentLayout"],
-    file: "components/site/document-layout.tsx",
-    id: "document-layout",
-    jp: "頁",
-    name: "DocumentLayout",
-    usage: `<DocumentLayout
-  dossier={<CompactDossier code="DS-00" />}
-  dossierLabel="Design system index"
-  hero={<DocumentHero code="DS-00" title="Design system" />}
+      "Persistent frame in app/(document)/layout.tsx. A sticky 4-column dossier with the page aside slot beside an 8-column content stack.",
+    exports: ["DocumentShell"],
+    file: "components/site/document-shell.tsx",
+    id: "document-shell",
+    jp: "枠組",
+    name: "DocumentShell",
+    usage: `<DocumentShell
+  aside={aside}
+  dossier={<IdentityDossier identity={identity} />}
+  handle={identity.login}
+  name={identity.name}
 >
-  {sections}
-</DocumentLayout>`,
+  {children}
+</DocumentShell>`,
     variants: noVariants,
   }),
   siteComponent({
     description:
-      "Page header: doc code and meta strip, display title, jp glyph and hazard stripe.",
+      "Page header: doc code and meta strip, display title, jp glyph and hazard stripe. Sizes with container queries.",
     exports: ["DocumentHero"],
     file: "components/site/document-hero.tsx",
     id: "document-hero",
@@ -392,15 +394,26 @@ export const siteComponentSpecs: readonly ComponentSpec<SiteComponentId>[] = [
   }),
   siteComponent({
     description:
-      "Sticky identity column with portrait and optional panels such as filters or a table of contents.",
-    exports: ["CompactDossier", "DossierPanel", "DossierStrip"],
-    file: "components/site/compact-dossier.tsx",
-    id: "compact-dossier",
-    jp: "身元",
-    name: "CompactDossier",
-    usage: `<CompactDossier code="DS-00">
+      "Left-panel wrapper for a route's @aside slot. Swaps on navigation while the dossier stays mounted.",
+    exports: ["PageAside"],
+    file: "components/site/page-aside.tsx",
+    id: "page-aside",
+    jp: "脇",
+    name: "PageAside",
+    usage: `<PageAside code="DS-00" label="Design system index">
   <DossierPanel collapsible jp="目次" label="On this page">{toc}</DossierPanel>
-</CompactDossier>`,
+</PageAside>`,
+    variants: noVariants,
+  }),
+  siteComponent({
+    description:
+      "Titled panel for the left column. Collapsible below lg, always open from lg.",
+    exports: ["DossierPanel"],
+    file: "components/site/compact-dossier.tsx",
+    id: "dossier-panel",
+    jp: "枠",
+    name: "DossierPanel",
+    usage: `<DossierPanel collapsible jp="絞込" label="Filter">{filters}</DossierPanel>`,
     variants: noVariants,
   }),
   siteComponent({
@@ -539,3 +552,18 @@ export const allComponentSpecs: readonly ComponentSpec[] = [
   ...primitiveSpecs,
   ...siteComponentSpecs,
 ];
+
+export const pageRecipe = `app/(document)/<route>/page.tsx
+<>
+  <DocumentHero code="XX-01" jp="日本語" title="Title" />
+  <DocumentSection id="first" index="XX-03" jp="日本語" label="First">
+    {content}
+  </DocumentSection>
+</>
+
+app/(document)/@aside/<route>/page.tsx
+<PageAside code="XX-02" label="Panel label">
+  <DossierPanel collapsible jp="目次" label="On this page">
+    <TableOfContents headings={headings} />
+  </DossierPanel>
+</PageAside>`;
