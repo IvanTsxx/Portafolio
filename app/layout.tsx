@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
+import { Companion } from "@/components/scene/companion";
 import { SceneLayer } from "@/components/scene/scene-layer";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -44,6 +45,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => (
       </main>
       <SiteFooter />
       <SceneLayer />
+      <Companion />
     </body>
   </html>
 );

@@ -23,8 +23,8 @@ const AgentLineupPage = async ({ searchParams }: PageProps<"/dev/agents">) => {
         <p className="label text-clay">Dev · Character rig</p>
         <h1 className="display text-5xl md:text-7xl">Agent lineup</h1>
         <p className="text-muted-foreground max-w-prose text-sm">
-          One procedural mascot rig with seven accessory kits. Hover an agent to
-          focus it.
+          One procedural mascot rig with seven accessory kits. Hover an agent
+          and it reacts, never the same way twice in a row.
         </p>
       </header>
       <AgentLineup

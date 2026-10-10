@@ -8,12 +8,10 @@ import { NeutralToneMapping } from "three";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 import { setSceneFrameRequester, useNearViewSlots } from "./view-registry";
-import { ViewSlotContext } from "./view-slot-context";
 
 const maxDpr = 1.75;
 const minDpr = 1;
 const clearPriority = 1;
-const viewPriority = 2;
 const statsPriority = 1000;
 
 const FrameClear = () => {
@@ -78,10 +76,8 @@ const TrackedViews = () => {
   });
 
   return slots.map((slot) => (
-    <View index={viewPriority} key={slot.id} track={slot.track}>
-      <ViewSlotContext value={slot}>
-        <Suspense fallback={null}>{slot.node}</Suspense>
-      </ViewSlotContext>
+    <View index={slot.priority} key={slot.id} track={slot.track}>
+      <Suspense fallback={null}>{slot.node}</Suspense>
     </View>
   ));
 };

@@ -18,9 +18,7 @@ export interface LineupEntry {
 
 export interface AgentLineupSceneProps {
   entries: readonly LineupEntry[];
-  focusedRole: AgentRole | null;
   motion: AgentMotion;
-  onFocusRole: (role: AgentRole | null) => void;
 }
 
 const spacing = 2.25;
@@ -62,12 +60,7 @@ const FitCamera = ({ width, depth }: { width: number; depth: number }) => {
   return null;
 };
 
-const LineupAgents = ({
-  entries,
-  focusedRole,
-  motion,
-  onFocusRole,
-}: AgentLineupSceneProps) => {
+const LineupAgents = ({ entries, motion }: AgentLineupSceneProps) => {
   const aspect = useThree((state) => state.size.width / state.size.height);
   const columns = Math.min(columnsForAspect(aspect), entries.length);
   const rows = Math.ceil(entries.length / columns);
@@ -88,14 +81,8 @@ const LineupAgents = ({
         return (
           <Agent
             action={action}
-            focused={focusedRole === role}
             key={role}
             motion={motion}
-            onPointerOut={() => onFocusRole(null)}
-            onPointerOver={(event) => {
-              event.stopPropagation();
-              onFocusRole(role);
-            }}
             position={[x, 0, z]}
             role={role}
           />
