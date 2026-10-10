@@ -4,16 +4,24 @@ import { PerspectiveCamera } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import type { ThreeElements } from "@react-three/fiber";
 import { useRef } from "react";
-import type { PerspectiveCamera as PerspectiveCameraImpl } from "three";
+import type { Ref } from "react";
+import type { Group, PerspectiveCamera as PerspectiveCameraImpl } from "three";
 import { MathUtils, Vector3 } from "three";
 
 import { disc, roundedBox } from "@/components/agents/geometry";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 import type { SceneMaterialName } from "./scene-values";
-import { blobMaterial, boxGeometry, sceneMaterials } from "./scene-values";
+import {
+  blobMaterial,
+  boxGeometry,
+  issueCardSize,
+  sceneMaterials,
+} from "./scene-values";
 
 type MeshProps = Omit<ThreeElements["mesh"], "geometry" | "material">;
+type GroupProps = ThreeElements["group"];
+type Size3 = readonly [number, number, number];
 
 interface BlockProps extends MeshProps {
   material?: SceneMaterialName;
@@ -114,14 +122,20 @@ export const useSceneClock = (loopSeconds: number, keyTime: number) => {
   };
 };
 
-export const Check = (props: ThreeElements["group"]) => (
+interface CheckProps extends GroupProps {
+  material?: SceneMaterialName;
+}
+
+export const Check = ({ material = "ink", ...props }: CheckProps) => (
   <group {...props}>
     <Block
+      material={material}
       position={[-0.1, -0.05, 0]}
       rotation-z={Math.PI / 4}
       scale={[0.06, 0.17, 0.06]}
     />
     <Block
+      material={material}
       position={[0.075, 0.05, 0]}
       rotation-z={-0.69}
       scale={[0.06, 0.42, 0.06]}
@@ -144,4 +158,112 @@ export const PanelLegs = ({ panelY, panelHeight, spread }: PanelLegsProps) => {
       scale={[0.045, legHeight, 0.045]}
     />
   ));
+};
+
+interface BoardProps extends Omit<GroupProps, "position"> {
+  position: Size3;
+  size: Size3;
+  legSpread: number;
+}
+
+export const Board = ({
+  position,
+  size,
+  legSpread,
+  children,
+  ...props
+}: BoardProps) => (
+  <group position={position} {...props}>
+    <Slab size={size} />
+    <Slab
+      material="paperDeep"
+      position={[0, size[1] / 2 - 0.1, size[2] / 2 + 0.005]}
+      size={[size[0] - 0.08, 0.12, 0.02]}
+    />
+    <PanelLegs panelHeight={size[1]} panelY={position[1]} spread={legSpread} />
+    {children}
+  </group>
+);
+
+export const IssueCard = (props: GroupProps) => (
+  <group {...props}>
+    <Slab
+      material="rule"
+      radius={0.03}
+      size={[issueCardSize[0] + 0.03, issueCardSize[1] + 0.03, 0.03]}
+    />
+    <Slab
+      position={[0, 0, 0.012]}
+      radius={0.025}
+      size={[issueCardSize[0], issueCardSize[1], 0.03]}
+    />
+    <Block
+      material="vermilion"
+      position={[-0.28, 0.09, 0.032]}
+      scale={[0.05, 0.05, 0.015]}
+    />
+    <Block position={[-0.13, 0.09, 0.032]} scale={[0.2, 0.045, 0.015]} />
+    <Block
+      material="graphite"
+      position={[-0.03, -0.02, 0.032]}
+      scale={[0.54, 0.035, 0.015]}
+    />
+    <Block
+      material="rule"
+      position={[-0.12, -0.1, 0.032]}
+      scale={[0.36, 0.035, 0.015]}
+    />
+  </group>
+);
+
+interface ClipboardProps extends GroupProps {
+  size: readonly [number, number];
+}
+
+export const Clipboard = ({ size, children, ...props }: ClipboardProps) => (
+  <group {...props}>
+    <Slab material="paperDeep" size={[size[0], size[1], 0.06]} />
+    <Slab
+      position={[0, -0.04, 0.035]}
+      radius={0.01}
+      size={[size[0] - 0.14, size[1] - 0.2, 0.01]}
+    />
+    <Slab
+      material="ink"
+      position={[0, size[1] / 2 - 0.02, 0.05]}
+      radius={0.02}
+      size={[size[0] * 0.34, 0.14, 0.05]}
+    />
+    {children}
+  </group>
+);
+
+interface BarChartProps extends GroupProps {
+  bars: readonly number[];
+  width: number;
+  growRef?: Ref<Group>;
+}
+
+export const BarChart = ({ bars, width, growRef, ...props }: BarChartProps) => {
+  const step = width / bars.length;
+  const tallest = Math.max(...bars);
+  return (
+    <group {...props}>
+      <Block scale={[width + 0.08, 0.02, 0.015]} />
+      <Block
+        position={[-width / 2 - 0.04, tallest / 2 + 0.04, 0]}
+        scale={[0.02, tallest + 0.08, 0.015]}
+      />
+      <group ref={growRef}>
+        {bars.map((height, index) => (
+          <Block
+            key={`${height}`}
+            material={index === bars.length - 1 ? "vermilion" : "graphite"}
+            position={[-width / 2 + step * (index + 0.5), height / 2, 0]}
+            scale={[step * 0.55, height, 0.015]}
+          />
+        ))}
+      </group>
+    </group>
+  );
 };

@@ -63,3 +63,5 @@ export const easeOutBack = (value: number) => {
 export const popScale = (time: number, appearAt: number, vanishAt: number) =>
   easeOutBack(progressBetween(time, appearAt, appearAt + 0.35)) *
   (1 - easeInOutCubic(progressBetween(time, vanishAt, vanishAt + 0.3)));
+
+export const issueCardSize = [0.74, 0.38] as const;

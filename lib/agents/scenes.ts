@@ -1,8 +1,10 @@
 export const agentScenes = [
-  "debugging",
+  "orchestrate",
+  "code-search",
   "figma-to-code",
   "feature",
-  "code-search",
+  "debugging",
+  "review",
 ] as const;
 
 export type AgentSceneId = (typeof agentScenes)[number];
