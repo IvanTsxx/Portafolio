@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
 import { ExperimentCard } from "@/components/lab/experiment-card";
-import { LabArchive, LabArchiveFallback } from "@/components/lab/lab-archive";
-import { PageHeader } from "@/components/site/page-header";
+import { LabArchive, LabTopicFilter } from "@/components/lab/lab-archive";
+import {
+  CompactDossier,
+  DossierPanel,
+} from "@/components/site/compact-dossier";
+import { DocumentHero } from "@/components/site/document-hero";
+import { DocumentLayout } from "@/components/site/document-layout";
 import { activeTopics, experiments } from "@/lib/lab/experiments";
 
 export const metadata: Metadata = {
@@ -26,23 +30,30 @@ const topicCounts = activeTopics.map((topic) => ({
 }));
 
 const LabPage = () => (
-  <>
-    <PageHeader
-      code="LAB-00"
-      jp="実験"
-      lede="Techniques tested live"
-      meta={[
-        { label: "Experiments", value: pad(experiments.length) },
-        { label: "Topics", value: pad(activeTopics.length) },
-      ]}
-      title="Lab"
-    />
-    <Suspense
-      fallback={<LabArchiveFallback items={items} topics={topicCounts} />}
-    >
-      <LabArchive items={items} topics={topicCounts} />
-    </Suspense>
-  </>
+  <DocumentLayout
+    dossier={
+      <CompactDossier code="LAB-02">
+        <DossierPanel jp="絞込" label="Filter">
+          <LabTopicFilter topics={topicCounts} total={experiments.length} />
+        </DossierPanel>
+      </CompactDossier>
+    }
+    dossierLabel="Lab filters"
+    hero={
+      <DocumentHero
+        code="LAB-01"
+        jp="実験"
+        lede="Techniques tested live"
+        meta={[
+          { label: "Experiments", value: pad(experiments.length) },
+          { label: "Topics", value: pad(activeTopics.length) },
+        ]}
+        title="Lab"
+      />
+    }
+  >
+    <LabArchive items={items} />
+  </DocumentLayout>
 );
 
 export default LabPage;

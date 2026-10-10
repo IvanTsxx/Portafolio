@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { PortraitPlate } from "@/components/profile/portrait-plate";
 import { LeaderList, LeaderRow } from "@/components/site/leader-list";
+import { PanelHeading } from "@/components/site/panel-heading";
 import { focusRingClassName } from "@/components/site/styles";
 import { siteConfig } from "@/lib/site/config";
 import { experience } from "@/lib/site/experience";
@@ -22,14 +23,13 @@ export const DossierStrip = ({
   code: string;
   revision?: string;
 }) => (
-  <div className="label border-rule-strong flex items-baseline justify-between border-b pb-2">
-    <span className="flex items-baseline gap-3">
-      <span className="text-mist tabular-nums">[ {code} ]</span>
-      <span className="text-ink">Dossier</span>
-      <span className="jp text-mist">身元</span>
-    </span>
-    <span className="text-mist">{revision}</span>
-  </div>
+  <PanelHeading
+    as="p"
+    aside={revision}
+    index={code}
+    jp="身元"
+    label="Dossier"
+  />
 );
 
 export const DossierPanel = ({
