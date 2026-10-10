@@ -1,0 +1,82 @@
+import type { ReactNode } from "react";
+
+import { DocumentSection } from "@/components/site/document-section";
+import type { UtilityDoc } from "@/lib/design-system/model";
+import { sectionById } from "@/lib/design-system/sections";
+import type { UtilityName } from "@/lib/design-system/specs";
+
+import {
+  ClassTag,
+  PreviewBox,
+  SpecCell,
+  SpecGrid,
+  padCount,
+} from "./spec-frame";
+
+const previews = {
+  "blueprint-dots": (
+    <div className="blueprint-dots absolute inset-0 [--grid-size:12px]" />
+  ),
+  "blueprint-grid": (
+    <div className="blueprint-grid absolute inset-0 [--grid-size:16px]" />
+  ),
+  display: <p className="display text-ink text-6xl">Ivan</p>,
+  grain: <div className="grain bg-paper-deep absolute inset-0" />,
+  "h-below-header": (
+    <div className="border-rule-strong absolute inset-3 flex flex-col border">
+      <span className="label text-mist border-rule-strong border-b px-2 py-1">
+        Header 48
+      </span>
+      <span className="hatch flex-1" />
+    </div>
+  ),
+  hairline: <div className="hairline absolute inset-3 border" />,
+  hatch: (
+    <div className="hatch border-rule-strong absolute inset-3 border border-dashed" />
+  ),
+  "hazard-stripe": <span className="hazard-stripe text-ink block h-3 w-full" />,
+  jp: <p className="jp text-graphite text-2xl font-light">日本語の注釈</p>,
+  label: <p className="label text-ink">Label 0123</p>,
+  "min-h-below-header": (
+    <div className="border-rule-strong absolute inset-3 flex flex-col border">
+      <span className="label text-mist border-rule-strong border-b px-2 py-1">
+        Header 48
+      </span>
+      <span className="hatch flex-1" />
+    </div>
+  ),
+} as const satisfies Record<UtilityName, ReactNode>;
+
+export const UtilitiesSection = ({
+  utilities,
+}: {
+  utilities: readonly UtilityDoc[];
+}) => {
+  const section = sectionById("utilities");
+  return (
+    <DocumentSection
+      aside={`${padCount(utilities.length)} utilities`}
+      id={section.id}
+      index={section.index}
+      jp={section.jp}
+      label={section.label}
+    >
+      <SpecGrid className="grid-cols-1 @xl:grid-cols-2 @4xl:grid-cols-3">
+        {utilities.map((utility, index) => (
+          <SpecCell
+            code={`U-${padCount(index + 1)}`}
+            footer={utility.variable}
+            key={utility.name}
+            name={utility.name}
+          >
+            <PreviewBox>{previews[utility.name]}</PreviewBox>
+            <p className="text-graphite text-sm leading-snug text-pretty">
+              {utility.summary}
+            </p>
+            <ClassTag className="self-start">{utility.name}</ClassTag>
+          </SpecCell>
+        ))}
+      </SpecGrid>
+    </DocumentSection>
+  );
+};
