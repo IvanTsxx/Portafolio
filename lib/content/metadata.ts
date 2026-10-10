@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { siteConfig } from "@/lib/site/config";
 
-import type { BlogPost } from "./blog";
-import type { WorkProject } from "./work";
+import { notePath } from "./note-domain";
+import type { FieldNote, Note } from "./note-domain";
 
 export const isIndexable = (entry: { sample: boolean }) => !entry.sample;
 
@@ -13,46 +13,37 @@ export const absoluteUrl = (pathname: string) =>
 const robotsFor = (entry: { sample: boolean }): Metadata["robots"] =>
   isIndexable(entry) ? undefined : { follow: true, index: false };
 
-export const buildWorkMetadata = (project: WorkProject): Metadata => {
-  const pathname = `/work/${project.slug}`;
-  return {
-    alternates: { canonical: pathname },
-    description: project.summary,
-    openGraph: {
-      description: project.summary,
-      siteName: siteConfig.name,
-      title: `${project.title} · ${siteConfig.shortName}`,
-      type: "website",
-      url: pathname,
-    },
-    robots: robotsFor(project),
-    title: project.title,
-  };
-};
+const openGraphFor = (note: Note): Metadata["openGraph"] =>
+  note.kind === "note"
+    ? {
+        authors: [siteConfig.name],
+        description: note.summary,
+        publishedTime: `${note.date}T00:00:00.000Z`,
+        siteName: siteConfig.name,
+        tags: note.tags,
+        title: note.title,
+        type: "article",
+        url: notePath(note.slug),
+      }
+    : {
+        description: note.summary,
+        siteName: siteConfig.name,
+        title: `${note.title} · ${siteConfig.shortName}`,
+        type: "website",
+        url: notePath(note.slug),
+      };
 
-export const buildPostMetadata = (post: BlogPost): Metadata => {
-  const pathname = `/blog/${post.slug}`;
-  return {
-    alternates: { canonical: pathname },
-    authors: [{ name: siteConfig.name, url: siteConfig.url }],
-    description: post.summary,
-    keywords: post.tags,
-    openGraph: {
-      authors: [siteConfig.name],
-      description: post.summary,
-      publishedTime: `${post.date}T00:00:00.000Z`,
-      siteName: siteConfig.name,
-      tags: post.tags,
-      title: post.title,
-      type: "article",
-      url: pathname,
-    },
-    robots: robotsFor(post),
-    title: post.title,
-  };
-};
+export const buildNoteMetadata = (note: Note): Metadata => ({
+  alternates: { canonical: notePath(note.slug) },
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  description: note.summary,
+  keywords: note.kind === "note" ? note.tags : note.stack,
+  openGraph: openGraphFor(note),
+  robots: robotsFor(note),
+  title: note.title,
+});
 
-export const buildPostJsonLd = (post: BlogPost) => ({
+export const buildNoteJsonLd = (note: FieldNote) => ({
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   author: {
@@ -60,9 +51,9 @@ export const buildPostJsonLd = (post: BlogPost) => ({
     name: siteConfig.name,
     url: siteConfig.url,
   },
-  datePublished: post.date,
-  description: post.summary,
-  headline: post.title,
-  keywords: post.tags.join(", "),
-  mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
+  datePublished: note.date,
+  description: note.summary,
+  headline: note.title,
+  keywords: note.tags.join(", "),
+  mainEntityOfPage: absoluteUrl(notePath(note.slug)),
 });

@@ -57,33 +57,42 @@ export const linkSchema = z.strictObject({
   label: text,
 });
 
-export const workMetaSchema = z.strictObject({
+const noteFields = {
+  related: z.array(slugSchema).default([]),
+  sample: z.boolean().default(false),
+  summary: text.max(280),
+  title: text,
+};
+
+export const caseStudyMetaSchema = z.strictObject({
+  ...noteFields,
   aiWorkflowNotes: textList.default([]),
   client: text.optional(),
   context: text,
   featured: z.boolean().default(false),
+  kind: z.literal("case-study"),
   links: z.array(linkSchema).default([]),
   motionNotes: textList.default([]),
   previews: z.array(previewSchema).default([]),
-  related: z.array(slugSchema).default([]),
   responsibilities: requiredTextList,
   role: text,
-  sample: z.boolean().default(false),
-  summary: text.max(280),
-  technologies: requiredTextList,
-  title: text,
+  stack: requiredTextList,
   year: z.number().int().min(2000).max(2100),
 });
 
-export const blogMetaSchema = z.strictObject({
+export const fieldNoteMetaSchema = z.strictObject({
+  ...noteFields,
   date: z.iso.date(),
-  sample: z.boolean().default(false),
-  summary: text.max(280),
+  kind: z.literal("note"),
   tags: requiredTextList,
-  title: text,
 });
+
+export const noteMetaSchema = z.discriminatedUnion("kind", [
+  caseStudyMetaSchema,
+  fieldNoteMetaSchema,
+]);
 
 export type Preview = z.infer<typeof previewSchema>;
 export type ContentLink = z.infer<typeof linkSchema>;
-export type WorkMeta = z.infer<typeof workMetaSchema>;
-export type BlogMeta = z.infer<typeof blogMetaSchema>;
+export type NoteMeta = z.infer<typeof noteMetaSchema>;
+export type NoteKind = NoteMeta["kind"];

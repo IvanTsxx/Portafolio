@@ -10,10 +10,9 @@ import { cn } from "@/lib/utils";
 
 const routeAnnotations = {
   "/": "ホーム",
-  "/blog": "野帳",
   "/lab": "実験",
+  "/notes": "手記",
   "/registry": "登録簿",
-  "/work": "作品",
 } as const satisfies Record<PrimaryRoute["href"], string>;
 
 const isActiveRoute = (pathname: string, href: string) =>

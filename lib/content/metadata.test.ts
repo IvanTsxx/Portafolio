@@ -2,29 +2,27 @@ import { describe, expect, test } from "bun:test";
 
 import { siteConfig } from "@/lib/site/config";
 
-import type { BlogPost } from "./blog";
-import {
-  buildPostJsonLd,
-  buildPostMetadata,
-  buildWorkMetadata,
-} from "./metadata";
-import type { WorkProject } from "./work";
+import { buildNoteJsonLd, buildNoteMetadata } from "./metadata";
+import type { CaseStudy, FieldNote } from "./note-domain";
 
-const post: BlogPost = {
+const note: FieldNote = {
   date: "2026-10-09",
+  kind: "note",
   readingTimeMinutes: 3,
+  related: [],
   sample: false,
   slug: "worktrees-as-lanes",
-  summary: "Summary of the post",
+  summary: "Summary of the note",
   tags: ["Conductor", "Workflow"],
   title: "Worktrees as lanes",
   wordCount: 600,
 };
 
-const project: WorkProject = {
+const caseStudy: CaseStudy = {
   aiWorkflowNotes: [],
   context: "Context",
   featured: false,
+  kind: "case-study",
   links: [],
   motionNotes: [],
   previews: [],
@@ -34,60 +32,54 @@ const project: WorkProject = {
   role: "Frontend engineer",
   sample: false,
   slug: "editorial-motion-system",
-  summary: "Summary of the project",
-  technologies: ["GSAP"],
+  stack: ["GSAP"],
+  summary: "Summary of the case study",
   title: "Editorial motion system",
   wordCount: 300,
   year: 2026,
 };
 
-describe("work metadata", () => {
-  test("points the canonical URL and Open Graph URL at the case study", () => {
-    const metadata = buildWorkMetadata(project);
+describe("note metadata", () => {
+  test("points canonical and Open Graph URLs at /notes for both kinds", () => {
+    for (const entry of [note, caseStudy]) {
+      const metadata = buildNoteMetadata(entry);
 
-    expect(metadata.alternates?.canonical).toBe(
-      "/work/editorial-motion-system"
-    );
-    expect(metadata.openGraph?.url).toBe("/work/editorial-motion-system");
-    expect(metadata.description).toBe("Summary of the project");
+      expect(metadata.alternates?.canonical).toBe(`/notes/${entry.slug}`);
+      expect(metadata.openGraph?.url).toBe(`/notes/${entry.slug}`);
+      expect(metadata.description).toBe(entry.summary);
+    }
   });
 
-  test("keeps sample projects out of search results and real ones in", () => {
-    expect(buildWorkMetadata({ ...project, sample: true }).robots).toEqual({
-      follow: true,
-      index: false,
-    });
-    expect(buildWorkMetadata(project).robots).toBeUndefined();
-  });
-});
-
-describe("post metadata", () => {
-  test("describes the post as an article with its publish date and tags", () => {
-    const metadata = buildPostMetadata(post);
-
-    expect(metadata.openGraph).toMatchObject({
+  test("describes a note as an article with its publish date and tags", () => {
+    expect(buildNoteMetadata(note).openGraph).toMatchObject({
       publishedTime: "2026-10-09T00:00:00.000Z",
       tags: ["Conductor", "Workflow"],
       type: "article",
     });
-    expect(metadata.alternates?.canonical).toBe("/blog/worktrees-as-lanes");
+    expect(buildNoteMetadata(caseStudy).openGraph).toMatchObject({
+      type: "website",
+    });
   });
 
-  test("keeps sample posts out of search results and real ones in", () => {
-    expect(buildPostMetadata({ ...post, sample: true }).robots).toEqual({
+  test("keeps sample entries out of search results and real ones in", () => {
+    expect(buildNoteMetadata({ ...caseStudy, sample: true }).robots).toEqual({
       follow: true,
       index: false,
     });
-    expect(buildPostMetadata(post).robots).toBeUndefined();
+    expect(buildNoteMetadata({ ...note, sample: true }).robots).toEqual({
+      follow: true,
+      index: false,
+    });
+    expect(buildNoteMetadata(note).robots).toBeUndefined();
   });
 
   test("builds BlogPosting structured data with an absolute URL", () => {
-    const jsonLd = buildPostJsonLd(post);
+    const jsonLd = buildNoteJsonLd(note);
 
     expect(jsonLd["@type"]).toBe("BlogPosting");
     expect(jsonLd.datePublished).toBe("2026-10-09");
     expect(jsonLd.mainEntityOfPage).toBe(
-      `${siteConfig.url}/blog/worktrees-as-lanes`
+      `${siteConfig.url}/notes/worktrees-as-lanes`
     );
   });
 });
