@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import { AgentWaypoint } from "@/components/scene/agent-waypoint";
 import type { AgentWaypointProps } from "@/components/scene/agent-waypoint";
 import { PanelHeading } from "@/components/site/panel-heading";
 import { cn } from "@/lib/utils";
@@ -40,9 +39,9 @@ export const DocumentSection = ({
       index={index}
       jp={jp}
       label={label}
+      waypoint={waypoint}
     />
     {children}
-    {waypoint ? <AgentWaypoint {...waypoint} /> : null}
   </section>
 );
 
