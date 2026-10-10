@@ -1,322 +1,218 @@
 import { siteConfig } from "@/lib/site/config";
 
-import {
-  agentActionNames,
-  agentContract,
-  agentReactionNames,
-  agentRoleSpecs,
-  agentSceneSpecs,
-  agentUsage,
-} from "./agents";
-import {
-  allComponentSpecs,
-  pageRecipe,
-  primitiveSpecs,
-  siteComponentSpecs,
-} from "./catalog";
-import type { ComponentSpec } from "./catalog";
-import type { ContrastGrade } from "./color";
 import type { ColorToken, DesignSystem } from "./model";
 import { guidance, principles } from "./philosophy";
-import { rawMarkdownPath, sectionById } from "./sections";
-import type { SectionId } from "./sections";
-import {
-  agentMotionSpecs,
-  breakpointSpecs,
-  colorGroupLabels,
-  colorGroups,
-  documentGridSpec,
-  spacingSpecs,
-  typeScaleSpecs,
-} from "./specs";
+import { spacingSpecs } from "./specs";
 
-const escapeCell = (cell: string) => cell.replaceAll("|", String.raw`\|`);
+const quote = (value: string) => JSON.stringify(value);
 
-const table = (
-  headers: readonly string[],
-  rows: readonly (readonly string[])[]
-) =>
-  [
-    `| ${headers.join(" | ")} |`,
-    `| ${headers.map(() => "---").join(" | ")} |`,
-    ...rows.map((row) => `| ${row.map(escapeCell).join(" | ")} |`),
-  ].join("\n");
+const yamlMap = (
+  key: string,
+  entries: readonly (readonly [string, string])[],
+  indent = ""
+) => [
+  `${indent}${key}:`,
+  ...entries.map(([name, value]) => `${indent}  ${name}: ${quote(value)}`),
+];
 
-const code = (value: string) => `\`${value}\``;
-
-const fence = (language: string, body: string) =>
-  `\`\`\`${language}\n${body}\n\`\`\``;
-
-const bullets = (items: readonly string[]) =>
-  items.map((item) => `- ${item}`).join("\n");
-
-const sectionHeading = (id: SectionId) => {
-  const section = sectionById(id);
-  return `## ${section.index} ${section.label} ${section.jp}`;
+const typographyTokens = (system: DesignSystem) => {
+  const sans = system.fonts.find((font) => font.className === "font-sans");
+  const mono = system.fonts.find((font) => font.className === "font-mono");
+  const jp = system.fonts.find((font) => font.className === "font-jp");
+  const sansFamily = sans?.name ?? "Zen Kaku Gothic New";
+  const monoFamily = mono?.name ?? "Geist Mono";
+  return [
+    [
+      "display",
+      {
+        fontFamily: sansFamily,
+        fontSize: "6rem",
+        fontWeight: "300",
+        letterSpacing: "-0.05em",
+        lineHeight: "0.88",
+      },
+    ],
+    [
+      "title",
+      {
+        fontFamily: sansFamily,
+        fontSize: "3rem",
+        fontWeight: "300",
+        letterSpacing: "-0.05em",
+        lineHeight: "0.88",
+      },
+    ],
+    [
+      "heading",
+      {
+        fontFamily: sansFamily,
+        fontSize: "1.25rem",
+        fontWeight: "300",
+        lineHeight: "1.25",
+      },
+    ],
+    [
+      "body",
+      {
+        fontFamily: sansFamily,
+        fontSize: "1rem",
+        fontWeight: "400",
+        lineHeight: "1.5",
+      },
+    ],
+    [
+      "body-sm",
+      {
+        fontFamily: sansFamily,
+        fontSize: "0.875rem",
+        fontWeight: "400",
+        lineHeight: "1.625",
+      },
+    ],
+    [
+      "label",
+      {
+        fontFamily: monoFamily,
+        fontSize: "0.625rem",
+        fontWeight: "400",
+        letterSpacing: "0.16em",
+        lineHeight: "0.875rem",
+      },
+    ],
+    [
+      "numeral",
+      {
+        fontFamily: monoFamily,
+        fontFeature: "tnum",
+        fontSize: "1.875rem",
+        fontWeight: "300",
+      },
+    ],
+    [
+      "annotation-jp",
+      {
+        fontFamily: jp?.name ?? "Noto Sans JP",
+        fontSize: "0.625rem",
+        fontWeight: "400",
+      },
+    ],
+  ] as const;
 };
 
-const gradeLabels = {
-  AA: "AA",
-  "AA-large": "AA large",
-  AAA: "AAA",
-  "non-text": "non-text",
-} as const satisfies Record<ContrastGrade, string>;
+const paletteColors = (system: DesignSystem) =>
+  system.colors.filter((token) => token.alias === null);
 
-const contrastCell = (token: ColorToken) => {
-  if (token.name === "paper") {
-    return "base";
-  }
-  const grade = `${token.contrast.toFixed(1)}:1 ${gradeLabels[token.grade]}`;
-  return token.against === "paper" ? grade : `${grade} on ${token.against}`;
-};
-
-const colorRow = (token: ColorToken) => [
-  code(token.name),
-  code(token.tailwind),
-  code(token.cssVar),
-  token.alias ? code(token.alias) : "",
-  code(token.oklch),
-  code(token.hex),
-  contrastCell(token),
-  token.role,
-];
-
-const importPath = (file: string) => `@/${file.replace(/\.tsx?$/u, "")}`;
-
-const philosophy = () => [
-  sectionHeading("philosophy"),
-  principles
-    .map(
-      (principle, index) =>
-        `${index + 1}. **${principle.title}** ${principle.jp}. ${principle.rule}`
-    )
-    .join("\n"),
-];
-
-const color = (system: DesignSystem) => [
-  sectionHeading("color"),
-  "Every color is a CSS variable declared in `:root` of `app/globals.css` and exposed to Tailwind through `@theme inline` as `--color-*`. Values are OKLCH. Hex is the sRGB equivalent. Contrast is WCAG 2.x against `--paper` unless the row says `on <token>`, with translucent tokens composited over paper first. Grades: AAA from 7, AA from 4.5, AA large from 3, non-text below 3 (decorative only, never body text).",
-  ...colorGroups.flatMap((group) => {
-    const tokens = system.colors.filter((token) => token.group === group);
-    const { jp, label } = colorGroupLabels[group];
-    return [
-      `### ${label} ${jp}`,
-      table(
-        [
-          "Token",
-          "Tailwind",
-          "CSS variable",
-          "Alias of",
-          "OKLCH",
-          "Hex",
-          "Contrast",
-          "Role",
-        ],
-        tokens.map(colorRow)
-      ),
-    ];
-  }),
-];
-
-const typography = (system: DesignSystem) => [
-  sectionHeading("typography"),
-  "### Families",
-  table(
-    ["Class", "Family", "Variable", "Weights", "Role"],
-    system.fonts.map((font) => [
-      code(font.className),
-      font.name,
-      code(font.cssVar),
-      font.weights,
-      font.role,
-    ])
-  ),
-  `Fonts load through ${code("lib/fonts.ts")} (next/font) into ${system.fonts.map((font) => code(font.sourceVar)).join(", ")}, which ${code("@theme inline")} maps to the ${code("--font-*")} variables above. ${code("font-heading")} and ${code("font-display")} alias ${code("font-sans")}.`,
-  "### Scale",
-  table(
-    ["Classes", "Size px", "Use"],
-    typeScaleSpecs.map((step) => [code(step.className), step.size, step.use])
-  ),
-  `The ${code("label")} utility is the annotation style (see utilities). Pair every section label with a ${code("jp")} annotation. The theme also defines a ${code(system.textLabel.className)} step: ${system.textLabel.size}, line height ${system.textLabel.lineHeight}, tracking ${system.textLabel.letterSpacing}.`,
-];
-
-const spacing = (system: DesignSystem) => [
-  sectionHeading("spacing"),
-  "### Spacing",
-  "Tailwind's 4px scale (`--spacing: 0.25rem`). Spacing, sizes and positions are multiples of 4px.",
-  table(
-    ["Step", "Example class", "Px", "Use"],
-    spacingSpecs.map((step) => [
-      step.step,
-      code(`p-${step.step}`),
-      String(step.px),
-      step.use,
-    ])
-  ),
-  "### Radius",
-  `Radius is ${code(`${system.radius.baseVar}: ${system.radius.base}`)}. Every step derives from it, so every corner is square.`,
-  table(
-    ["Class", "Variable", "Factor", "Px"],
-    system.radius.steps.map((step) => [
-      code(step.className),
-      code(step.cssVar),
-      String(step.factor),
-      String(step.px),
-    ])
-  ),
-  "### Document grid",
-  bullets([
-    `Container: ${code(documentGridSpec.containerClasses.join(" "))}.`,
-    `${documentGridSpec.columns} columns from lg. Dossier spans ${documentGridSpec.dossierSpan} and is sticky. Content spans ${documentGridSpec.contentSpan}.`,
-    `Column gutter ${code(documentGridSpec.gutter)}. Sections stack with ${code(documentGridSpec.sectionGap)}. Panels stack with ${code("gap-6")}.`,
-    "Cells use hairline right and bottom borders inside a container with top and left borders.",
-  ]),
-  "### Breakpoints",
-  table(
-    ["Name", "Min width px", "What changes"],
-    breakpointSpecs.map((breakpoint) => [
-      code(breakpoint.name),
-      String(breakpoint.px),
-      breakpoint.changes,
-    ])
-  ),
-];
-
-const utilities = (system: DesignSystem) => [
-  sectionHeading("utilities"),
-  "Utilities are defined once with `@utility` in `app/globals.css`. Use them in markup. Do not write ad-hoc CSS classes.",
-  ...system.utilities.flatMap((utility) => [
-    `### ${code(utility.name)}`,
-    utility.summary,
-    fence("tsx", utility.usage),
-    fence("css", utility.css),
-  ]),
-];
-
-const variantTables = (spec: ComponentSpec) =>
-  spec.variants.flatMap((axis) => [
-    `Variant axis ${code(axis.axis)}:`,
-    table(
-      ["Value", "Meaning"],
-      axis.values.map((value) => [code(value.name), value.note])
+const frontMatter = (system: DesignSystem) => {
+  const typography = typographyTokens(system).flatMap(([name, style]) => [
+    `  ${name}:`,
+    ...Object.entries(style).map(
+      ([property, value]) => `    ${property}: ${quote(value)}`
     ),
   ]);
+  return [
+    "---",
+    "version: alpha",
+    `name: ${quote(`${siteConfig.name} · Paper and ink`)}`,
+    `description: ${quote("A technical document on paper. Ink type, hairline rules, numbered panels, and small orange 3D agents as the only color.")}`,
+    ...yamlMap(
+      "colors",
+      paletteColors(system).map((token) => [token.name, token.hex])
+    ),
+    "typography:",
+    ...typography,
+    ...yamlMap("rounded", [
+      ["none", "0px"],
+      ...system.radius.steps.map(
+        (step) => [step.name, `${step.px}px`] as const
+      ),
+    ]),
+    ...yamlMap(
+      "spacing",
+      spacingSpecs.map((step) => [step.step, `${step.px}px`])
+    ),
+    "components:",
+    "  button-primary:",
+    '    backgroundColor: "{colors.ink}"',
+    '    textColor: "{colors.paper}"',
+    '    typography: "{typography.label}"',
+    '    rounded: "{rounded.none}"',
+    '    height: "44px"',
+    "  button-outline:",
+    '    backgroundColor: "{colors.paper}"',
+    '    textColor: "{colors.ink}"',
+    '    typography: "{typography.label}"',
+    '    rounded: "{rounded.none}"',
+    '    height: "44px"',
+    "  chip:",
+    '    backgroundColor: "{colors.paper}"',
+    '    textColor: "{colors.ink}"',
+    '    typography: "{typography.label}"',
+    '    rounded: "{rounded.none}"',
+    '    padding: "4px 8px"',
+    "  chip-active:",
+    '    backgroundColor: "{colors.ink}"',
+    '    textColor: "{colors.paper}"',
+    "  card:",
+    '    backgroundColor: "{colors.paper}"',
+    '    textColor: "{colors.ink}"',
+    '    rounded: "{rounded.none}"',
+    '    padding: "20px"',
+    "  panel-heading:",
+    '    textColor: "{colors.ink}"',
+    '    typography: "{typography.label}"',
+    "---",
+  ];
+};
 
-const componentBlock = (spec: ComponentSpec) => [
-  `### ${spec.name} ${spec.jp}`,
-  spec.description,
-  spec.kind === "pattern"
-    ? `Pattern. Reference: ${code(spec.file)}.`
-    : `Import: ${code(`import { ${spec.exports.join(", ")} } from "${importPath(spec.file)}"`)}`,
-  ...variantTables(spec),
-  fence("tsx", spec.usage),
-];
-
-const primitives = () => [
-  sectionHeading("primitives"),
-  "shadcn base-lyra primitives on Base UI in `components/ui`, restyled by tokens: radius 0, ink fills, hairline borders. Compose them; do not fork them.",
-  ...primitiveSpecs.flatMap(componentBlock),
-];
-
-const siteComponents = () => [
-  sectionHeading("components"),
-  "Site-level parts in `components/site`, `components/profile` and `components/content`. Every document page sits inside the persistent `DocumentShell` and is a `DocumentHero` followed by `DocumentSection`s. Its left panels live in the route's `@aside` slot.",
-  "### Page recipe",
-  fence("tsx", pageRecipe),
-  ...siteComponentSpecs.flatMap(componentBlock),
-];
-
-const motion = (system: DesignSystem) => [
-  sectionHeading("motion"),
-  "### Easings",
-  "Declared in `@theme inline`, available as `ease-*` utilities.",
-  table(
-    ["Token", "Class", "Curve", "Use"],
-    system.easings.map((easing) => [
-      code(easing.cssVar),
-      code(easing.className),
-      code(easing.curve),
-      easing.use,
-    ])
-  ),
-  "### Durations",
-  "Tailwind duration utilities. Hover, focus and press flip in 100ms.",
-  table(
-    ["Name", "Class", "Ms", "Ease", "Use"],
-    system.durations.map((duration) => [
-      duration.name,
-      code(duration.className),
-      String(duration.ms),
-      code(`ease-${duration.ease}`),
-      duration.use,
-    ])
-  ),
-  "### Rules",
-  bullets([
-    "Animate transform, opacity, color and clip-path. Do not animate layout properties.",
-    "Hover and focus effects are CSS only. Gate hover-only inversions with `pointer-fine:` so touch never sticks.",
-    "Every animation ships with a reduced-motion twin. The global rule below collapses all CSS durations; JavaScript motion branches on `useReducedMotion` from `hooks/use-reduced-motion`.",
-    "GSAP comes from `motionKit` in `lib/motion/gsap.ts`.",
-    `Agent motion: ${agentMotionSpecs.map((spec) => `${spec.label.toLowerCase()} ${spec.value.toLowerCase()}`).join("; ")}.`,
-  ]),
-  fence("css", system.reducedMotionCss),
-];
-
-const agents = () => [
-  sectionHeading("agents"),
-  "### Contract",
-  bullets(agentContract),
-  "### Roles",
-  table(
-    ["Designation", "Role", "Kit", "Signature actions", "Responsibilities"],
-    agentRoleSpecs.map((profile) => [
-      profile.designation,
-      `${code(profile.role)} ${profile.title}`,
-      profile.kit.join(", "),
-      profile.signatureActions.join(", "),
-      profile.responsibilities.join("; "),
-    ])
-  ),
-  "### Actions",
-  agentActionNames.map(code).join(" "),
-  "### Hover reactions",
-  agentReactionNames.map(code).join(" "),
-  "### Scenes",
-  table(
-    ["Code", "Scene", "Id", "Cast"],
-    agentSceneSpecs.map((scene) => [
-      scene.code,
-      scene.label,
-      code(scene.id),
-      scene.cast.join(", "),
-    ])
-  ),
-  "### Usage",
-  fence("tsx", agentUsage.join("\n")),
-];
-
-const rules = () => [
-  "## Do and do not",
-  "### Do",
-  bullets(guidance.do),
-  "### Do not",
-  bullets(guidance.dont),
-];
+const colorLine = (token: ColorToken) =>
+  `- **${token.name} (${token.hex}):** ${token.role}.`;
 
 export const renderDesignMarkdown = (system: DesignSystem) =>
-  `${[
-    `# ${siteConfig.name} design system`,
-    `Design system of ${siteConfig.name}'s portfolio (${siteConfig.url}). A technical document on paper: ink on paper, with small orange 3D agents as the only color.`,
-    `Live reference: /design-system. Raw markdown: ${rawMarkdownPath}. Generated by ${code("bun run design:md")} from ${code("app/globals.css")} and typed data in ${code("lib/design-system/")}. Do not edit by hand.`,
-    `${allComponentSpecs.length} documented components, ${system.colors.length} color tokens, ${system.utilities.length} utilities.`,
-    ...philosophy(),
-    ...color(system),
-    ...typography(system),
-    ...spacing(system),
-    ...utilities(system),
-    ...primitives(),
-    ...siteComponents(),
-    ...motion(system),
-    ...agents(),
-    ...rules(),
-  ].join("\n\n")}\n`;
+  [
+    ...frontMatter(system),
+    "",
+    "## Overview",
+    "",
+    "A personal portfolio rendered as a technical document on paper: numbered panels, mono labels with Japanese annotations, hairline rules, hatch fills and dithered imagery. Ink and paper carry the interface. Small orange 3D agents are the only color and the only playful element.",
+    "",
+    ...principles.map(
+      (principle) => `- **${principle.title}.** ${principle.rule}`
+    ),
+    "",
+    "## Colors",
+    "",
+    "High-contrast neutrals on warm paper. Clay orange is reserved for the 3D agents and never used for UI chrome.",
+    "",
+    ...paletteColors(system).map(colorLine),
+    "",
+    "## Typography",
+    "",
+    "Zen Kaku Gothic New, light and tightly tracked, for names and titles. Geist Mono, 10px uppercase and tracked, for every label, number and button. Noto Sans JP for short Japanese annotations beside section labels. Instrument Serif italic only for the wordmark.",
+    "",
+    "## Layout",
+    "",
+    "A 12-column document grid. A sticky identity dossier fills 4 columns on the left; numbered sections fill 8 on the right and stack on mobile. Spacing follows a 4px scale. Sections are separated by 64px and open with a panel heading: `[ XX-NN ]  LABEL  日本語 ........ 06 / 06` over a strong rule.",
+    "",
+    "## Elevation & Depth",
+    "",
+    "Flat. No shadows. Depth comes from rules, recessed paper-deep fills, hatch patterns and crosshair corner marks. The only real depth is the 3D agents, rendered in one shared canvas.",
+    "",
+    "## Shapes",
+    "",
+    "Square everything. Radius is 0 on cards, buttons, chips, inputs and images. Frames are 1px hairlines; strong rules mark section boundaries.",
+    "",
+    "## Components",
+    "",
+    "- **Panel heading:** index in brackets, mono label, Japanese annotation, dotted leader, count.",
+    "- **Specimen card:** hairline frame, corner marks, mono index top-left, square badge top-right, light title, one-line summary, mono footer row.",
+    "- **Button:** 44px, square, mono uppercase label. Primary is ink on paper inverted; outline is a 1px ink frame. State flips in 100ms.",
+    "- **Chip:** square hairline frame with a mono label; active chips invert to ink.",
+    "- **Leader row:** mono key, dotted leader, value aligned right.",
+    "- **Agent:** small orange box-shaped 3D mascot with role accessories. One per view, hover and click reactions, static fallback without WebGL.",
+    "",
+    "## Do's and Don'ts",
+    "",
+    ...guidance.do.map((item) => `- Do: ${item}`),
+    ...guidance.dont.map((item) => `- Don't: ${item}`),
+    "",
+  ].join("\n");

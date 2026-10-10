@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { AgentsSection } from "@/components/design-system/agents-section";
 import { ColorSection } from "@/components/design-system/color-section";
 import { ComponentsSection } from "@/components/design-system/components-section";
+import { ExportActions } from "@/components/design-system/export-actions";
 import { MotionSection } from "@/components/design-system/motion-section";
 import { PhilosophySection } from "@/components/design-system/philosophy-section";
 import { PrimitivesSection } from "@/components/design-system/primitives-section";
@@ -12,11 +13,11 @@ import { UtilitiesSection } from "@/components/design-system/utilities-section";
 import { DocumentHero } from "@/components/site/document-hero";
 import { allComponentSpecs } from "@/lib/design-system/catalog";
 import { padCount } from "@/lib/design-system/format";
-import { loadDesignSystem } from "@/lib/design-system/load";
-import { documentCode } from "@/lib/design-system/sections";
+import { loadDesignMarkdown, loadDesignSystem } from "@/lib/design-system/load";
+import { documentCode, rawMarkdownPath } from "@/lib/design-system/sections";
 
 const description =
-  "Paper-and-ink design system: tokens, type, utilities, components, motion and 3D agents. Copy it as design.md.";
+  "Paper-and-ink design system: tokens, type, components and motion. Copy it as a DESIGN.md for coding agents.";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/design-system" },
@@ -25,7 +26,10 @@ export const metadata: Metadata = {
 };
 
 const DesignSystemPage = async () => {
-  const system = await loadDesignSystem();
+  const [system, markdown] = await Promise.all([
+    loadDesignSystem(),
+    loadDesignMarkdown(),
+  ]);
 
   return (
     <>
@@ -38,7 +42,13 @@ const DesignSystemPage = async () => {
           { label: "Parts", value: padCount(allComponentSpecs.length) },
         ]}
         title="Design system"
-      />
+      >
+        <ExportActions
+          filename="DESIGN.md"
+          href={rawMarkdownPath}
+          markdown={markdown}
+        />
+      </DocumentHero>
       <PhilosophySection />
       <ColorSection colors={system.colors} />
       <TypographySection fonts={system.fonts} textLabel={system.textLabel} />

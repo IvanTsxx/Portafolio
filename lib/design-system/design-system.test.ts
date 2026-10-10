@@ -15,7 +15,6 @@ import { renderDesignMarkdown } from "./design-md";
 import { designMarkdownPath, globalsCssPath, loadDesignMarkdown } from "./load";
 import { designMarkdownResponse } from "./markdown-response";
 import { buildDesignSystem, findMissingTokens, tokenReferences } from "./model";
-import { sectionSpecs } from "./sections";
 import {
   colorSpecs,
   documentGridSpec,
@@ -252,16 +251,26 @@ describe("design.md", () => {
     ).toBe("in sync");
   });
 
-  test("it documents every section, color token and utility", () => {
+  test("it follows the DESIGN.md format with every color token", () => {
     const markdown = renderDesignMarkdown(buildDesignSystem(globals));
-    for (const section of sectionSpecs) {
-      expect(markdown).toContain(`## ${section.index} ${section.label}`);
-    }
-    for (const token of colorSpecs) {
-      expect(markdown).toContain(`\`--${token.name}\``);
-    }
-    for (const utility of utilitySpecs) {
-      expect(markdown).toContain(`### \`${utility.name}\``);
+    expect(markdown.startsWith("---\nversion: alpha\n")).toBe(true);
+    const headings = markdown
+      .split("\n")
+      .filter((line) => line.startsWith("## "));
+    expect(headings).toEqual([
+      "## Overview",
+      "## Colors",
+      "## Typography",
+      "## Layout",
+      "## Elevation & Depth",
+      "## Shapes",
+      "## Components",
+      "## Do's and Don'ts",
+    ]);
+    for (const token of buildDesignSystem(globals).colors.filter(
+      (color) => color.alias === null
+    )) {
+      expect(markdown).toContain(`\n  ${token.name}: "#`);
     }
   });
 
