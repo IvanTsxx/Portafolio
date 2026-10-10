@@ -11,7 +11,7 @@ Blender is not installed, so a GLB pipeline would have meant hand-authoring mesh
 - Performance. Geometry is cached by dimensions and materials are module singletons, so seven agents share geometries, textures and shader programs. With shadow maps gone, an agent costs about 35 draw calls (the seven-agent lineup measured 242 calls at 1440 by 900).
 - Bundle. No model files, no loader, no Draco decoder. The only addition is the three addon for rounded boxes, which ships with the installed three package.
 - Maintainability. Proportions live in `components/agents/rig.ts`. Changing the body width moves every anchor and accessory with it.
-- Adding roles. Add the role to `lib/agents/roles.ts`, write one accessory module, and register it in `accessories/registry.ts`. The `Record<AgentRole, AccessoryKit>` type fails the build until the kit exists.
+- Adding roles. Add the role to `lib/agents/roles.ts` and give it a preset in `outfit.ts`. The `Record<AgentRole, Outfit>` type fails the build until the preset exists.
 
 ## Structure
 
@@ -22,13 +22,17 @@ Blender is not installed, so a GLB pipeline would have meant hand-authoring mesh
 - `reaction-deck.ts` deals reactions from a shuffled deck, so an agent never repeats a reaction twice in a row.
 - `materials.ts` and `textures.ts` create every material and procedural texture once (clay, glossy eye, knit, plaid, tweed, brass, steel, glass, code glow).
 - `geometry.ts` caches geometry by shape and dimensions.
-- `accessories/` holds one module per role plus `registry.ts`. Kits attach to anchors: `head`, `face`, `torso`, `body`, `rightArm`, `leftArm`. The left arm is mirrored, so kit authors write both arms with +x pointing outward.
+- `outfit.ts` is the outfit model with no React or three import: five slots (`head`, `face`, `torso`, `held`, `offhand`), the piece ids per slot, `Outfit` (one piece per slot) and `rolePresets`, the outfit each role wears.
+- `accessories/` holds the meshes, grouped by the role that introduced them, plus `knitwear.tsx`. `accessories/registry.ts` maps every piece id to an `AccessoryKit` that attaches meshes to anchors: `head`, `face`, `torso`, `body`, `rightArm`, `leftArm`. A coat brings its sleeves, so `lab-coat` plus `pointer` renders the same meshes the analyst always had. The left arm is mirrored, so authors write both arms with +x pointing outward.
 
 ## Usage
 
 ```tsx
 <Agent role="debugger" action="inspect" motion="reduced" position={[0, 0, 0]} />
+<Agent role="debugger" outfit={{ ...rolePresets.debugger, torso: "knit-sweater" }} animateOutfit />
 ```
+
+`outfit` overrides the role preset. With `animateOutfit`, an outfit change hops the agent and drops each new piece in (`outfit-motion.tsx`); reduced motion swaps in place. The home page Workshop section (`components/profile/agent-workshop.tsx`) dresses one agent through `AgentStageSlot` and keeps the outfit in the URL (`agent`, `head`, `face`, `torso`, `held`, `offhand`, `action`; slots equal to the preset are omitted).
 
 Every agent carries an invisible hit box. Hovering it sets the cursor to pointer and plays the next reaction from its deck. An agent driven from the DOM (the companion) passes its own `pointer` ref instead.
 

@@ -2,17 +2,20 @@
 
 import { useThree } from "@react-three/fiber";
 import type { ThreeElements, ThreeEvent } from "@react-three/fiber";
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useLayoutEffect, useRef } from "react";
 import type { RefObject } from "react";
 import { BoxGeometry, MathUtils, MeshBasicMaterial, Vector3 } from "three";
 
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 
-import type { AccessoryKit } from "./accessories/kit";
-import { accessoryKits } from "./accessories/registry";
+import type { WornPart } from "./accessories/registry";
+import { wornParts } from "./accessories/registry";
 import { disc, roundedBox } from "./geometry";
 import { AgentLiveContext, armPivotNames } from "./held-pose";
+import type { Outfit } from "./outfit";
+import { outfitSlots, rolePresets } from "./outfit";
+import { PieceDrop, useOutfitPop } from "./outfit-motion";
 import { Part } from "./part";
 import {
   anchorPositions,
@@ -32,6 +35,8 @@ export type { AgentMotion, AgentPointer } from "./use-agent-rig";
 
 export interface AgentProps extends Omit<ThreeElements["group"], "children"> {
   role: AgentRole;
+  outfit?: Outfit;
+  animateOutfit?: boolean;
   action?: AgentAction;
   actionRef?: RefObject<AgentAction>;
   pointer?: RefObject<AgentPointer>;
@@ -166,8 +171,17 @@ const Eye = ({ side }: { side: 1 | -1 }) => (
   </group>
 );
 
+const Worn = ({ parts }: { parts: readonly WornPart[] }) =>
+  parts.map(({ key, Wear }) => (
+    <PieceDrop key={key}>
+      <Wear />
+    </PieceDrop>
+  ));
+
 export const Agent = ({
   role,
+  outfit,
+  animateOutfit = false,
   action = "idle",
   actionRef,
   pointer,
@@ -191,18 +205,21 @@ export const Agent = ({
     pointer: pointer ?? ownPointer,
     seed,
   });
-  const kit: AccessoryKit = accessoryKits[role];
-  const {
-    body: BodyKit,
-    face: FaceKit,
-    head: HeadKit,
-    leftArm: LeftArmKit,
-    rightArm: RightArmKit,
-    torso: TorsoKit,
-  } = kit;
+  const worn = outfit ?? rolePresets[role];
+  const parts = wornParts(worn);
+  const isDressing = animateOutfit && resolvedMotion === "full";
+  const dressing = useRef(false);
+  const pop = useOutfitPop(
+    outfitSlots.map((slot) => worn[slot]).join("|"),
+    isDressing
+  );
+
+  useLayoutEffect(() => {
+    dressing.current = isDressing;
+  }, [isDressing]);
 
   return (
-    <AgentLiveContext value={{ liveAction, motion: resolvedMotion }}>
+    <AgentLiveContext value={{ dressing, liveAction, motion: resolvedMotion }}>
       <group {...groupProps} dispose={null} name={`agent-${role}-${action}`}>
         {pointer ? null : (
           <HitProxy
@@ -225,68 +242,70 @@ export const Agent = ({
             />
           </group>
         ) : null}
-        <group ref={attach("root")}>
-          {legOffsets.map((x, index) => (
-            <group
-              key={x}
-              position={[x, legSize.height, legSize.z]}
-              ref={attachLeg(index)}
-            >
-              <Part
-                castShadow
-                geometry={legGeometry}
-                material="clay"
-                position={[0, -legSize.height / 2, 0]}
-              />
-            </group>
-          ))}
-          <group position={[0, bodyBase, 0]} ref={attach("body")}>
-            <Part
-              castShadow
-              geometry={bodyGeometry}
-              material="clay"
-              position={[0, bodySize.height / 2, 0]}
-            />
-            <group position={anchorPositions.face}>
-              <group ref={attach("eyes")}>
-                <Eye side={1} />
-                <Eye side={-1} />
+        <group ref={pop}>
+          <group ref={attach("root")}>
+            {legOffsets.map((x, index) => (
+              <group
+                key={x}
+                position={[x, legSize.height, legSize.z]}
+                ref={attachLeg(index)}
+              >
+                <Part
+                  castShadow
+                  geometry={legGeometry}
+                  material="clay"
+                  position={[0, -legSize.height / 2, 0]}
+                />
               </group>
-              {FaceKit ? <FaceKit /> : null}
-            </group>
-            <group position={anchorPositions.head}>
-              {HeadKit ? <HeadKit /> : null}
-            </group>
-            <group position={anchorPositions.torso}>
-              {TorsoKit ? <TorsoKit /> : null}
-            </group>
-            {BodyKit ? <BodyKit /> : null}
-            <group
-              name={armPivotNames.right}
-              position={[shoulder.x, shoulder.y, shoulder.z]}
-              ref={attach("armRight")}
-            >
+            ))}
+            <group position={[0, bodyBase, 0]} ref={attach("body")}>
               <Part
                 castShadow
-                geometry={armGeometry}
+                geometry={bodyGeometry}
                 material="clay"
-                position={[armSize.length / 2, 0, 0]}
+                position={[0, bodySize.height / 2, 0]}
               />
-              {RightArmKit ? <RightArmKit /> : null}
-            </group>
-            <group
-              name={armPivotNames.left}
-              position={[-shoulder.x, shoulder.y, shoulder.z]}
-              ref={attach("armLeft")}
-            >
-              <group scale={[-1, 1, 1]}>
+              <group position={anchorPositions.face}>
+                <group ref={attach("eyes")}>
+                  <Eye side={1} />
+                  <Eye side={-1} />
+                </group>
+                <Worn parts={parts.face} />
+              </group>
+              <group position={anchorPositions.head}>
+                <Worn parts={parts.head} />
+              </group>
+              <group position={anchorPositions.torso}>
+                <Worn parts={parts.torso} />
+              </group>
+              <Worn parts={parts.body} />
+              <group
+                name={armPivotNames.right}
+                position={[shoulder.x, shoulder.y, shoulder.z]}
+                ref={attach("armRight")}
+              >
                 <Part
                   castShadow
                   geometry={armGeometry}
                   material="clay"
                   position={[armSize.length / 2, 0, 0]}
                 />
-                {LeftArmKit ? <LeftArmKit /> : null}
+                <Worn parts={parts.rightArm} />
+              </group>
+              <group
+                name={armPivotNames.left}
+                position={[-shoulder.x, shoulder.y, shoulder.z]}
+                ref={attach("armLeft")}
+              >
+                <group scale={[-1, 1, 1]}>
+                  <Part
+                    castShadow
+                    geometry={armGeometry}
+                    material="clay"
+                    position={[armSize.length / 2, 0, 0]}
+                  />
+                  <Worn parts={parts.leftArm} />
+                </group>
               </group>
             </group>
           </group>

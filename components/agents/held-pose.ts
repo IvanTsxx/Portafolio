@@ -44,6 +44,7 @@ const facingYaw = (pivot: Object3D | null, facing: number) => {
 };
 
 export interface AgentLiveState {
+  dressing: RefObject<boolean>;
   liveAction: RefObject<AgentAction>;
   motion: AgentMotion;
 }

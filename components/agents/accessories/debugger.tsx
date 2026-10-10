@@ -108,31 +108,28 @@ const magnifierPoses = {
 export const MagnifyingGlass = () => {
   const held = useHeldPose(magnifierRest, magnifierPoses);
   return (
-    <group>
-      <PlaidSleeve />
-      <group {...held}>
-        <Rod
-          from={[0, 0, 0]}
-          material="leather"
-          radius={0.026}
-          to={[0.24, 0.04, 0]}
-        />
+    <group {...held}>
+      <Rod
+        from={[0, 0, 0]}
+        material="leather"
+        radius={0.026}
+        to={[0.24, 0.04, 0]}
+      />
+      <Part
+        geometry={cylinder(16)}
+        material="brass"
+        position={[0.26, 0.045, 0]}
+        rotation={[0, 0, Math.PI / 2 - 0.16]}
+        scale={[0.032, 0.05, 0.032]}
+      />
+      <group position={[0.44, 0.075, 0]} rotation={[0, 1.05, 0]}>
+        <Part geometry={torus(0.14)} material="brass" scale={0.17} />
         <Part
-          geometry={cylinder(16)}
-          material="brass"
-          position={[0.26, 0.045, 0]}
-          rotation={[0, 0, Math.PI / 2 - 0.16]}
-          scale={[0.032, 0.05, 0.032]}
+          geometry={cylinder(32)}
+          material="glass"
+          rotation={[Math.PI / 2, 0, 0]}
+          scale={[0.165, 0.01, 0.165]}
         />
-        <group position={[0.44, 0.075, 0]} rotation={[0, 1.05, 0]}>
-          <Part geometry={torus(0.14)} material="brass" scale={0.17} />
-          <Part
-            geometry={cylinder(32)}
-            material="glass"
-            rotation={[Math.PI / 2, 0, 0]}
-            scale={[0.165, 0.01, 0.165]}
-          />
-        </group>
       </group>
     </group>
   );
