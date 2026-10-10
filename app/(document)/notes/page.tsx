@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { NoteArchive } from "@/components/content/note-archive";
+import { NotesPanels } from "@/components/page-panels/notes";
 import { DocumentHero } from "@/components/site/document-hero";
 import {
   countNoteFacets,
@@ -47,6 +48,7 @@ const NotesPage = async () => {
         ]}
         title="Notes"
       />
+      <NotesPanels />
       <NoteArchive facets={facets} notes={notes.map(toNoteIndexItem)} />
     </>
   );

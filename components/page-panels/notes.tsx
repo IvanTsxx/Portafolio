@@ -4,7 +4,7 @@ import { PageAside } from "@/components/site/page-aside";
 import { countNoteFacets } from "@/lib/content/note-domain";
 import { getNotes } from "@/lib/content/notes";
 
-const NotesAside = async () => {
+export const NotesPanels = async () => {
   const notes = await getNotes();
   return (
     <PageAside code="NT-02" label="Notes filters">
@@ -14,5 +14,3 @@ const NotesAside = async () => {
     </PageAside>
   );
 };
-
-export default NotesAside;

@@ -2,21 +2,11 @@ import { TableOfContents } from "@/components/content/table-of-contents";
 import { DossierPanel } from "@/components/site/compact-dossier";
 import { LeaderList, LeaderRow } from "@/components/site/leader-list";
 import { PageAside } from "@/components/site/page-aside";
-import {
-  getRegistryItem,
-  registryItems,
-  toCategoryLabel,
-} from "@/lib/registry/registry";
+import { getRegistryItem, toCategoryLabel } from "@/lib/registry/registry";
 import { siteConfig } from "@/lib/site/config";
 import { registrySectionsOf, toHeadings } from "@/lib/site/sections";
 
-export const dynamicParams = false;
-
-export const generateStaticParams = () =>
-  registryItems.map((item) => ({ slug: item.name }));
-
-const RegistryItemAside = async ({ params }: PageProps<"/registry/[slug]">) => {
-  const { slug } = await params;
+export const RegistryItemPanels = ({ slug }: { slug: string }) => {
   const item = getRegistryItem(slug);
   if (!item) {
     return null;
@@ -45,5 +35,3 @@ const RegistryItemAside = async ({ params }: PageProps<"/registry/[slug]">) => {
     </PageAside>
   );
 };
-
-export default RegistryItemAside;

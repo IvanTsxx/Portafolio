@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ExperimentCard } from "@/components/lab/experiment-card";
+import { ExperimentPanels } from "@/components/page-panels/experiment";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { experiments, getExperiment } from "@/lib/lab/experiments";
@@ -47,6 +48,7 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
           {experiment.summary}
         </p>
       </DocumentHero>
+      <ExperimentPanels slug={slug} />
       <DocumentSection
         id="preview"
         index={`${experiment.index}.1`}

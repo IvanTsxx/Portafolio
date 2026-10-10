@@ -11,14 +11,8 @@ export const PageAside = ({
   code: string;
   label: string;
 }) => (
-  <section aria-label={label} className="contents">
-    <PanelHeading
-      as="p"
-      className="max-lg:hidden lg:mt-4"
-      index={code}
-      jp="頁"
-      label={label}
-    />
-    {children}
+  <section aria-label={label} className="flex flex-col gap-6">
+    <PanelHeading as="p" index={code} jp="頁" label={label} />
+    <div className="grid gap-6 md:grid-cols-2">{children}</div>
   </section>
 );

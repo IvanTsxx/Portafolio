@@ -3,13 +3,11 @@ import type { ReactNode } from "react";
 import { DossierDisclosure } from "@/components/site/dossier-disclosure";
 
 export const DocumentShell = ({
-  aside,
   children,
   dossier,
   handle,
   name,
 }: {
-  aside: ReactNode;
   children: ReactNode;
   dossier: ReactNode;
   handle: string;
@@ -24,7 +22,6 @@ export const DocumentShell = ({
       <DossierDisclosure handle={handle} name={name}>
         {dossier}
       </DossierDisclosure>
-      {aside}
     </aside>
     <div className="flex min-w-0 flex-col gap-16 lg:col-span-8">{children}</div>
   </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ExperimentCard } from "@/components/lab/experiment-card";
 import { LabArchive } from "@/components/lab/lab-archive";
+import { LabPanels } from "@/components/page-panels/lab";
 import { DocumentHero } from "@/components/site/document-hero";
 import { activeTopics, experiments } from "@/lib/lab/experiments";
 
@@ -30,6 +31,7 @@ const LabPage = () => (
       ]}
       title="Lab"
     />
+    <LabPanels />
     <LabArchive items={items} />
   </>
 );

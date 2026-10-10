@@ -3,7 +3,7 @@ import { DossierPanel } from "@/components/site/compact-dossier";
 import { PageAside } from "@/components/site/page-aside";
 import { getRegistryCategories, registryItems } from "@/lib/registry/registry";
 
-const RegistryAside = () => (
+export const RegistryPanels = () => (
   <PageAside code="REG-02" label="Registry filters">
     <DossierPanel collapsible jp="絞込" label="Filter">
       <RegistryFilters
@@ -13,5 +13,3 @@ const RegistryAside = () => (
     </DossierPanel>
   </PageAside>
 );
-
-export default RegistryAside;

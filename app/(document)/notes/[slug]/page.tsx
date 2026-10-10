@@ -9,6 +9,7 @@ import {
 import { NoteJsonLd } from "@/components/content/note-json-ld";
 import { NoteRow } from "@/components/content/note-row";
 import { SampleBadge } from "@/components/content/sample-badge";
+import { NotePanels } from "@/components/page-panels/note";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { chipClassName } from "@/components/site/styles";
@@ -106,6 +107,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
           </ul>
         </div>
       </DocumentHero>
+      <NotePanels slug={slug} />
       {note.kind === "note" && isIndexable(note) ? (
         <NoteJsonLd note={note} />
       ) : null}

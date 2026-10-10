@@ -1,5 +1,4 @@
 import { TableOfContents } from "@/components/content/table-of-contents";
-import { ExportActions } from "@/components/design-system/export-actions";
 import { DossierPanel } from "@/components/site/compact-dossier";
 import { LeaderList, LeaderRow } from "@/components/site/leader-list";
 import { PageAside } from "@/components/site/page-aside";
@@ -10,7 +9,7 @@ import { designSystemHeadings } from "@/lib/site/sections";
 
 const bytesPerKilobyte = 1024;
 
-const DesignSystemAside = async () => {
+export const DesignSystemPanels = async () => {
   const markdown = await loadDesignMarkdown();
   const kilobytes = (
     new TextEncoder().encode(markdown).length / bytesPerKilobyte
@@ -22,11 +21,6 @@ const DesignSystemAside = async () => {
         <TableOfContents headings={designSystemHeadings} />
       </DossierPanel>
       <DossierPanel jp="出力" label="Export">
-        <ExportActions
-          filename="design.md"
-          href={rawMarkdownPath}
-          markdown={markdown}
-        />
         <LeaderList>
           <LeaderRow jp="形式" label="Format">
             Markdown
@@ -47,5 +41,3 @@ const DesignSystemAside = async () => {
     </PageAside>
   );
 };
-
-export default DesignSystemAside;

@@ -4,13 +4,12 @@ import { getGithubProfile } from "@/lib/site/github-profile";
 
 export const revalidate = 3600;
 
-const DocumentGroupLayout = async ({ aside, children }: LayoutProps<"/">) => {
+const DocumentGroupLayout = async ({ children }: LayoutProps<"/">) => {
   const {
     profile: { identity },
   } = await getGithubProfile();
   return (
     <DocumentShell
-      aside={aside}
       dossier={<IdentityDossier identity={identity} />}
       handle={identity.login}
       name={identity.name ?? identity.login}

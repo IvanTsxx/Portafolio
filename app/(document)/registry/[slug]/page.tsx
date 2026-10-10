@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { RegistryItemPanels } from "@/components/page-panels/registry-item";
 import { DependenciesPanel } from "@/components/registry-docs/dependencies-panel";
 import { BulletList } from "@/components/registry-docs/docs-section";
 import {
@@ -131,6 +132,7 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
           {item.description}
         </p>
       </DocumentHero>
+      <RegistryItemPanels slug={slug} />
       <DocumentSection
         {...sectionProps("preview")}
         waypoint={{ action: "inspect", role: "inspector", side: "left" }}

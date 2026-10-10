@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { RegistryPanels } from "@/components/page-panels/registry";
 import { CommandLine } from "@/components/registry-docs/command-line";
 import { ItemStyles } from "@/components/registry-docs/item-styles";
 import { loadDemoModule } from "@/components/registry-docs/load-demo";
@@ -67,6 +68,7 @@ const RegistryPage = async () => {
           title="Registry"
         />
       </div>
+      <RegistryPanels />
       <DocumentSection id="install" index="REG-03" jp="導入" label="Install">
         <div className="flex flex-col gap-2">
           <CommandLine

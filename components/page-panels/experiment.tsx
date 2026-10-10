@@ -5,17 +5,11 @@ import { DossierPanel } from "@/components/site/compact-dossier";
 import { LeaderList, LeaderRow } from "@/components/site/leader-list";
 import { PageAside } from "@/components/site/page-aside";
 import { linkClassName } from "@/components/site/styles";
-import { experiments, getExperiment } from "@/lib/lab/experiments";
+import { getExperiment } from "@/lib/lab/experiments";
 import { experimentSectionsOf } from "@/lib/site/sections";
 import { cn } from "@/lib/utils";
 
-export const dynamicParams = false;
-
-export const generateStaticParams = () =>
-  experiments.map((experiment) => ({ slug: experiment.slug }));
-
-const ExperimentAside = async ({ params }: PageProps<"/lab/[slug]">) => {
-  const { slug } = await params;
+export const ExperimentPanels = ({ slug }: { slug: string }) => {
   const experiment = getExperiment(slug);
   if (!experiment) {
     return null;
@@ -56,5 +50,3 @@ const ExperimentAside = async ({ params }: PageProps<"/lab/[slug]">) => {
     </PageAside>
   );
 };
-
-export default ExperimentAside;
