@@ -11,7 +11,8 @@
     "check": "ultracite check",
     "fix": "ultracite fix",
     "test": "bun test",
-    "registry:build": "shadcn build"
+    "registry:build": "shadcn build",
+    "registry:sync-agent": "bun lib/registry/sync-agent.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

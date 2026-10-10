@@ -16,5 +16,8 @@ export default defineConfig({
     ".claude/**",
   ],
   jsPlugins: jsPlugins.jsPlugins,
+  rules: {
+    "jsx-a11y/aria-role": ["error", { ignoreNonDOM: true }],
+  },
   settings: jsPluginSettings,
 });
