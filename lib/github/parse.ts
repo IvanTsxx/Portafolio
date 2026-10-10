@@ -11,7 +11,13 @@ import type {
   TimelineEventOf,
   TimelineMonth,
 } from "./model";
-import { isRedacted, keepPublic, publicEmail } from "./privacy";
+import {
+  isRedacted,
+  keepPublic,
+  publicAffiliation,
+  publicEmail,
+  publicOrganizations,
+} from "./privacy";
 import type {
   RawCalendar,
   RawCollection,
@@ -85,6 +91,7 @@ export const parseIdentity = (
   allowedEmail: string
 ): GithubIdentity => ({
   bio: publicText(user.bio),
+  company: publicAffiliation(user.company),
   createdAt: rest.created_at,
   email: publicEmail(rest.email, allowedEmail),
   followers: user.followers.totalCount,
@@ -92,9 +99,8 @@ export const parseIdentity = (
   location: publicText(user.location),
   login: user.login,
   name: user.name,
-  organizations: keepPublic(
-    user.organizations.nodes.map((node) => node.login),
-    (login) => [login]
+  organizations: publicOrganizations(
+    user.organizations.nodes.map((node) => node.login)
   ),
   repositories: user.repositories.totalCount,
   starred: user.starredRepositories.totalCount,

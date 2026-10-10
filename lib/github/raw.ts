@@ -83,6 +83,7 @@ export type RawCollection = z.infer<typeof rawCollectionSchema>;
 
 export const rawUserSchema = z.object({
   bio: optionalTextSchema,
+  company: optionalTextSchema,
   contributionsCollection: rawCollectionSchema,
   followers: totalCountSchema,
   following: totalCountSchema,

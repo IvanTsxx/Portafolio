@@ -100,10 +100,34 @@ const pullRequestNode = (
 });
 
 describe("parseIdentity", () => {
-  test("drops the company field and redacted organizations", () => {
+  test("keeps the company affiliation and the company organization", () => {
     const identity = parseIdentity(rawUser(), rawRest(null), ALLOWED_EMAIL);
 
-    expect(identity).not.toHaveProperty("company");
+    expect(identity.company).toBe("@basementstudio");
+    expect(identity.organizations).toEqual(["basementstudio", "ServalHQ"]);
+  });
+
+  test("drops a company field that describes the work", () => {
+    const identity = parseIdentity(
+      rawUser({ company: "Shipping client sites at basement studio" }),
+      rawRest(null),
+      ALLOWED_EMAIL
+    );
+
+    expect(identity.company).toBeNull();
+  });
+
+  test("drops organizations that only resemble the company", () => {
+    const identity = parseIdentity(
+      rawUser({
+        organizations: {
+          nodes: [{ login: "basementstudio-labs" }, { login: "ServalHQ" }],
+        },
+      }),
+      rawRest(null),
+      ALLOWED_EMAIL
+    );
+
     expect(identity.organizations).toEqual(["ServalHQ"]);
   });
 
@@ -254,7 +278,20 @@ describe("publicEmail", () => {
 });
 
 describe("assertPublicProfile", () => {
-  test("rejects a profile that still carries the redacted term", () => {
+  test("accepts the company affiliation and organization", () => {
+    const affiliated: GithubProfile = {
+      ...snapshotProfile(),
+      identity: {
+        ...snapshotProfile().identity,
+        company: "@basementstudio",
+        organizations: ["basementstudio", "ServalHQ"],
+      },
+    };
+
+    expect(assertPublicProfile(affiliated)).toBe(affiliated);
+  });
+
+  test("rejects a company repository even when the affiliation is allowed", () => {
     const leaked: GithubProfile = {
       ...snapshotProfile(),
       pinned: [
@@ -271,12 +308,49 @@ describe("assertPublicProfile", () => {
 
     expect(() => assertPublicProfile(leaked)).toThrow(GithubPrivacyError);
   });
+
+  test("rejects a timeline event that names a company project", () => {
+    const leaked: GithubProfile = {
+      ...snapshotProfile(),
+      timeline: [
+        {
+          events: [
+            {
+              id: "E-01",
+              kind: "commits",
+              repositories: [
+                { count: 3, repository: "IvanTsxx/basement-hero" },
+              ],
+              total: 3,
+            },
+          ],
+          month: 9,
+          year: 2026,
+        },
+      ],
+    };
+
+    expect(() => assertPublicProfile(leaked)).toThrow(GithubPrivacyError);
+  });
 });
 
 describe("snapshot", () => {
-  test("parses as a profile and holds no redacted term", () => {
-    expect(githubProfileSchema.safeParse(snapshot).success).toBe(true);
-    expect(JSON.stringify(snapshot)).not.toMatch(REDACTED);
-    expect(snapshot).not.toHaveProperty("identity.company");
+  test("parses as a profile and names no company repository", () => {
+    const parsed = githubProfileSchema.parse(snapshot);
+    const repositoryNames = [
+      ...parsed.pinned.map((repository) => repository.nameWithOwner),
+      ...parsed.activity.repositories,
+      ...parsed.timeline.flatMap((month) =>
+        month.events.flatMap((event) => {
+          if ("repositories" in event) {
+            return event.repositories.map((row) => row.repository);
+          }
+          return "repository" in event ? [event.repository] : [];
+        })
+      ),
+    ];
+
+    expect(repositoryNames.filter((name) => REDACTED.test(name))).toEqual([]);
+    expect(() => assertPublicProfile(parsed)).not.toThrow();
   });
 });

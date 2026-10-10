@@ -22,10 +22,9 @@ export const siteConfig = {
 
 export const primaryRoutes = [
   { href: "/", index: "00", label: "Home" },
-  { href: "/work", index: "01", label: "Work" },
+  { href: "/notes", index: "01", label: "Notes" },
   { href: "/lab", index: "02", label: "Lab" },
   { href: "/registry", index: "03", label: "Registry" },
-  { href: "/blog", index: "04", label: "Field notes" },
 ] as const;
 
 export type PrimaryRoute = (typeof primaryRoutes)[number];

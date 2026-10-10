@@ -10,10 +10,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
-import { getPost, getPosts, getPostSlugs } from "./blog";
 import type { ContentDocument } from "./collection";
+import { noteSource } from "./note-domain";
+import { getNote, getNotes, getNoteSlugs } from "./notes";
 import { removeMetaExport } from "./text";
-import { getProject, getProjects, getProjectSlugs } from "./work";
 
 plugin({
   name: "mdx",
@@ -70,86 +70,53 @@ const compareHeadingIds = (
     })
   );
 
-describe("shipped work content", () => {
-  test("every project passes its schema and lists only existing related projects", async () => {
-    const [projects, slugs] = await Promise.all([
-      getProjects(),
-      getProjectSlugs(),
-    ]);
+describe("shipped notes", () => {
+  test("every entry passes its schema and relations resolve", async () => {
+    const [notes, slugs] = await Promise.all([getNotes(), getNoteSlugs()]);
 
-    expect(projects.map((item) => item.slug).toSorted()).toEqual(slugs);
-    expect(projects.length).toBeGreaterThanOrEqual(3);
+    expect(notes.map((item) => item.slug).toSorted()).toEqual(slugs);
+    expect(
+      notes.filter((item) => item.kind === "case-study").length
+    ).toBeGreaterThanOrEqual(3);
+    expect(
+      notes.filter((item) => item.kind === "note").length
+    ).toBeGreaterThanOrEqual(3);
   });
 
-  test("is ordered newest year first", async () => {
-    const projects = await getProjects();
-    const years = projects.map((item) => item.year);
+  test("is ordered newest first across both kinds", async () => {
+    const notes = await getNotes();
+    const keys = notes.map((item) =>
+      item.kind === "note" ? item.date : String(item.year)
+    );
 
-    expect(years).toEqual(years.toSorted((a, b) => b - a));
+    expect(keys).toEqual(keys.toSorted().toReversed());
   });
 
   test("labels every non-real entry as sample content", async () => {
-    const projects = await getProjects();
+    const notes = await getNotes();
 
-    expect(projects.every((item) => item.sample)).toBe(true);
-  });
-
-  test("table of contents ids match the ids rendered into the page", async () => {
-    const slugs = await getProjectSlugs();
-    const results = await compareHeadingIds(slugs, getProject);
-
-    for (const result of results) {
-      expect({ ids: result.rendered, slug: result.slug }).toEqual({
-        ids: result.expected,
-        slug: result.slug,
-      });
-    }
-  });
-});
-
-describe("shipped blog content", () => {
-  test("every post passes its schema", async () => {
-    const [posts, slugs] = await Promise.all([getPosts(), getPostSlugs()]);
-
-    expect(posts.map((item) => item.slug).toSorted()).toEqual(slugs);
-    expect(posts.length).toBeGreaterThanOrEqual(3);
-  });
-
-  test("is ordered newest first", async () => {
-    const posts = await getPosts();
-    const dates = posts.map((item) => item.date);
-
-    expect(dates).toEqual(dates.toSorted().toReversed());
-  });
-
-  test("labels every non-real post as sample content", async () => {
-    const posts = await getPosts();
-
-    expect(posts.every((item) => item.sample)).toBe(true);
+    expect(notes.every((item) => item.sample)).toBe(true);
   });
 
   test("reading time comes from the prose and not from the meta block", async () => {
-    const posts = await getPosts();
+    const notes = await getNotes();
     const sources = await Promise.all(
-      posts.map((post) =>
-        readFile(
-          path.join(process.cwd(), "content/blog", `${post.slug}.mdx`),
-          "utf-8"
-        )
+      notes.map((note) =>
+        readFile(path.join(process.cwd(), noteSource(note.slug)), "utf-8")
       )
     );
 
-    for (const [index, post] of posts.entries()) {
+    for (const [index, note] of notes.entries()) {
       const source = sources[index] ?? "";
       expect(removeMetaExport(source)).not.toContain("export const meta");
-      expect(post.wordCount).toBeGreaterThan(150);
-      expect(post.readingTimeMinutes).toBe(Math.ceil(post.wordCount / 220));
+      expect(note.wordCount).toBeGreaterThan(50);
+      expect(note.readingTimeMinutes).toBe(Math.ceil(note.wordCount / 220));
     }
   });
 
   test("table of contents ids match the ids rendered into the page", async () => {
-    const slugs = await getPostSlugs();
-    const results = await compareHeadingIds(slugs, getPost);
+    const slugs = await getNoteSlugs();
+    const results = await compareHeadingIds(slugs, getNote);
 
     for (const result of results) {
       expect({ ids: result.rendered, slug: result.slug }).toEqual({

@@ -71,9 +71,16 @@ interface PortraitPlateProps {
   src: string;
   monogram: string;
   label: string;
+  size?: "full" | "compact";
 }
 
-export const PortraitPlate = ({ src, monogram, label }: PortraitPlateProps) => {
+export const PortraitPlate = ({
+  src,
+  monogram,
+  label,
+  size = "full",
+}: PortraitPlateProps) => {
+  const isCompact = size === "compact";
   const [scanned, setScanned] = useState(false);
   const [ready, setReady] = useState(false);
   const ditherRef = useRef<HTMLCanvasElement>(null);
@@ -114,14 +121,21 @@ export const PortraitPlate = ({ src, monogram, label }: PortraitPlateProps) => {
       <button
         aria-label={scanned ? "Show dithered portrait" : "Scan source portrait"}
         aria-pressed={scanned}
-        className="relative block w-full cursor-crosshair p-4 text-left"
+        className={cn(
+          "relative block w-full cursor-crosshair text-left",
+          isCompact ? "p-2" : "p-4"
+        )}
         onClick={() => setScanned((current) => !current)}
         type="button"
       >
         {registrationCorners.map((corner) => (
           <svg
             aria-hidden
-            className={cn("text-ink absolute size-4", corner)}
+            className={cn(
+              "text-ink absolute",
+              isCompact ? "size-3" : "size-4",
+              corner
+            )}
             fill="none"
             key={corner}
             stroke="currentColor"
@@ -155,7 +169,7 @@ export const PortraitPlate = ({ src, monogram, label }: PortraitPlateProps) => {
             alt=""
             className="ease-mechanical object-cover transition-[clip-path] duration-700 motion-reduce:transition-none"
             fill
-            sizes="(min-width: 1024px) 30vw, 100vw"
+            sizes={isCompact ? "160px" : "(min-width: 1024px) 30vw, 100vw"}
             src={src}
             style={{ clipPath: scanned ? "inset(0)" : "inset(0 0 100% 0)" }}
           />
@@ -168,12 +182,19 @@ export const PortraitPlate = ({ src, monogram, label }: PortraitPlateProps) => {
               Scan
             </span>
           </span>
-          <span className="label bg-paper text-ink absolute top-2 left-2 px-1.5 py-0.5">
-            {monogram}
-          </span>
+          {isCompact ? null : (
+            <span className="label bg-paper text-ink absolute top-2 left-2 px-1.5 py-0.5">
+              {monogram}
+            </span>
+          )}
         </span>
       </button>
-      <figcaption className="label text-mist flex items-baseline justify-between">
+      <figcaption
+        className={cn(
+          "label text-mist flex items-baseline justify-between",
+          isCompact && "sr-only"
+        )}
+      >
         <span className="sr-only">{label}</span>
         <span>
           PL-01 Portrait <span className="jp">肖像</span>

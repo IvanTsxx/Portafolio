@@ -6,6 +6,13 @@ import { codeTheme } from "./lib/content/code-theme";
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   reactCompiler: true,
+  redirects: () =>
+    Promise.resolve([
+      { destination: "/notes", permanent: true, source: "/work" },
+      { destination: "/notes/:slug", permanent: true, source: "/work/:slug" },
+      { destination: "/notes", permanent: true, source: "/blog" },
+      { destination: "/notes/:slug", permanent: true, source: "/blog/:slug" },
+    ]),
 };
 
 const withMDX = createMDX({

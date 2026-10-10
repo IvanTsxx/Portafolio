@@ -1,27 +1,49 @@
 import { describe, expect, test } from "bun:test";
 
-import { blogMetaSchema, slugPattern, workMetaSchema } from "./schema";
+import { caseStudyMetaSchema, noteMetaSchema, slugPattern } from "./schema";
 
 const validWork = {
   context: "Sample entry",
+  kind: "case-study",
   responsibilities: ["Motion tokens"],
   role: "Frontend engineer",
+  stack: ["Next.js"],
   summary: "A summary",
-  technologies: ["Next.js"],
   title: "Project",
   year: 2026,
 };
 
 const validPost = {
   date: "2026-10-09",
+  kind: "note",
   summary: "A summary",
   tags: ["Workflow"],
   title: "Post",
 };
 
-describe("workMetaSchema", () => {
+describe("note kinds", () => {
+  test("rejects an entry without a kind or with an unknown kind", () => {
+    const { kind: _kind, ...withoutKind } = validPost;
+
+    expect(noteMetaSchema.safeParse(withoutKind).success).toBe(false);
+    expect(
+      noteMetaSchema.safeParse({ ...validPost, kind: "essay" }).success
+    ).toBe(false);
+  });
+
+  test("rejects fields that belong to the other kind", () => {
+    expect(
+      noteMetaSchema.safeParse({ ...validPost, stack: ["GSAP"] }).success
+    ).toBe(false);
+    expect(
+      noteMetaSchema.safeParse({ ...validWork, date: "2026-10-09" }).success
+    ).toBe(false);
+  });
+});
+
+describe("case study meta", () => {
   test("applies defaults for optional collections and flags", () => {
-    const parsed = workMetaSchema.parse(validWork);
+    const parsed = caseStudyMetaSchema.parse(validWork);
     expect(parsed.featured).toBe(false);
     expect(parsed.sample).toBe(false);
     expect(parsed.related).toEqual([]);
@@ -30,43 +52,43 @@ describe("workMetaSchema", () => {
   });
 
   test("rejects unknown keys such as a hand-written slug", () => {
-    const result = workMetaSchema.safeParse({ ...validWork, slug: "project" });
+    const result = noteMetaSchema.safeParse({ ...validWork, slug: "project" });
     expect(result.success).toBe(false);
   });
 
   test("rejects a missing title", () => {
     const { title: _title, ...withoutTitle } = validWork;
-    expect(workMetaSchema.safeParse(withoutTitle).success).toBe(false);
+    expect(noteMetaSchema.safeParse(withoutTitle).success).toBe(false);
   });
 
-  test("rejects an empty technologies list and duplicate entries", () => {
+  test("rejects an empty stack list and duplicate entries", () => {
+    expect(noteMetaSchema.safeParse({ ...validWork, stack: [] }).success).toBe(
+      false
+    );
     expect(
-      workMetaSchema.safeParse({ ...validWork, technologies: [] }).success
-    ).toBe(false);
-    expect(
-      workMetaSchema.safeParse({
+      noteMetaSchema.safeParse({
         ...validWork,
-        technologies: ["GSAP", "GSAP"],
+        stack: ["GSAP", "GSAP"],
       }).success
     ).toBe(false);
   });
 
   test("rejects a year outside a sane range", () => {
-    expect(workMetaSchema.safeParse({ ...validWork, year: 1850 }).success).toBe(
+    expect(noteMetaSchema.safeParse({ ...validWork, year: 1850 }).success).toBe(
       false
     );
   });
 
   test("rejects a summary longer than 280 characters", () => {
     expect(
-      workMetaSchema.safeParse({ ...validWork, summary: "x".repeat(281) })
+      noteMetaSchema.safeParse({ ...validWork, summary: "x".repeat(281) })
         .success
     ).toBe(false);
   });
 
   test("rejects related entries that are not slugs", () => {
     expect(
-      workMetaSchema.safeParse({ ...validWork, related: ["Not A Slug"] })
+      noteMetaSchema.safeParse({ ...validWork, related: ["Not A Slug"] })
         .success
     ).toBe(false);
   });
@@ -76,16 +98,16 @@ describe("workMetaSchema", () => {
       alt: "Screenshot",
       height: 900,
       kind: "image",
-      src: "/work/example.png",
+      src: "/notes/example.png",
       width: 1600,
     };
-    const video = { ...image, kind: "video", poster: "/work/poster.png" };
+    const video = { ...image, kind: "video", poster: "/notes/poster.png" };
     expect(
-      workMetaSchema.safeParse({ ...validWork, previews: [image, video] })
+      noteMetaSchema.safeParse({ ...validWork, previews: [image, video] })
         .success
     ).toBe(true);
     expect(
-      workMetaSchema.safeParse({
+      noteMetaSchema.safeParse({
         ...validWork,
         previews: [{ ...image, kind: "audio" }],
       }).success
@@ -94,7 +116,7 @@ describe("workMetaSchema", () => {
 
   test("rejects links that are neither URLs nor root-relative paths", () => {
     expect(
-      workMetaSchema.safeParse({
+      noteMetaSchema.safeParse({
         ...validWork,
         links: [{ href: "example.com", label: "Site" }],
       }).success
@@ -102,22 +124,22 @@ describe("workMetaSchema", () => {
   });
 });
 
-describe("blogMetaSchema", () => {
+describe("note meta", () => {
   test("accepts a valid post and defaults sample to false", () => {
-    expect(blogMetaSchema.parse(validPost).sample).toBe(false);
+    expect(noteMetaSchema.parse(validPost).sample).toBe(false);
   });
 
   test("rejects a date that is not a calendar day", () => {
     expect(
-      blogMetaSchema.safeParse({ ...validPost, date: "2026-02-31" }).success
+      noteMetaSchema.safeParse({ ...validPost, date: "2026-02-31" }).success
     ).toBe(false);
     expect(
-      blogMetaSchema.safeParse({ ...validPost, date: "October 9" }).success
+      noteMetaSchema.safeParse({ ...validPost, date: "October 9" }).success
     ).toBe(false);
   });
 
   test("rejects a post without tags", () => {
-    expect(blogMetaSchema.safeParse({ ...validPost, tags: [] }).success).toBe(
+    expect(noteMetaSchema.safeParse({ ...validPost, tags: [] }).success).toBe(
       false
     );
   });

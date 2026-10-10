@@ -1,6 +1,10 @@
 import { StarIcon } from "@phosphor-icons/react/ssr";
 import { cva } from "class-variance-authority";
 
+import {
+  PanelCount,
+  DocumentSection,
+} from "@/components/site/document-section";
 import type {
   PinnedRepository,
   RepositoryVisibility,
@@ -8,7 +12,8 @@ import type {
 import { cn } from "@/lib/utils";
 
 import { LanguageSwatch } from "./language-swatch";
-import { PanelCount, SectionFrame } from "./section-frame";
+import { SpecimenCorners } from "./specimen-corners";
+import { specimenVariants } from "./specimen-variants";
 
 const PINNED_LIMIT = 6;
 
@@ -21,18 +26,11 @@ const visibilityLabels: Record<
   "public-template": { en: "Public template", jp: "公開雛形" },
 };
 
-const specimen = cva(
-  "group border-rule ease-mechanical pointer-fine:hover:bg-paper-deep/60 focus-visible:bg-paper-deep/60 relative flex h-full flex-col gap-4 border-r border-b p-4 transition-colors duration-100 md:p-5",
-  {
-    variants: {
-      visibility: {
-        private: "bg-paper-deep/40",
-        public: "",
-        "public-template": "hatch",
-      } satisfies Record<RepositoryVisibility, string>,
-    },
-  }
-);
+const surfaceByVisibility = {
+  private: "deep",
+  public: "plain",
+  "public-template": "hatch",
+} as const satisfies Record<RepositoryVisibility, string>;
 
 const visibilityBadge = cva("label border px-1.5 py-0.5", {
   variants: {
@@ -44,13 +42,6 @@ const visibilityBadge = cva("label border px-1.5 py-0.5", {
   },
 });
 
-const corners = [
-  "top-1.5 left-1.5 border-t border-l",
-  "top-1.5 right-1.5 border-t border-r",
-  "bottom-1.5 left-1.5 border-b border-l",
-  "right-1.5 bottom-1.5 border-r border-b",
-] as const;
-
 const RepositorySpecimen = ({
   id,
   repository,
@@ -61,21 +52,15 @@ const RepositorySpecimen = ({
   const visibility = visibilityLabels[repository.visibility];
   return (
     <a
-      className={specimen({ visibility: repository.visibility })}
+      className={specimenVariants({
+        interactive: true,
+        surface: surfaceByVisibility[repository.visibility],
+      })}
       href={`https://github.com/${repository.nameWithOwner}`}
       rel="noopener"
       target="_blank"
     >
-      {corners.map((corner) => (
-        <span
-          aria-hidden
-          className={cn(
-            "border-ink ease-mechanical absolute size-2 opacity-0 transition-opacity duration-100 group-hover:opacity-100 group-focus-visible:opacity-100",
-            corner
-          )}
-          key={corner}
-        />
-      ))}
+      <SpecimenCorners />
       <span className="label flex items-baseline justify-between gap-3">
         <span className="text-mist tabular-nums">{id}</span>
         <span
@@ -119,10 +104,11 @@ export const PinnedRepositories = ({
 }: {
   repositories: readonly PinnedRepository[];
 }) => (
-  <SectionFrame
+  <DocumentSection
     aside={<PanelCount current={repositories.length} total={PINNED_LIMIT} />}
     id="pinned"
-    index="GH-03"
+    index="GH-04"
+    waypoint={{ action: "read", role: "researcher", side: "left" }}
     jp="固定標本"
     label="Pinned specimens"
   >
@@ -136,5 +122,5 @@ export const PinnedRepositories = ({
         </li>
       ))}
     </ul>
-  </SectionFrame>
+  </DocumentSection>
 );

@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react/ssr";
 import type { ReactNode } from "react";
 
+import { DocumentSection } from "@/components/site/document-section";
 import type {
   RepositoryCount,
   TimelineEventOf,
@@ -21,7 +22,6 @@ import { cn } from "@/lib/utils";
 import { formatMonth, formatShortDay } from "./contributions";
 import { inkPatterns, profileLink } from "./ink";
 import { TickMark } from "./module";
-import { SectionFrame } from "./section-frame";
 import { TimelineDisclosure } from "./timeline-disclosure";
 
 interface KindDefinition<Kind extends TimelineKind> {
@@ -325,10 +325,10 @@ export const ActivityTimeline = ({
 }: {
   months: readonly TimelineMonth[];
 }) => (
-  <SectionFrame
-    className="relative"
+  <DocumentSection
     id="timeline"
-    index="GH-07"
+    index="GH-08"
+    waypoint={{ action: "check", role: "debugger", side: "right" }}
     jp="活動記録"
     label="Contribution activity"
   >
@@ -348,5 +348,5 @@ export const ActivityTimeline = ({
         initialCount={INITIAL_MONTHS}
       />
     )}
-  </SectionFrame>
+  </DocumentSection>
 );

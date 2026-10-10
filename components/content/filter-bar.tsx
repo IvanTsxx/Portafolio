@@ -3,29 +3,37 @@
 import { useId } from "react";
 
 import { chipClassName } from "@/components/site/styles";
-import type { FacetCount } from "@/lib/content/facets";
+
+export interface FilterFacet {
+  count: number;
+  label?: string;
+  name: string;
+}
+
+const pad = (value: number) => String(value).padStart(2, "0");
 
 export const FilterBar = ({
   active,
   facets,
+  jp,
   label,
   onChange,
-  shown,
   total,
 }: {
   active: string;
-  facets: readonly FacetCount[];
+  facets: readonly FilterFacet[];
+  jp?: string;
   label: string;
   onChange: (facet: string) => void;
-  shown: number;
   total: number;
 }) => {
   const labelId = useId();
 
   return (
-    <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
-      <p className="label text-mist shrink-0" id={labelId}>
+    <div className="flex flex-col gap-3">
+      <p className="label text-mist" id={labelId}>
         {label}
+        {jp ? <span className="jp ml-1">{jp}</span> : null}
       </p>
       <fieldset
         aria-labelledby={labelId}
@@ -38,7 +46,7 @@ export const FilterBar = ({
           type="button"
         >
           All
-          <span className="tabular-nums">{String(total).padStart(2, "0")}</span>
+          <span className="tabular-nums">{pad(total)}</span>
         </button>
         {facets.map((facet) => (
           <button
@@ -48,16 +56,11 @@ export const FilterBar = ({
             onClick={() => onChange(active === facet.name ? "" : facet.name)}
             type="button"
           >
-            {facet.name}
-            <span className="tabular-nums">
-              {String(facet.count).padStart(2, "0")}
-            </span>
+            {facet.label ?? facet.name}
+            <span className="tabular-nums">{pad(facet.count)}</span>
           </button>
         ))}
       </fieldset>
-      <p aria-live="polite" className="sr-only">
-        Showing {shown} of {total}
-      </p>
     </div>
   );
 };
