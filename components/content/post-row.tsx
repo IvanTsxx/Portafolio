@@ -4,8 +4,6 @@ import type { VariantProps } from "class-variance-authority";
 import Link from "next/link";
 
 import { SampleBadge } from "@/components/content/sample-badge";
-import { AgentSpot } from "@/components/scene/agent-spot";
-import { agentSpots } from "@/components/site/agent-spots";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { hoverRowClassName } from "@/components/site/styles";
 import type { PostIndexItem } from "@/lib/content/blog";
@@ -25,10 +23,8 @@ const postTitleVariants = cva("display text-ink text-balance", {
 export const PostRow = ({
   density,
   post,
-  spot = false,
 }: {
   post: PostIndexItem;
-  spot?: boolean;
 } & VariantProps<typeof postTitleVariants>) => (
   <li
     className={cn(
@@ -37,7 +33,6 @@ export const PostRow = ({
     )}
   >
     <CornerMarks reveal="hover" />
-    {spot ? <AgentSpot {...agentSpots.researcherRow} /> : null}
     <div className="grid gap-x-4 gap-y-4 p-4 md:p-5 lg:grid-cols-12">
       <div className="label text-mist flex flex-wrap items-center gap-x-4 gap-y-1 lg:col-span-2 lg:flex-col lg:items-start">
         <time className="tabular-nums" dateTime={post.date}>

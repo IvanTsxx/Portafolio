@@ -1,13 +1,11 @@
 import type { CSSProperties } from "react";
 
-import { AgentSpot } from "@/components/scene/agent-spot";
 import type {
   ActivityKind,
   ActivityOverview as ActivityOverviewData,
 } from "@/lib/github/model";
 import { cn } from "@/lib/utils";
 
-import { profileAgentSpots } from "./agent-spots";
 import { inkPatterns, profileLink } from "./ink";
 import { Module } from "./module";
 import { SectionFrame } from "./section-frame";
@@ -282,7 +280,6 @@ export const ActivityOverview = ({
             </dl>
           </div>
         </Module>
-        <AgentSpot {...profileAgentSpots.activityOverview} />
       </div>
     </SectionFrame>
   );

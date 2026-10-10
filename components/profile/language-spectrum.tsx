@@ -1,7 +1,5 @@
-import { AgentSpot } from "@/components/scene/agent-spot";
 import type { PinnedRepository } from "@/lib/github/model";
 
-import { profileAgentSpots } from "./agent-spots";
 import { LanguageSwatch } from "./language-swatch";
 import { languageMark } from "./languages";
 import { SectionFrame } from "./section-frame";
@@ -45,7 +43,6 @@ export const LanguageSpectrum = ({
             />
           ))}
         </div>
-        <AgentSpot {...profileAgentSpots.languageSpectrum} />
       </div>
       <table className="label w-full border-collapse tabular-nums">
         <caption className="sr-only">

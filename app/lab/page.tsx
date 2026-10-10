@@ -6,8 +6,6 @@ import { LabArchive, LabArchiveFallback } from "@/components/lab/lab-archive";
 import { PageHeader } from "@/components/site/page-header";
 import { activeTopics, experiments } from "@/lib/lab/experiments";
 
-const agentSpotLimit = 2;
-
 export const metadata: Metadata = {
   description: "Experiments in shaders, motion, typography, CSS and 3D.",
   title: "Lab",
@@ -15,10 +13,8 @@ export const metadata: Metadata = {
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
-const items = experiments.map((experiment, position) => ({
-  card: (
-    <ExperimentCard experiment={experiment} spot={position < agentSpotLimit} />
-  ),
+const items = experiments.map((experiment) => ({
+  card: <ExperimentCard experiment={experiment} />,
   slug: experiment.slug,
   topics: experiment.topics,
 }));

@@ -7,8 +7,6 @@ import { PanelHeading } from "@/components/site/panel-heading";
 import type { FacetCount } from "@/lib/content/facets";
 import type { WorkIndexItem } from "@/lib/content/work";
 
-const agentSpotLimit = 2;
-
 const pad = (value: number) => String(value).padStart(2, "0");
 
 export const WorkArchive = ({
@@ -69,7 +67,6 @@ export const WorkArchive = ({
               index={pad(position + 1)}
               key={project.slug}
               project={project}
-              spot={position < agentSpotLimit}
             />
           );
         })}

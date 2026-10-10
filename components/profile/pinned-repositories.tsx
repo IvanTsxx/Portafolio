@@ -1,14 +1,12 @@
 import { StarIcon } from "@phosphor-icons/react/ssr";
 import { cva } from "class-variance-authority";
 
-import { AgentSpot } from "@/components/scene/agent-spot";
 import type {
   PinnedRepository,
   RepositoryVisibility,
 } from "@/lib/github/model";
 import { cn } from "@/lib/utils";
 
-import { profileAgentSpots } from "./agent-spots";
 import { LanguageSwatch } from "./language-swatch";
 import { PanelCount, SectionFrame } from "./section-frame";
 
@@ -135,7 +133,6 @@ export const PinnedRepositories = ({
             id={`P-${String(index + 1).padStart(2, "0")}`}
             repository={repository}
           />
-          {index === 0 && <AgentSpot {...profileAgentSpots.pinned} />}
         </li>
       ))}
     </ul>

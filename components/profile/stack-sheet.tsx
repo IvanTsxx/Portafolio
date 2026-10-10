@@ -1,7 +1,5 @@
-import { AgentSpot } from "@/components/scene/agent-spot";
 import { practiceNotes, stack } from "@/lib/site/practice";
 
-import { profileAgentSpots } from "./agent-spots";
 import { TickMark } from "./module";
 import { PanelCount, SectionFrame } from "./section-frame";
 
@@ -31,7 +29,6 @@ export const StackSheet = () => (
           </li>
         ))}
       </ul>
-      <AgentSpot {...profileAgentSpots.stack} />
     </div>
     {practiceNotes.map((note) => (
       <p

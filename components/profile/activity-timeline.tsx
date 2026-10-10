@@ -10,7 +10,6 @@ import {
 } from "@phosphor-icons/react/ssr";
 import type { ReactNode } from "react";
 
-import { AgentSpot } from "@/components/scene/agent-spot";
 import type {
   RepositoryCount,
   TimelineEventOf,
@@ -19,7 +18,6 @@ import type {
 } from "@/lib/github/model";
 import { cn } from "@/lib/utils";
 
-import { profileAgentSpots } from "./agent-spots";
 import { formatMonth, formatShortDay } from "./contributions";
 import { inkPatterns, profileLink } from "./ink";
 import { TickMark } from "./module";
@@ -334,7 +332,6 @@ export const ActivityTimeline = ({
     jp="活動記録"
     label="Contribution activity"
   >
-    <AgentSpot {...profileAgentSpots.timeline} />
     {months.length === 0 ? (
       <p className="label text-mist">
         No recorded activity <span className="jp">記録なし</span>

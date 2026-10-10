@@ -1,10 +1,8 @@
 import { AgentScene } from "@/components/scene/agent-scene";
-import { AgentSpot } from "@/components/scene/agent-spot";
 import type { AgentSceneId } from "@/lib/agents/scenes";
 import { aiPractice } from "@/lib/site/practice";
 import { cn } from "@/lib/utils";
 
-import { profileAgentSpots } from "./agent-spots";
 import { TickMark } from "./module";
 import { PanelCount, SectionFrame } from "./section-frame";
 
@@ -100,7 +98,6 @@ const PracticeCell = ({ id, span }: { id: PracticeId; span: string }) => {
       >
         {entry.jp}
       </span>
-      {id === "conductor" && <AgentSpot {...profileAgentSpots.aiPractice} />}
     </li>
   );
 };

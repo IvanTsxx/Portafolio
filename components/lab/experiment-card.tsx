@@ -1,20 +1,12 @@
 import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
-import { AgentSpot } from "@/components/scene/agent-spot";
-import { agentSpots } from "@/components/site/agent-spots";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { focusRingClassName } from "@/components/site/styles";
 import type { Experiment } from "@/lib/lab/experiments";
 import { cn } from "@/lib/utils";
 
-export const ExperimentCard = ({
-  experiment,
-  spot = false,
-}: {
-  experiment: Experiment;
-  spot?: boolean;
-}) => {
+export const ExperimentCard = ({ experiment }: { experiment: Experiment }) => {
   const { Poster } = experiment;
   return (
     <Link
@@ -25,7 +17,6 @@ export const ExperimentCard = ({
       href={`/lab/${experiment.slug}`}
     >
       <CornerMarks reveal="hover" />
-      {spot ? <AgentSpot {...agentSpots.debuggerCard} /> : null}
       <div className="border-graphite/30 bg-popover relative aspect-video overflow-hidden border-b lg:aspect-auto lg:min-h-0 lg:flex-1">
         <div className="ease-out-expo size-full transition-transform duration-500 pointer-fine:group-hover/marks:scale-103">
           <Poster />

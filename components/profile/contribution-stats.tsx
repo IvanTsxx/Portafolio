@@ -1,7 +1,5 @@
-import { AgentSpot } from "@/components/scene/agent-spot";
 import type { ContributionCalendar } from "@/lib/github/model";
 
-import { profileAgentSpots } from "./agent-spots";
 import { contributionStats, formatShortDay } from "./contributions";
 import type { ContributionStreak } from "./contributions";
 import { Module } from "./module";
@@ -71,7 +69,6 @@ export const ContributionStatsReadout = ({
           value={pad(stats.activeDays)}
         />
       </Module>
-      <AgentSpot {...profileAgentSpots.contributionStats} />
     </div>
   );
 };

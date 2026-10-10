@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useId, useState } from "react";
 import type { ReactNode } from "react";
 
-import { AgentSpot } from "@/components/scene/agent-spot";
-import { agentSpots } from "@/components/site/agent-spots";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { PanelHeading } from "@/components/site/panel-heading";
 import { chipClassName, hoverRowClassName } from "@/components/site/styles";
@@ -37,8 +35,6 @@ export interface RegistryFilterCategory {
 
 const allCategoriesId = "all";
 
-const agentSpotLimit = 2;
-
 const pad = (value: number) => String(value).padStart(2, "0");
 
 const matchesQuery = (entry: RegistryEntry, query: string) => {
@@ -54,13 +50,7 @@ const matchesQuery = (entry: RegistryEntry, query: string) => {
   return terms.every((term) => haystack.includes(term));
 };
 
-const RegistryCard = ({
-  entry,
-  spot,
-}: {
-  entry: RegistryEntry;
-  spot: boolean;
-}) => (
+const RegistryCard = ({ entry }: { entry: RegistryEntry }) => (
   <li
     className={cn(
       "group/marks border-graphite/30 relative flex flex-col border-r border-b",
@@ -68,7 +58,6 @@ const RegistryCard = ({
     )}
   >
     <CornerMarks reveal="hover" />
-    {spot ? <AgentSpot {...agentSpots.builderCard} /> : null}
     <div
       aria-hidden="true"
       className="border-graphite/30 bg-popover blueprint-dots relative aspect-4/3 overflow-hidden border-b [--clay:var(--clay-deep)] [--grid-size:16px]"
@@ -188,11 +177,7 @@ export const RegistryBrowser = ({
       {visibleEntries.length > 0 ? (
         <ul className="border-graphite/30 mt-4 grid border-t border-l sm:grid-cols-2 xl:grid-cols-3">
           {visibleEntries.map((entry) => (
-            <RegistryCard
-              entry={entry}
-              key={entry.name}
-              spot={entries.indexOf(entry) < agentSpotLimit}
-            />
+            <RegistryCard entry={entry} key={entry.name} />
           ))}
         </ul>
       ) : (

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import type { KeyboardEvent } from "react";
 
-import { AgentSpot } from "@/components/scene/agent-spot";
 import { contributionLevels } from "@/lib/github/model";
 import type {
   ContributionCalendar,
@@ -11,7 +10,6 @@ import type {
 } from "@/lib/github/model";
 import { cn } from "@/lib/utils";
 
-import { profileAgentSpots } from "./agent-spots";
 import { ContributionStatsReadout } from "./contribution-stats";
 import {
   calendarCaption,
@@ -286,7 +284,6 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
             />
           </svg>
         </div>
-        <AgentSpot {...profileAgentSpots.contributionMatrix} />
       </div>
 
       <div className="label text-mist flex flex-wrap items-center justify-between gap-4">

@@ -2,8 +2,6 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 import { SampleBadge } from "@/components/content/sample-badge";
-import { AgentSpot } from "@/components/scene/agent-spot";
-import { agentSpots } from "@/components/site/agent-spots";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { hoverRowClassName } from "@/components/site/styles";
 import type { WorkIndexItem } from "@/lib/content/work";
@@ -14,11 +12,9 @@ const visibleTechnologyCount = 3;
 export const WorkRow = ({
   index,
   project,
-  spot = false,
 }: {
   index: string;
   project: WorkIndexItem;
-  spot?: boolean;
 }) => {
   const hiddenTechnologyCount = Math.max(
     0,
@@ -33,7 +29,6 @@ export const WorkRow = ({
       )}
     >
       <CornerMarks reveal="hover" />
-      {spot ? <AgentSpot {...agentSpots.architectRow} /> : null}
       <div className="grid gap-x-4 gap-y-3 p-4 md:p-5 lg:grid-cols-12 lg:items-baseline">
         <div className="label text-mist flex gap-4 tabular-nums lg:contents">
           <span className="lg:col-span-1">{index}</span>

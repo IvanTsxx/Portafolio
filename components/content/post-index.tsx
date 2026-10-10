@@ -7,8 +7,6 @@ import { PanelHeading } from "@/components/site/panel-heading";
 import type { PostIndexItem } from "@/lib/content/blog";
 import type { FacetCount } from "@/lib/content/facets";
 
-const agentSpotLimit = 2;
-
 const pad = (value: number) => String(value).padStart(2, "0");
 
 export const PostIndex = ({
@@ -50,11 +48,7 @@ export const PostIndex = ({
       </div>
       <ul className="border-rule border-t">
         {visiblePosts.map((post) => (
-          <PostRow
-            key={post.slug}
-            post={post}
-            spot={posts.indexOf(post) < agentSpotLimit}
-          />
+          <PostRow key={post.slug} post={post} />
         ))}
       </ul>
     </section>
