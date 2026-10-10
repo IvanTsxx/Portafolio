@@ -3,6 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { agentActions, agentProfiles, agentRoles } from "@/lib/agents/roles";
+import * as registryOutfit from "@/registry/ivan/components/agent/outfit";
 import * as registryTypes from "@/registry/ivan/components/agent/types";
 
 import {
@@ -89,14 +90,8 @@ describe("agent registry copy", () => {
     }
   });
 
-  test("registers one accessory kit per role", async () => {
-    const registrySource = await readProjectFile(
-      toRegistryAgentPath("accessories/registry.ts")
-    );
-    const registeredRoles = [
-      ...registrySource.matchAll(/^ {2}[a-z]+: \{$/gmu),
-    ].map(([line]) => line.trim().slice(0, -3));
-    expect(registeredRoles.toSorted()).toEqual(
+  test("dresses every role with a preset outfit", () => {
+    expect(Object.keys(registryOutfit.rolePresets).toSorted()).toEqual(
       [...registryTypes.agentRoles].toSorted()
     );
   });

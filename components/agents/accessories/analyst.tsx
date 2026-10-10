@@ -122,7 +122,6 @@ export const WhiteSleeve = () => <Sleeve material="knitWhite" />;
 
 export const Pointer = () => (
   <group>
-    <WhiteSleeve />
     <Rod
       from={[handReach, 0, 0.12]}
       material="ink"

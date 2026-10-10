@@ -746,7 +746,7 @@
       "name": "agent",
       "type": "registry:component",
       "title": "Agent",
-      "description": "Procedural 3D mascot for React Three Fiber. Seven roles with their own gear, twelve typed actions, held props and reduced motion.",
+      "description": "Procedural 3D mascot for React Three Fiber. Seven role presets, mixable outfit pieces, twelve typed actions, held props and reduced motion.",
       "categories": ["characters", "three"],
       "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
       "devDependencies": ["@types/three@^0.186.0"],
@@ -762,6 +762,16 @@
           "path": "registry/ivan/components/agent/types.ts",
           "type": "registry:lib",
           "target": "@components/agent/types.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/outfit.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/outfit.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/outfit-motion.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/outfit-motion.tsx"
         },
         {
           "path": "registry/ivan/components/agent/rig.ts",
@@ -859,6 +869,11 @@
           "target": "@components/agent/accessories/analyst.tsx"
         },
         {
+          "path": "registry/ivan/components/agent/accessories/knitwear.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/knitwear.tsx"
+        },
+        {
           "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
           "type": "registry:hook",
           "target": "@hooks/use-prefers-reduced-motion.ts"
@@ -875,7 +890,19 @@
                   "name": "role",
                   "type": "\"orchestrator\" | \"architect\" | \"researcher\" | \"builder\" | \"debugger\" | \"inspector\" | \"analyst\"",
                   "required": true,
-                  "description": "Which accessory kit the mascot wears. The rig, clips and materials are shared."
+                  "description": "Which preset outfit the mascot wears, from rolePresets in outfit.ts. The rig, clips and materials are shared."
+                },
+                {
+                  "name": "outfit",
+                  "type": "Outfit",
+                  "default": "rolePresets[role]",
+                  "description": "Mix pieces across roles: { head, face, torso, held, offhand }, each a piece id from outfitPieceIds or \"none\". Overrides the role preset. Held props keep their per-action poses."
+                },
+                {
+                  "name": "animateOutfit",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "When the outfit changes, the agent hops with a small squash and each new piece drops into place. Off under reduced motion."
                 },
                 {
                   "name": "action",
@@ -909,38 +936,38 @@
               ]
             },
             {
-              "component": "AccessoryKit",
-              "description": "One kit per role in accessories/registry.ts. To add a role, extend agentRoles in types.ts, write one accessory module and register its kit. The Record type fails the build until the kit exists.",
+              "component": "Outfit",
+              "description": "Typed outfit in outfit.ts: one piece id per slot. Each piece in accessories/registry.ts is an AccessoryKit that attaches meshes to anchors (head, face, torso, body, rightArm, leftArm), so a coat can bring its sleeves. The mapped types fail the build until every piece id has meshes.",
               "props": [
                 {
                   "name": "head",
-                  "type": "ComponentType",
-                  "description": "Hats and helmets. Anchored on top of the body."
+                  "type": "\"none\" | \"yellow-hard-hat\" | \"white-hard-hat\" | \"safety-helmet\" | \"deerstalker\" | \"mortarboard\" | \"headset\" | \"goggles\"",
+                  "required": true,
+                  "description": "Hats and helmets on top of the body."
                 },
                 {
                   "name": "face",
-                  "type": "ComponentType",
-                  "description": "Glasses and shades. Anchored on the eye line."
+                  "type": "\"none\" | \"round-glasses\" | \"pixel-shades\" | \"teal-visor\"",
+                  "required": true,
+                  "description": "Glasses and shades on the eye line."
                 },
                 {
                   "name": "torso",
-                  "type": "ComponentType",
-                  "description": "Props held against the front, such as a laptop or a book."
+                  "type": "\"none\" | \"safety-vest\" | \"tweed-vest\" | \"lab-coat\" | \"plaid-coat\" | \"knit-sweater\"",
+                  "required": true,
+                  "description": "Coats and vests. Coats and the sweater add sleeves to both arms."
                 },
                 {
-                  "name": "body",
-                  "type": "ComponentType",
-                  "description": "Coats and vests that wrap the body."
+                  "name": "held",
+                  "type": "\"none\" | \"laptop\" | \"book\" | \"magnifier\" | \"tape-measure\" | \"pointer\" | \"pencil\"",
+                  "required": true,
+                  "description": "Main prop: in the right hand, or in front of the body for the laptop and book."
                 },
                 {
-                  "name": "rightArm",
-                  "type": "ComponentType",
-                  "description": "Held props. Use useHeldPose to re-aim them per action."
-                },
-                {
-                  "name": "leftArm",
-                  "type": "ComponentType",
-                  "description": "Mirrored arm. Write it like the right arm with +x pointing outward."
+                  "name": "offhand",
+                  "type": "\"none\" | \"clipboard\" | \"blueprint-roll\" | \"tablet\"",
+                  "required": true,
+                  "description": "Prop in the mirrored left hand."
                 }
               ]
             }
@@ -958,7 +985,7 @@
                 "inspector",
                 "analyst"
               ],
-              "description": "Selects the accessory kit: headgear, coat, glasses and the props in each hand."
+              "description": "Selects the preset outfit: headgear, coat, glasses and the props in each hand. Pass outfit to mix pieces."
             },
             {
               "name": "action",
@@ -996,6 +1023,11 @@
               "title": "Switch actions without re-rendering",
               "description": "Write to actionRef from event handlers. The rig reads it every frame and crossfades.",
               "file": "registry/ivan/examples/agent/action-ref.tsx"
+            },
+            {
+              "title": "Mix an outfit",
+              "description": "Spread a role preset and swap single pieces. animateOutfit hops the agent and drops each new piece in.",
+              "file": "registry/ivan/examples/agent/outfit.tsx"
             }
           ],
           "accessibility": [
@@ -1025,6 +1057,13 @@
               "timing": "Exponential settle at rate 9.",
               "trigger": "Action changes",
               "reducedMotion": "Snap to the pose."
+            },
+            {
+              "target": "Outfit change",
+              "properties": "Agent hop and squash, new piece position and scale",
+              "timing": "0.34 second hop. Each new piece falls 0.5 units over 0.46 seconds with an ease-out-back overshoot.",
+              "trigger": "outfit changes while animateOutfit is set",
+              "reducedMotion": "Pieces swap in place with no hop."
             }
           ]
         }

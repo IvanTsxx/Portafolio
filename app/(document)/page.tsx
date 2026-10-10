@@ -1,5 +1,6 @@
 import { ActivityOverview } from "@/components/profile/activity-overview";
 import { ActivityTimeline } from "@/components/profile/activity-timeline";
+import { AgentWorkshop } from "@/components/profile/agent-workshop";
 import { ContactRow } from "@/components/profile/contact-row";
 import { ContributionMatrix } from "@/components/profile/contribution-matrix";
 import { ExperienceLedger } from "@/components/profile/experience-ledger";
@@ -29,6 +30,7 @@ const HomePage = async () => {
       <ActivityOverview activity={profile.activity} />
       <ActivityTimeline months={profile.timeline} />
       <HowIWork />
+      <AgentWorkshop />
       <StackSheet />
       <ContactRow />
     </>
