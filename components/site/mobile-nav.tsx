@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { NavLinks } from "@/components/site/nav-links";
 import { PanelHeading } from "@/components/site/panel-heading";
+import { SocialLinks } from "@/components/site/social-links";
 import { technicalButtonVariants } from "@/components/site/styles";
 import {
   Sheet,
@@ -14,7 +15,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { siteConfig } from "@/lib/site/config";
 import { cn } from "@/lib/utils";
 
 export const MobileNav = () => {
@@ -56,12 +56,7 @@ export const MobileNav = () => {
         </nav>
         <div className="mt-auto flex flex-col gap-4 p-4">
           <span aria-hidden className="hazard-stripe text-ink block h-1.5" />
-          <a
-            className={cn(technicalButtonVariants(), "normal-case")}
-            href={`mailto:${siteConfig.email}`}
-          >
-            {siteConfig.email}
-          </a>
+          <SocialLinks variant="inline" />
         </div>
       </SheetContent>
     </Sheet>

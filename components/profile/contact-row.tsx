@@ -1,5 +1,4 @@
-import { ArrowUpRightIcon } from "@phosphor-icons/react/ssr";
-
+import { SocialLinks } from "@/components/site/social-links";
 import { siteConfig } from "@/lib/site/config";
 
 export const ContactRow = () => (
@@ -21,21 +20,7 @@ export const ContactRow = () => (
           {siteConfig.email}
         </a>
       </div>
-      <ul className="flex flex-wrap gap-2">
-        {siteConfig.socials.map((social) => (
-          <li key={social.href}>
-            <a
-              className="label border-rule-strong text-ink ease-mechanical pointer-fine:hover:border-ink pointer-fine:hover:bg-ink pointer-fine:hover:text-paper flex h-11 items-center gap-2 border px-4 transition-colors duration-100"
-              href={social.href}
-              rel="noopener"
-              target="_blank"
-            >
-              {social.label}
-              <ArrowUpRightIcon aria-hidden className="size-3" />
-            </a>
-          </li>
-        ))}
-      </ul>
+      <SocialLinks ids={["github", "x", "linkedin"]} variant="contact" />
     </div>
   </section>
 );
