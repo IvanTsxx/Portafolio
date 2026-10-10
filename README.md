@@ -40,7 +40,7 @@ bun run build           # shadcn build (public/r) + next build
 
 ## Adding content
 
-- **Project.** Add `content/work/<slug>.mdx` starting with `export const meta = { ... }`. The schema is `workMetaSchema` in `lib/content/schema.ts`; the filename is the slug. Set `sample: false` when it is real so it gets indexed and loses the sample label. `featured: true` puts it first on the home page.
+- **Project.** Add `content/work/<slug>.mdx` starting with `export const meta = { ... }`. The schema is `workMetaSchema` in `lib/content/schema.ts`; the filename is the slug. Set `sample: false` when it is real so it gets indexed and loses the sample label.
 - **Post.** Add `content/blog/<slug>.mdx` with `meta` matching `blogMetaSchema`. MDX blocks (`Callout`, `Figure`, `Video`, `Table`, `Diagram`, `Demo`, `Steps`, `NoteList`) are available without imports. Write text-only children of JSX blocks as `{"text"}` so the formatter cannot split them into paragraphs.
 - **Experiment.** Add a folder in `components/lab/experiments/<slug>/` with `poster.tsx`, `preview.tsx` and, for client experiments, a `live.tsx` that dynamic-imports the preview. Then add one entry in `lib/lab/experiments.ts` and its slug to `ExperimentSlug`.
 - **Registry item.** Add the item to `registry.json`, the source under `registry/ivan/`, an example in `registry/ivan/examples/<name>/` and a demo in `components/registry-docs/demos/<name>.tsx`. `bun test` fails if a piece is missing or if the item depends on a site-only token it does not ship.
