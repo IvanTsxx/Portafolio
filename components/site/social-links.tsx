@@ -25,10 +25,10 @@ const socialListVariants = cva("", {
   defaultVariants: { variant: "inline" },
   variants: {
     variant: {
-      contact: "flex flex-wrap gap-2",
+      contact: "flex flex-wrap gap-x-8 gap-y-2",
       dossier: "border-rule flex flex-col border-t",
       footer: "grid grid-cols-2 gap-x-6",
-      inline: "flex flex-wrap gap-2",
+      inline: "flex flex-wrap gap-x-6 gap-y-2",
     },
   },
 });
@@ -40,31 +40,27 @@ const socialLinkVariants = cva(
     variants: {
       variant: {
         contact:
-          "border-rule-strong pointer-fine:hover:border-ink pointer-fine:hover:bg-ink pointer-fine:hover:text-paper h-11 border pr-4 pl-1.5",
+          "border-rule-strong pointer-fine:hover:border-ink h-11 gap-2 border-b",
         dossier:
           "border-rule pointer-fine:hover:bg-paper-deep/60 min-h-11 border-b py-1.5",
         footer: "min-h-11 py-1 md:min-h-9",
         inline:
-          "border-rule-strong pointer-fine:hover:border-ink min-h-11 border pr-3 pl-1.5",
+          "border-rule-strong pointer-fine:hover:border-ink min-h-11 gap-2 border-b",
       },
     },
   }
 );
 
 const iconFrameVariants = cva(
-  "border-rule-strong ease-mechanical grid shrink-0 place-items-center border transition-colors duration-100",
+  "text-graphite pointer-fine:group-hover/social:text-ink ease-mechanical grid shrink-0 place-items-center transition-colors duration-100",
   {
     defaultVariants: { variant: "inline" },
     variants: {
       variant: {
-        contact:
-          "pointer-fine:group-hover/social:border-paper/60 group-focus-visible/social:border-ink size-8",
-        dossier:
-          "pointer-fine:group-hover/social:border-ink pointer-fine:group-hover/social:bg-ink pointer-fine:group-hover/social:text-paper size-8",
-        footer:
-          "pointer-fine:group-hover/social:border-ink pointer-fine:group-hover/social:bg-ink pointer-fine:group-hover/social:text-paper size-7",
-        inline:
-          "pointer-fine:group-hover/social:border-ink pointer-fine:group-hover/social:bg-ink pointer-fine:group-hover/social:text-paper size-8",
+        contact: "size-5",
+        dossier: "size-8",
+        footer: "size-5",
+        inline: "size-5",
       },
     },
   }

@@ -125,7 +125,7 @@ describe("documented values match the source", () => {
     const sources = await Promise.all(
       [
         "components/profile/portrait-plate.tsx",
-        "components/profile/ai-practice.tsx",
+        "components/profile/how-i-work.tsx",
         "components/lab/experiment-card.tsx",
         "components/content/note-row.tsx",
         "components/site/styles.ts",

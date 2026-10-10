@@ -62,6 +62,15 @@
   --text-label--line-height: 1rem;
   --text-label--letter-spacing: 0.08em;
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --animate-step-progress: step-progress 8s linear forwards;
+  @keyframes step-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }

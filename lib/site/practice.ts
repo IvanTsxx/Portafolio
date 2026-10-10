@@ -1,42 +1,46 @@
-export const aiPractice = [
+import type { AgentSceneId } from "@/lib/agents/scenes";
+
+export const workSteps = [
   {
-    id: "conductor",
+    id: "orchestrate",
     jp: "指揮",
+    scene: "feature",
     summary:
-      "Conductor workspaces on isolated git worktrees, one per Linear issue.",
-    title: "Conductor + worktrees",
+      "Each Linear issue gets a Conductor workspace on its own git worktree. Agents take the tasks, subagents only when the task needs them.",
+    title: "Orchestrate",
   },
   {
-    id: "agents",
-    jp: "代理",
-    summary: "Agents per task, subagents only when the task needs them.",
-    title: "Agents & subagents",
-  },
-  {
-    id: "skills",
-    jp: "技能",
-    summary: "Reusable skills, and new ones when a workflow repeats.",
-    title: "Skills",
-  },
-  {
-    id: "mcp",
-    jp: "接続",
-    summary: "MCP servers to reach tools, and custom ones when needed.",
-    title: "MCPs",
+    id: "research",
+    jp: "探索",
+    scene: "code-search",
+    summary:
+      "Agents read the code and the docs through reusable skills and MCP servers. New skills and MCPs when a workflow repeats.",
+    title: "Research",
   },
   {
     id: "design-to-code",
     jp: "設計",
-    summary: "Designs to code, animated and fully responsive.",
+    scene: "figma-to-code",
+    summary: "Designs become code, animated and fully responsive.",
     title: "Design to code",
   },
   {
-    id: "judgment",
+    id: "review",
     jp: "判断",
-    summary: "The criteria to guide agents and own every decision.",
-    title: "Judgment",
+    scene: "debugging",
+    summary:
+      "I set the criteria, review every change and own the decision before it merges.",
+    title: "Review",
   },
-] as const;
+] as const satisfies readonly {
+  id: string;
+  jp: string;
+  scene: AgentSceneId;
+  summary: string;
+  title: string;
+}[];
+
+export type WorkStep = (typeof workSteps)[number];
 
 export const stack = [
   { code: "NX", jp: "枠組", name: "Next.js" },
