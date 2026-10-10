@@ -1,6 +1,7 @@
 "use client";
 
 import { cylinder, roundedBox, sphere, torus } from "../geometry";
+import { useHeldPose } from "../held-pose";
 import { Part } from "../part";
 import { bodySize, handReach } from "../rig";
 import { BodyShell, Rod, Sleeve } from "./shapes";
@@ -90,32 +91,49 @@ export const PlaidCoat = () => (
 
 export const PlaidSleeve = () => <Sleeve material="plaid" />;
 
-export const MagnifyingGlass = () => (
-  <group>
-    <PlaidSleeve />
-    <group position={[handReach, -0.03, 0.12]} rotation={[0, -0.35, 0]}>
-      <Rod
-        from={[0, 0, 0]}
-        material="leather"
-        radius={0.026}
-        to={[0.24, 0.04, 0]}
-      />
-      <Part
-        geometry={cylinder(16)}
-        material="brass"
-        position={[0.26, 0.045, 0]}
-        rotation={[0, 0, Math.PI / 2 - 0.16]}
-        scale={[0.032, 0.05, 0.032]}
-      />
-      <group position={[0.44, 0.075, 0]} rotation={[0, 1.05, 0]}>
-        <Part geometry={torus(0.14)} material="brass" scale={0.17} />
-        <Part
-          geometry={cylinder(32)}
-          material="glass"
-          rotation={[Math.PI / 2, 0, 0]}
-          scale={[0.165, 0.01, 0.165]}
+const magnifierRest = {
+  position: [handReach, -0.03, 0.12],
+  rotation: [0, -0.35, 0],
+} as const;
+
+const magnifierPoses = {
+  inspect: {
+    facing: -1.05,
+    position: [handReach, 0.02, 0.1],
+    rotation: [0, 0, 0.15],
+  },
+  point: { position: [handReach, -0.02, 0.12], rotation: [0, -0.6, 0.1] },
+} as const;
+
+export const MagnifyingGlass = () => {
+  const held = useHeldPose(magnifierRest, magnifierPoses);
+  return (
+    <group>
+      <PlaidSleeve />
+      <group {...held}>
+        <Rod
+          from={[0, 0, 0]}
+          material="leather"
+          radius={0.026}
+          to={[0.24, 0.04, 0]}
         />
+        <Part
+          geometry={cylinder(16)}
+          material="brass"
+          position={[0.26, 0.045, 0]}
+          rotation={[0, 0, Math.PI / 2 - 0.16]}
+          scale={[0.032, 0.05, 0.032]}
+        />
+        <group position={[0.44, 0.075, 0]} rotation={[0, 1.05, 0]}>
+          <Part geometry={torus(0.14)} material="brass" scale={0.17} />
+          <Part
+            geometry={cylinder(32)}
+            material="glass"
+            rotation={[Math.PI / 2, 0, 0]}
+            scale={[0.165, 0.01, 0.165]}
+          />
+        </group>
       </group>
     </group>
-  </group>
-);
+  );
+};

@@ -1,4 +1,4 @@
-export const bodySize = { depth: 1, height: 1, radius: 0.1, width: 1.25 };
+export const bodySize = { depth: 1, height: 1, radius: 0.13, width: 1.25 };
 
 export const legSize = {
   depth: 0.2,

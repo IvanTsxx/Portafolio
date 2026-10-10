@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
+import { SceneLayer } from "@/components/scene/scene-layer";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { fontClassNames } from "@/lib/fonts";
@@ -42,6 +43,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => (
         {children}
       </main>
       <SiteFooter />
+      <SceneLayer />
     </body>
   </html>
 );

@@ -36,6 +36,7 @@ export const accessoryKits = {
   inspector: {
     head: inspectorParts.SafetyHelmet,
     leftArm: inspectorParts.Clipboard,
+    rightArm: inspectorParts.Pencil,
   },
   orchestrator: {
     face: orchestratorParts.PixelShades,

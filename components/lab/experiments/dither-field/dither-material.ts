@@ -5,7 +5,7 @@ const vertexShader = `
   varying vec2 vUv;
   void main() {
     vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    gl_Position = vec4(position.xy * 2.0, 0.0, 1.0);
   }
 `;
 
@@ -16,6 +16,7 @@ const fragmentShader = `
   uniform float uContrast;
   uniform float uAccent;
   uniform vec2 uResolution;
+  uniform vec2 uOrigin;
   uniform vec2 uPointer;
   uniform float uPressure;
   uniform vec3 uInk;
@@ -74,7 +75,7 @@ const fragmentShader = `
 
   void main() {
     vec2 cellSize = vec2(uCell);
-    vec2 cell = floor(gl_FragCoord.xy / cellSize);
+    vec2 cell = floor((gl_FragCoord.xy - uOrigin) / cellSize);
     vec2 cellCenter = (cell + 0.5) * cellSize / uResolution;
     float aspect = uResolution.x / uResolution.y;
     vec2 field = vec2(cellCenter.x * aspect, cellCenter.y);
@@ -89,7 +90,7 @@ const fragmentShader = `
     float ripple = sin(distanceToPointer * 38.0 - uTime * 2.2) * 0.5 + 0.5;
     float influence = wave * (0.55 + 0.45 * ripple);
 
-    float lit = clamp((tone - 0.5) * uContrast + 0.3 + influence * 0.8, 0.0, 1.0);
+    float lit = clamp((tone - 0.5) * uContrast + 0.2 + influence * 0.8, 0.0, 1.0);
     float limit = threshold(cell);
     float on = step(limit, lit);
 
@@ -106,11 +107,12 @@ export const DitherMaterial = shaderMaterial(
   {
     uAccent: 1,
     uCell: 4,
-    uClay: new Color("#e0855c"),
+    uClay: new Color("#e9814f"),
     uContrast: 1.6,
-    uInk: new Color("#a8a39b"),
+    uInk: new Color("#141414"),
     uMatrix: 8,
-    uPaper: new Color("#121110"),
+    uOrigin: new Vector2(0, 0),
+    uPaper: new Color("#ededeb"),
     uPointer: new Vector2(0.5, 0.5),
     uPressure: 0,
     uResolution: new Vector2(1, 1),

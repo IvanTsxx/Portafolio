@@ -28,6 +28,30 @@ const stride = (time: number, out: Pose, speed: number, swing: number) => {
   out.bodyTiltZ = step * 0.03;
 };
 
+const measureCycle = 2.6;
+
+export const measureExtension = (time: number) => {
+  const phase = (time % measureCycle) / measureCycle;
+  if (phase < 0.45) {
+    const local = phase / 0.45;
+    return 1 - (1 - local) ** 3;
+  }
+  if (phase < 0.7) {
+    return 1;
+  }
+  const local = (phase - 0.7) / 0.3;
+  return 1 - local * local;
+};
+
+const checkCycle = 1.8;
+
+export const checkStroke = (time: number) => {
+  const phase = (time % checkCycle) / checkCycle;
+  return phase > 0.55 && phase < 0.8
+    ? Math.sin(((phase - 0.55) / 0.25) * Math.PI)
+    : 0;
+};
+
 export const actionClips = {
   carry: {
     keyTime: 0.4,
@@ -57,6 +81,23 @@ export const actionClips = {
       out.leg0 = airborne * 0.25;
       out.leg3 = -airborne * 0.25;
       out.gazeY = 0.02;
+    },
+  },
+  check: {
+    keyTime: 1.25,
+    pose: (time, out) => {
+      resetPose(out);
+      breathe(time, out, 0.26);
+      const stroke = checkStroke(time);
+      const glance = Math.sin(time * 0.9);
+      out.armLeftForward = 1.18;
+      out.armLeftRaise = 0.3;
+      out.armRightForward = 1.05 + stroke * 0.12;
+      out.armRightRaise = 0.12 - stroke * 0.18;
+      out.bodyTiltX = 0.08 + stroke * 0.03;
+      out.bodyYaw = -0.12;
+      out.gazeX = -0.02 + glance * 0.012;
+      out.gazeY = -0.03 + Math.max(0, glance) * 0.02;
     },
   },
   direct: {
@@ -96,6 +137,23 @@ export const actionClips = {
       out.armLeftRaise = restArmRaise - 0.08;
       out.gazeX = scan * 0.03;
       out.gazeY = -0.025;
+    },
+  },
+  measure: {
+    keyTime: 1.2,
+    pose: (time, out) => {
+      resetPose(out);
+      breathe(time, out, 0.3);
+      const extension = measureExtension(time);
+      out.armRightForward = 1.05;
+      out.armRightRaise = 0.05;
+      out.armLeftForward = 1.2 - extension * 0.75;
+      out.armLeftRaise = 0.05 + extension * 0.12;
+      out.bodyYaw = -0.1 + extension * 0.18;
+      out.bodyTiltX = 0.06;
+      out.bodyTiltZ = extension * 0.04;
+      out.gazeX = -0.02 - extension * 0.02;
+      out.gazeY = -0.02;
     },
   },
   point: {

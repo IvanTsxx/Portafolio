@@ -40,7 +40,7 @@ export const DitherFieldPoster = () => (
     preserveAspectRatio="xMidYMid slice"
     viewBox={`0 0 ${columns} ${rows}`}
   >
-    <path className="fill-muted-foreground/70" d={paths.ink} />
+    <path className="fill-ink" d={paths.ink} />
     <path className="fill-clay" d={paths.hot} />
   </svg>
 );
