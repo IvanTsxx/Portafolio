@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 
+import { CommandLine } from "@/components/registry-docs/command-line";
 import { ItemStyles } from "@/components/registry-docs/item-styles";
 import { loadDemoModule } from "@/components/registry-docs/load-demo";
 import { RegistryBrowser } from "@/components/registry-docs/registry-browser";
+import { PageHeader } from "@/components/site/page-header";
 import {
   getRegistryItemUrl,
   registryUrlTemplate,
@@ -17,7 +19,7 @@ import { siteConfig } from "@/lib/site/config";
 import { TechnicalGrid } from "@/registry/ivan/ui/technical-grid";
 
 export const metadata: Metadata = {
-  description: `Installable shadcn components for technical, industrial interfaces. Add any item with the shadcn CLI from ${registryUrlTemplate}.`,
+  description: `Installable shadcn components. Add any item from ${registryUrlTemplate}.`,
   title: "Registry",
 };
 
@@ -42,45 +44,38 @@ const RegistryPage = async () => {
   return (
     <>
       <ItemStyles items={registryItems} />
-      <section className="border-rule relative isolate overflow-hidden border-b">
+      <div className="relative isolate overflow-hidden">
         <TechnicalGrid
           className="absolute inset-0"
-          fade="edges"
+          fade="bottom"
           markers={false}
           nodes={4}
-          scanDuration={12}
+          scan="none"
         />
-        <div className="relative mx-auto flex w-full max-w-screen-2xl flex-col gap-6 px-4 py-16 md:px-6 md:py-24">
-          <p className="label text-clay">03 · Registry</p>
-          <h1 className="display max-w-3xl text-5xl md:text-7xl">
-            Components you can install
-          </h1>
-          <p className="text-muted-foreground max-w-prose text-base text-pretty">
-            {registryItems.length} self contained shadcn items for technical,
-            industrial interfaces. Each one carries its own tokens and
-            keyframes, respects reduced motion and installs with one command.
-          </p>
-          <div className="flex w-fit max-w-full flex-col gap-2">
-            {[
-              `bunx --bun shadcn@latest add ${getRegistryItemUrl("<name>")}`,
-              `bunx --bun shadcn@latest add ${siteConfig.registryNamespace}/<name>`,
-            ].map((command) => (
-              <code
-                className="border-rule bg-card overflow-x-auto border px-4 py-3 font-mono text-xs whitespace-nowrap"
-                key={command}
-              >
-                <span aria-hidden="true" className="text-clay select-none">
-                  ${" "}
-                </span>
-                {command}
-              </code>
-            ))}
-          </div>
+        <PageHeader
+          code="REG-00"
+          jp="登録簿"
+          lede="Install with one command"
+          meta={[
+            {
+              label: "Items",
+              value: String(registryItems.length).padStart(2, "0"),
+            },
+          ]}
+          title="Registry"
+        />
+        <div className="relative mx-auto flex w-full max-w-screen-2xl flex-col gap-2 px-4 pb-14 md:px-8">
+          <CommandLine
+            command={`bunx --bun shadcn@latest add ${getRegistryItemUrl("<name>")}`}
+          />
+          <CommandLine
+            command={`bunx --bun shadcn@latest add ${siteConfig.registryNamespace}/<name>`}
+          />
         </div>
-      </section>
+      </div>
       <section
         aria-label="Registry components"
-        className="mx-auto w-full max-w-screen-2xl px-4 py-12 md:px-6"
+        className="mx-auto w-full max-w-screen-2xl px-4 pb-8 md:px-8"
       >
         <RegistryBrowser
           categories={getRegistryCategories()}

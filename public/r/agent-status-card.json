@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "agent-status-card",
   "title": "Agent Status Card",
-  "description": "Status card for an agent run with a designation, role, live status, task line, segmented progress and mono metadata. Status is always text, never color alone.",
+  "description": "Status card for an agent run with a task line, segmented progress and mono metadata.",
   "dependencies": [
     "class-variance-authority"
   ],
@@ -22,7 +22,7 @@
       "color-signal-steel": "var(--signal-steel)"
     },
     "light": {
-      "clay": "oklch(0.56 0.12 42)",
+      "clay": "oklch(0.52 0.13 42)",
       "signal-moss": "oklch(0.5 0.09 150)",
       "signal-steel": "oklch(0.5 0.07 240)"
     },
@@ -37,7 +37,7 @@
       "props": [
         {
           "component": "AgentStatusCard",
-          "description": "An article with a header, a body and optional metadata and footer. Extends every article prop except title.",
+          "description": "Header, body, optional metadata and footer.",
           "props": [
             {
               "name": "agentId",
@@ -66,28 +66,28 @@
             {
               "name": "statusLabel",
               "type": "string",
-              "description": "Overrides the default status text, for localisation or a more specific phrase."
+              "description": "Overrides the default status text."
             },
             {
               "name": "progress",
               "type": "number",
-              "description": "0 to 100. Renders the segmented progress bar. Omit to hide it."
+              "description": "0 to 100. Omit to hide the bar."
             },
             {
               "name": "meta",
               "type": "{ label: string; value: string }[]",
-              "description": "Mono key and value pairs rendered as equal columns under the body."
+              "description": "Mono key and value pairs in equal columns."
             },
             {
               "name": "footer",
               "type": "ReactNode",
-              "description": "Slot under a hairline for actions such as approve or inspect."
+              "description": "Slot under a hairline for actions."
             },
             {
               "name": "announce",
               "type": "boolean",
               "default": "false",
-              "description": "Makes the status text a polite live region so screen readers hear status changes."
+              "description": "Makes the status a polite live region."
             },
             {
               "name": "children",
@@ -108,42 +108,39 @@
             "blocked",
             "done"
           ],
-          "description": "idle is muted, running is clay, review is steel, blocked is destructive and done is moss. The same tone paints the top hairline, the cube, the dot and the filled progress segments."
+          "description": "Tone paints the hairline, cube, dot and progress. idle muted, running clay, review steel, blocked destructive, done moss."
         }
       ],
       "examples": [
         {
           "title": "Running agent",
-          "description": "Progress, metadata and a live status announcement.",
           "file": "registry/ivan/examples/agent-status-card/basic.tsx"
         },
         {
           "title": "Awaiting a human decision",
-          "description": "The review status with an action footer. The agent proposes, a person decides.",
           "file": "registry/ivan/examples/agent-status-card/review.tsx"
         }
       ],
       "accessibility": [
-        "Renders an article labelled by the name heading, so each card is a named landmark-like region in the reading order.",
-        "Status is always written out as text. The dot and tone color are redundant cues, never the only one.",
-        "Progress uses role progressbar with aria-valuenow, aria-valuemin, aria-valuemax and a readable aria-valuetext.",
-        "Set announce on cards whose status changes live. It turns the status text into a polite status region. It is off by default to avoid noisy pages.",
-        "Tone colors keep at least 4.5:1 against the card in both themes. The cube and dot are aria-hidden."
+        "An article labelled by the name heading.",
+        "Status is always text. Dot and tone are redundant cues.",
+        "announce makes the status a polite live region. Off by default.",
+        "Tone colors keep 4.5:1 against the card in both themes."
       ],
       "animation": [
         {
           "target": "Running status dot",
-          "properties": "transform (scale) and opacity, a ping ring behind the dot",
-          "timing": "Tailwind animate-ping, 1 second, infinite.",
-          "trigger": "Only while status is running.",
-          "reducedMotion": "Ring removed with motion-safe. The solid dot stays."
+          "properties": "transform, opacity",
+          "timing": "animate-ping, 1 second, infinite",
+          "trigger": "While status is running",
+          "reducedMotion": "Ring removed. Dot stays."
         },
         {
           "target": "Active progress segment",
           "properties": "opacity",
-          "timing": "Tailwind animate-pulse, 2 seconds, infinite.",
-          "trigger": "The first unfilled segment while status is running.",
-          "reducedMotion": "Rendered steady at 60 percent opacity."
+          "timing": "animate-pulse, 2 seconds, infinite",
+          "trigger": "First unfilled segment while running",
+          "reducedMotion": "Steady at 60 percent."
         }
       ]
     }

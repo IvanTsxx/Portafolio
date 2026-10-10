@@ -8,8 +8,8 @@ const DependencyGroup = ({
   children: React.ReactNode;
   title: string;
 }) => (
-  <div className="border-rule bg-card flex flex-col gap-3 border p-4">
-    <h3 className="label text-muted-foreground">{title}</h3>
+  <div className="border-graphite/30 flex flex-col gap-3 border-r border-b p-4">
+    <h3 className="label text-mist">{title}</h3>
     {children}
   </div>
 );
@@ -24,13 +24,13 @@ const MonoList = ({
   items.length > 0 ? (
     <ul className="flex flex-col gap-1.5">
       {items.map((entry) => (
-        <li className="font-mono text-xs break-all" key={entry}>
+        <li className="text-ink font-mono text-xs break-all" key={entry}>
           {entry}
         </li>
       ))}
     </ul>
   ) : (
-    <p className="text-muted-foreground text-sm">{emptyLabel}</p>
+    <p className="text-graphite text-sm">{emptyLabel}</p>
   );
 
 const formatCssVariables = (item: RegistryItem) => {
@@ -54,15 +54,12 @@ const formatCssVariables = (item: RegistryItem) => {
 const formatCssRules = (item: RegistryItem) => Object.keys(item.css ?? {});
 
 export const DependenciesPanel = ({ item }: { item: RegistryItem }) => (
-  <div className="grid gap-4 md:grid-cols-2">
+  <div className="border-graphite/30 grid border-t border-l md:grid-cols-2">
     <DependencyGroup title="npm packages">
-      <MonoList emptyLabel="None beyond React." items={item.dependencies} />
+      <MonoList emptyLabel="None." items={item.dependencies} />
     </DependencyGroup>
     <DependencyGroup title="Registry dependencies">
-      <MonoList
-        emptyLabel="None. The item is self contained."
-        items={item.registryDependencies}
-      />
+      <MonoList emptyLabel="None." items={item.registryDependencies} />
     </DependencyGroup>
     <DependencyGroup title="Files written">
       <MonoList
@@ -72,7 +69,7 @@ export const DependenciesPanel = ({ item }: { item: RegistryItem }) => (
     </DependencyGroup>
     <DependencyGroup title="Added to your CSS">
       <MonoList
-        emptyLabel="Nothing is added to your CSS."
+        emptyLabel="None."
         items={[...formatCssRules(item), ...formatCssVariables(item)]}
       />
     </DependencyGroup>

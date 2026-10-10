@@ -1,3 +1,4 @@
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,7 +19,9 @@ import { InstallSection } from "@/components/registry-docs/install-section";
 import { ItemStyles } from "@/components/registry-docs/item-styles";
 import { loadDemoModule } from "@/components/registry-docs/load-demo";
 import { PreviewCodeTabs } from "@/components/registry-docs/preview-code-tabs";
-import { Badge } from "@/components/ui/badge";
+import { CornerMarks } from "@/components/site/corner-marks";
+import { LeaderList, LeaderRow } from "@/components/site/leader-list";
+import { focusRingClassName } from "@/components/site/styles";
 import { highlightCode } from "@/lib/registry/highlight";
 import {
   getInstallCommand,
@@ -34,6 +37,8 @@ import {
   toCategoryLabel,
 } from "@/lib/registry/registry";
 import { buildItemCodeFiles } from "@/lib/registry/source";
+import { siteConfig } from "@/lib/site/config";
+import { cn } from "@/lib/utils";
 
 export const dynamicParams = false;
 
@@ -51,6 +56,17 @@ export const generateMetadata = async ({
   return { description: item.description, title: item.title };
 };
 
+const sectionAnnotations = {
+  accessibility: "配慮",
+  animation: "動作",
+  dependencies: "依存",
+  installation: "導入",
+  preview: "見本",
+  props: "属性",
+  usage: "用法",
+  variants: "変種",
+} as const;
+
 const NeighborLink = ({
   direction,
   name,
@@ -64,13 +80,17 @@ const NeighborLink = ({
   }
   return (
     <Link
-      className="group border-rule hover:border-rule-strong focus-visible:border-rule-strong flex min-h-11 flex-col gap-1 border px-4 py-3 transition-colors"
+      className={cn(
+        "group/marks border-rule-strong ease-mechanical hover:bg-paper-deep/60 relative flex min-h-11 flex-col gap-1 border px-4 py-3 transition-colors duration-100",
+        focusRingClassName
+      )}
       href={`/registry/${item.name}`}
     >
-      <span className="label text-muted-foreground group-hover:text-clay transition-colors">
+      <CornerMarks reveal="hover" />
+      <span className="label text-mist group-hover/marks:text-ink transition-colors">
         {direction}
       </span>
-      <span className="text-sm font-medium">{item.title}</span>
+      <span className="text-ink text-sm font-medium">{item.title}</span>
     </Link>
   );
 };
@@ -84,6 +104,7 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
 
   const { docs } = item.meta;
   const position = getRegistryItemIndex(item.name);
+  const code = formatRegistryIndex(position);
   const registriesSource = getRegistriesSnippet();
   const [codeFiles, { Demo }, registriesLines] = await Promise.all([
     buildItemCodeFiles(item),
@@ -91,77 +112,83 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
     highlightCode(registriesSource, "json"),
   ]);
 
-  const sections = [
+  const sections: { id: keyof typeof sectionAnnotations; label: string }[] = [
     { id: "preview", label: "Preview" },
     { id: "installation", label: "Installation" },
     { id: "usage", label: "Usage" },
     ...(docs.variants.length > 0
-      ? [{ id: "variants", label: "Variants" }]
+      ? [{ id: "variants" as const, label: "Variants" }]
       : []),
     { id: "props", label: "Props" },
     { id: "accessibility", label: "Accessibility" },
     { id: "animation", label: "Animation" },
     { id: "dependencies", label: "Dependencies" },
   ];
-  const indexOf = (id: string) =>
-    String(sections.findIndex((section) => section.id === id) + 1).padStart(
-      2,
-      "0"
-    );
+  const sectionProps = (id: keyof typeof sectionAnnotations) => {
+    const section = sections.find((entry) => entry.id === id);
+    const number = String(
+      sections.findIndex((entry) => entry.id === id) + 1
+    ).padStart(2, "0");
+    return {
+      id,
+      index: `${code}.${number}`,
+      jp: sectionAnnotations[id],
+      title: section?.label ?? id,
+    };
+  };
 
   return (
     <>
       <ItemStyles items={[item]} />
-      <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-12 px-4 py-12 md:px-6 md:py-16">
-        <header className="flex flex-col gap-6">
-          <nav
-            aria-label="Breadcrumb"
-            className="label flex items-center gap-3"
-          >
+      <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-16 px-4 pt-6 pb-8 md:px-8 md:pt-8">
+        <header>
+          <div className="label border-rule-strong flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b pb-2">
             <Link
-              className="text-muted-foreground hover:text-clay focus-visible:text-clay inline-flex min-h-9 items-center transition-colors"
+              className={cn(
+                focusRingClassName,
+                "text-ink hover:text-graphite ease-mechanical inline-flex min-h-11 items-center gap-2 transition-colors duration-100 md:min-h-8"
+              )}
               href="/registry"
             >
+              <ArrowLeft aria-hidden className="size-4" />
               Registry
             </Link>
-            <span aria-hidden="true" className="text-muted-foreground">
-              /
+            <span className="flex gap-2">
+              <span className="text-mist">Doc</span>
+              <span className="text-ink tabular-nums">{code}</span>
             </span>
-            <span aria-current="page" className="text-clay">
-              {formatRegistryIndex(position)}
-            </span>
-          </nav>
-          <h1 className="display max-w-4xl text-5xl md:text-7xl">
-            {item.title}
-          </h1>
-          <p className="text-muted-foreground max-w-prose text-base text-pretty">
-            {item.description}
-          </p>
-          <ul className="flex flex-wrap gap-2">
-            {item.categories.map((category) => (
-              <li key={category}>
-                <Badge variant="outline">{toCategoryLabel(category)}</Badge>
-              </li>
-            ))}
-            <li>
-              <Badge variant="secondary">{item.type}</Badge>
-            </li>
-          </ul>
+          </div>
+          <div className="mt-10 grid gap-x-6 gap-y-10 md:mt-16 lg:grid-cols-12 lg:items-end">
+            <div className="flex flex-col gap-6 lg:col-span-7">
+              <h1 className="display text-ink text-5xl md:text-7xl">
+                {item.title}
+              </h1>
+              <p className="text-graphite max-w-prose text-base text-pretty">
+                {item.description}
+              </p>
+            </div>
+            <LeaderList className="lg:col-span-5">
+              <LeaderRow jp="種別" label="Type">
+                {item.type}
+              </LeaderRow>
+              <LeaderRow jp="分類" label="Category">
+                {item.categories.map(toCategoryLabel).join(" / ")}
+              </LeaderRow>
+              <LeaderRow jp="名称" label="Name">
+                {`${siteConfig.registryNamespace}/${item.name}`}
+              </LeaderRow>
+              <LeaderRow jp="ファイル" label="Files">
+                {String(item.files.length).padStart(2, "0")}
+              </LeaderRow>
+            </LeaderList>
+          </div>
         </header>
         <div className="grid gap-12 lg:grid-cols-12">
-          <div className="flex min-w-0 flex-col gap-14 lg:col-span-9">
-            <DocsSection
-              id="preview"
-              index={indexOf("preview")}
-              title="Preview"
-            >
+          <div className="flex min-w-0 flex-col gap-16 lg:col-span-9">
+            <DocsSection {...sectionProps("preview")}>
               <PreviewCodeTabs files={codeFiles} preview={<Demo />} />
             </DocsSection>
-            <DocsSection
-              id="installation"
-              index={indexOf("installation")}
-              title="Installation"
-            >
+            <DocsSection {...sectionProps("installation")}>
               <InstallSection
                 commands={packageRunners.map((runner) => ({
                   id: runner.id,
@@ -173,7 +200,7 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
                 registriesSource={registriesSource}
               />
             </DocsSection>
-            <DocsSection id="usage" index={indexOf("usage")} title="Usage">
+            <DocsSection {...sectionProps("usage")}>
               <div className="flex flex-col gap-12">
                 {docs.examples.map((example) => (
                   <ExampleBlock example={example} key={example.file} />
@@ -181,48 +208,31 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
               </div>
             </DocsSection>
             {docs.variants.length > 0 ? (
-              <DocsSection
-                id="variants"
-                index={indexOf("variants")}
-                title="Variants"
-              >
+              <DocsSection {...sectionProps("variants")}>
                 <VariantsTable variants={docs.variants} />
               </DocsSection>
             ) : null}
-            <DocsSection id="props" index={indexOf("props")} title="Props">
+            <DocsSection {...sectionProps("props")}>
               <PropsTables groups={docs.props} />
             </DocsSection>
-            <DocsSection
-              id="accessibility"
-              index={indexOf("accessibility")}
-              title="Accessibility"
-            >
+            <DocsSection {...sectionProps("accessibility")}>
               <BulletList items={docs.accessibility} />
             </DocsSection>
-            <DocsSection
-              id="animation"
-              index={indexOf("animation")}
-              title="Animation"
-            >
+            <DocsSection {...sectionProps("animation")}>
               {docs.animation.length > 0 ? (
                 <AnimationTable animations={docs.animation} />
               ) : (
-                <p className="text-muted-foreground max-w-prose text-sm text-pretty">
-                  This component is static. It has no animation and nothing to
-                  switch off for reduced motion.
+                <p className="label text-graphite">
+                  Static. Nothing to switch off.
                 </p>
               )}
             </DocsSection>
-            <DocsSection
-              id="dependencies"
-              index={indexOf("dependencies")}
-              title="Dependencies"
-            >
+            <DocsSection {...sectionProps("dependencies")}>
               <DependenciesPanel item={item} />
             </DocsSection>
             <nav
               aria-label="More registry items"
-              className="border-rule grid gap-4 border-t pt-8 sm:grid-cols-2"
+              className="border-rule-strong grid gap-4 border-t pt-8 sm:grid-cols-2"
             >
               <NeighborLink
                 direction="Previous"
