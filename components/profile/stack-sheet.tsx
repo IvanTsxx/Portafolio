@@ -1,13 +1,17 @@
+import {
+  PanelCount,
+  DocumentSection,
+} from "@/components/site/document-section";
 import { practiceNotes, stack } from "@/lib/site/practice";
 
 import { TickMark } from "./module";
-import { PanelCount, SectionFrame } from "./section-frame";
 
 export const StackSheet = () => (
-  <SectionFrame
+  <DocumentSection
     aside={<PanelCount current={stack.length} total={stack.length} />}
     id="stack"
-    index="GH-09"
+    index="GH-10"
+    waypoint={{ action: "carry", role: "builder", side: "right" }}
     jp="技術"
     label="Stack"
   >
@@ -44,5 +48,5 @@ export const StackSheet = () => (
         </span>
       </p>
     ))}
-  </SectionFrame>
+  </DocumentSection>
 );

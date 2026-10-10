@@ -9783,10 +9783,7 @@
     "location": "Argentina ,Tucumán",
     "login": "IvanTsxx",
     "name": "Ivan Bongiovanni",
-    "organizations": [
-      "basementstudio",
-      "ServalHQ"
-    ],
+    "organizations": ["basementstudio", "ServalHQ"],
     "repositories": 55,
     "starred": 261,
     "twitterUsername": "IvanTsxx",

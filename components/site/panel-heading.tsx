@@ -23,7 +23,7 @@ export const PanelHeading = ({
 }) => (
   <div
     className={cn(
-      "label border-rule-strong flex items-baseline gap-x-3 border-b pb-2",
+      "label border-rule-strong flex flex-wrap items-baseline gap-x-3 gap-y-2 border-b pb-2",
       className
     )}
   >

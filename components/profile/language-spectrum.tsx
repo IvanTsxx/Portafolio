@@ -1,8 +1,8 @@
+import { DocumentSection } from "@/components/site/document-section";
 import type { PinnedRepository } from "@/lib/github/model";
 
 import { LanguageSwatch } from "./language-swatch";
 import { languageMark } from "./languages";
-import { SectionFrame } from "./section-frame";
 
 const spectrumOf = (repositories: readonly PinnedRepository[]) => {
   const counts = new Map<string | null, number>();
@@ -26,9 +26,10 @@ export const LanguageSpectrum = ({
 }) => {
   const spectrum = spectrumOf(repositories);
   return (
-    <SectionFrame
+    <DocumentSection
       id="spectrum"
-      index="GH-04"
+      index="GH-05"
+      waypoint={{ action: "point", role: "analyst", side: "right" }}
       jp="言語分布"
       label="Language spectrum"
     >
@@ -93,6 +94,6 @@ export const LanguageSpectrum = ({
           })}
         </tbody>
       </table>
-    </SectionFrame>
+    </DocumentSection>
   );
 };

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 
+import { DocumentSection } from "@/components/site/document-section";
 import type {
   ActivityKind,
   ActivityOverview as ActivityOverviewData,
@@ -8,7 +9,6 @@ import { cn } from "@/lib/utils";
 
 import { inkPatterns, profileLink } from "./ink";
 import { Module } from "./module";
-import { SectionFrame } from "./section-frame";
 
 const CENTER = 100;
 const REACH = 70;
@@ -188,9 +188,10 @@ export const ActivityOverview = ({
   const recorded = shares.filter((share) => share.percent > 0);
 
   return (
-    <SectionFrame
+    <DocumentSection
       id="overview"
-      index="GH-06"
+      index="GH-07"
+      waypoint={{ action: "inspect", role: "inspector", side: "left" }}
       jp="活動概要"
       label="Activity overview"
     >
@@ -281,6 +282,6 @@ export const ActivityOverview = ({
           </div>
         </Module>
       </div>
-    </SectionFrame>
+    </DocumentSection>
   );
 };

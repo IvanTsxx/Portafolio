@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { KeyboardEvent } from "react";
 
+import { DocumentSection } from "@/components/site/document-section";
 import { contributionLevels } from "@/lib/github/model";
 import type {
   ContributionCalendar,
@@ -16,7 +17,6 @@ import {
   formatDayLabel,
   monthLabelsFor,
 } from "./contributions";
-import { SectionFrame } from "./section-frame";
 import { TechnicalButton } from "./technical-button";
 
 interface CellPosition {
@@ -136,7 +136,7 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
   };
 
   return (
-    <SectionFrame
+    <DocumentSection
       aside={
         <fieldset className="flex flex-wrap gap-1">
           <legend className="sr-only">Contribution year</legend>
@@ -154,7 +154,7 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
         </fieldset>
       }
       id="matrix"
-      index="GH-05"
+      index="GH-06"
       jp="貢献行列"
       label="Contribution matrix"
     >
@@ -303,6 +303,6 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
       </div>
 
       <ContributionStatsReadout calendar={calendar} />
-    </SectionFrame>
+    </DocumentSection>
   );
 };

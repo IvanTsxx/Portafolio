@@ -30,9 +30,7 @@ export const publicAffiliation = (value: string | null) =>
     : null;
 
 export const publicOrganizations = (logins: readonly string[]) =>
-  logins.filter(
-    (login) => !isRedacted(login) || isAllowedAffiliation(login)
-  );
+  logins.filter((login) => !isRedacted(login) || isAllowedAffiliation(login));
 
 export const publicEmail = (email: string | null, allowedEmail: string) =>
   email !== null && email.toLowerCase() === allowedEmail.toLowerCase()

@@ -1,3 +1,4 @@
+import { DossierStrip, PORTRAIT_SRC } from "@/components/site/compact-dossier";
 import type { GithubIdentity } from "@/lib/github/model";
 import { siteConfig } from "@/lib/site/config";
 import { cn } from "@/lib/utils";
@@ -6,7 +7,6 @@ import { profileLink } from "./ink";
 import { PortraitPlate } from "./portrait-plate";
 import { hashText, seededRandom } from "./seeded";
 
-const PORTRAIT_SRC = "/profile/portrait.jpg";
 const BARCODE_UNITS = 96;
 
 interface SpecRow {
@@ -100,14 +100,7 @@ export const IdentityDossier = ({ identity }: { identity: GithubIdentity }) => {
 
   return (
     <section aria-labelledby="dossier-heading" className="flex flex-col gap-6">
-      <div className="label border-rule-strong flex items-baseline justify-between border-b pb-2">
-        <span className="flex items-baseline gap-3">
-          <span className="text-mist tabular-nums">[ GH-02 ]</span>
-          <span className="text-ink">Dossier</span>
-          <span className="jp text-mist">身元</span>
-        </span>
-        <span className="text-mist">Rev 4.2</span>
-      </div>
+      <DossierStrip code="GH-02" />
 
       <PortraitPlate
         label={`Dithered portrait of ${name}`}

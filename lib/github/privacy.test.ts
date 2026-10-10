@@ -318,7 +318,9 @@ describe("assertPublicProfile", () => {
             {
               id: "E-01",
               kind: "commits",
-              repositories: [{ count: 3, repository: "IvanTsxx/basement-hero" }],
+              repositories: [
+                { count: 3, repository: "IvanTsxx/basement-hero" },
+              ],
               total: 3,
             },
           ],
@@ -338,9 +340,14 @@ describe("snapshot", () => {
     const repositoryNames = [
       ...parsed.pinned.map((repository) => repository.nameWithOwner),
       ...parsed.activity.repositories,
-      ...[
-        ...JSON.stringify(parsed.timeline).matchAll(/"repository":"([^"]+)"/gu),
-      ].map((match) => match[1] ?? ""),
+      ...parsed.timeline.flatMap((month) =>
+        month.events.flatMap((event) => {
+          if ("repositories" in event) {
+            return event.repositories.map((row) => row.repository);
+          }
+          return "repository" in event ? [event.repository] : [];
+        })
+      ),
     ];
 
     expect(repositoryNames.filter((name) => REDACTED.test(name))).toEqual([]);
