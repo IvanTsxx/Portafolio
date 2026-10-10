@@ -33,6 +33,16 @@ const specRowsOf = (identity: GithubIdentity): SpecRow[] => {
   const email = identity.email ?? siteConfig.email;
   const rows: (SpecRow | null)[] = [
     { href: null, jp: "所在地", key: "Location", value: siteConfig.location },
+    identity.company
+      ? {
+          href: identity.company.startsWith("@")
+            ? `https://github.com/${identity.company.slice(1)}`
+            : null,
+          jp: "所属",
+          key: "Company",
+          value: identity.company,
+        }
+      : null,
     { href: `mailto:${email}`, jp: "連絡", key: "Email", value: email },
     identity.websiteUrl
       ? {

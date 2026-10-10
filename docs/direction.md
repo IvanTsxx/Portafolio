@@ -4,7 +4,7 @@ Ivan Bongiovanni's portfolio. The visual language comes from his GitHub-profile 
 
 ## Content rules
 
-- Never mention Basement Studio, its repos, orgs, clients or company field. Filter anything from GitHub data that matches `basement` (case-insensitive) in org, repo owner, repo name or company.
+- Basement Studio may appear only as Ivan's employer: company name, role, dates, type, link, the `@basementstudio` company field, the `basementstudio` org badge and his avatar. Never show Basement code, projects, repos, clients or the kind of companies they work with. `lib/github/privacy.ts` drops anything matching `basement` (case-insensitive) outside those affiliation fields.
 - Less text. Let animation and 3D carry the story. Labels and short lines, not paragraphs.
 - AI practice and stack copy come from `lib/site/practice.ts` (Ivan's own words). Identity from `lib/site/config.ts`.
 - Never invent clients, metrics or achievements. Placeholder content is labeled sample.

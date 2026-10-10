@@ -37,6 +37,7 @@ export type ContributionRange = ContributionCalendar["range"];
 
 const githubIdentitySchema = z.object({
   bio: z.string().nullable(),
+  company: z.string().nullable(),
   createdAt: z.string(),
   email: z.string().nullable(),
   followers: z.number(),

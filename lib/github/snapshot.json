@@ -9772,9 +9772,10 @@
       "year": 2022
     }
   ],
-  "fetchedAt": "2026-10-09T23:57:01.497Z",
+  "fetchedAt": "2026-10-10T00:31:01.395Z",
   "identity": {
     "bio": "Full Stack Developer · Argentina 🇦🇷 👩🏻‍💻 Next.js · Vercel ▲ ❤️",
+    "company": "@basementstudio",
     "createdAt": "2022-04-22T14:59:10Z",
     "email": "bongiovannidev@gmail.com",
     "followers": 47,
@@ -9782,7 +9783,10 @@
     "location": "Argentina ,Tucumán",
     "login": "IvanTsxx",
     "name": "Ivan Bongiovanni",
-    "organizations": ["ServalHQ"],
+    "organizations": [
+      "basementstudio",
+      "ServalHQ"
+    ],
     "repositories": 55,
     "starred": 261,
     "twitterUsername": "IvanTsxx",
