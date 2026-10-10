@@ -1,46 +1,64 @@
 import Link from "next/link";
 
+import { CommandPaletteProvider } from "@/components/command/command-palette-provider";
+import { CommandPaletteTrigger } from "@/components/command/command-palette-trigger";
+import { GithubStars } from "@/components/site/github-stars";
 import { MobileNav } from "@/components/site/mobile-nav";
 import { NavLinks } from "@/components/site/nav-links";
 import {
   focusRingClassName,
   technicalButtonVariants,
 } from "@/components/site/styles";
+import { buildSearchIndex } from "@/lib/search/build-index";
 import { siteConfig } from "@/lib/site/config";
+import { getRepoStars } from "@/lib/site/github-repo";
 import { cn } from "@/lib/utils";
 
-export const SiteHeader = () => (
-  <header className="border-rule bg-paper/85 text-ink sticky top-0 z-50 border-b backdrop-blur-md">
-    <div className="mx-auto flex h-12 max-w-screen-2xl items-center justify-between gap-4 px-4 md:px-8">
-      <Link
-        className={cn(
-          "group flex min-w-0 shrink-0 items-baseline gap-3",
-          focusRingClassName
-        )}
-        href="/"
-      >
-        <span className="font-wordmark text-xl leading-none whitespace-nowrap italic">
-          {siteConfig.name}
-        </span>
-        <span className="label text-mist group-hover:text-ink ease-mechanical hidden transition-colors duration-100 sm:inline">
-          Archive of builds
-        </span>
-      </Link>
-      <nav aria-label="Primary" className="hidden self-stretch lg:flex">
-        <NavLinks />
-      </nav>
-      <div className="flex items-center gap-4">
-        <Link
-          className={cn(
-            technicalButtonVariants({ size: "sm" }),
-            "hidden lg:inline-flex"
-          )}
-          href="/#contact"
-        >
-          Contact
-        </Link>
-        <MobileNav />
-      </div>
-    </div>
-  </header>
-);
+export const SiteHeader = async () => {
+  const [searchEntries, stars] = await Promise.all([
+    buildSearchIndex(),
+    getRepoStars(),
+  ]);
+  return (
+    <CommandPaletteProvider entries={searchEntries}>
+      <header className="border-rule bg-paper/85 text-ink sticky top-0 z-50 border-b backdrop-blur-md">
+        <div className="mx-auto grid h-12 max-w-screen-2xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 md:px-8">
+          <Link
+            className={cn(
+              "group col-start-1 flex min-w-0 items-baseline gap-3 justify-self-start",
+              focusRingClassName
+            )}
+            href="/"
+          >
+            <span className="font-wordmark text-xl leading-none whitespace-nowrap italic">
+              {siteConfig.nickname}
+            </span>
+            <span className="label text-mist group-hover:text-ink ease-mechanical hidden whitespace-nowrap transition-colors duration-100 sm:inline lg:hidden xl:inline">
+              Archive of builds
+            </span>
+          </Link>
+          <nav
+            aria-label="Primary"
+            className="col-start-2 hidden self-stretch lg:flex"
+          >
+            <NavLinks />
+          </nav>
+          <div className="col-start-3 flex items-center gap-3 justify-self-end">
+            <CommandPaletteTrigger />
+            <GithubStars count={stars} />
+            <Link
+              className={cn(
+                technicalButtonVariants({ size: "sm" }),
+                "hidden lg:inline-flex"
+              )}
+              href="/#contact"
+            >
+              Contact
+            </Link>
+            <MobileNav />
+          </div>
+        </div>
+      </header>
+    </CommandPaletteProvider>
+  );
+};

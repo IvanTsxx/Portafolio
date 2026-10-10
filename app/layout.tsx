@@ -13,14 +13,14 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   openGraph: {
     description: siteConfig.description,
-    siteName: siteConfig.name,
-    title: `${siteConfig.name} · Agent Workshop`,
+    siteName: siteConfig.nickname,
+    title: `${siteConfig.nickname} · Agent Workshop`,
     type: "website",
     url: siteConfig.url,
   },
   title: {
-    default: `${siteConfig.name} · Agent Workshop`,
-    template: `%s · ${siteConfig.shortName}`,
+    default: `${siteConfig.nickname} · Agent Workshop`,
+    template: `%s · ${siteConfig.nickname}`,
   },
   twitter: { card: "summary_large_image", creator: `@${siteConfig.handle}` },
 };

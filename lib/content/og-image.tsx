@@ -130,7 +130,7 @@ export const renderOgImage = async ({
       >
         <div style={{ display: "flex", gap: 20 }}>
           <span style={{ color: palette.mist }}>[ DOC ]</span>
-          <span>{siteConfig.name}</span>
+          <span>{siteConfig.nickname}</span>
         </div>
         <span style={{ color: palette.mist }}>
           {sample ? "Sample content" : "Archive of builds"}

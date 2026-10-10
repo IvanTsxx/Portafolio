@@ -7,8 +7,8 @@ const manifest = (): MetadataRoute.Manifest => ({
   description: siteConfig.description,
   display: "standalone",
   icons: [{ sizes: "any", src: "/favicon.ico", type: "image/x-icon" }],
-  name: `${siteConfig.name} · Agent Workshop`,
-  short_name: siteConfig.shortName,
+  name: `${siteConfig.nickname} · Agent Workshop`,
+  short_name: siteConfig.nickname,
   start_url: "/",
   theme_color: "#121110",
 });

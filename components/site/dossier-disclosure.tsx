@@ -5,20 +5,19 @@ import { useId, useState } from "react";
 import type { ReactNode } from "react";
 
 import { focusRingClassName } from "@/components/site/styles";
+import { siteConfig } from "@/lib/site/config";
 import { cn } from "@/lib/utils";
 
 export const DossierDisclosure = ({
   children,
   handle,
-  name,
 }: {
   children: ReactNode;
   handle: string;
-  name: string;
 }) => {
   const [open, setOpen] = useState(false);
   const bodyId = useId();
-  const monogram = name
+  const monogram = siteConfig.name
     .split(/\s+/u)
     .map((part) => part[0])
     .join("")
@@ -44,7 +43,7 @@ export const DossierDisclosure = ({
         </span>
         <span className="flex min-w-0 flex-col">
           <span className="text-ink truncate text-lg leading-tight font-light tracking-tight">
-            {name}
+            {siteConfig.nickname}
           </span>
           <span className="label text-graphite truncate normal-case">
             @{handle}

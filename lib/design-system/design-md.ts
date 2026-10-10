@@ -112,7 +112,7 @@ const frontMatter = (system: DesignSystem) => {
   return [
     "---",
     "version: alpha",
-    `name: ${quote(`${siteConfig.name} · Paper and ink`)}`,
+    `name: ${quote(`${siteConfig.nickname} · Paper and ink`)}`,
     `description: ${quote("A technical document on paper. Ink type, hairline rules, numbered panels, and small orange 3D agents as the only color.")}`,
     ...yamlMap(
       "colors",

@@ -1,12 +1,16 @@
 "use client";
 
-import { ListIcon } from "@phosphor-icons/react";
-import { useState } from "react";
+import { ListIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
+import { useRef, useState } from "react";
 
+import { useCommandPalette } from "@/components/command/command-palette-provider";
 import { NavLinks } from "@/components/site/nav-links";
 import { PanelHeading } from "@/components/site/panel-heading";
 import { SocialLinks } from "@/components/site/social-links";
-import { technicalButtonVariants } from "@/components/site/styles";
+import {
+  focusRingClassName,
+  technicalButtonVariants,
+} from "@/components/site/styles";
 import {
   Sheet,
   SheetClose,
@@ -19,8 +23,27 @@ import { cn } from "@/lib/utils";
 
 export const MobileNav = () => {
   const [open, setOpen] = useState(false);
+  const { openPalette } = useCommandPalette();
+  const searchRequested = useRef(false);
+
+  const handleSearchClick = () => {
+    searchRequested.current = true;
+    setOpen(false);
+  };
+
+  const handleOpenChangeComplete = (isOpen: boolean) => {
+    if (!isOpen && searchRequested.current) {
+      searchRequested.current = false;
+      openPalette();
+    }
+  };
+
   return (
-    <Sheet onOpenChange={setOpen} open={open}>
+    <Sheet
+      onOpenChange={setOpen}
+      onOpenChangeComplete={handleOpenChangeComplete}
+      open={open}
+    >
       <SheetTrigger
         aria-label="Open menu"
         className={cn(technicalButtonVariants({ size: "sm" }), "lg:hidden")}
@@ -51,6 +74,20 @@ export const MobileNav = () => {
             </SheetClose>
           </div>
         </SheetHeader>
+        <div className="px-4 pb-4">
+          <button
+            className={cn(
+              "border-rule-strong ease-mechanical hover:bg-paper-deep/60 flex min-h-12 w-full items-center gap-3 border px-3 text-left transition-colors duration-100",
+              focusRingClassName
+            )}
+            onClick={handleSearchClick}
+            type="button"
+          >
+            <MagnifyingGlassIcon aria-hidden className="text-graphite size-4" />
+            <span className="text-graphite text-base">Search the site</span>
+            <span className="jp label text-mist ml-auto">検索</span>
+          </button>
+        </div>
         <nav aria-label="Mobile">
           <NavLinks onNavigate={() => setOpen(false)} orientation="vertical" />
         </nav>

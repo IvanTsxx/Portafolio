@@ -14,7 +14,7 @@ export const SiteFooter = () => (
     <div className="mt-6 grid gap-8 md:grid-cols-12">
       <div className="flex flex-col gap-2 md:col-span-5">
         <p className="font-wordmark text-2xl leading-none italic">
-          {siteConfig.name}
+          {siteConfig.nickname}
         </p>
         <p className="label text-mist">
           {siteConfig.role} / {siteConfig.location}

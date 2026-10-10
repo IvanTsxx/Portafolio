@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: "Ivan Bongiovanni · Paper and ink"
+name: "Ivo · Paper and ink"
 description: "A technical document on paper. Ink type, hairline rules, numbered panels, and small orange 3D agents as the only color."
 colors:
   paper: "#ebebe9"

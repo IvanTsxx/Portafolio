@@ -12,7 +12,6 @@ const DocumentGroupLayout = async ({ children }: LayoutProps<"/">) => {
     <DocumentShell
       dossier={<IdentityDossier identity={identity} />}
       handle={identity.login}
-      name={identity.name ?? identity.login}
     >
       {children}
     </DocumentShell>

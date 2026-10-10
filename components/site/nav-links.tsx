@@ -5,16 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { primaryRoutes } from "@/lib/site/config";
-import type { PrimaryRoute } from "@/lib/site/config";
 import { cn } from "@/lib/utils";
-
-const routeAnnotations = {
-  "/": "ホーム",
-  "/design-system": "設計",
-  "/lab": "実験",
-  "/notes": "手記",
-  "/registry": "登録簿",
-} as const satisfies Record<PrimaryRoute["href"], string>;
 
 const isActiveRoute = (pathname: string, href: string) =>
   href === "/"
@@ -80,7 +71,7 @@ export const NavLinks = ({
                     className="border-rule-strong mb-1.5 h-px min-w-4 flex-1 self-end border-b border-dotted"
                   />
                   <span className="jp label text-graphite shrink-0">
-                    {routeAnnotations[route.href]}
+                    {route.jp}
                   </span>
                 </>
               ) : (

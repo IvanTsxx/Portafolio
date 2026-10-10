@@ -16,10 +16,10 @@ const robotsFor = (entry: { sample: boolean }): Metadata["robots"] =>
 const openGraphFor = (note: Note): Metadata["openGraph"] =>
   note.kind === "note"
     ? {
-        authors: [siteConfig.name],
+        authors: [siteConfig.nickname],
         description: note.summary,
         publishedTime: `${note.date}T00:00:00.000Z`,
-        siteName: siteConfig.name,
+        siteName: siteConfig.nickname,
         tags: note.tags,
         title: note.title,
         type: "article",
@@ -27,15 +27,15 @@ const openGraphFor = (note: Note): Metadata["openGraph"] =>
       }
     : {
         description: note.summary,
-        siteName: siteConfig.name,
-        title: `${note.title} · ${siteConfig.shortName}`,
+        siteName: siteConfig.nickname,
+        title: `${note.title} · ${siteConfig.nickname}`,
         type: "website",
         url: notePath(note.slug),
       };
 
 export const buildNoteMetadata = (note: Note): Metadata => ({
   alternates: { canonical: notePath(note.slug) },
-  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  authors: [{ name: siteConfig.nickname, url: siteConfig.url }],
   description: note.summary,
   keywords: note.kind === "note" ? note.tags : note.stack,
   openGraph: openGraphFor(note),
@@ -48,7 +48,7 @@ export const buildNoteJsonLd = (note: FieldNote) => ({
   "@type": "BlogPosting",
   author: {
     "@type": "Person",
-    name: siteConfig.name,
+    name: siteConfig.nickname,
     url: siteConfig.url,
   },
   datePublished: note.date,
