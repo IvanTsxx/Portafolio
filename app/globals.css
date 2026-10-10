@@ -180,8 +180,8 @@
     font-feature-settings: "ss01", "cv11";
   }
   ::selection {
-    background: var(--clay);
-    color: var(--primary-foreground);
+    background: var(--ink);
+    color: var(--paper);
   }
   :focus-visible {
     @apply outline-ink outline-1 outline-offset-2;
