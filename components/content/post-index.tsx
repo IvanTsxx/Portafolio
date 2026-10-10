@@ -3,8 +3,13 @@
 import { FilterBar } from "@/components/content/filter-bar";
 import { PostRow } from "@/components/content/post-row";
 import { useUrlFilter } from "@/components/content/use-url-filter";
+import { PanelHeading } from "@/components/site/panel-heading";
 import type { PostIndexItem } from "@/lib/content/blog";
 import type { FacetCount } from "@/lib/content/facets";
+
+const agentSpotLimit = 2;
+
+const pad = (value: number) => String(value).padStart(2, "0");
 
 export const PostIndex = ({
   posts,
@@ -22,12 +27,22 @@ export const PostIndex = ({
     : posts;
 
   return (
-    <>
-      <div className="px-4 pb-8 md:px-6">
+    <section
+      aria-label="Field notes index"
+      className="mx-auto w-full max-w-screen-2xl px-4 pb-8 md:px-8"
+    >
+      <PanelHeading
+        aside={`${pad(visiblePosts.length)} / ${pad(posts.length)}`}
+        as="h2"
+        index="FN-01"
+        jp="一覧"
+        label="Index"
+      />
+      <div className="py-6">
         <FilterBar
           active={tag}
           facets={tags}
-          label="Filter by tag"
+          label="Tag"
           onChange={setTag}
           shown={visiblePosts.length}
           total={posts.length}
@@ -35,9 +50,13 @@ export const PostIndex = ({
       </div>
       <ul className="border-rule border-t">
         {visiblePosts.map((post) => (
-          <PostRow key={post.slug} post={post} />
+          <PostRow
+            key={post.slug}
+            post={post}
+            spot={posts.indexOf(post) < agentSpotLimit}
+          />
         ))}
       </ul>
-    </>
+    </section>
   );
 };

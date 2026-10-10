@@ -1,66 +1,64 @@
 export const meta = {
   title: "Composable page builder",
   year: 2026,
-  context: "Sample entry for a Sanity-backed site. No real client.",
+  context: "Sample, Sanity-backed site",
   role: "Frontend engineer",
   summary:
-    "A sample case study for a CMS page builder where every block is one self-contained module and adding a block never touches existing code.",
+    "Every block is one module. Adding a block never touches existing code.",
   technologies: ["Next.js", "Sanity", "TypeScript", "Tailwind CSS", "shadcn"],
   responsibilities: [
-    "Block module contract: schema, query fragment, types and component",
-    "Registry that builds the schema list and the page query",
+    "Block module contract",
+    "Registry behind the schema list and page query",
     "Typed content from schema to component",
-    "Editor-facing preview and fallbacks",
+    "Editor previews and fallbacks",
   ],
   previews: [],
   links: [],
   motionNotes: [
-    "Blocks share one entrance utility so motion stays consistent across pages.",
-    "Hover and focus states are CSS. Blocks only add JavaScript when CSS cannot express the effect.",
+    "One shared entrance utility for every block.",
+    "Hover and focus in CSS. JavaScript only where CSS cannot.",
   ],
   aiWorkflowNotes: [
-    "An agent reads one complete existing block end to end before it scaffolds a new one.",
-    "Each new block is built in its own worktree and reviewed as a single diff.",
-    "A skill encodes the block contract so the agent follows the same pattern every time.",
+    "An agent reads one complete block before it scaffolds the next.",
+    "Each block gets its own worktree and one reviewed diff.",
+    "A skill encodes the block contract.",
   ],
   featured: false,
   sample: true,
   related: ["editorial-motion-system"],
 };
 
-<Callout tone="sample" title="Sample case study">
-  Everything on this page is placeholder text that demonstrates the template.
-  Replace the meta block and the sections with a real project. The file is
-  `content/work/composable-page-builder.mdx`.
-</Callout>
-
 ## Context
 
-Describe the site, the editors and the number of block types. A page builder earns its keep when editors recombine blocks without asking for code changes.
+Editors recombine blocks without asking for code changes.
 
 ## Challenges
 
-- Adding a block must never require editing an existing file.
-- The shape of a block should be declared once and derived everywhere else.
-- Editors need safe previews and clear empty states.
-
-## Contribution
-
-List the pieces you designed: the module contract, the registry, the typed query and the editor experience.
+- Adding a block never edits an existing file.
+- A block's shape is declared once.
+- Safe previews and clear empty states.
 
 ## Architecture
 
 <Diagram
-  caption="Illustrative architecture. The renderer, the schema list and the query all read from one registry."
+  caption="One registry feeds the renderer, the schema list and the page query."
   label="Each block module registers itself in a registry. The renderer, the schema list and the page query are built from that registry"
 >
   <div className="grid w-full max-w-2xl gap-4 text-center text-sm sm:grid-cols-3 sm:items-center">
-    <div className="border-rule-strong border p-4">{"Block modules"}</div>
-    <div className="border-rule-strong border p-4">{"Registry"}</div>
+    <div className="border-rule-strong bg-popover border p-4">
+      {"Block modules"}
+    </div>
+    <div className="border-rule-strong bg-popover border p-4">{"Registry"}</div>
     <div className="grid gap-4">
-      <div className="border-rule-strong border p-4">{"Renderer"}</div>
-      <div className="border-rule-strong border p-4">{"Schema list"}</div>
-      <div className="border-rule-strong border p-4">{"Page query"}</div>
+      <div className="border-rule-strong bg-popover border p-4">
+        {"Renderer"}
+      </div>
+      <div className="border-rule-strong bg-popover border p-4">
+        {"Schema list"}
+      </div>
+      <div className="border-rule-strong bg-popover border p-4">
+        {"Page query"}
+      </div>
     </div>
   </div>
 </Diagram>
@@ -69,15 +67,13 @@ List the pieces you designed: the module contract, the registry, the typed query
 
 <Steps>
   <Step title="Write the block module">
-    One file owns the schema, the query fragment, the types and the component.
+    Schema, query fragment, types and component in one file.
   </Step>
   <Step title="Register it">
-    The module exports a definition. The registry collects definitions in one
-    place.
+    The module exports a definition. The registry collects them.
   </Step>
   <Step title="Render by type">
-    The renderer looks the block up by its type. There is no switch over block
-    types.
+    The renderer looks the block up by type. No switch.
   </Step>
 </Steps>
 
@@ -104,5 +100,5 @@ export const defineBlock = <Data>(definition: BlockDefinition<Data>) =>
 ## Outcomes
 
 <Callout tone="warning" title="No outcomes recorded">
-  This is a sample entry. Add measured results only when they are real.
+  Sample entry. No measured results.
 </Callout>

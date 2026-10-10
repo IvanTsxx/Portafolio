@@ -1,5 +1,7 @@
 import { codeToTokens } from "shiki";
 
+import { codeTheme } from "@/lib/content/code-theme";
+
 export type CodeLanguage = "css" | "json" | "ts" | "tsx";
 
 export interface HighlightedToken {
@@ -11,8 +13,6 @@ export interface HighlightedToken {
 }
 
 export type HighlightedLine = readonly HighlightedToken[];
-
-const codeTheme = "vitesse-black";
 
 const italicFlag = 1;
 const boldFlag = 2;

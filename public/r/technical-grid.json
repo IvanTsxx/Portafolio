@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "technical-grid",
   "title": "Animated Technical Grid",
-  "description": "Hairline engineering grid with major lines, corner registration marks, a scanning line and pulsing intersection nodes. Reads as a calm blueprint with motion off.",
+  "description": "Hairline blueprint grid with a scan line, pulsing nodes and corner marks.",
   "dependencies": [
     "class-variance-authority"
   ],
@@ -20,7 +20,7 @@
       "color-clay": "var(--clay)"
     },
     "light": {
-      "clay": "oklch(0.56 0.12 42)"
+      "clay": "oklch(0.52 0.13 42)"
     },
     "dark": {
       "clay": "oklch(0.7 0.14 45)"
@@ -79,19 +79,19 @@
       "props": [
         {
           "component": "TechnicalGrid",
-          "description": "A div that paints the grid behind its children. Extends every div prop.",
+          "description": "A div that paints the grid behind its children.",
           "props": [
             {
               "name": "tone",
               "type": "\"muted\" | \"strong\" | \"clay\"",
               "default": "\"muted\"",
-              "description": "Line intensity and ink color. clay tints lines, scan line and nodes with the accent."
+              "description": "Line intensity and ink. clay tints the lines, scan and nodes."
             },
             {
               "name": "fade",
               "type": "\"none\" | \"edges\" | \"top\" | \"bottom\"",
               "default": "\"none\"",
-              "description": "Masks the field so the grid dissolves toward the edges or one side."
+              "description": "Fades the grid toward the edges or one side."
             },
             {
               "name": "cellSize",
@@ -121,13 +121,13 @@
               "name": "nodes",
               "type": "number",
               "default": "5",
-              "description": "Count of pulsing intersection nodes, snapped to grid lines. Maximum 24."
+              "description": "Pulsing nodes snapped to grid lines. Maximum 24."
             },
             {
               "name": "markers",
               "type": "boolean",
               "default": "true",
-              "description": "Draws registration marks in the four corners."
+              "description": "Registration marks in the four corners."
             },
             {
               "name": "label",
@@ -143,7 +143,7 @@
               "name": "animated",
               "type": "boolean",
               "default": "true",
-              "description": "Turns the scan line and node pulses off while keeping the static grid."
+              "description": "Turns the scan and pulses off. The static grid stays."
             }
           ]
         }
@@ -157,7 +157,7 @@
             "strong",
             "clay"
           ],
-          "description": "Foreground ink at 6 and 12 percent, 10 and 22 percent, or the clay accent."
+          "description": "Ink at 6 and 12 percent, 10 and 22 percent, or clay."
         },
         {
           "name": "fade",
@@ -168,41 +168,38 @@
             "top",
             "bottom"
           ],
-          "description": "Radial or linear mask applied to the grid field only, never to children."
+          "description": "Mask on the grid field only, never on children."
         }
       ],
       "examples": [
         {
           "title": "Grid as a framed field",
-          "description": "Content sits above the grid in a relatively positioned wrapper.",
           "file": "registry/ivan/examples/technical-grid/basic.tsx"
         },
         {
           "title": "Grid as a section background",
-          "description": "Absolutely positioned behind content with an edge fade and both scan axes.",
           "file": "registry/ivan/examples/technical-grid/background.tsx"
         }
       ],
       "accessibility": [
-        "The grid, scan line, nodes and corner marks are aria-hidden and ignore pointer events, so they never enter the accessibility tree or block clicks.",
-        "Nothing meaningful is encoded in the grid. label and caption are real text in text-muted-foreground, which stays above 4.5:1 on the card and background tokens.",
-        "Children render above the grid in normal DOM order and keep their own semantics and focus order.",
-        "With prefers-reduced-motion the scan line and node pulses are hidden. The static grid, nodes and marks remain, so the composition is complete with all motion off."
+        "Grid, scan line, nodes and marks are aria-hidden and ignore pointer events.",
+        "label and caption are real text at 4.5:1 or more.",
+        "Reduced motion hides the scan and pulses. The static grid stays."
       ],
       "animation": [
         {
           "target": "Scan line",
-          "properties": "transform (translate) and opacity, composited on the GPU",
-          "timing": "scanDuration seconds, linear, infinite. Vertical scan starts half a cycle later so both axes never align.",
-          "trigger": "Starts on mount and loops without interaction.",
+          "properties": "transform, opacity",
+          "timing": "scanDuration seconds, linear, infinite",
+          "trigger": "On mount",
           "reducedMotion": "Hidden."
         },
         {
           "target": "Node pulse ring",
-          "properties": "transform (scale 1 to 4) and opacity",
-          "timing": "3 to 5 seconds per node, ease-out, infinite, delays staggered up to 4 seconds.",
-          "trigger": "Starts on mount and loops without interaction.",
-          "reducedMotion": "Ring hidden. The solid node dot stays."
+          "properties": "transform, opacity",
+          "timing": "3 to 5 seconds, ease-out, infinite",
+          "trigger": "On mount",
+          "reducedMotion": "Ring hidden. Dot stays."
         }
       ]
     }

@@ -1,10 +1,9 @@
 export const meta = {
   title: "Product configurator",
   year: 2026,
-  context: "Sample entry for a 3D product page. No real client.",
+  context: "Sample, 3D product page",
   role: "Frontend engineer",
-  summary:
-    "A sample case study for a real-time 3D configurator: scene structure, lazy loading, a static fallback and how camera and material changes stay in sync with the interface.",
+  summary: "A real-time 3D configurator over a complete static page.",
   technologies: [
     "React Three Fiber",
     "Drei",
@@ -14,58 +13,52 @@ export const meta = {
   ],
   responsibilities: [
     "Scene graph and camera rig",
-    "Lazy-loaded canvas with a meaningful static fallback",
+    "Lazy canvas with a static fallback",
     "Material and variant switching",
     "Frame budget and mobile adaptation",
   ],
   previews: [],
   links: [],
   motionNotes: [
-    "Camera moves between named viewpoints with a damped spring, never a linear tween.",
-    "Material changes crossfade over a short duration and respect reduced motion.",
+    "Camera moves between named viewpoints with a damped spring.",
+    "Material changes crossfade and respect reduced motion.",
     "The render loop pauses when the canvas leaves the viewport.",
   ],
   aiWorkflowNotes: [
-    "An agent reads the scene code and lists objects that allocate on every frame.",
-    "A researcher subagent summarizes loader options. The decision stays with the engineer.",
-    "Performance numbers are measured by a person on real devices before they are written down.",
+    "An agent lists objects that allocate on every frame.",
+    "A researcher subagent summarizes loader options. The engineer decides.",
+    "A person measures performance on real devices.",
   ],
   featured: false,
   sample: true,
   related: ["editorial-motion-system"],
 };
 
-<Callout tone="sample" title="Sample case study">
-  Everything on this page is placeholder text that demonstrates the template.
-  Replace the meta block and the sections with a real project. The file is
-  `content/work/product-configurator.mdx`.
-</Callout>
-
 ## Context
 
-Describe the product, the audience and the platform constraints. For a 3D page the key facts are the asset budget, the devices you had to support and what the page does when WebGL is unavailable.
+Asset budget, supported devices and the page without WebGL set the constraints.
 
 ## Challenges
 
-- A first paint that does not wait for the 3D scene.
+- A first paint that does not wait for the scene.
 - Smooth interaction on mid-range phones.
-- Variant changes that never leave the scene in a half-updated state.
-
-## Contribution
-
-Keep the list honest. Name the parts of the scene you built and the parts that came from the design or art team.
+- Variant changes that never leave the scene half updated.
 
 ## Architecture
 
 <Diagram
-  caption="Illustrative structure. The canvas is an enhancement over a complete static page."
+  caption="The canvas enhances a complete static page."
   label="A static product page renders first. A lazy client wrapper loads the canvas on top of it"
 >
   <div className="grid w-full max-w-2xl gap-4 text-center text-sm">
-    <div className="border-rule-strong border p-4">{"Static product page"}</div>
+    <div className="border-rule-strong bg-popover border p-4">
+      {"Static product page"}
+    </div>
     <div className="grid gap-4 sm:grid-cols-2">
-      <div className="border-rule-strong border p-4">{"Variant state"}</div>
-      <div className="border-rule-strong text-muted-foreground border border-dashed p-4">
+      <div className="border-rule-strong bg-popover border p-4">
+        {"Variant state"}
+      </div>
+      <div className="border-rule-strong text-graphite bg-popover border border-dashed p-4">
         {"Lazy canvas"}
       </div>
     </div>
@@ -76,7 +69,7 @@ Keep the list honest. Name the parts of the scene you built and the parts that c
 
 ### Loading the canvas
 
-The canvas loads from a client wrapper with `ssr: false` and renders the static image until it is ready.
+A client wrapper loads the canvas with `ssr: false` over the static image.
 
 ```tsx title="configurator-canvas.tsx" {4-6}
 import dynamic from "next/dynamic";
@@ -108,5 +101,5 @@ Variant state lives outside the scene. The scene reads it and never owns it.
 ## Outcomes
 
 <Callout tone="warning" title="No outcomes recorded">
-  This is a sample entry. Add measured results only when they are real.
+  Sample entry. No measured results.
 </Callout>

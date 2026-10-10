@@ -4,50 +4,65 @@ import { ListIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 
 import { NavLinks } from "@/components/site/nav-links";
-import { Button } from "@/components/ui/button";
+import { PanelHeading } from "@/components/site/panel-heading";
+import { technicalButtonVariants } from "@/components/site/styles";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { siteConfig } from "@/lib/site/config";
+import { cn } from "@/lib/utils";
 
 export const MobileNav = () => {
   const [open, setOpen] = useState(false);
   return (
     <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger
-        render={
-          <Button
-            aria-label="Open menu"
-            className="lg:hidden"
-            size="icon-sm"
-            variant="ghost"
-          />
-        }
+        aria-label="Open menu"
+        className={cn(technicalButtonVariants({ size: "sm" }), "lg:hidden")}
       >
-        <ListIcon />
+        <ListIcon aria-hidden className="size-4" />
+        Menu
       </SheetTrigger>
-      <SheetContent className="w-full max-w-xs" side="right">
-        <SheetHeader>
-          <SheetTitle className="label text-muted-foreground">
-            Navigate
-          </SheetTitle>
+      <SheetContent
+        className="w-full sm:max-w-sm"
+        showCloseButton={false}
+        side="right"
+      >
+        <SheetHeader className="gap-4 p-4">
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <div className="flex items-center justify-between gap-4">
+            <PanelHeading
+              as="p"
+              className="flex-1"
+              index="NAV"
+              jp="案内"
+              label="Navigate"
+            />
+            <SheetClose
+              className={technicalButtonVariants({ size: "sm" })}
+              type="button"
+            >
+              Close
+            </SheetClose>
+          </div>
         </SheetHeader>
-        <nav aria-label="Mobile" className="px-2">
-          <NavLinks
-            className="flex-col items-stretch gap-0 [&_a]:py-3 [&_a]:text-sm"
-            onNavigate={() => setOpen(false)}
-          />
+        <nav aria-label="Mobile">
+          <NavLinks onNavigate={() => setOpen(false)} orientation="vertical" />
         </nav>
-        <a
-          className="label border-rule-strong mx-4 mt-auto mb-6 border px-3 py-3 text-center"
-          href={`mailto:${siteConfig.email}`}
-        >
-          {siteConfig.email}
-        </a>
+        <div className="mt-auto flex flex-col gap-4 p-4">
+          <span aria-hidden className="hazard-stripe text-ink block h-1.5" />
+          <a
+            className={cn(technicalButtonVariants(), "normal-case")}
+            href={`mailto:${siteConfig.email}`}
+          >
+            {siteConfig.email}
+          </a>
+        </div>
       </SheetContent>
     </Sheet>
   );

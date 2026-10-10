@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { focusRingClassName } from "@/components/site/styles";
 import type { Heading } from "@/lib/content/text";
 import { cn } from "@/lib/utils";
 
@@ -49,21 +50,18 @@ export const TableOfContents = ({
 
   return (
     <nav aria-label="On this page" className={className}>
-      <ol>
+      <ol className="border-rule border-l">
         {headings.map((heading) => (
           <li key={heading.id}>
             <a
               aria-current={activeId === heading.id ? "location" : undefined}
               className={cn(
-                "text-muted-foreground hover:text-foreground aria-[current=location]:text-foreground group flex min-h-11 items-center gap-3 py-2 text-sm transition-colors md:min-h-0",
-                heading.depth === 3 && "pl-4"
+                "text-graphite hover:text-ink aria-[current=location]:text-ink aria-[current=location]:border-ink ease-mechanical -ml-px flex min-h-11 items-center gap-3 border-l border-transparent py-2 pr-2 pl-4 text-sm transition-colors duration-100 md:min-h-0",
+                focusRingClassName,
+                heading.depth === 3 && "pl-8"
               )}
               href={`#${heading.id}`}
             >
-              <span
-                aria-hidden
-                className="group-aria-[current=location]:bg-clay size-1.5 shrink-0 bg-transparent transition-colors"
-              />
               {heading.text}
             </a>
           </li>

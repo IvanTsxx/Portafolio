@@ -8,13 +8,13 @@ export const NoteList = ({
   items: readonly string[];
 }) =>
   items.length > 0 ? (
-    <ul className={cn("border-rule my-6 border-t", className)}>
+    <ul className={cn("border-rule-strong my-6 border-t", className)}>
       {items.map((item) => (
         <li
-          className="border-rule text-foreground/90 flex gap-4 border-b py-4 text-base/7 md:text-lg/8"
+          className="border-rule text-ink flex gap-4 border-b border-dotted py-4 text-base/7 md:text-lg/8"
           key={item}
         >
-          <span aria-hidden className="bg-faint mt-3 size-1.5 shrink-0" />
+          <span aria-hidden className="bg-ink mt-3 size-1.5 shrink-0" />
           {item}
         </li>
       ))}

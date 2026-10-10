@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useId, useState } from "react";
 import type { ReactNode } from "react";
 
-import { choiceItemClassName } from "@/components/registry-docs/toggle-styles";
+import { AgentSpot } from "@/components/scene/agent-spot";
+import { agentSpots } from "@/components/site/agent-spots";
+import { CornerMarks } from "@/components/site/corner-marks";
+import { PanelHeading } from "@/components/site/panel-heading";
+import { chipClassName, hoverRowClassName } from "@/components/site/styles";
 import {
   Empty,
   EmptyDescription,
@@ -14,6 +18,7 @@ import {
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
 
 export interface RegistryEntry {
   categories: readonly { id: string; label: string }[];
@@ -32,6 +37,10 @@ export interface RegistryFilterCategory {
 
 const allCategoriesId = "all";
 
+const agentSpotLimit = 2;
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
 const matchesQuery = (entry: RegistryEntry, query: string) => {
   const terms = query.toLowerCase().split(/\s+/u).filter(Boolean);
   const haystack = [
@@ -45,33 +54,44 @@ const matchesQuery = (entry: RegistryEntry, query: string) => {
   return terms.every((term) => haystack.includes(term));
 };
 
-const RegistryCard = ({ entry }: { entry: RegistryEntry }) => (
-  <li className="group border-rule bg-card hover:border-rule-strong focus-within:border-rule-strong relative flex flex-col border transition-colors">
+const RegistryCard = ({
+  entry,
+  spot,
+}: {
+  entry: RegistryEntry;
+  spot: boolean;
+}) => (
+  <li
+    className={cn(
+      "group/marks border-graphite/30 relative flex flex-col border-r border-b",
+      hoverRowClassName
+    )}
+  >
+    <CornerMarks reveal="hover" />
+    {spot ? <AgentSpot {...agentSpots.builderCard} /> : null}
     <div
       aria-hidden="true"
-      className="border-rule bg-background blueprint-dots relative aspect-4/3 overflow-hidden border-b"
+      className="border-graphite/30 bg-popover blueprint-dots relative aspect-4/3 overflow-hidden border-b [--clay:var(--clay-deep)] [--grid-size:16px]"
       inert
     >
       {entry.thumbnail}
     </div>
-    <div className="flex flex-1 flex-col gap-3 p-4">
+    <div className="flex flex-1 flex-col gap-3 p-4 md:p-5">
       <div className="label flex items-center justify-between gap-4">
-        <span className="text-muted-foreground group-hover:text-clay transition-colors">
-          {entry.index}
-        </span>
-        <span className="text-muted-foreground truncate">
+        <span className="text-mist tabular-nums">{entry.index}</span>
+        <span className="text-graphite truncate">
           {entry.categories.map((category) => category.label).join(" / ")}
         </span>
       </div>
-      <h3 className="text-base font-medium tracking-tight">
+      <h3 className="text-ink text-xl font-light tracking-tight">
         <Link
-          className="after:absolute after:inset-0 focus-visible:outline-offset-4"
+          className="outline-none after:absolute after:inset-0"
           href={`/registry/${entry.name}`}
         >
           {entry.title}
         </Link>
       </h3>
-      <p className="text-muted-foreground line-clamp-3 text-sm text-pretty">
+      <p className="text-graphite line-clamp-2 text-sm text-pretty">
         {entry.description}
       </p>
     </div>
@@ -102,20 +122,27 @@ export const RegistryBrowser = ({
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
+      <PanelHeading
+        aside={`${pad(visibleEntries.length)} / ${pad(entries.length)}`}
+        as="h2"
+        index="REG-01"
+        jp="部品"
+        label="Components"
+      />
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="flex flex-col gap-3">
-          <label className="label text-muted-foreground" htmlFor={searchId}>
-            Search components
+          <label className="label text-mist" htmlFor={searchId}>
+            Search
           </label>
           <div className="relative w-full md:w-80">
             <MagnifyingGlassIcon
               aria-hidden="true"
-              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+              className="text-graphite pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
             />
             <Input
               autoComplete="off"
-              className="h-11 pl-9 text-base md:text-sm"
+              className="border-graphite/60 focus-visible:border-ink focus-visible:ring-ink/50 h-11 pl-9 text-base md:text-sm"
               id={searchId}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Grid, button, scramble"
@@ -126,10 +153,7 @@ export const RegistryBrowser = ({
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <span
-            className="label text-muted-foreground"
-            id={`${searchId}-filter`}
-          >
+          <span className="label text-mist" id={`${searchId}-filter`}>
             Category
           </span>
           <ToggleGroup
@@ -138,54 +162,49 @@ export const RegistryBrowser = ({
             onValueChange={(next) =>
               setActiveCategory(next[0] ?? allCategoriesId)
             }
-            size="lg"
-            spacing={1}
+            spacing={2}
             value={[activeCategory]}
             variant="outline"
           >
-            <ToggleGroupItem
-              className={choiceItemClassName}
-              value={allCategoriesId}
-            >
-              All
-              <span className="text-muted-foreground tabular-nums">
-                {entries.length}
-              </span>
+            <ToggleGroupItem className={chipClassName} value={allCategoriesId}>
+              All <span className="tabular-nums">{pad(entries.length)}</span>
             </ToggleGroupItem>
             {categories.map((category) => (
               <ToggleGroupItem
-                className={choiceItemClassName}
+                className={chipClassName}
                 key={category.id}
                 value={category.id}
               >
                 {category.label}
-                <span className="text-muted-foreground tabular-nums">
-                  {category.count}
-                </span>
+                <span className="tabular-nums">{pad(category.count)}</span>
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
         </div>
       </div>
-      <output aria-live="polite" className="label text-muted-foreground">
+      <output aria-live="polite" className="sr-only">
         {visibleEntries.length} of {entries.length} items
       </output>
       {visibleEntries.length > 0 ? (
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="border-graphite/30 mt-4 grid border-t border-l sm:grid-cols-2 xl:grid-cols-3">
           {visibleEntries.map((entry) => (
-            <RegistryCard entry={entry} key={entry.name} />
+            <RegistryCard
+              entry={entry}
+              key={entry.name}
+              spot={entries.indexOf(entry) < agentSpotLimit}
+            />
           ))}
         </ul>
       ) : (
-        <Empty className="border py-16">
+        <Empty className="border-rule-strong py-16">
           <EmptyHeader>
-            <EmptyTitle>No components match</EmptyTitle>
-            <EmptyDescription>
-              Nothing in the registry matches that search and category.
+            <EmptyTitle className="label text-ink">No match</EmptyTitle>
+            <EmptyDescription className="label text-graphite">
+              Nothing fits that search and category.
             </EmptyDescription>
           </EmptyHeader>
           <button
-            className="label border-rule-strong hover:border-clay hover:text-clay inline-flex min-h-11 items-center border px-4 transition-colors"
+            className={cn(chipClassName, "justify-center")}
             onClick={resetFilters}
             type="button"
           >

@@ -20,14 +20,14 @@ export const Demo = ({
   title,
 }: DemoProps) => (
   <figure className={cn("my-10", className)}>
-    <div className="border-rule overflow-hidden rounded-sm border">
-      <p className="label border-rule bg-graphite text-muted-foreground flex items-center justify-between gap-4 border-b px-4 py-3">
+    <div className="border-rule-strong overflow-hidden border">
+      <p className="label border-rule-strong bg-paper-deep text-graphite flex items-center justify-between gap-4 border-b px-4 py-3">
         <span className="truncate">{title}</span>
-        <span className="text-muted-foreground shrink-0">Demo</span>
+        <span className="text-mist shrink-0">Demo</span>
       </p>
       {src ? (
         <iframe
-          className="bg-background block w-full"
+          className="bg-paper block w-full"
           height={height}
           loading="lazy"
           sandbox="allow-scripts"
@@ -35,13 +35,13 @@ export const Demo = ({
           title={title}
         />
       ) : (
-        <div className="blueprint-dots bg-card grid min-h-48 place-items-center p-6">
-          {children ?? <p className="label text-muted-foreground">Demo slot</p>}
+        <div className="hatch bg-popover grid min-h-48 place-items-center p-6">
+          {children ?? <p className="label text-graphite">Demo slot</p>}
         </div>
       )}
     </div>
     {caption ? (
-      <figcaption className="text-muted-foreground mt-3 text-sm text-pretty">
+      <figcaption className="label text-graphite mt-3 normal-case">
         {caption}
       </figcaption>
     ) : null}

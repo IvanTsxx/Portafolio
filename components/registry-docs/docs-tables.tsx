@@ -8,15 +8,16 @@ import {
 } from "@/components/ui/table";
 import type { RegistryItemDocs } from "@/lib/registry/schema";
 
-const headCellClassName = "label text-muted-foreground h-11 px-4";
+const headCellClassName =
+  "label bg-paper-deep text-graphite border-rule-strong h-11 border-b px-4 font-normal";
 const cellClassName = "px-4 py-3 align-top whitespace-normal";
 
 const Frame = ({ children }: { children: React.ReactNode }) => (
-  <div className="border-rule bg-card border">{children}</div>
+  <div className="border-rule-strong bg-popover border">{children}</div>
 );
 
 const Mono = ({ children }: { children: React.ReactNode }) => (
-  <code className="text-foreground font-mono text-xs">{children}</code>
+  <code className="text-ink font-mono text-xs">{children}</code>
 );
 
 export const PropsTables = ({
@@ -28,9 +29,9 @@ export const PropsTables = ({
     {groups.map((group) => (
       <div className="flex flex-col gap-3" key={group.component}>
         <div className="flex flex-col gap-1">
-          <h3 className="font-mono text-sm">{`<${group.component}>`}</h3>
+          <h3 className="text-ink font-mono text-sm">{`<${group.component}>`}</h3>
           {group.description ? (
-            <p className="text-muted-foreground max-w-prose text-sm text-pretty">
+            <p className="text-graphite max-w-prose text-sm text-pretty">
               {group.description}
             </p>
           ) : null}
@@ -51,11 +52,13 @@ export const PropsTables = ({
                   <TableCell className={cellClassName}>
                     <Mono>{prop.name}</Mono>
                     {prop.required ? (
-                      <span className="label text-clay ml-2">Required</span>
+                      <span className="label text-ink border-ink ml-2 border px-1">
+                        Req
+                      </span>
                     ) : null}
                   </TableCell>
                   <TableCell className={`${cellClassName} min-w-48`}>
-                    <code className="text-muted-foreground font-mono text-xs">
+                    <code className="text-graphite font-mono text-xs">
                       {prop.type}
                     </code>
                   </TableCell>
@@ -63,11 +66,11 @@ export const PropsTables = ({
                     {prop.default ? (
                       <Mono>{prop.default}</Mono>
                     ) : (
-                      <span className="text-muted-foreground">None</span>
+                      <span className="text-graphite">None</span>
                     )}
                   </TableCell>
                   <TableCell
-                    className={`${cellClassName} text-muted-foreground min-w-64 text-sm text-pretty`}
+                    className={`${cellClassName} text-graphite min-w-64 text-sm text-pretty`}
                   >
                     {prop.description}
                   </TableCell>
@@ -106,7 +109,7 @@ export const VariantsTable = ({
               <ul className="flex flex-wrap gap-1">
                 {variant.options.map((option) => (
                   <li
-                    className="border-rule text-muted-foreground border px-1.5 py-0.5 font-mono text-xs"
+                    className="border-rule-strong text-graphite border px-1.5 py-0.5 font-mono text-xs"
                     key={option}
                   >
                     {option}
@@ -118,7 +121,7 @@ export const VariantsTable = ({
               <Mono>{variant.default}</Mono>
             </TableCell>
             <TableCell
-              className={`${cellClassName} text-muted-foreground min-w-64 text-sm text-pretty`}
+              className={`${cellClassName} text-graphite min-w-64 text-sm text-pretty`}
             >
               {variant.description}
             </TableCell>
@@ -148,7 +151,7 @@ export const AnimationTable = ({
       <TableBody>
         {animations.map((animation) => (
           <TableRow key={animation.target}>
-            <TableCell className={`${cellClassName} text-foreground text-sm`}>
+            <TableCell className={`${cellClassName} text-ink text-sm`}>
               {animation.target}
             </TableCell>
             {[
@@ -158,7 +161,7 @@ export const AnimationTable = ({
               animation.reducedMotion,
             ].map((value) => (
               <TableCell
-                className={`${cellClassName} text-muted-foreground min-w-48 text-sm text-pretty`}
+                className={`${cellClassName} text-graphite min-w-48 text-sm text-pretty`}
                 key={value}
               >
                 {value}

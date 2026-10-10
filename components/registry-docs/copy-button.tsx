@@ -39,8 +39,8 @@ export const CopyButton = ({
     <button
       aria-label={label}
       className={cn(
-        "text-muted-foreground hover:text-foreground focus-visible:text-foreground inline-flex size-11 shrink-0 items-center justify-center transition-colors",
-        copied && "text-clay hover:text-clay",
+        "text-graphite hover:text-ink focus-visible:text-ink focus-visible:ring-ink ease-mechanical inline-flex size-11 shrink-0 items-center justify-center transition-colors duration-100 outline-none focus-visible:ring-2 focus-visible:ring-inset",
+        copied && "text-ink hover:text-ink",
         className
       )}
       onClick={copy}

@@ -22,7 +22,12 @@ export const CodeBlock = ({
   className?: string;
   lines: readonly HighlightedLine[];
 }) => (
-  <div className={cn("overflow-x-auto font-mono text-xs leading-6", className)}>
+  <div
+    className={cn(
+      "text-ink overflow-x-auto font-mono text-xs leading-6",
+      className
+    )}
+  >
     <pre
       className="min-w-max p-4 outline-offset-[-2px]"
       {...keyboardScrollableProps}

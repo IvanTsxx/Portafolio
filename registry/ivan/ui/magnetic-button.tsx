@@ -28,7 +28,7 @@ const magneticButtonVariants = cva(
         ghost:
           "text-muted-foreground group-hover/mb:text-foreground group-focus-visible/mb:text-foreground border-transparent",
         outline:
-          "border-border text-foreground group-hover/mb:border-clay group-hover/mb:text-primary-foreground group-focus-visible/mb:border-clay group-focus-visible/mb:text-primary-foreground",
+          "border-foreground/40 text-foreground group-hover/mb:border-clay group-hover/mb:text-primary-foreground group-focus-visible/mb:border-clay group-focus-visible/mb:text-primary-foreground",
         solid:
           "border-foreground bg-foreground text-background group-hover/mb:border-clay group-hover/mb:text-primary-foreground group-focus-visible/mb:border-clay group-focus-visible/mb:text-primary-foreground",
       },

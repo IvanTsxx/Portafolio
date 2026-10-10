@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "text-scramble",
   "title": "Text Scramble Reveal",
-  "description": "Monospace text that resolves out of noise glyphs, left to right. The real text is always in the DOM, and reduced motion renders it plain.",
+  "description": "Monospace text that resolves out of noise glyphs. The real text is always in the DOM.",
   "dependencies": [
     "class-variance-authority"
   ],
@@ -26,7 +26,7 @@
       "color-clay": "var(--clay)"
     },
     "light": {
-      "clay": "oklch(0.56 0.12 42)"
+      "clay": "oklch(0.52 0.13 42)"
     },
     "dark": {
       "clay": "oklch(0.7 0.14 45)"
@@ -37,19 +37,19 @@
       "props": [
         {
           "component": "TextScramble",
-          "description": "An inline-grid element that animates its text. Extends every span prop except children.",
+          "description": "Animates its text. Extends every span prop except children.",
           "props": [
             {
               "name": "text",
               "type": "string",
               "required": true,
-              "description": "The final text. Always rendered in the DOM for assistive tech, search and copy."
+              "description": "The final text. Always in the DOM."
             },
             {
               "name": "trigger",
               "type": "\"mount\" | \"visible\" | \"hover\" | \"manual\"",
               "default": "\"visible\"",
-              "description": "When the scramble runs. visible waits until half of the text is on screen. manual runs when replayKey changes."
+              "description": "When it runs. visible waits for half the text on screen. manual runs when replayKey changes."
             },
             {
               "name": "duration",
@@ -72,12 +72,12 @@
               "name": "once",
               "type": "boolean",
               "default": "true",
-              "description": "With the visible trigger, stop observing after the first reveal."
+              "description": "With visible, stop observing after the first reveal."
             },
             {
               "name": "replayKey",
               "type": "number | string",
-              "description": "Change it to replay the animation, for example from a button."
+              "description": "Change it to replay."
             },
             {
               "name": "as",
@@ -89,13 +89,13 @@
               "name": "variant",
               "type": "\"label\" | \"heading\" | \"body\"",
               "default": "\"label\"",
-              "description": "Type treatment. All three are monospace so glyph swaps never change the layout."
+              "description": "Type treatment. All three are monospace."
             },
             {
               "name": "tone",
               "type": "\"default\" | \"muted\" | \"accent\"",
               "default": "\"default\"",
-              "description": "Resolved text color. Unresolved glyphs use clay, or the foreground color when the tone is accent."
+              "description": "Resolved text color. Noise glyphs use clay, or foreground for accent."
             }
           ]
         }
@@ -109,7 +109,7 @@
             "heading",
             "body"
           ],
-          "description": "label is 12 px uppercase and tracked, heading is 24 px medium, body is 14 px."
+          "description": "label 12 px uppercase, heading 24 px medium, body 14 px."
         },
         {
           "name": "tone",
@@ -119,42 +119,39 @@
             "muted",
             "accent"
           ],
-          "description": "Foreground, muted foreground or clay for the resolved text."
+          "description": "Foreground, muted foreground or clay."
         }
       ],
       "examples": [
         {
           "title": "Heading revealed on scroll",
-          "description": "The default visible trigger on a real h2.",
           "file": "registry/ivan/examples/text-scramble/basic.tsx"
         },
         {
           "title": "Hover and manual replay",
-          "description": "A hex label that rescrambles on hover and a button that replays a heading.",
           "file": "registry/ivan/examples/text-scramble/interactive.tsx"
         }
       ],
       "accessibility": [
-        "The final text is always present as the element's real content, so screen readers, find in page, translation tools and copy all see it. The animated copy is aria-hidden.",
-        "Both copies share one grid cell. The final copy reserves the box, so the scramble never shifts the layout.",
-        "With prefers-reduced-motion no scramble runs for any trigger and the final text is shown immediately.",
-        "No JavaScript renders the final text statically from the server.",
-        "Use as to render real headings. The animated copy never changes the heading level or the reading order."
+        "The final text is the element's real content. The animated copy is aria-hidden.",
+        "Both copies share one grid cell, so nothing shifts.",
+        "Reduced motion shows the final text immediately.",
+        "Use as to keep real heading levels."
       ],
       "animation": [
         {
           "target": "Glyph resolve",
-          "properties": "text content of one span per glyph. No layout or style properties are animated.",
-          "timing": "One requestAnimationFrame loop. Noise glyphs reshuffle every 45 ms. 70 percent of the duration is a left to right stagger and 30 percent is random jitter.",
-          "trigger": "mount, first time half of the text is visible, pointer enter or focus, or replayKey change.",
-          "reducedMotion": "Skipped. Final text is shown immediately."
+          "properties": "Text of one span per glyph",
+          "timing": "One rAF loop. Noise reshuffles every 45 ms. 70 percent stagger, 30 percent jitter.",
+          "trigger": "Mount, half visible, pointer enter, focus or replayKey",
+          "reducedMotion": "Skipped."
         },
         {
           "target": "Unresolved glyph color",
           "properties": "color",
-          "timing": "Switches the instant a glyph resolves.",
-          "trigger": "Per glyph as it resolves.",
-          "reducedMotion": "Not applicable. Nothing is unresolved."
+          "timing": "Switches when a glyph resolves",
+          "trigger": "Per glyph",
+          "reducedMotion": "Not applicable."
         }
       ]
     }

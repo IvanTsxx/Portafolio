@@ -8,9 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { HighlightedFile } from "@/lib/registry/source";
 
 const FilePanel = ({ file }: { file: HighlightedFile }) => (
-  <div className="border-rule bg-card flex flex-col border">
-    <div className="border-rule flex items-center justify-between gap-4 border-b pl-4">
-      <p className="label text-muted-foreground truncate">{file.installPath}</p>
+  <div className="border-rule-strong bg-popover flex flex-col border">
+    <div className="border-rule-strong bg-paper-deep flex items-center justify-between gap-4 border-b pl-4">
+      <p className="label text-graphite truncate">{file.installPath}</p>
       <CopyButton label={`Copy ${file.label}`} value={file.source} />
     </div>
     <CodeBlock className="max-h-128 overflow-y-auto" lines={file.lines} />
