@@ -27,10 +27,24 @@ const colors = {
 const eyeCenters = [48, 112] as const;
 const legCenters = [40, 64, 96, 120] as const;
 
-const HardHat = ({ color }: { color: string }) => (
+const HardHat = ({ color, edge }: { color: string; edge?: string }) => (
   <>
-    <path d="M42 52 C42 26 118 26 118 52 Z" fill={color} />
-    <rect fill={color} height="6" rx="3" width="92" x="34" y="49" />
+    <path
+      d="M42 52 C42 26 118 26 118 52 Z"
+      fill={color}
+      stroke={edge}
+      strokeWidth="1.5"
+    />
+    <rect
+      fill={color}
+      height="6"
+      rx="3"
+      stroke={edge}
+      strokeWidth="1.5"
+      width="92"
+      x="34"
+      y="49"
+    />
     <rect
       fill={colors.ink}
       height="20"
@@ -89,7 +103,7 @@ const posterKits = {
     ),
   },
   architect: {
-    head: <HardHat color={colors.white} />,
+    head: <HardHat color={colors.white} edge="#b9b29d" />,
     props: (
       <>
         <rect fill="#2f5c98" height="34" rx="4" width="16" x="12" y="88" />

@@ -1052,7 +1052,7 @@
       ],
       "devDependencies": ["@types/three@^0.186.0"],
       "registryDependencies": ["https://bongi.dev/r/agent.json"],
-      "docs": "Requires React 19. Render <AgentStage role=\"debugger\" className=\"h-72 w-full\" /> anywhere. It owns its Canvas, so keep one stage per view.",
+      "docs": "Requires React 19. Render <AgentStage role=\"debugger\" className=\"h-72 w-full\" /> anywhere. Each stage owns a Canvas, so mount AgentStageScene in one shared canvas when a page needs many agents.",
       "files": [
         {
           "path": "registry/ivan/components/agent-stage/agent-stage.tsx",
