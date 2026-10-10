@@ -6,8 +6,20 @@ import type { RegistryFile } from "./schema";
 
 const installedImportRewrites = [
   [`@/registry/${registry.name}/ui/`, "@/components/ui/"],
+  [`@/registry/${registry.name}/components/`, "@/components/"],
   [`@/registry/${registry.name}/hooks/`, "@/hooks/"],
   [`@/registry/${registry.name}/lib/`, "@/lib/"],
+] as const;
+
+export const docsShimRewrites = [
+  [
+    '"@/components/registry-docs/demos/agent-canvas-view"',
+    '"@react-three/fiber"',
+  ],
+  [
+    '"@/components/registry-docs/demos/agent-stage-view"',
+    '"@/components/agent-stage/agent-stage"',
+  ],
 ] as const;
 
 const targetPlaceholders = [
@@ -19,7 +31,7 @@ const targetPlaceholders = [
 
 export const toInstalledSource = (source: string) => {
   let installed = source;
-  for (const [from, to] of installedImportRewrites) {
+  for (const [from, to] of [...installedImportRewrites, ...docsShimRewrites]) {
     installed = installed.replaceAll(from, to);
   }
   return installed;

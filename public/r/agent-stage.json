@@ -1,0 +1,236 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "agent-stage",
+  "title": "Agent Stage",
+  "description": "Ready canvas for one agent: warm key light, room reflections, contact shadow, auto framing, paused offscreen, poster fallback.",
+  "dependencies": [
+    "three@^0.186.1",
+    "@react-three/fiber@^9.8.1",
+    "@react-three/drei@^10.7.9"
+  ],
+  "devDependencies": [
+    "@types/three@^0.186.0"
+  ],
+  "registryDependencies": [
+    "https://bongi.dev/r/agent.json"
+  ],
+  "files": [
+    {
+      "path": "registry/ivan/components/agent-stage/agent-stage.tsx",
+      "content": "\"use client\";\n\nimport { Canvas } from \"@react-three/fiber\";\nimport { useEffect, useRef, useState, useSyncExternalStore } from \"react\";\nimport type { ReactNode, RefObject } from \"react\";\nimport { NeutralToneMapping } from \"three\";\n\nimport { cn } from \"@/lib/utils\";\nimport { agentRoleLabels } from \"@/registry/ivan/components/agent/types\";\nimport type {\n  AgentAction,\n  AgentRole,\n} from \"@/registry/ivan/components/agent/types\";\nimport type { AgentMotion } from \"@/registry/ivan/components/agent/use-agent-rig\";\nimport { usePrefersReducedMotion } from \"@/registry/ivan/hooks/use-prefers-reduced-motion\";\n\nimport { AgentPoster } from \"./agent-poster\";\nimport { AgentStageScene } from \"./agent-stage-scene\";\n\nexport interface AgentStageProps {\n  role: AgentRole;\n  action?: AgentAction;\n  focused?: boolean;\n  motion?: AgentMotion;\n  shadow?: boolean;\n  label?: string;\n  fallback?: ReactNode;\n  className?: string;\n}\n\nlet cachedWebGLSupport: boolean | null = null;\n\nconst detectWebGL = () => {\n  if (cachedWebGLSupport !== null) {\n    return cachedWebGLSupport;\n  }\n  try {\n    const probe = document.createElement(\"canvas\");\n    const context = probe.getContext(\"webgl2\") ?? probe.getContext(\"webgl\");\n    context?.getExtension(\"WEBGL_lose_context\")?.loseContext();\n    cachedWebGLSupport = context !== null;\n  } catch {\n    cachedWebGLSupport = false;\n  }\n  return cachedWebGLSupport;\n};\n\nconst subscribeToPageShow = (onChange: () => void) => {\n  window.addEventListener(\"pageshow\", onChange);\n  return () => window.removeEventListener(\"pageshow\", onChange);\n};\n\nconst getServerWebGLSupport = () => true;\n\nconst useWebGLSupport = () =>\n  useSyncExternalStore(subscribeToPageShow, detectWebGL, getServerWebGLSupport);\n\nconst useIsInView = (target: RefObject<Element | null>) => {\n  const [isInView, setIsInView] = useState(false);\n\n  useEffect(() => {\n    const element = target.current;\n    if (!element) {\n      return;\n    }\n    const observer = new IntersectionObserver(\n      ([entry]) => setIsInView(entry?.isIntersecting ?? false),\n      { rootMargin: \"10% 0px\" }\n    );\n    observer.observe(element);\n    return () => observer.disconnect();\n  }, [target]);\n\n  return isInView;\n};\n\nexport const AgentStage = ({\n  role,\n  action,\n  focused,\n  motion,\n  shadow,\n  label,\n  fallback,\n  className,\n}: AgentStageProps) => {\n  const frame = useRef<HTMLElement>(null);\n  const [isHovered, setIsHovered] = useState(false);\n  const hasWebGL = useWebGLSupport();\n  const isInView = useIsInView(frame);\n  const prefersReducedMotion = usePrefersReducedMotion();\n  const resolvedMotion = motion ?? (prefersReducedMotion ? \"reduced\" : \"full\");\n\n  let frameloop: \"always\" | \"demand\" | \"never\" = \"never\";\n  if (isInView) {\n    frameloop = resolvedMotion === \"reduced\" ? \"demand\" : \"always\";\n  }\n\n  return (\n    <figure\n      aria-label={label ?? agentRoleLabels[role]}\n      className={cn(\"relative m-0 aspect-4/3 w-full\", className)}\n      onPointerEnter={() => setIsHovered(true)}\n      onPointerLeave={() => setIsHovered(false)}\n      ref={frame}\n    >\n      {hasWebGL ? (\n        <Canvas\n          dpr={[1, 2]}\n          frameloop={frameloop}\n          gl={{\n            alpha: true,\n            antialias: true,\n            powerPreference: \"high-performance\",\n            toneMapping: NeutralToneMapping,\n          }}\n        >\n          <AgentStageScene\n            action={action}\n            focused={focused ?? isHovered}\n            motion={resolvedMotion}\n            role={role}\n            shadow={shadow}\n          />\n        </Canvas>\n      ) : (\n        (fallback ?? <AgentPoster className=\"size-full\" role={role} />)\n      )}\n    </figure>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/agent-stage/agent-stage.tsx"
+    },
+    {
+      "path": "registry/ivan/components/agent-stage/agent-stage-scene.tsx",
+      "content": "\"use client\";\n\nimport { PerspectiveCamera } from \"@react-three/drei\";\nimport { useThree } from \"@react-three/fiber\";\nimport { useEffect, useLayoutEffect } from \"react\";\nimport { MathUtils, Vector3 } from \"three\";\n\nimport { Agent } from \"@/registry/ivan/components/agent/agent\";\nimport type {\n  AgentAction,\n  AgentRole,\n} from \"@/registry/ivan/components/agent/types\";\nimport { agentSignatureActions } from \"@/registry/ivan/components/agent/types\";\nimport type { AgentMotion } from \"@/registry/ivan/components/agent/use-agent-rig\";\n\nimport { StageLights } from \"./stage-lights\";\n\nexport interface AgentStageSceneProps {\n  role: AgentRole;\n  action?: AgentAction;\n  focused?: boolean;\n  motion?: AgentMotion;\n  shadow?: boolean;\n}\n\nconst lookTarget = new Vector3(0, 1, 0);\nconst viewDirection = new Vector3();\nconst elevation = 0.2;\nconst framedHeight = 2.5;\nconst framedWidth = 3;\nconst framePadding = 1.08;\nconst agentYaw = -0.28;\n\nconst FitCamera = () => {\n  const camera = useThree((state) => state.camera);\n  const aspect = useThree((state) => state.size.width / state.size.height);\n\n  useLayoutEffect(() => {\n    if (!(\"fov\" in camera)) {\n      return;\n    }\n    viewDirection.set(0, Math.sin(elevation), Math.cos(elevation));\n    const halfFov = MathUtils.degToRad(camera.fov / 2);\n    const fitHeight = framedHeight / 2 / Math.tan(halfFov);\n    const fitWidth = framedWidth / 2 / (Math.tan(halfFov) * aspect);\n    const distance = Math.max(fitHeight, fitWidth) * framePadding;\n    camera.position.copy(lookTarget).addScaledVector(viewDirection, distance);\n    camera.lookAt(lookTarget);\n    camera.updateProjectionMatrix();\n  }, [aspect, camera]);\n\n  return null;\n};\n\nconst FrameInvalidator = () => {\n  const invalidate = useThree((state) => state.invalidate);\n  const frameloop = useThree((state) => state.frameloop);\n\n  useEffect(() => {\n    if (frameloop === \"demand\") {\n      invalidate();\n    }\n  }, [frameloop, invalidate]);\n\n  return null;\n};\n\nexport const AgentStageScene = ({\n  role,\n  action = agentSignatureActions[role],\n  focused = false,\n  motion,\n  shadow = true,\n}: AgentStageSceneProps) => (\n  <>\n    <PerspectiveCamera fov={30} makeDefault position={[0, 2.4, 10]} />\n    <FitCamera />\n    <StageLights />\n    <FrameInvalidator />\n    <Agent\n      action={action}\n      focused={focused}\n      motion={motion}\n      role={role}\n      rotation-y={agentYaw}\n      shadow={shadow}\n    />\n  </>\n);\n",
+      "type": "registry:component",
+      "target": "@components/agent-stage/agent-stage-scene.tsx"
+    },
+    {
+      "path": "registry/ivan/components/agent-stage/stage-lights.tsx",
+      "content": "\"use client\";\n\nimport { Environment } from \"@react-three/drei\";\nimport { useThree } from \"@react-three/fiber\";\nimport { useMemo } from \"react\";\nimport type { Texture, WebGLRenderer } from \"three\";\nimport { PMREMGenerator } from \"three\";\nimport { RoomEnvironment } from \"three/addons/environments/RoomEnvironment.js\";\n\nconst environmentIntensity = 0.38;\n\nconst environments = new WeakMap<WebGLRenderer, Texture>();\n\nconst roomEnvironment = (gl: WebGLRenderer) => {\n  const cached = environments.get(gl);\n  if (cached) {\n    return cached;\n  }\n  const generator = new PMREMGenerator(gl);\n  const room = new RoomEnvironment();\n  const { texture } = generator.fromScene(room, 0.04);\n  room.dispose();\n  generator.dispose();\n  environments.set(gl, texture);\n  return texture;\n};\n\nexport const StageLights = () => {\n  const gl = useThree((state) => state.gl);\n  const environment = useMemo(() => roomEnvironment(gl), [gl]);\n\n  return (\n    <>\n      <Environment\n        environmentIntensity={environmentIntensity}\n        map={environment}\n      />\n      <hemisphereLight args={[\"#fffaf3\", \"#cfc8bd\", 1.25]} />\n      <directionalLight\n        color=\"#fff3e6\"\n        intensity={2.1}\n        position={[-3.5, 6, 6]}\n      />\n      <directionalLight\n        color=\"#e8eef7\"\n        intensity={0.7}\n        position={[5, 2.5, 3]}\n      />\n      <directionalLight color=\"#ffffff\" intensity={0.9} position={[2, 4, -6]} />\n    </>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/agent-stage/stage-lights.tsx"
+    },
+    {
+      "path": "registry/ivan/components/agent-stage/agent-poster.tsx",
+      "content": "import type { ReactNode } from \"react\";\n\nimport type { AgentRole } from \"@/registry/ivan/components/agent/types\";\n\nexport interface AgentPosterProps {\n  role: AgentRole;\n  label?: string;\n  className?: string;\n}\n\ninterface PosterKit {\n  body?: ReactNode;\n  face?: ReactNode;\n  head?: ReactNode;\n  props?: ReactNode;\n}\n\nconst colors = {\n  brass: \"#d9a946\",\n  clay: \"#f48d58\",\n  clayDeep: \"#e07a45\",\n  ink: \"#08080a\",\n  paper: \"#efe7d3\",\n  white: \"#efece4\",\n} as const;\n\nconst eyeCenters = [48, 112] as const;\nconst legCenters = [40, 64, 96, 120] as const;\n\nconst HardHat = ({ color, edge }: { color: string; edge?: string }) => (\n  <>\n    <path\n      d=\"M42 52 C42 26 118 26 118 52 Z\"\n      fill={color}\n      stroke={edge}\n      strokeWidth=\"1.5\"\n    />\n    <rect\n      fill={color}\n      height=\"6\"\n      rx=\"3\"\n      stroke={edge}\n      strokeWidth=\"1.5\"\n      width=\"92\"\n      x=\"34\"\n      y=\"49\"\n    />\n    <rect\n      fill={colors.ink}\n      height=\"20\"\n      opacity=\"0.1\"\n      rx=\"2\"\n      width=\"8\"\n      x=\"76\"\n      y=\"30\"\n    />\n  </>\n);\n\nconst posterKits = {\n  analyst: {\n    body: (\n      <>\n        <rect\n          fill={colors.white}\n          height=\"38\"\n          rx=\"12\"\n          width=\"100\"\n          x=\"30\"\n          y=\"94\"\n        />\n        <path d=\"M80 94 L68 112 L80 118 L92 112 Z\" fill={colors.paper} />\n      </>\n    ),\n    head: (\n      <>\n        <rect fill=\"#2f9e95\" height=\"6\" rx=\"3\" width=\"88\" x=\"36\" y=\"44\" />\n        <circle\n          cx=\"62\"\n          cy=\"44\"\n          fill=\"#e6f1ff\"\n          r=\"9\"\n          stroke=\"#2f9e95\"\n          strokeWidth=\"3\"\n        />\n        <circle\n          cx=\"98\"\n          cy=\"44\"\n          fill=\"#e6f1ff\"\n          r=\"9\"\n          stroke=\"#2f9e95\"\n          strokeWidth=\"3\"\n        />\n      </>\n    ),\n    props: (\n      <path\n        d=\"M130 100 L152 74\"\n        stroke=\"#d33a35\"\n        strokeLinecap=\"round\"\n        strokeWidth=\"4\"\n      />\n    ),\n  },\n  architect: {\n    head: <HardHat color={colors.white} edge=\"#b9b29d\" />,\n    props: (\n      <>\n        <rect fill=\"#2f5c98\" height=\"34\" rx=\"4\" width=\"16\" x=\"12\" y=\"88\" />\n        <rect fill={colors.paper} height=\"3\" width=\"16\" x=\"12\" y=\"96\" />\n      </>\n    ),\n  },\n  builder: {\n    body: (\n      <>\n        {[36, 102].map((x) => (\n          <g key={x}>\n            <rect fill=\"#c3cc4a\" height=\"44\" rx=\"3\" width=\"22\" x={x} y=\"88\" />\n            <rect fill=\"#c9ccd0\" height=\"5\" width=\"22\" x={x} y=\"112\" />\n          </g>\n        ))}\n      </>\n    ),\n    head: <HardHat color=\"#f2b42e\" />,\n  },\n  debugger: {\n    body: (\n      <>\n        <rect fill=\"#d6c39a\" height=\"38\" rx=\"12\" width=\"100\" x=\"30\" y=\"94\" />\n        <path\n          d=\"M46 94 V132 M62 94 V132 M78 94 V132 M94 94 V132 M110 94 V132 M30 108 H130 M30 122 H130\"\n          stroke=\"#8d7452\"\n          strokeOpacity=\"0.55\"\n          strokeWidth=\"2\"\n        />\n      </>\n    ),\n    head: (\n      <>\n        <rect fill=\"#d6c39a\" height=\"26\" rx=\"13\" width=\"88\" x=\"36\" y=\"28\" />\n        <path\n          d=\"M52 28 V54 M68 28 V54 M84 28 V54 M100 28 V54 M36 41 H124\"\n          stroke=\"#8d7452\"\n          strokeOpacity=\"0.55\"\n          strokeWidth=\"2\"\n        />\n        <rect fill=\"#8d7452\" height=\"5\" rx=\"2\" width=\"40\" x=\"60\" y=\"50\" />\n      </>\n    ),\n    props: (\n      <>\n        <path\n          d=\"M138 106 L130 120\"\n          stroke=\"#5a3a24\"\n          strokeLinecap=\"round\"\n          strokeWidth=\"4\"\n        />\n        <circle\n          cx=\"144\"\n          cy=\"94\"\n          fill=\"#e6f1ff\"\n          fillOpacity=\"0.55\"\n          r=\"12\"\n          stroke={colors.brass}\n          strokeWidth=\"4\"\n        />\n      </>\n    ),\n  },\n  inspector: {\n    head: <HardHat color=\"#7d93ab\" />,\n    props: (\n      <>\n        <rect fill=\"#5a3a24\" height=\"32\" rx=\"3\" width=\"22\" x=\"10\" y=\"86\" />\n        <rect fill={colors.paper} height=\"22\" width=\"16\" x=\"13\" y=\"92\" />\n        <rect fill={colors.brass} height=\"5\" rx=\"2\" width=\"10\" x=\"16\" y=\"84\" />\n      </>\n    ),\n  },\n  orchestrator: {\n    face: (\n      <>\n        <rect fill=\"#16171a\" height=\"16\" rx=\"2\" width=\"36\" x=\"30\" y=\"64\" />\n        <rect fill=\"#16171a\" height=\"16\" rx=\"2\" width=\"36\" x=\"94\" y=\"64\" />\n        <rect fill=\"#16171a\" height=\"5\" width=\"28\" x=\"66\" y=\"68\" />\n        <rect\n          fill={colors.white}\n          height=\"3\"\n          opacity=\"0.6\"\n          width=\"6\"\n          x=\"35\"\n          y=\"67\"\n        />\n        <rect\n          fill={colors.white}\n          height=\"3\"\n          opacity=\"0.6\"\n          width=\"6\"\n          x=\"99\"\n          y=\"67\"\n        />\n      </>\n    ),\n    head: (\n      <>\n        <path\n          d=\"M36 64 C36 22 124 22 124 64\"\n          fill=\"none\"\n          stroke=\"#16171a\"\n          strokeLinecap=\"round\"\n          strokeWidth=\"5\"\n        />\n        <rect fill=\"#16171a\" height=\"22\" rx=\"4\" width=\"10\" x=\"26\" y=\"60\" />\n        <rect fill=\"#16171a\" height=\"22\" rx=\"4\" width=\"10\" x=\"124\" y=\"60\" />\n      </>\n    ),\n    props: (\n      <>\n        <rect fill=\"#16171a\" height=\"32\" rx=\"4\" width=\"22\" x=\"10\" y=\"86\" />\n        <rect fill=\"#8fb4e0\" height=\"24\" rx=\"2\" width=\"16\" x=\"13\" y=\"90\" />\n      </>\n    ),\n  },\n  researcher: {\n    body: <rect fill=\"#b59d7c\" height=\"38\" rx=\"12\" width=\"100\" x=\"30\" y=\"94\" />,\n    face: (\n      <>\n        {eyeCenters.map((cx) => (\n          <circle\n            cx={cx}\n            cy=\"72\"\n            fill=\"none\"\n            key={cx}\n            r=\"12\"\n            stroke={colors.brass}\n            strokeWidth=\"3\"\n          />\n        ))}\n        <path d=\"M60 72 H100\" stroke={colors.brass} strokeWidth=\"3\" />\n      </>\n    ),\n    head: (\n      <>\n        <rect fill=\"#5c5e63\" height=\"18\" rx=\"4\" width=\"46\" x=\"57\" y=\"34\" />\n        <path d=\"M80 18 L130 33 L80 48 L30 33 Z\" fill=\"#5c5e63\" />\n        <path d=\"M126 34 V54\" stroke={colors.brass} strokeWidth=\"3\" />\n      </>\n    ),\n    props: (\n      <>\n        <rect\n          fill={colors.paper}\n          height=\"16\"\n          rx=\"2\"\n          width=\"48\"\n          x=\"56\"\n          y=\"110\"\n        />\n        <path d=\"M80 110 V126\" stroke=\"#9c3a2e\" strokeWidth=\"2\" />\n      </>\n    ),\n  },\n} as const satisfies Record<AgentRole, PosterKit>;\n\nexport const AgentPoster = ({ role, label, className }: AgentPosterProps) => {\n  const kit: PosterKit = posterKits[role];\n  return (\n    <svg\n      aria-hidden={label ? undefined : true}\n      aria-label={label}\n      className={className}\n      fill=\"none\"\n      role={label ? \"img\" : undefined}\n      viewBox=\"0 0 160 160\"\n    >\n      <ellipse cx=\"80\" cy=\"148\" fill=\"#3b2a1f\" opacity=\"0.22\" rx=\"56\" ry=\"7\" />\n      {legCenters.map((cx) => (\n        <rect\n          fill={colors.clayDeep}\n          height=\"20\"\n          key={cx}\n          rx=\"4\"\n          width=\"14\"\n          x={cx - 7}\n          y=\"130\"\n        />\n      ))}\n      <rect fill={colors.clay} height=\"82\" rx=\"12\" width=\"100\" x=\"30\" y=\"50\" />\n      <rect\n        fill=\"#fff\"\n        height=\"6\"\n        opacity=\"0.2\"\n        rx=\"3\"\n        width=\"44\"\n        x=\"36\"\n        y=\"55\"\n      />\n      {kit.body}\n      <rect\n        fill={colors.clayDeep}\n        height=\"28\"\n        rx=\"7\"\n        width=\"18\"\n        x=\"20\"\n        y=\"84\"\n      />\n      <rect\n        fill={colors.clayDeep}\n        height=\"28\"\n        rx=\"7\"\n        width=\"18\"\n        x=\"122\"\n        y=\"84\"\n      />\n      {eyeCenters.map((cx) => (\n        <g key={cx}>\n          <rect\n            fill={colors.ink}\n            height=\"14\"\n            rx=\"3\"\n            width=\"14\"\n            x={cx - 7}\n            y=\"65\"\n          />\n          <rect fill=\"#fff\" height=\"4\" rx=\"1\" width=\"4\" x={cx - 5} y=\"67\" />\n        </g>\n      ))}\n      {kit.face}\n      {kit.head}\n      {kit.props}\n    </svg>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/agent-stage/agent-poster.tsx"
+    }
+  ],
+  "meta": {
+    "docs": {
+      "props": [
+        {
+          "component": "AgentStage",
+          "description": "A div that owns one Canvas. Size it with className.",
+          "props": [
+            {
+              "name": "role",
+              "type": "AgentRole",
+              "required": true,
+              "description": "Which accessory kit the agent wears."
+            },
+            {
+              "name": "action",
+              "type": "AgentAction",
+              "default": "the role's signature action",
+              "description": "Clip to play. debugger inspects, builder types, architect measures."
+            },
+            {
+              "name": "focused",
+              "type": "boolean",
+              "default": "pointer hover",
+              "description": "Set it to control the reaction yourself. Left unset, hovering the stage focuses the agent."
+            },
+            {
+              "name": "motion",
+              "type": "\"full\" | \"reduced\"",
+              "default": "prefers-reduced-motion",
+              "description": "reduced holds the key pose and renders only when something changes."
+            },
+            {
+              "name": "shadow",
+              "type": "boolean",
+              "default": "true",
+              "description": "Blob contact shadow under the feet."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "default": "\"{Role} agent\"",
+              "description": "Accessible name of the figure that wraps the Canvas."
+            },
+            {
+              "name": "fallback",
+              "type": "ReactNode",
+              "default": "<AgentPoster />",
+              "description": "Shown when WebGL is unavailable."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "default": "\"relative aspect-4/3 w-full\"",
+              "description": "Merged with the base. Give the stage a size."
+            }
+          ]
+        },
+        {
+          "component": "AgentStageScene",
+          "description": "Camera, lights and agent without the Canvas. Mount it inside your own Canvas or a drei View when a page needs several stages.",
+          "props": [
+            {
+              "name": "role",
+              "type": "AgentRole",
+              "required": true,
+              "description": "Which accessory kit the agent wears."
+            },
+            {
+              "name": "action",
+              "type": "AgentAction",
+              "default": "the role's signature action",
+              "description": "Clip to play."
+            },
+            {
+              "name": "focused",
+              "type": "boolean",
+              "default": "false",
+              "description": "Turns toward the camera and hops once."
+            },
+            {
+              "name": "motion",
+              "type": "\"full\" | \"reduced\"",
+              "description": "Forwarded to the agent."
+            },
+            {
+              "name": "shadow",
+              "type": "boolean",
+              "default": "true",
+              "description": "Blob contact shadow."
+            }
+          ]
+        },
+        {
+          "component": "AgentPoster",
+          "description": "Static SVG of the role, used as the WebGL fallback and for thumbnails.",
+          "props": [
+            {
+              "name": "role",
+              "type": "AgentRole",
+              "required": true,
+              "description": "Which kit to draw."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Makes the poster an img with this name. Omit it to hide the poster from assistive tech."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "description": "Applied to the svg."
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "name": "role",
+          "default": "required",
+          "options": [
+            "orchestrator",
+            "architect",
+            "researcher",
+            "builder",
+            "debugger",
+            "inspector",
+            "analyst"
+          ],
+          "description": "Selects the accessory kit. Framing and lights are shared."
+        },
+        {
+          "name": "action",
+          "default": "signature action",
+          "options": [
+            "idle",
+            "wave",
+            "walk",
+            "type",
+            "inspect",
+            "point",
+            "read",
+            "carry",
+            "direct",
+            "celebrate",
+            "measure",
+            "check"
+          ],
+          "description": "Selects the clip. Omit it to play the role's signature action."
+        }
+      ],
+      "examples": [
+        {
+          "title": "One agent, one line",
+          "description": "The stage frames the agent for any width and height.",
+          "file": "registry/ivan/examples/agent-stage/basic.tsx"
+        },
+        {
+          "title": "Switch role with typed props",
+          "description": "agentRoles is a const tuple, so the buttons and the prop type cannot drift.",
+          "file": "registry/ivan/examples/agent-stage/role-picker.tsx"
+        }
+      ],
+      "accessibility": [
+        "The stage is a figure with an accessible name. Override it with label.",
+        "The Canvas is decorative. Put anything the agent communicates in text beside it.",
+        "Without WebGL the poster replaces the Canvas. A custom fallback should keep the same name.",
+        "Reduced motion holds the key pose and stops continuous rendering.",
+        "Hover focuses the agent by default. Pass focused to mirror keyboard focus."
+      ],
+      "animation": [
+        {
+          "target": "Render loop",
+          "properties": "Canvas frameloop",
+          "timing": "always while visible, demand with reduced motion, never offscreen.",
+          "trigger": "IntersectionObserver with a 10 percent margin",
+          "reducedMotion": "Renders one frame per change."
+        },
+        {
+          "target": "Agent clips and focus",
+          "properties": "Arm, leg, body and eye transforms",
+          "timing": "0.38 second crossfade. 0.42 second hop on focus.",
+          "trigger": "action changes or the pointer enters the stage",
+          "reducedMotion": "Holds the key pose. No hop."
+        }
+      ]
+    }
+  },
+  "docs": "Requires React 19. Render <AgentStage role=\"debugger\" className=\"h-72 w-full\" /> anywhere. Each stage owns a Canvas, so mount AgentStageScene in one shared canvas when a page needs many agents.",
+  "categories": [
+    "characters",
+    "three"
+  ],
+  "type": "registry:block"
+}

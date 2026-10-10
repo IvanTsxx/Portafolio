@@ -20,7 +20,7 @@ import {
   registryItems,
   toCategoryLabel,
 } from "./registry";
-import type { RegistryItem } from "./schema";
+import type { RegistryFile, RegistryItem } from "./schema";
 
 const projectRoot = process.cwd();
 
@@ -110,11 +110,45 @@ const usedVariables = (source: string) =>
 const declaredVariables = (source: string) =>
   collectMatches(source, /--[a-z0-9-]+(?=["']?\s*:)/gu, (raw) => raw.slice(2));
 
+const registryItemUrl = (name: string) => `${siteConfig.url}/r/${name}.json`;
+
+const installedFiles = (item: RegistryItem): RegistryFile[] => [
+  ...item.files,
+  ...item.registryDependencies.flatMap((dependency) => {
+    const dependencyItem = registryItems.find(
+      (entry) => registryItemUrl(entry.name) === dependency
+    );
+    return dependencyItem ? installedFiles(dependencyItem) : [];
+  }),
+];
+
+const hasFileAt = (resolvedPath: string, item: RegistryItem) =>
+  installedFiles(item).some((file) => file.path.startsWith(`${resolvedPath}.`));
+
 const isInstalledSibling = (specifier: string, item: RegistryItem) =>
   specifier.startsWith(`@/registry/${registry.name}/`) &&
-  item.files.some((file) =>
-    file.path.startsWith(`${specifier.replace("@/", "")}.`)
-  );
+  hasFileAt(specifier.replace("@/", ""), item);
+
+const isRelativeSibling = (
+  specifier: string,
+  importer: string,
+  item: RegistryItem
+) =>
+  specifier.startsWith(".") &&
+  hasFileAt(path.posix.join(path.posix.dirname(importer), specifier), item);
+
+const packageName = (dependency: string) => {
+  const versionSeparator = dependency.lastIndexOf("@");
+  return versionSeparator > 0
+    ? dependency.slice(0, versionSeparator)
+    : dependency;
+};
+
+const isDeclaredPackage = (specifier: string, item: RegistryItem) =>
+  item.dependencies.some((dependency) => {
+    const name = packageName(dependency);
+    return specifier === name || specifier.startsWith(`${name}/`);
+  });
 
 describe("registry.json", () => {
   test("parses and matches the site identity", () => {
@@ -126,6 +160,20 @@ describe("registry.json", () => {
   test("item names are unique", () => {
     const names = registryItems.map((item) => item.name);
     expect(new Set(names).size).toBe(names.length);
+  });
+
+  test("registry dependencies are URLs of items in this registry", () => {
+    const urls = new Set(
+      registryItems.map((item) => registryItemUrl(item.name))
+    );
+    for (const item of registryItems) {
+      for (const dependency of item.registryDependencies) {
+        expect(
+          urls.has(dependency),
+          `${item.name} depends on ${dependency}`
+        ).toBe(true);
+      }
+    }
   });
 
   test("every item carries title, description, categories and file targets", () => {
@@ -161,8 +209,9 @@ describe("registry sources stay portable", () => {
           const allowed =
             specifier === "react" ||
             specifier === "@/lib/utils" ||
-            item.dependencies.includes(specifier) ||
-            isInstalledSibling(specifier, item);
+            isDeclaredPackage(specifier, item) ||
+            isInstalledSibling(specifier, item) ||
+            isRelativeSibling(specifier, file.path, item);
           expect(allowed, `${file.path} imports ${specifier}`).toBe(true);
         }
       }

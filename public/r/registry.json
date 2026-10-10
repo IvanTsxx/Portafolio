@@ -741,6 +741,527 @@
           "animation": []
         }
       }
+    },
+    {
+      "name": "agent",
+      "type": "registry:component",
+      "title": "Agent",
+      "description": "Procedural 3D mascot for React Three Fiber. Seven roles with their own gear, twelve typed actions, held props and reduced motion.",
+      "categories": ["characters", "three"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19. Render <Agent role=\"builder\" /> inside a React Three Fiber <Canvas> with lights, or add agent-stage for a ready scene.",
+      "files": [
+        {
+          "path": "registry/ivan/components/agent/agent.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/agent.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/types.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/types.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/rig.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/rig.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/actions.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/actions.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/use-agent-rig.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/use-agent-rig.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/held-pose.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/held-pose.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/part.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/part.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/geometry.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/geometry.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/materials.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/materials.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/textures.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/textures.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/kit.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/accessories/kit.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/registry.ts",
+          "type": "registry:lib",
+          "target": "@components/agent/accessories/registry.ts"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/shapes.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/shapes.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/orchestrator.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/orchestrator.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/architect.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/architect.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/researcher.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/researcher.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/builder.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/builder.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/debugger.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/debugger.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/inspector.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/inspector.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent/accessories/analyst.tsx",
+          "type": "registry:component",
+          "target": "@components/agent/accessories/analyst.tsx"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "Agent",
+              "description": "A group of meshes. Render it inside a React Three Fiber Canvas with lights. It stands on y = 0 and is about 2.4 units tall with its headgear.",
+              "props": [
+                {
+                  "name": "role",
+                  "type": "\"orchestrator\" | \"architect\" | \"researcher\" | \"builder\" | \"debugger\" | \"inspector\" | \"analyst\"",
+                  "required": true,
+                  "description": "Which accessory kit the mascot wears. The rig, clips and materials are shared."
+                },
+                {
+                  "name": "action",
+                  "type": "AgentAction",
+                  "default": "\"idle\"",
+                  "description": "Clip to play. Changing it crossfades over 0.38 seconds."
+                },
+                {
+                  "name": "actionRef",
+                  "type": "RefObject<AgentAction>",
+                  "description": "Drives the action from a ref that is read every frame, so switching never re-renders. Wins over action."
+                },
+                {
+                  "name": "focused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Turns toward the camera, leans in and hops once. Drive it from hover or focus."
+                },
+                {
+                  "name": "motion",
+                  "type": "\"full\" | \"reduced\"",
+                  "default": "prefers-reduced-motion",
+                  "description": "reduced holds each clip's key pose with no blink, breathing or loops."
+                },
+                {
+                  "name": "shadow",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Blob contact shadow under the feet. No shadow maps are used."
+                },
+                {
+                  "name": "position",
+                  "type": "[number, number, number]",
+                  "default": "[0, 0, 0]",
+                  "description": "Placement. Every React Three Fiber group prop except children is accepted, including rotation, scale and pointer handlers."
+                }
+              ]
+            },
+            {
+              "component": "AccessoryKit",
+              "description": "One kit per role in accessories/registry.ts. To add a role, extend agentRoles in types.ts, write one accessory module and register its kit. The Record type fails the build until the kit exists.",
+              "props": [
+                {
+                  "name": "head",
+                  "type": "ComponentType",
+                  "description": "Hats and helmets. Anchored on top of the body."
+                },
+                {
+                  "name": "face",
+                  "type": "ComponentType",
+                  "description": "Glasses and shades. Anchored on the eye line."
+                },
+                {
+                  "name": "torso",
+                  "type": "ComponentType",
+                  "description": "Props held against the front, such as a laptop or a book."
+                },
+                {
+                  "name": "body",
+                  "type": "ComponentType",
+                  "description": "Coats and vests that wrap the body."
+                },
+                {
+                  "name": "rightArm",
+                  "type": "ComponentType",
+                  "description": "Held props. Use useHeldPose to re-aim them per action."
+                },
+                {
+                  "name": "leftArm",
+                  "type": "ComponentType",
+                  "description": "Mirrored arm. Write it like the right arm with +x pointing outward."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "role",
+              "default": "required",
+              "options": [
+                "orchestrator",
+                "architect",
+                "researcher",
+                "builder",
+                "debugger",
+                "inspector",
+                "analyst"
+              ],
+              "description": "Selects the accessory kit: headgear, coat, glasses and the props in each hand."
+            },
+            {
+              "name": "action",
+              "default": "idle",
+              "options": [
+                "idle",
+                "wave",
+                "walk",
+                "type",
+                "inspect",
+                "point",
+                "read",
+                "carry",
+                "direct",
+                "celebrate",
+                "measure",
+                "check"
+              ],
+              "description": "Selects the clip. Held props re-aim with it, so the builder stows the laptop while carrying and walking."
+            },
+            {
+              "name": "motion",
+              "default": "prefers-reduced-motion",
+              "options": ["full", "reduced"],
+              "description": "full plays the clips. reduced holds the key pose."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Agent in your own Canvas",
+              "description": "Any React Three Fiber canvas works. The agent stands on y = 0, so lower it to centre it under the camera.",
+              "file": "registry/ivan/examples/agent/basic.tsx"
+            },
+            {
+              "title": "Switch actions without re-rendering",
+              "description": "Write to actionRef from event handlers. The rig reads it every frame and crossfades.",
+              "file": "registry/ivan/examples/agent/action-ref.tsx"
+            }
+          ],
+          "accessibility": [
+            "The mascot is decorative. Wrap the Canvas in an element with role=img and a label, or mark it aria-hidden.",
+            "Put anything the agent communicates in text next to the canvas.",
+            "motion=reduced, or the prefers-reduced-motion query when motion is omitted, holds each action's key pose. No blink, breathing, bobbing or loops.",
+            "The agent adds no focusable elements and never captures focus. Pointer handlers pass through to the group.",
+            "Pass focused from hover and focus state so keyboard users get the same reaction as pointer users."
+          ],
+          "animation": [
+            {
+              "target": "Action clip",
+              "properties": "Arm, leg, body and eye transforms",
+              "timing": "One useFrame per agent. 0.38 second smoothstep crossfade between clips.",
+              "trigger": "action or actionRef changes",
+              "reducedMotion": "Holds the clip's key pose."
+            },
+            {
+              "target": "Focus reaction",
+              "properties": "Body yaw, tilt, root height, squash",
+              "timing": "Damped turn at rate 7, one 0.42 second hop.",
+              "trigger": "focused becomes true",
+              "reducedMotion": "Leans in slightly. No turn or hop."
+            },
+            {
+              "target": "Blink",
+              "properties": "Eye scale",
+              "timing": "0.13 seconds every 3.4 to 5.6 seconds, offset per agent.",
+              "trigger": "Always",
+              "reducedMotion": "No blink."
+            },
+            {
+              "target": "Held props",
+              "properties": "Prop position, rotation, visibility",
+              "timing": "Exponential settle at rate 9.",
+              "trigger": "Action changes",
+              "reducedMotion": "Snap to the pose."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "agent-stage",
+      "type": "registry:block",
+      "title": "Agent Stage",
+      "description": "Ready canvas for one agent: warm key light, room reflections, contact shadow, auto framing, paused offscreen, poster fallback.",
+      "categories": ["characters", "three"],
+      "dependencies": [
+        "three@^0.186.1",
+        "@react-three/fiber@^9.8.1",
+        "@react-three/drei@^10.7.9"
+      ],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": ["https://bongi.dev/r/agent.json"],
+      "docs": "Requires React 19. Render <AgentStage role=\"debugger\" className=\"h-72 w-full\" /> anywhere. Each stage owns a Canvas, so mount AgentStageScene in one shared canvas when a page needs many agents.",
+      "files": [
+        {
+          "path": "registry/ivan/components/agent-stage/agent-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/agent-stage/agent-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent-stage/agent-stage-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/agent-stage/agent-stage-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent-stage/stage-lights.tsx",
+          "type": "registry:component",
+          "target": "@components/agent-stage/stage-lights.tsx"
+        },
+        {
+          "path": "registry/ivan/components/agent-stage/agent-poster.tsx",
+          "type": "registry:component",
+          "target": "@components/agent-stage/agent-poster.tsx"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "AgentStage",
+              "description": "A div that owns one Canvas. Size it with className.",
+              "props": [
+                {
+                  "name": "role",
+                  "type": "AgentRole",
+                  "required": true,
+                  "description": "Which accessory kit the agent wears."
+                },
+                {
+                  "name": "action",
+                  "type": "AgentAction",
+                  "default": "the role's signature action",
+                  "description": "Clip to play. debugger inspects, builder types, architect measures."
+                },
+                {
+                  "name": "focused",
+                  "type": "boolean",
+                  "default": "pointer hover",
+                  "description": "Set it to control the reaction yourself. Left unset, hovering the stage focuses the agent."
+                },
+                {
+                  "name": "motion",
+                  "type": "\"full\" | \"reduced\"",
+                  "default": "prefers-reduced-motion",
+                  "description": "reduced holds the key pose and renders only when something changes."
+                },
+                {
+                  "name": "shadow",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Blob contact shadow under the feet."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "default": "\"{Role} agent\"",
+                  "description": "Accessible name of the figure that wraps the Canvas."
+                },
+                {
+                  "name": "fallback",
+                  "type": "ReactNode",
+                  "default": "<AgentPoster />",
+                  "description": "Shown when WebGL is unavailable."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"relative aspect-4/3 w-full\"",
+                  "description": "Merged with the base. Give the stage a size."
+                }
+              ]
+            },
+            {
+              "component": "AgentStageScene",
+              "description": "Camera, lights and agent without the Canvas. Mount it inside your own Canvas or a drei View when a page needs several stages.",
+              "props": [
+                {
+                  "name": "role",
+                  "type": "AgentRole",
+                  "required": true,
+                  "description": "Which accessory kit the agent wears."
+                },
+                {
+                  "name": "action",
+                  "type": "AgentAction",
+                  "default": "the role's signature action",
+                  "description": "Clip to play."
+                },
+                {
+                  "name": "focused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Turns toward the camera and hops once."
+                },
+                {
+                  "name": "motion",
+                  "type": "\"full\" | \"reduced\"",
+                  "description": "Forwarded to the agent."
+                },
+                {
+                  "name": "shadow",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Blob contact shadow."
+                }
+              ]
+            },
+            {
+              "component": "AgentPoster",
+              "description": "Static SVG of the role, used as the WebGL fallback and for thumbnails.",
+              "props": [
+                {
+                  "name": "role",
+                  "type": "AgentRole",
+                  "required": true,
+                  "description": "Which kit to draw."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "description": "Makes the poster an img with this name. Omit it to hide the poster from assistive tech."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "description": "Applied to the svg."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "role",
+              "default": "required",
+              "options": [
+                "orchestrator",
+                "architect",
+                "researcher",
+                "builder",
+                "debugger",
+                "inspector",
+                "analyst"
+              ],
+              "description": "Selects the accessory kit. Framing and lights are shared."
+            },
+            {
+              "name": "action",
+              "default": "signature action",
+              "options": [
+                "idle",
+                "wave",
+                "walk",
+                "type",
+                "inspect",
+                "point",
+                "read",
+                "carry",
+                "direct",
+                "celebrate",
+                "measure",
+                "check"
+              ],
+              "description": "Selects the clip. Omit it to play the role's signature action."
+            }
+          ],
+          "examples": [
+            {
+              "title": "One agent, one line",
+              "description": "The stage frames the agent for any width and height.",
+              "file": "registry/ivan/examples/agent-stage/basic.tsx"
+            },
+            {
+              "title": "Switch role with typed props",
+              "description": "agentRoles is a const tuple, so the buttons and the prop type cannot drift.",
+              "file": "registry/ivan/examples/agent-stage/role-picker.tsx"
+            }
+          ],
+          "accessibility": [
+            "The stage is a figure with an accessible name. Override it with label.",
+            "The Canvas is decorative. Put anything the agent communicates in text beside it.",
+            "Without WebGL the poster replaces the Canvas. A custom fallback should keep the same name.",
+            "Reduced motion holds the key pose and stops continuous rendering.",
+            "Hover focuses the agent by default. Pass focused to mirror keyboard focus."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "always while visible, demand with reduced motion, never offscreen.",
+              "trigger": "IntersectionObserver with a 10 percent margin",
+              "reducedMotion": "Renders one frame per change."
+            },
+            {
+              "target": "Agent clips and focus",
+              "properties": "Arm, leg, body and eye transforms",
+              "timing": "0.38 second crossfade. 0.42 second hop on focus.",
+              "trigger": "action changes or the pointer enters the stage",
+              "reducedMotion": "Holds the key pose. No hop."
+            }
+          ]
+        }
+      }
     }
   ]
 }

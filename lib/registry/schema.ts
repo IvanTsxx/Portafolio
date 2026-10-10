@@ -94,6 +94,7 @@ export const registryItemSchema = z.object({
   cssVars: registryCssVarsSchema.optional(),
   dependencies: z.array(z.string().min(1)).default([]),
   description: z.string().min(1),
+  devDependencies: z.array(z.string().min(1)).default([]),
   files: z.array(registryFileSchema).min(1),
   meta: z.object({ docs: registryItemDocsSchema }),
   name: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
