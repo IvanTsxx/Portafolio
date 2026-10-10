@@ -9,15 +9,7 @@ export const sectionSpecs = [
     label: "Spacing and grid",
   },
   { id: "utilities", index: "DS-05", jp: "ユーティリティ", label: "Utilities" },
-  { id: "primitives", index: "DS-06", jp: "基本部品", label: "Primitives" },
-  {
-    id: "components",
-    index: "DS-07",
-    jp: "構成部品",
-    label: "Site components",
-  },
-  { id: "motion", index: "DS-08", jp: "動作", label: "Motion" },
-  { id: "agents", index: "DS-09", jp: "エージェント", label: "3D agents" },
+  { id: "motion", index: "DS-06", jp: "動作", label: "Motion" },
 ] as const;
 
 export type SectionId = (typeof sectionSpecs)[number]["id"];

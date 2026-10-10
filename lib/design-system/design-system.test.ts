@@ -1,15 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import {
-  allComponentSpecs,
-  otherPrimitiveFiles,
-  primitiveIds,
-  primitiveSpecs,
-  siteComponentIds,
-  siteComponentSpecs,
-} from "./catalog";
 import { parseGlobalsCss } from "./css-parse";
 import { renderDesignMarkdown } from "./design-md";
 import { designMarkdownPath, globalsCssPath, loadDesignMarkdown } from "./load";
@@ -154,89 +146,6 @@ describe("documented values match the source", () => {
   test("radius steps all derive from the radius base", () => {
     expect(system.radius.base).toBe("0");
     expect(system.radius.steps.map((step) => step.px)).toEqual([0, 0, 0, 0, 0]);
-  });
-});
-
-const catalogSources = new Map(
-  await Promise.all(
-    [...new Set(allComponentSpecs.map((spec) => spec.file))].map(
-      async (file) => [file, await readProjectFile(file)] as const
-    )
-  )
-);
-
-const exportPattern = (name: string) =>
-  new RegExp(
-    `export\\s+(?:default\\s+)?(?:async\\s+)?(?:const|function|class|type|interface)\\s+${name}\\b|export\\s*\\{[^}]*\\b${name}\\b[^}]*\\}`,
-    "u"
-  );
-
-describe("component catalog", () => {
-  test("every file in components/ui is shown or listed as available", async () => {
-    const entries = await readdir(path.join(projectRoot, "components/ui"));
-    const files = entries
-      .filter((file) => file.endsWith(".tsx"))
-      .map((file) => file.replace(/\.tsx$/u, ""))
-      .toSorted();
-    const documented = [
-      ...primitiveSpecs.map((spec) =>
-        path.basename(spec.file).replace(/\.tsx$/u, "")
-      ),
-      ...otherPrimitiveFiles,
-    ].toSorted();
-    expect(documented).toEqual(files);
-  });
-
-  test("every documented export exists in its file", () => {
-    const missing = allComponentSpecs.flatMap((spec) =>
-      spec.exports
-        .filter(
-          (name) =>
-            !exportPattern(name).test(catalogSources.get(spec.file) ?? "")
-        )
-        .map((name) => `${spec.file}: ${name}`)
-    );
-    expect(missing).toEqual([]);
-  });
-
-  test("patterns still appear in their reference file", () => {
-    const missing = allComponentSpecs
-      .filter((spec) => spec.kind === "pattern")
-      .flatMap((spec) =>
-        spec.needles
-          .filter((needle) => !catalogSources.get(spec.file)?.includes(needle))
-          .map((needle) => `${spec.file}: ${needle}`)
-      );
-    expect(missing).toEqual([]);
-  });
-
-  test("usage snippets only open components the catalog documents", () => {
-    const known = new Set<string>([
-      "Agent",
-      "AgentScene",
-      "AgentWaypoint",
-      "IdentityDossier",
-      ...allComponentSpecs.flatMap((spec) => spec.exports),
-      ...allComponentSpecs.map((spec) => spec.name),
-    ]);
-    const unknown = allComponentSpecs.flatMap((spec) =>
-      [...spec.usage.matchAll(/<[A-Z][A-Za-z]*/gu)]
-        .map((match) => match[0].slice(1))
-        .filter((tag) => !known.has(tag))
-        .map((tag) => `${spec.name}: <${tag}>`)
-    );
-    expect(unknown).toEqual([]);
-  });
-
-  test("ids are unique and every declared id has a spec", () => {
-    const ids = allComponentSpecs.map((spec) => spec.id);
-    expect(new Set(ids).size).toBe(ids.length);
-    expect(primitiveSpecs.map((spec) => spec.id).toSorted()).toEqual(
-      [...primitiveIds].toSorted()
-    );
-    expect(siteComponentSpecs.map((spec) => spec.id).toSorted()).toEqual(
-      [...siteComponentIds].toSorted()
-    );
   });
 });
 
