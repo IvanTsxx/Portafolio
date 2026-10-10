@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { agentReactions } from "@/lib/agents/roles";
 
-import { createReactionDeck } from "./reaction-deck";
+import { createHopPlanner, createReactionDeck } from "./reaction-deck";
 
 const seeded = (seed: number) => {
   let state = seed;
@@ -36,6 +36,22 @@ describe("createReactionDeck", () => {
     const draws = Array.from({ length: 32 }, () => deal());
     for (let index = 1; index < draws.length; index += 1) {
       expect(draws[index]).not.toBe(draws[index - 1]);
+    }
+  });
+});
+
+describe("createHopPlanner", () => {
+  test("alternates sides so a click never lands on the same spot", () => {
+    for (const seed of [2, 11, 77]) {
+      const plan = createHopPlanner(seeded(seed));
+      let previous = plan();
+      for (let click = 0; click < 50; click += 1) {
+        const current = plan();
+        expect(Math.sign(current.reachX)).toBe(-Math.sign(previous.reachX));
+        expect(Math.abs(current.reachX)).toBeGreaterThan(0.3);
+        expect(Math.abs(current.reachX)).toBeLessThanOrEqual(0.5);
+        previous = current;
+      }
     }
   });
 });

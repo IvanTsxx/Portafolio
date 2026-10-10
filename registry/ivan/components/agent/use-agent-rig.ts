@@ -6,8 +6,15 @@ import type { RefObject } from "react";
 import type { Group } from "three";
 import { MathUtils } from "three";
 
-import { actionClips, reactionClips } from "./actions";
-import { createReactionDeck } from "./reaction-deck";
+import type { HopPlan } from "./actions";
+import {
+  actionClips,
+  applyHop,
+  applyHopReduced,
+  hopClip,
+  reactionClips,
+} from "./actions";
+import { createHopPlanner, createReactionDeck } from "./reaction-deck";
 import type { Pose } from "./rig";
 import { blendPoses, createPose } from "./rig";
 import type { AgentAction, AgentReaction } from "./types";
@@ -16,6 +23,7 @@ export type AgentMotion = "full" | "reduced";
 
 export interface AgentPointer {
   hovered: boolean;
+  presses: number;
   x: number;
   y: number;
 }
@@ -43,6 +51,10 @@ interface Playback {
   blendStart: number;
   current: AgentAction;
   dealReaction: (() => AgentReaction) | null;
+  hop: HopPlan | null;
+  hopStart: number;
+  planHop: (() => HopPlan) | null;
+  presses: number;
   reaction: AgentReaction | null;
   reactionStart: number;
   wasHovered: boolean;
@@ -63,9 +75,10 @@ const applyPose = (nodes: RigNodes, pose: Pose, blink: number) => {
   const { armLeft, armRight, body, eyes, legs, root, shadow } = nodes;
   if (shadow) {
     shadow.scale.setScalar(MathUtils.clamp(1 - pose.rootY * 1.6, 0.45, 1));
+    shadow.position.set(pose.rootX, 0, pose.rootZ);
   }
   if (root) {
-    root.position.y = pose.rootY;
+    root.position.set(pose.rootX, pose.rootY, pose.rootZ);
     root.rotation.y = pose.bodyYaw;
   }
   if (body) {
@@ -104,6 +117,21 @@ const blinkAmount = (time: number, seed: number) => {
   return 1 - Math.sin((local / blinkSeconds) * Math.PI) * 0.9;
 };
 
+const trackHop = (track: Playback, presses: number, time: number) => {
+  if (presses !== track.presses) {
+    track.presses = presses;
+    const plan = track.planHop ?? createHopPlanner();
+    track.planHop = plan;
+    track.hop = plan();
+    track.hopStart = time;
+  }
+  const hopTime = time - track.hopStart;
+  if (track.hop && hopTime >= hopClip.duration) {
+    track.hop = null;
+  }
+  return hopTime;
+};
+
 export const useAgentRig = ({
   action: actionProp,
   actionRef,
@@ -126,6 +154,10 @@ export const useAgentRig = ({
     blendStart: Number.NEGATIVE_INFINITY,
     current: actionProp,
     dealReaction: null,
+    hop: null,
+    hopStart: Number.NEGATIVE_INFINITY,
+    planHop: null,
+    presses: 0,
     reaction: null,
     reactionStart: Number.NEGATIVE_INFINITY,
     wasHovered: false,
@@ -157,6 +189,7 @@ export const useAgentRig = ({
       }
     }
     track.wasHovered = look.hovered;
+    const hopTime = trackHop(track, look.presses, time);
     const reactionTime = time - track.reactionStart;
     if (
       track.reaction &&
@@ -173,6 +206,10 @@ export const useAgentRig = ({
       } else {
         const clip = actionClips[action];
         clip.pose(clip.keyTime, out);
+      }
+      if (track.hop) {
+        applyHopReduced(hopTime, track.hop, out);
+        state.invalidate();
       }
       applyPose(nodes.current, out, 1);
       return;
@@ -200,6 +237,10 @@ export const useAgentRig = ({
         smoothstep(reactionTime / reactionInSeconds) *
         smoothstep((clip.duration - reactionTime) / reactionOutSeconds);
       blendPoses(out, reaction, weight, out);
+    }
+
+    if (track.hop) {
+      applyHop(hopTime, track.hop, out);
     }
 
     applyPose(nodes.current, out, blinkAmount(time, seed));

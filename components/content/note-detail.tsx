@@ -8,13 +8,11 @@ import Link from "next/link";
 import { Figure } from "@/components/content/figure";
 import { TableOfContents } from "@/components/content/table-of-contents";
 import { Video } from "@/components/content/video";
-import {
-  CompactDossier,
-  DossierPanel,
-} from "@/components/site/compact-dossier";
+import { DossierPanel } from "@/components/site/compact-dossier";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { DocumentSection } from "@/components/site/document-section";
 import { LeaderList, LeaderRow } from "@/components/site/leader-list";
+import { PageAside } from "@/components/site/page-aside";
 import { focusRingClassName, linkClassName } from "@/components/site/styles";
 import {
   hasPreviewSection,
@@ -167,14 +165,14 @@ export const CaseStudySections = ({
   </>
 );
 
-export const NoteDossier = ({
+export const NoteAside = ({
   headings,
   note,
 }: {
   headings: readonly Heading[];
   note: Note;
 }) => (
-  <CompactDossier code="NT-02">
+  <PageAside code="NT-02" label="Note details">
     <DossierPanel collapsible jp="仕様" label="Facts">
       <LeaderList>
         <LeaderRow jp="種別" label="Kind">
@@ -214,5 +212,5 @@ export const NoteDossier = ({
         </ul>
       </DossierPanel>
     ) : null}
-  </CompactDossier>
+  </PageAside>
 );

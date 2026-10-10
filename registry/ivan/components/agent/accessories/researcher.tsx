@@ -154,7 +154,7 @@ export const TweedVest = () => (
 const pageAngle = 0.16;
 
 export const OpenBook = () => (
-  <group position={[0, -0.04, 0.3]} rotation={[0.42, 0, 0]}>
+  <group position={[0, 0.06, 0.34]} rotation={[-0.85, 0, 0]}>
     {[1, -1].map((side) => (
       <group key={side} rotation={[0, 0, side * pageAngle]}>
         <Part

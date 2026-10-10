@@ -1,5 +1,6 @@
 "use client";
 
+import { useThree } from "@react-three/fiber";
 import type { ThreeElements, ThreeEvent } from "@react-three/fiber";
 import { useEffect, useId, useRef } from "react";
 import type { RefObject } from "react";
@@ -94,10 +95,12 @@ const hitGeometry = new BoxGeometry(
 const hitMaterial = new MeshBasicMaterial({ visible: false });
 const hitLocal = new Vector3();
 
+type PointerLook = Omit<AgentPointer, "presses">;
+
 const pointerAt = (
   event: ThreeEvent<PointerEvent>,
   hovered: boolean
-): AgentPointer => {
+): PointerLook => {
   hitLocal.copy(event.point);
   event.object.worldToLocal(hitLocal);
   return {
@@ -109,10 +112,13 @@ const pointerAt = (
 
 const HitProxy = ({
   onPointer,
+  onPress,
 }: {
-  onPointer: (pointer: AgentPointer) => void;
+  onPointer: (look: PointerLook) => void;
+  onPress: () => void;
 }) => {
   const isHovering = useRef(false);
+  const invalidate = useThree((state) => state.invalidate);
 
   useEffect(
     () => () => {
@@ -127,6 +133,10 @@ const HitProxy = ({
     <mesh
       geometry={hitGeometry}
       material={hitMaterial}
+      onClick={() => {
+        onPress();
+        invalidate();
+      }}
       onPointerMove={(event) => onPointer(pointerAt(event, isHovering.current))}
       onPointerOut={(event) => {
         isHovering.current = false;
@@ -168,7 +178,12 @@ export const Agent = ({
   const prefersReducedMotion = useReducedMotion();
   const resolvedMotion = motion ?? (prefersReducedMotion ? "reduced" : "full");
   const seed = seedFromId(useId());
-  const ownPointer = useRef<AgentPointer>({ hovered: false, x: 0, y: 0 });
+  const ownPointer = useRef<AgentPointer>({
+    hovered: false,
+    presses: 0,
+    x: 0,
+    y: 0,
+  });
   const { attach, attachLeg, liveAction } = useAgentRig({
     action,
     actionRef,
@@ -191,8 +206,11 @@ export const Agent = ({
       <group {...groupProps} dispose={null} name={`agent-${role}-${action}`}>
         {pointer ? null : (
           <HitProxy
-            onPointer={(next) => {
-              ownPointer.current = next;
+            onPointer={(look) => {
+              Object.assign(ownPointer.current, look);
+            }}
+            onPress={() => {
+              ownPointer.current.presses += 1;
             }}
           />
         )}

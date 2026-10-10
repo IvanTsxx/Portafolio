@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 import type { CompanionInput, CompanionPose } from "./companion-motion";
 import {
   createCompanionMotion,
+  startLeap,
   stepCompanion,
   swapSeconds,
 } from "./companion-motion";
@@ -105,5 +106,34 @@ describe("stepCompanion", () => {
     expect(poses.some((pose) => pose.cue.kind === "swap")).toBe(false);
     expect(poses[0]?.cue).toEqual({ kind: "wear", role: "analyst" });
     expect(state.scale).toBeLessThan(0.05);
+  });
+});
+
+describe("startLeap", () => {
+  test("arcs to the new spot, lands on it, then rests", () => {
+    const state = createCompanionMotion("builder");
+    run(30, 0, (time) => input({ time }), state);
+    const spot = { x: 1150, y: 800 };
+    startLeap(state, spot, 0.5);
+    const poses = run(60, 0.5, (time) => input({ target: spot, time }), state);
+    const peak = Math.max(...poses.map((pose) => pose.lift));
+    expect(peak).toBeGreaterThan(30);
+    expect(poses.some((pose) => pose.squash < 1)).toBe(true);
+    expect(poses.every((pose) => pose.action !== "walk")).toBe(true);
+    expect(state.leap).toBeNull();
+    expect(state.travel).toMatchObject({ x: spot.x, y: spot.y });
+    expect(poses.at(-1)?.lift).toBe(0);
+  });
+
+  test("cuts straight to the spot with reduced motion", () => {
+    const state = createCompanionMotion("builder");
+    run(5, 0, (time) => input({ isReduced: true, time }), state);
+    const spot = { x: 1150, y: 800 };
+    const pose = stepCompanion(
+      state,
+      input({ isReduced: true, target: spot, time: 1 })
+    );
+    expect(pose.lift).toBe(0);
+    expect(state.travel).toMatchObject({ x: spot.x, y: spot.y });
   });
 });

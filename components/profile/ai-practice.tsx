@@ -1,10 +1,20 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import type { RefObject } from "react";
+import { useEffect, useId, useReducer, useRef, useState } from "react";
+import type { Dispatch, RefObject } from "react";
 
 import { AgentScene } from "@/components/scene/agent-scene";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import type {
+  SceneSchedule,
+  SceneScheduleEvent,
+} from "@/lib/agents/scene-schedule";
+import {
+  createSceneSchedule,
+  msUntilAdvance,
+  shownSceneIndex,
+  stepSceneSchedule,
+} from "@/lib/agents/scene-schedule";
 import type { AgentSceneId } from "@/lib/agents/scenes";
 import { aiPractice } from "@/lib/site/practice";
 import { cn } from "@/lib/utils";
@@ -65,6 +75,7 @@ interface PracticeCellProps {
   isActive: boolean;
   sceneId: string;
   onPin: (id: PracticeId) => void;
+  onRelease: () => void;
 }
 
 const PracticeCell = ({
@@ -73,6 +84,7 @@ const PracticeCell = ({
   isActive,
   sceneId,
   onPin,
+  onRelease,
 }: PracticeCellProps) => {
   const entry = practiceById.get(id);
   if (!entry) {
@@ -121,9 +133,11 @@ const PracticeCell = ({
             cellBody,
             "focus-visible:outline-ink size-full cursor-default text-left focus-visible:outline-1 focus-visible:-outline-offset-4"
           )}
+          onBlur={onRelease}
           onClick={() => onPin(id)}
           onFocus={() => onPin(id)}
           onPointerEnter={() => onPin(id)}
+          onPointerLeave={onRelease}
           type="button"
         >
           {content}
@@ -141,26 +155,32 @@ const progressThrough = (element: HTMLElement) => {
   return Math.min(0.999, Math.max(0, (start - box.top) / box.height));
 };
 
-const useScrolledScene = (track: RefObject<HTMLElement | null>) => {
-  const [scene, setScene] = useState<AgentSceneId>(sceneCycle[0]);
+const scrollIndexOf = (element: HTMLElement) =>
+  Math.floor(progressThrough(element) * sceneCycle.length);
 
+const reduceSchedule = (schedule: SceneSchedule, event: SceneScheduleEvent) =>
+  stepSceneSchedule(schedule, event, sceneCycle.length);
+
+const useScrollQueue = (
+  track: RefObject<HTMLElement | null>,
+  dispatch: Dispatch<SceneScheduleEvent>,
+  isEnabled: boolean
+) => {
   useEffect(() => {
     const element = track.current;
-    if (!element) {
+    if (!(element && isEnabled)) {
       return;
     }
     let frame = 0;
     const measure = () => {
       frame = 0;
-      const index = Math.floor(progressThrough(element) * sceneCycle.length);
-      setScene(sceneCycle[index] ?? sceneCycle[0]);
+      dispatch({ index: scrollIndexOf(element), kind: "scroll" });
     };
     const schedule = () => {
       if (frame === 0) {
         frame = requestAnimationFrame(measure);
       }
     };
-    measure();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
@@ -168,9 +188,93 @@ const useScrolledScene = (track: RefObject<HTMLElement | null>) => {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
-  }, [track]);
+  }, [dispatch, isEnabled, track]);
+};
 
-  return scene;
+const useInView = (track: RefObject<HTMLElement | null>) => {
+  const [isInView, setIsInView] = useState(false);
+  useEffect(() => {
+    const element = track.current;
+    if (!element) {
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry?.isIntersecting ?? false),
+      { threshold: 0.35 }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [track]);
+  return isInView;
+};
+
+const useSceneSchedule = (
+  grid: RefObject<HTMLElement | null>,
+  tile: RefObject<HTMLElement | null>,
+  isReduced: boolean
+) => {
+  const [schedule, dispatch] = useReducer(reduceSchedule, null, () =>
+    createSceneSchedule(0, 0)
+  );
+  const isInView = useInView(tile);
+  const isAutoplaying = isInView && !isReduced && schedule.pinned === null;
+
+  useScrollQueue(grid, dispatch, !isReduced);
+
+  useEffect(() => {
+    if (isInView) {
+      dispatch({ kind: "wake", now: performance.now() });
+    }
+  }, [isInView]);
+
+  useEffect(() => {
+    if (!isAutoplaying) {
+      return;
+    }
+    const timer = window.setTimeout(
+      () => {
+        dispatch({ kind: "tick", now: performance.now() });
+      },
+      msUntilAdvance(schedule, performance.now()) + 20
+    );
+    return () => window.clearTimeout(timer);
+  }, [isAutoplaying, schedule]);
+
+  return { dispatch, schedule };
+};
+
+const SceneTicks = ({ scene }: { scene: AgentSceneId }) => {
+  const activeIndex = sceneCycle.indexOf(scene);
+  return (
+    <ol
+      aria-label={`Scene ${activeIndex + 1} of ${sceneCycle.length}`}
+      className="flex items-center gap-2"
+    >
+      {sceneCycle.map((entry, index) => (
+        <li
+          aria-current={entry === scene ? "step" : undefined}
+          className="flex items-center gap-1"
+          key={entry}
+        >
+          <span
+            aria-hidden
+            className={cn(
+              "border-ink block h-1.5 w-3 border transition-colors duration-300 motion-reduce:transition-none",
+              entry === scene ? "bg-ink" : "bg-transparent"
+            )}
+          />
+          <span
+            className={cn(
+              "tabular-nums transition-colors duration-300 motion-reduce:transition-none",
+              entry === scene ? "text-ink" : "text-mist"
+            )}
+          >
+            {String(index + 1).padStart(2, "0")}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
 };
 
 const SceneTile = ({
@@ -179,12 +283,14 @@ const SceneTile = ({
   isCovered,
   onCovered,
   span,
+  ref,
 }: {
   id: string;
   scene: AgentSceneId;
   isCovered: boolean;
   onCovered: () => void;
   span: string;
+  ref: RefObject<HTMLLIElement | null>;
 }) => {
   const caption = sceneCaptions[scene];
   return (
@@ -194,6 +300,7 @@ const SceneTile = ({
         span
       )}
       id={id}
+      ref={ref}
     >
       <div className="relative flex-1">
         <AgentScene
@@ -206,8 +313,8 @@ const SceneTile = ({
           className={cn(
             "bg-paper blueprint-grid pointer-events-none absolute inset-0 z-40 transition-opacity motion-reduce:transition-none",
             isCovered
-              ? "ease-out-quart opacity-100 duration-150"
-              : "ease-out-quint opacity-0 duration-300"
+              ? "ease-out-quart opacity-100 duration-200"
+              : "ease-out-quint opacity-0 duration-500"
           )}
           onTransitionEnd={(event) => {
             if (event.propertyName === "opacity" && isCovered) {
@@ -216,31 +323,26 @@ const SceneTile = ({
           }}
         />
       </div>
-      <p className="label border-rule flex items-baseline justify-between border-t px-4 py-2">
-        <span className="flex items-baseline gap-2">
+      <div className="label border-rule flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-t px-4 py-2">
+        <p className="flex items-baseline gap-2">
           <span className="text-mist tabular-nums">{caption.code}</span>
-          <span aria-live="polite" className="text-ink">
-            {caption.label}
-          </span>
-        </span>
-        <span className="jp text-mist">{caption.jp}</span>
-      </p>
+          <span className="text-ink">{caption.label}</span>
+          <span className="jp text-mist">{caption.jp}</span>
+        </p>
+        <SceneTicks scene={scene} />
+      </div>
     </li>
   );
 };
 
 export const AiPractice = () => {
   const grid = useRef<HTMLUListElement>(null);
+  const tile = useRef<HTMLLIElement>(null);
   const sceneId = useId();
   const isReduced = useReducedMotion();
-  const scrolledScene = useScrolledScene(grid);
-  const [pin, setPin] = useState<{
-    cell: PracticeId;
-    scrolledScene: AgentSceneId;
-  } | null>(null);
-  const pinnedCell = pin?.scrolledScene === scrolledScene ? pin.cell : null;
-  const pinnedScene = pinnedCell ? sceneForPractice[pinnedCell] : undefined;
-  const requestedScene = pinnedScene ?? scrolledScene;
+  const { dispatch, schedule } = useSceneSchedule(grid, tile, isReduced);
+  const [pinnedCell, setPinnedCell] = useState<PracticeId | null>(null);
+  const requestedScene = sceneCycle[shownSceneIndex(schedule)] ?? sceneCycle[0];
   const [shownScene, setShownScene] = useState<AgentSceneId>(requestedScene);
 
   if (isReduced && shownScene !== requestedScene) {
@@ -248,9 +350,25 @@ export const AiPractice = () => {
   }
 
   const isActiveCell = (id: PracticeId) =>
-    pinnedCell ? pinnedCell === id : sceneForPractice[id] === scrolledScene;
+    pinnedCell ? pinnedCell === id : sceneForPractice[id] === requestedScene;
 
-  const pinCell = (cell: PracticeId) => setPin({ cell, scrolledScene });
+  const pinCell = (cell: PracticeId) => {
+    const scene = sceneForPractice[cell];
+    if (!scene) {
+      return;
+    }
+    setPinnedCell(cell);
+    dispatch({
+      index: sceneCycle.indexOf(scene),
+      kind: "pin",
+      now: performance.now(),
+    });
+  };
+
+  const releaseCell = () => {
+    setPinnedCell(null);
+    dispatch({ kind: "unpin", now: performance.now() });
+  };
 
   return (
     <SectionFrame
@@ -266,15 +384,16 @@ export const AiPractice = () => {
         className="border-rule grid border-t border-l md:grid-cols-2 lg:grid-cols-12"
         ref={grid}
       >
-        {practiceTiles.map((tile) =>
-          tile.kind === "cell" ? (
+        {practiceTiles.map((entry) =>
+          entry.kind === "cell" ? (
             <PracticeCell
-              id={tile.id}
-              isActive={isActiveCell(tile.id)}
-              key={tile.id}
+              id={entry.id}
+              isActive={isActiveCell(entry.id)}
+              key={entry.id}
               onPin={pinCell}
+              onRelease={releaseCell}
               sceneId={sceneId}
-              span={tile.span}
+              span={entry.span}
             />
           ) : (
             <SceneTile
@@ -282,8 +401,9 @@ export const AiPractice = () => {
               isCovered={shownScene !== requestedScene}
               key="scene"
               onCovered={() => setShownScene(requestedScene)}
+              ref={tile}
               scene={shownScene}
-              span={tile.span}
+              span={entry.span}
             />
           )
         )}

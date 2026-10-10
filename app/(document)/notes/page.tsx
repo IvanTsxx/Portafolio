@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 
 import { NoteArchive } from "@/components/content/note-archive";
-import { NoteFilters } from "@/components/content/note-filters";
-import {
-  CompactDossier,
-  DossierPanel,
-} from "@/components/site/compact-dossier";
 import { DocumentHero } from "@/components/site/document-hero";
-import { DocumentLayout } from "@/components/site/document-layout";
 import {
   countNoteFacets,
   noteKinds,
@@ -39,33 +33,22 @@ const NotesPage = async () => {
   const facets = countNoteFacets(notes);
 
   return (
-    <DocumentLayout
-      dossier={
-        <CompactDossier code="NT-02">
-          <DossierPanel collapsible jp="絞込" label="Filter">
-            <NoteFilters facets={facets} total={notes.length} />
-          </DossierPanel>
-        </CompactDossier>
-      }
-      dossierLabel="Notes filters"
-      hero={
-        <DocumentHero
-          code="NT-01"
-          jp="手記"
-          lede="Builds and thoughts"
-          meta={[
-            { label: "Entries", value: pad(notes.length) },
-            ...facets.kinds.map(({ count, kind }) => ({
-              label: noteKinds[kind].plural,
-              value: pad(count),
-            })),
-          ]}
-          title="Notes"
-        />
-      }
-    >
+    <>
+      <DocumentHero
+        code="NT-01"
+        jp="手記"
+        lede="Builds and thoughts"
+        meta={[
+          { label: "Entries", value: pad(notes.length) },
+          ...facets.kinds.map(({ count, kind }) => ({
+            label: noteKinds[kind].plural,
+            value: pad(count),
+          })),
+        ]}
+        title="Notes"
+      />
       <NoteArchive facets={facets} notes={notes.map(toNoteIndexItem)} />
-    </DocumentLayout>
+    </>
   );
 };
 

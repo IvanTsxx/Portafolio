@@ -5,7 +5,12 @@ import type { PointerEvent } from "react";
 
 import type { AgentPointer } from "@/components/agents/use-agent-rig";
 
-import { useHasWaypoints, useViewSlot, viewPriority } from "./view-registry";
+import {
+  requestSceneFrame,
+  useHasWaypoints,
+  useViewSlot,
+  viewPriority,
+} from "./view-registry";
 import { useWebGLSupport } from "./webgl-support";
 
 const CompanionContent = lazy(() => import("./companion-content"));
@@ -15,12 +20,18 @@ const companionSlotId = "agent-companion";
 const CompanionStage = () => {
   const stage = useRef<HTMLDivElement>(null);
   const hit = useRef<HTMLDivElement>(null);
-  const pointer = useRef<AgentPointer>({ hovered: false, x: 0, y: 0 });
+  const pointer = useRef<AgentPointer>({
+    hovered: false,
+    presses: 0,
+    x: 0,
+    y: 0,
+  });
+  const presses = useRef(0);
 
   useViewSlot(
     companionSlotId,
     stage,
-    <CompanionContent hit={hit} pointer={pointer} />,
+    <CompanionContent hit={hit} pointer={pointer} presses={presses} />,
     true,
     viewPriority.overlay
   );
@@ -43,6 +54,10 @@ const CompanionStage = () => {
         aria-hidden
         className="pointer-events-none fixed top-0 left-0 z-30 size-0 cursor-pointer touch-manipulation"
         data-agent-companion-hit=""
+        onClick={() => {
+          presses.current += 1;
+          requestSceneFrame();
+        }}
         onPointerEnter={(event) => {
           trackPointer(event);
           pointer.current.hovered = true;

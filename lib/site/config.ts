@@ -1,7 +1,9 @@
+const email = "bongiovannidev@gmail.com";
+
 export const siteConfig = {
   description:
     "Ivan Bongiovanni, frontend engineer. Interfaces, motion, real-time 3D and AI-assisted development with Conductor, git worktrees, agents, skills and MCPs.",
-  email: "bongiovannidev@gmail.com",
+  email,
   github: "IvanTsxx",
   handle: "IvanTsxx",
   location: "Tucumán, Argentina",
@@ -10,11 +12,29 @@ export const siteConfig = {
   role: "Frontend engineer",
   shortName: "Ivan",
   socials: [
-    { href: "https://github.com/IvanTsxx", label: "GitHub" },
-    { href: "https://x.com/IvanTsxx", label: "X" },
     {
+      handle: "IvanTsxx",
+      href: "https://github.com/IvanTsxx",
+      id: "github",
+      label: "GitHub",
+    },
+    {
+      handle: "@IvanTsxx",
+      href: "https://x.com/IvanTsxx",
+      id: "x",
+      label: "X",
+    },
+    {
+      handle: "bongiovanni-ivan45",
       href: "https://www.linkedin.com/in/bongiovanni-ivan45",
+      id: "linkedin",
       label: "LinkedIn",
+    },
+    {
+      handle: email,
+      href: `mailto:${email}`,
+      id: "email",
+      label: "Email",
     },
   ],
   url: "https://bongi.dev",
@@ -26,5 +46,9 @@ export const primaryRoutes = [
   { href: "/lab", index: "02", label: "Lab" },
   { href: "/registry", index: "03", label: "Registry" },
 ] as const;
+
+export type Social = (typeof siteConfig.socials)[number];
+
+export type SocialId = Social["id"];
 
 export type PrimaryRoute = (typeof primaryRoutes)[number];

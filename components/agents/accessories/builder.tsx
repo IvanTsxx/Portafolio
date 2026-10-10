@@ -73,7 +73,7 @@ export const Laptop = () => {
   });
 
   return (
-    <group position={[0, -0.16, 0.34]} ref={laptop} rotation={[0, Math.PI, 0]}>
+    <group position={[0, -0.16, 0.34]} ref={laptop}>
       <Part
         geometry={roundedBox(0.62, 0.035, 0.4, 0.015, 2)}
         material="aluminum"

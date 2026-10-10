@@ -1,4 +1,5 @@
 import { DossierStrip, PORTRAIT_SRC } from "@/components/site/compact-dossier";
+import { SocialLinks } from "@/components/site/social-links";
 import type { GithubIdentity } from "@/lib/github/model";
 import { siteConfig } from "@/lib/site/config";
 import { cn } from "@/lib/utils";
@@ -30,7 +31,6 @@ const readoutsOf = (identity: GithubIdentity) => [
 ];
 
 const specRowsOf = (identity: GithubIdentity): SpecRow[] => {
-  const email = identity.email ?? siteConfig.email;
   const rows: (SpecRow | null)[] = [
     { href: null, jp: "所在地", key: "Location", value: siteConfig.location },
     identity.company
@@ -43,21 +43,12 @@ const specRowsOf = (identity: GithubIdentity): SpecRow[] => {
           value: identity.company,
         }
       : null,
-    { href: `mailto:${email}`, jp: "連絡", key: "Email", value: email },
     identity.websiteUrl
       ? {
           href: identity.websiteUrl,
           jp: "網址",
           key: "URL",
           value: identity.websiteUrl.replace(/^https?:\/\//u, ""),
-        }
-      : null,
-    identity.twitterUsername
-      ? {
-          href: `https://x.com/${identity.twitterUsername}`,
-          jp: "発信",
-          key: "X",
-          value: `@${identity.twitterUsername}`,
         }
       : null,
     {
@@ -168,6 +159,13 @@ export const IdentityDossier = ({ identity }: { identity: GithubIdentity }) => {
           </div>
         ))}
       </dl>
+
+      <div className="flex flex-col gap-2">
+        <p className="label text-mist">
+          Channels <span className="jp">経路</span>
+        </p>
+        <SocialLinks variant="dossier" />
+      </div>
 
       {identity.organizations.length > 0 && (
         <div className="flex flex-col gap-2">

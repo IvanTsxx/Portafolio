@@ -7,8 +7,16 @@ import type { Waypoint } from "./view-registry";
 
 export type CompanionStop = Pick<Waypoint, "action" | "role" | "side">;
 
+export interface CompanionLeap {
+  duration: number;
+  from: ScreenPoint;
+  height: number;
+  start: number;
+}
+
 export interface CompanionMotion {
   isPlaced: boolean;
+  leap: CompanionLeap | null;
   lastScrollY: number;
   role: AgentRole;
   scale: number;
@@ -31,6 +39,7 @@ export interface CompanionPose {
   lean: number;
   lift: number;
   spin: number;
+  squash: number;
 }
 
 export interface CompanionInput {
@@ -69,6 +78,7 @@ const restingYaw = (stop: CompanionStop) =>
 export const createCompanionMotion = (role: AgentRole): CompanionMotion => ({
   isPlaced: false,
   lastScrollY: 0,
+  leap: null,
   role,
   scale: 0,
   scaleVelocity: 0,
@@ -100,6 +110,67 @@ const stepReduced = (
     lean: 0,
     lift: 0,
     spin: 0,
+    squash: 1,
+  };
+};
+
+const leapSquash = (progress: number) => {
+  if (progress < 0.14) {
+    return 1 - Math.sin((progress / 0.14) * Math.PI) * 0.16;
+  }
+  if (progress > 0.86) {
+    return 1 - Math.sin(((progress - 0.86) / 0.14) * Math.PI) * 0.14;
+  }
+  return 1 + Math.sin(((progress - 0.14) / 0.72) * Math.PI) * 0.08;
+};
+
+export const isSwapActive = (state: CompanionMotion, time: number) => {
+  const progress = (time - state.swapStart) / swapSeconds;
+  return progress >= 0 && progress < 1;
+};
+
+export const startLeap = (
+  state: CompanionMotion,
+  target: ScreenPoint,
+  time: number
+) => {
+  const distance = Math.hypot(
+    target.x - state.travel.x,
+    target.y - state.travel.y
+  );
+  state.travel.isTraveling = false;
+  state.leap = {
+    duration: Math.min(0.85, 0.5 + distance / 1400),
+    from: { x: state.travel.x, y: state.travel.y },
+    height: Math.min(90, 30 + distance * 0.16),
+    start: time,
+  };
+};
+
+const stepLeap = (
+  state: CompanionMotion,
+  input: CompanionInput,
+  leap: CompanionLeap,
+  progress: number
+): CompanionPose => {
+  const { target, step } = input;
+  const glide = easeInOutCubic(
+    Math.min(1, Math.max(0, (progress - 0.1) / 0.8))
+  );
+  const heading = target.x - leap.from.x;
+  state.travel.x = leap.from.x + (target.x - leap.from.x) * glide;
+  state.travel.y = leap.from.y + (target.y - leap.from.y) * glide;
+  if (Math.abs(heading) > 1) {
+    state.yaw = damp(state.yaw, Math.sign(heading) * travelYaw, 12, step);
+  }
+  const air = Math.min(1, Math.max(0, (progress - 0.1) / 0.8));
+  return {
+    action: restingAction(input.stop),
+    cue: noCue,
+    lean: -Math.sign(heading) * Math.sin(air * Math.PI) * 0.12,
+    lift: Math.sin(air * Math.PI) * leap.height,
+    spin: 0,
+    squash: leapSquash(progress),
   };
 };
 
@@ -119,6 +190,7 @@ const stepSwap = (
     lean: 0,
     lift: Math.sin(progress * Math.PI) * swapHopPixels,
     spin: easeInOutCubic(progress) * tau,
+    squash: 1,
   };
 };
 
@@ -145,6 +217,7 @@ const stepRoam = (
     lean,
     lift: hopOffset(travel) * travelHopHeight,
     spin: 0,
+    squash: 1,
   };
 };
 
@@ -177,6 +250,7 @@ export const stepCompanion = (
     state.isPlaced = true;
   }
   if (input.isReduced) {
+    state.leap = null;
     return stepReduced(state, input);
   }
   trackScroll(state, input);
@@ -193,9 +267,21 @@ export const stepCompanion = (
     state.swapStart = input.time;
     return stepSwap(state, input, 0);
   }
-  const pose = isSwapping
-    ? stepSwap(state, input, progress)
-    : stepRoam(state, input);
+  const { leap } = state;
+  const leapProgress = leap ? (input.time - leap.start) / leap.duration : 1;
+  if (leap && leapProgress >= 1) {
+    state.leap = null;
+    state.travel.x = input.target.x;
+    state.travel.y = input.target.y;
+  }
+  let pose: CompanionPose;
+  if (isSwapping) {
+    pose = stepSwap(state, input, progress);
+  } else if (leap && leapProgress < 1) {
+    pose = stepLeap(state, input, leap, Math.max(0, leapProgress));
+  } else {
+    pose = stepRoam(state, input);
+  }
   return {
     ...pose,
     lean: pose.lean + clamp(-state.scrollVelocity / 7000, 0.16),

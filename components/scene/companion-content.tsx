@@ -18,12 +18,25 @@ import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 import type { BurstHandle, HatToss, TossHandle } from "./companion-effects";
 import { FlyingHat, PaperPoof } from "./companion-effects";
 import type { CompanionCue, CompanionMotion } from "./companion-motion";
-import { createCompanionMotion, stepCompanion } from "./companion-motion";
-import type { CompanionFrame, ScreenPoint, Viewport } from "./companion-path";
 import {
-  anchorFor,
+  createCompanionMotion,
+  isSwapActive,
+  startLeap,
+  stepCompanion,
+} from "./companion-motion";
+import type {
+  CompanionFrame,
+  Perch,
+  ScreenPoint,
+  ScreenRect,
+  Viewport,
+} from "./companion-path";
+import {
   companionFrame,
   ownVisibleShare,
+  perchBox,
+  perchCandidates,
+  perchPoint,
   pickWaypoint,
 } from "./companion-path";
 import { ViewLights } from "./view-lights";
@@ -33,6 +46,7 @@ import { getAgentCasts, getWaypoints } from "./view-registry";
 export interface CompanionContentProps {
   hit: RefObject<HTMLDivElement | null>;
   pointer: RefObject<AgentPointer>;
+  presses: RefObject<number>;
 }
 
 interface Outfit {
@@ -89,6 +103,61 @@ const placeHitBox = (
   hit.style.pointerEvents = isInteractive ? "auto" : "none";
 };
 
+const textSamples = 5;
+
+const overlaps = (a: ScreenRect, b: ScreenRect) =>
+  a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+
+const hasTextIn = (box: ScreenRect) => {
+  const touched = new Set<Element>();
+  const width = box.right - box.left;
+  const height = box.bottom - box.top;
+  for (let column = 0; column < textSamples; column += 1) {
+    for (let row = 0; row < textSamples; row += 1) {
+      const element = document.elementFromPoint(
+        box.left + (width * (column + 0.5)) / textSamples,
+        box.top + (height * (row + 0.5)) / textSamples
+      );
+      if (element) {
+        touched.add(element);
+      }
+    }
+  }
+  const range = document.createRange();
+  for (const element of touched) {
+    for (const node of element.childNodes) {
+      if (node.nodeType !== Node.TEXT_NODE || !node.textContent?.trim()) {
+        continue;
+      }
+      range.selectNodeContents(node);
+      for (const line of range.getClientRects()) {
+        if (overlaps(line, box)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
+const pickFreePerch = (
+  hit: HTMLDivElement | null,
+  rect: ScreenRect,
+  current: Perch,
+  from: ScreenPoint,
+  viewport: Viewport,
+  frame: CompanionFrame
+) => {
+  if (hit) {
+    hit.style.pointerEvents = "none";
+  }
+  const free = perchCandidates(rect, current, from, viewport, frame).filter(
+    (perch) =>
+      !hasTextIn(perchBox(perchPoint(rect, perch, viewport, frame), frame))
+  );
+  return free[Math.floor(Math.random() * free.length)] ?? null;
+};
+
 const swapOrigin = new Vector3();
 
 const ClearDepth = () => {
@@ -98,7 +167,7 @@ const ClearDepth = () => {
   return null;
 };
 
-const CompanionContent = ({ hit, pointer }: CompanionContentProps) => {
+const CompanionContent = ({ hit, pointer, presses }: CompanionContentProps) => {
   const isReduced = useReducedMotion();
   const camera = useRef<OrthographicCameraImpl>(null);
   const mover = useRef<Group>(null);
@@ -107,6 +176,8 @@ const CompanionContent = ({ hit, pointer }: CompanionContentProps) => {
   const hat = useRef<TossHandle>(null);
   const actionRef = useRef<AgentAction>("idle");
   const activeStop = useRef<Waypoint | null>(null);
+  const perch = useRef<Perch>({ shift: 0, side: "right" });
+  const handledPresses = useRef(0);
   const tossCount = useRef(0);
   const [outfit, setOutfit] = useState<Outfit>(() => ({
     role: findActiveWaypoint(readViewport(), null)?.role ?? "orchestrator",
@@ -149,6 +220,9 @@ const CompanionContent = ({ hit, pointer }: CompanionContentProps) => {
       view.updateProjectionMatrix();
     }
     const stop = findActiveWaypoint(viewport, activeStop.current);
+    if (stop && stop !== activeStop.current) {
+      perch.current = { shift: 0, side: stop.side };
+    }
     activeStop.current = stop;
     const state = motion.current ?? createCompanionMotion(outfit.role);
     motion.current = state;
@@ -158,23 +232,46 @@ const CompanionContent = ({ hit, pointer }: CompanionContentProps) => {
       return;
     }
 
+    const time = frameState.clock.elapsedTime;
+    const rect = stop.element.getBoundingClientRect();
+    if (presses.current !== handledPresses.current) {
+      handledPresses.current = presses.current;
+      if (state.isPlaced && !isSwapActive(state, time)) {
+        const next = pickFreePerch(
+          hit.current,
+          rect,
+          perch.current,
+          state.travel,
+          viewport,
+          frame
+        );
+        if (next) {
+          perch.current = next;
+        }
+        if (!isReduced) {
+          startLeap(
+            state,
+            perchPoint(rect, perch.current, viewport, frame),
+            time
+          );
+        }
+      }
+    }
+
     const pose = stepCompanion(state, {
       isHidden: isCastInView(viewport),
       isReduced,
       scrollY: window.scrollY,
       step: Math.min(delta, 0.1),
       stop,
-      target: anchorFor(
-        stop.element.getBoundingClientRect(),
-        stop.side,
-        viewport,
-        frame
-      ),
-      time: frameState.clock.elapsedTime,
+      target: perchPoint(rect, perch.current, viewport, frame),
+      time,
     });
     actionRef.current = pose.action;
     spinner.visible = state.scale > 0.01;
-    spinner.scale.setScalar(Math.max(0.0001, state.scale));
+    const size = Math.max(0.0001, state.scale);
+    const spread = size / Math.sqrt(pose.squash);
+    spinner.scale.set(spread, size * pose.squash, spread);
     spinner.rotation.set(baseTilt, state.yaw + pose.spin, pose.lean);
     group.position.set(
       (state.travel.x - viewport.width / 2) / zoom,

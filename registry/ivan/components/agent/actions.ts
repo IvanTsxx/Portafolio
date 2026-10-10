@@ -386,3 +386,45 @@ export const reactionClips = {
     },
   },
 } as const satisfies Record<AgentReaction, ReactionClip>;
+
+export interface HopPlan {
+  reachX: number;
+  reachZ: number;
+  turn: number;
+}
+
+export const hopClip = { duration: 1.75, keyTime: 0.9 } as const;
+
+const bump = (time: number, from: number, to: number) =>
+  Math.sin(window01(time, from, to) * Math.PI);
+
+export const applyHop = (time: number, plan: HopPlan, out: Pose) => {
+  const travel =
+    easeInOut(window01(time, 0.1, 0.5)) - easeInOut(window01(time, 1.15, 1.58));
+  const lift = bump(time, 0.1, 0.5) * 0.42 + bump(time, 1.15, 1.58) * 0.3;
+  const crouch =
+    bump(time, 0, 0.12) +
+    bump(time, 0.5, 0.64) * 0.8 +
+    bump(time, 1.03, 1.17) * 0.6 +
+    bump(time, 1.58, 1.75) * 0.8;
+  const turn = bump(time, 0.05, 0.62) - bump(time, 1.08, 1.64) * 0.75;
+  out.rootX += plan.reachX * travel;
+  out.rootZ += plan.reachZ * travel;
+  out.rootY += lift;
+  out.bodyYaw += plan.turn * turn;
+  out.bodySquash += lift * 0.07 - crouch * 0.11;
+  out.armLeftRaise += lift * 1.5;
+  out.armRightRaise += lift * 1.5;
+  out.leg0 += lift * 0.45;
+  out.leg1 -= lift * 0.45;
+  out.leg2 += lift * 0.45;
+  out.leg3 -= lift * 0.45;
+  out.gazeY += window01(time, 0.5, 0.7) * (1 - window01(time, 1, 1.15)) * 0.02;
+};
+
+export const applyHopReduced = (time: number, plan: HopPlan, out: Pose) => {
+  if (time >= 0 && time < hopClip.duration) {
+    out.rootX += plan.reachX;
+    out.rootZ += plan.reachZ;
+  }
+};
