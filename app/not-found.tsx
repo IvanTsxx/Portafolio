@@ -2,12 +2,8 @@ import { ArrowLeftIcon } from "@phosphor-icons/react/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { MissingRoute } from "@/components/home/missing-route";
-import { CornerMarks } from "@/components/home/primitives";
-import { LazyDebuggerScene } from "@/components/home/scene/lazy-scenes";
-import { primaryRoutes } from "@/lib/site/config";
-
-const secondaryRoutes = primaryRoutes.filter((route) => route.href !== "/");
+import { MissingRoute } from "@/components/not-found/missing-route";
+import { AgentScene } from "@/components/scene/agent-scene";
 
 export const metadata: Metadata = {
   title: "404 · Module not found",
@@ -16,77 +12,57 @@ export const metadata: Metadata = {
 const NotFound = () => (
   <section
     aria-labelledby="not-found-title"
-    className="min-h-below-header relative isolate mx-auto grid w-full max-w-screen-2xl items-center gap-10 px-4 py-16 md:px-6 lg:grid-cols-12 lg:gap-6"
+    className="min-h-below-header mx-auto grid w-full max-w-screen-2xl content-center gap-10 px-4 py-16 md:px-6 lg:grid-cols-12 lg:gap-6"
   >
-    <div
-      aria-hidden
-      className="blueprint-grid absolute inset-0 -z-10 mask-radial-from-20% mask-radial-to-80%"
-    />
-    <div className="flex flex-col gap-8 lg:col-span-6">
-      <p className="label text-signal-rust">Error 404 · ERR_MODULE_NOT_FOUND</p>
+    <div className="flex flex-col gap-8 lg:col-span-5">
+      <p className="label text-graphite flex items-center gap-3">
+        <span className="text-ink">[ ER-404 ]</span>
+        <span>
+          Route trace <span className="jp">経路追跡</span>
+        </span>
+        <span
+          aria-hidden
+          className="border-rule-strong min-w-8 flex-1 border-b border-dotted"
+        />
+        <span className="tabular-nums">01 / 01</span>
+      </p>
       <h1
         className="display text-6xl md:text-7xl xl:text-8xl"
         id="not-found-title"
       >
         404 — Module not found.
       </h1>
-      <pre className="border-rule bg-card/60 overflow-x-auto border p-4 font-mono text-xs/relaxed whitespace-pre-wrap">
+      <pre className="border-rule-strong overflow-x-auto border-l py-1 pl-4 font-mono text-xs/relaxed whitespace-pre-wrap">
         <code>
-          <span className="text-signal-rust">error</span>
-          <span className="text-muted-foreground"> Cannot resolve route </span>
+          <span className="text-ink">ERR_MODULE_NOT_FOUND </span>
           <MissingRoute />
           {"\n"}
-          <span className="text-faint">
-            {" "}
-            at router.match (app/[...]/page.tsx)
-          </span>
+          <span className="text-mist">{"  at router.resolve (app/)"}</span>
           {"\n"}
-          <span className="text-faint">
-            {" "}
-            at workshop.resolve (blueprint unavailable)
-          </span>
-          {"\n\n"}
-          <span className="text-muted-foreground">
-            AG-04 is tracing it. The page may have moved, or never existed.
-          </span>
+          <span className="text-mist">{"  at AG-04 · tracing"}</span>
         </code>
       </pre>
-      <div className="flex flex-wrap items-center gap-3">
-        <Link
-          className="group label bg-foreground text-background hover:bg-clay inline-flex h-11 items-center gap-3 px-4 transition-colors"
-          href="/"
-        >
-          <ArrowLeftIcon
-            aria-hidden
-            className="ease-out-quart size-3.5 transition-transform group-hover:-translate-x-0.5"
-          />
-          Back to the workshop
-        </Link>
-      </div>
-      <nav aria-label="Known routes">
-        <ul className="flex flex-wrap gap-x-4 gap-y-2">
-          {secondaryRoutes.map((route) => (
-            <li key={route.href}>
-              <Link
-                className="label text-muted-foreground hover:text-foreground inline-flex h-11 items-center gap-2 transition-colors"
-                href={route.href}
-              >
-                <span className="text-faint">{route.index}</span>
-                {route.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <Link
+        className="group label bg-ink text-paper hover:bg-clay inline-flex h-11 w-fit items-center gap-3 px-4 transition-colors"
+        href="/"
+      >
+        <ArrowLeftIcon
+          aria-hidden
+          className="ease-out-quart size-3.5 transition-transform group-hover:-translate-x-0.5"
+        />
+        Back home
+      </Link>
     </div>
-    <figure className="border-rule bg-card/40 relative m-0 aspect-4/3 border lg:col-span-6">
-      <CornerMarks />
-      <LazyDebuggerScene className="absolute inset-0" />
-      <figcaption className="label text-faint pointer-events-none absolute inset-x-0 top-0 flex justify-between gap-4 p-4">
-        <span>Fig. 404 · Broken route</span>
-        <span>AG-04 · Debugger</span>
-      </figcaption>
-    </figure>
+    <div className="border-rule-strong relative border lg:col-span-7">
+      <p className="label text-graphite border-rule flex justify-between gap-4 border-b px-4 py-2">
+        <span>Fig. 404 · Debugging</span>
+        <span>AG-04</span>
+      </p>
+      <AgentScene
+        label="The debugger agent inspects a code panel, finds the bug and resolves the broken line"
+        scene="debugging"
+      />
+    </div>
   </section>
 );
 

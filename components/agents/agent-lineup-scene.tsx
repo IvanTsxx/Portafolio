@@ -1,10 +1,11 @@
 "use client";
 
-import { useFrame, useThree } from "@react-three/fiber";
-import { useLayoutEffect, useRef } from "react";
+import { PerspectiveCamera } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
+import { useLayoutEffect } from "react";
 import { MathUtils, Vector3 } from "three";
 
-import { Stage } from "@/components/scene/stage";
+import { ViewLights } from "@/components/scene/view-lights";
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 
 import { Agent } from "./agent";
@@ -61,31 +62,6 @@ const FitCamera = ({ width, depth }: { width: number; depth: number }) => {
   return null;
 };
 
-const StatsProbe = () => {
-  const gl = useThree((state) => state.gl);
-  const windowStart = useRef(0);
-  const frames = useRef(0);
-  useFrame(() => {
-    const now = performance.now();
-    frames.current += 1;
-    const elapsed = now - windowStart.current;
-    if (elapsed < 1000) {
-      return;
-    }
-    document.documentElement.dataset.agentStageStats = JSON.stringify({
-      calls: gl.info.render.calls,
-      frameMs: Math.round((elapsed / frames.current) * 100) / 100,
-      geometries: gl.info.memory.geometries,
-      programs: gl.info.programs?.length ?? 0,
-      textures: gl.info.memory.textures,
-      triangles: gl.info.render.triangles,
-    });
-    windowStart.current = now;
-    frames.current = 0;
-  });
-  return null;
-};
-
 const LineupAgents = ({
   entries,
   focusedRole,
@@ -130,14 +106,11 @@ const LineupAgents = ({
 };
 
 const AgentLineupScene = (props: AgentLineupSceneProps) => (
-  <Stage
-    camera={{ fov: 30, position: [0, 3.2, 11], target: [0, 0.7, 0] }}
-    label="Lineup of seven workshop agents, each in its signature action"
-    shadowExtent={props.entries.length === 1 ? 2.5 : 8}
-  >
+  <>
+    <PerspectiveCamera fov={30} makeDefault position={[0, 3.2, 11]} />
+    <ViewLights />
     <LineupAgents {...props} />
-    <StatsProbe />
-  </Stage>
+  </>
 );
 
 export default AgentLineupScene;
