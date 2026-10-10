@@ -7,9 +7,13 @@ import { PostJsonLd } from "@/components/content/post-json-ld";
 import { PostRow } from "@/components/content/post-row";
 import { SampleBadge } from "@/components/content/sample-badge";
 import { TableOfContents } from "@/components/content/table-of-contents";
+import { CornerMarks } from "@/components/site/corner-marks";
+import { PanelHeading } from "@/components/site/panel-heading";
+import { chipClassName, focusRingClassName } from "@/components/site/styles";
 import {
   getAdjacentPosts,
   getPost,
+  getPosts,
   getPostSlugs,
   getRelatedPosts,
   toPostIndexItem,
@@ -36,6 +40,8 @@ export const generateMetadata = async ({
   return document ? buildPostMetadata(document.entry) : {};
 };
 
+const pad = (value: number) => String(value).padStart(2, "0");
+
 const AdjacentLink = ({
   direction,
   post,
@@ -50,17 +56,19 @@ const AdjacentLink = ({
   return (
     <Link
       className={cn(
-        "group border-rule hover:bg-card flex min-h-11 flex-col gap-3 border p-5 transition-colors md:p-6",
+        "group/marks border-rule-strong ease-mechanical hover:bg-paper-deep/60 relative flex min-h-11 flex-col gap-3 border p-5 transition-colors duration-100 md:p-6",
+        focusRingClassName,
         !isNewer && "md:items-end md:text-right"
       )}
       href={`/blog/${post.slug}`}
     >
-      <span className="label text-muted-foreground group-hover:text-clay flex items-center gap-2 transition-colors">
+      <CornerMarks reveal="hover" />
+      <span className="label text-mist group-hover/marks:text-ink flex items-center gap-2 transition-colors">
         {isNewer ? <ArrowLeft aria-hidden className="size-4" /> : null}
         {isNewer ? "Newer" : "Older"}
         {isNewer ? null : <ArrowRight aria-hidden className="size-4" />}
       </span>
-      <span className="display text-foreground text-2xl text-balance">
+      <span className="display text-ink text-2xl text-balance">
         {post.title}
       </span>
     </Link>
@@ -75,7 +83,10 @@ const BlogPostPage = async ({ params }: PageProps<"/blog/[slug]">) => {
   }
 
   const { Content, entry: post, headings } = document;
-  const adjacent = await getAdjacentPosts(post.slug);
+  const [posts, adjacent] = await Promise.all([
+    getPosts(),
+    getAdjacentPosts(post.slug),
+  ]);
   const related = await getRelatedPosts(post, {
     exclude: [adjacent.newer?.slug, adjacent.older?.slug].filter(
       (adjacentSlug) => adjacentSlug !== undefined
@@ -83,62 +94,81 @@ const BlogPostPage = async ({ params }: PageProps<"/blog/[slug]">) => {
   });
   const showTableOfContents =
     headings.length >= minimumHeadingsForTableOfContents;
+  const code = `FN-${pad(posts.findIndex((item) => item.slug === post.slug) + 1)}`;
 
   return (
-    <article className="mx-auto w-full max-w-screen-2xl px-4 pt-10 pb-24 md:px-6 md:pt-14">
+    <article className="mx-auto w-full max-w-screen-2xl px-4 pt-6 pb-8 md:px-8 md:pt-8">
       {isIndexable(post) ? <PostJsonLd post={post} /> : null}
       <header>
-        <Link
-          className="label text-muted-foreground hover:text-foreground inline-flex min-h-11 items-center gap-2 transition-colors"
-          href="/blog"
-        >
-          <ArrowLeft aria-hidden className="size-4" />
-          Field notes
-        </Link>
-        <div className="mt-6 flex flex-col items-start gap-6">
-          <p className="label text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2">
-            <time className="tabular-nums" dateTime={post.date}>
+        <div className="label border-rule-strong flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b pb-2">
+          <Link
+            className={cn(
+              focusRingClassName,
+              "text-ink hover:text-graphite inline-flex min-h-11 items-center gap-2 transition-colors md:min-h-8"
+            )}
+            href="/blog"
+          >
+            <ArrowLeft aria-hidden className="size-4" />
+            Field notes
+          </Link>
+          <span className="flex flex-wrap gap-x-6 gap-y-1">
+            <span className="flex gap-2">
+              <span className="text-mist">Doc</span>
+              <span className="text-ink tabular-nums">{code}</span>
+            </span>
+            <time className="text-ink tabular-nums" dateTime={post.date}>
               {formatPostDate(post.date)}
             </time>
-            <span className="tabular-nums">
-              {post.readingTimeMinutes} min read
+            <span className="text-ink tabular-nums">
+              {pad(post.readingTimeMinutes)} min
             </span>
+          </span>
+        </div>
+        <div className="mt-10 flex flex-col items-start gap-6 md:mt-16">
+          <h1 className="display text-ink max-w-5xl text-5xl md:text-7xl">
+            {post.title}
+          </h1>
+          <p className="text-graphite max-w-prose text-base text-pretty">
+            {post.summary}
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
             {post.sample ? (
               <SampleBadge source={`content/blog/${post.slug}.mdx`} />
             ) : null}
-          </p>
-          <h1 className="display max-w-5xl text-5xl md:text-7xl">
-            {post.title}
-          </h1>
-          <p className="text-muted-foreground max-w-2xl text-xl text-pretty">
-            {post.summary}
-          </p>
-          <ul className="flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <li key={tag}>
-                <Link
-                  className="label border-rule-strong text-muted-foreground hover:border-foreground/40 hover:text-foreground inline-flex min-h-11 items-center rounded-sm border px-3 transition-colors md:min-h-8"
-                  href={`/blog?tag=${encodeURIComponent(tag)}`}
-                >
-                  {tag}
-                </Link>
-              </li>
-            ))}
-          </ul>
+            <ul className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <li key={tag}>
+                  <Link
+                    className={chipClassName}
+                    href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  >
+                    {tag}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </header>
 
-      <div className="border-rule mt-12 border-t pt-12 lg:grid lg:grid-cols-12 lg:gap-x-8">
+      <div className="mt-16 lg:grid lg:grid-cols-12 lg:gap-x-8">
         {showTableOfContents ? (
-          <aside className="lg:sticky lg:top-24 lg:col-span-3 lg:self-start">
-            <details className="border-rule mb-8 border lg:hidden">
-              <summary className="label text-muted-foreground flex min-h-11 cursor-pointer items-center px-4">
+          <aside className="lg:sticky lg:top-20 lg:col-span-3 lg:self-start">
+            <details className="group/toc border-rule-strong mb-8 border lg:hidden">
+              <summary
+                className={cn(
+                  "label text-graphite flex min-h-11 cursor-pointer items-center px-4 after:ml-auto after:content-['+'] group-open/toc:after:content-['−']",
+                  focusRingClassName
+                )}
+              >
                 On this page
               </summary>
               <TableOfContents className="px-4 pb-3" headings={headings} />
             </details>
             <div className="hidden lg:block">
-              <p className="label text-muted-foreground mb-3">On this page</p>
+              <p className="label text-mist mb-3">
+                On this page <span className="jp ml-2">目次</span>
+              </p>
               <TableOfContents headings={headings} />
             </div>
           </aside>
@@ -164,11 +194,15 @@ const BlogPostPage = async ({ params }: PageProps<"/blog/[slug]">) => {
       ) : null}
 
       {related.length > 0 ? (
-        <section className="mt-24">
-          <h2 className="display border-rule border-t pt-6 pb-8 text-4xl">
-            Related notes
-          </h2>
-          <ul className="border-rule border-t">
+        <section aria-labelledby="related-notes" className="mt-24">
+          <PanelHeading
+            aside={pad(related.length)}
+            id="related-notes"
+            index={`${code}.1`}
+            jp="関連"
+            label="Related notes"
+          />
+          <ul className="border-rule mt-6 border-t">
             {related.map((item) => (
               <PostRow
                 density="compact"

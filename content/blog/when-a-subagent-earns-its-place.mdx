@@ -2,43 +2,41 @@ export const meta = {
   title: "When a subagent earns its place",
   date: "2026-10-07",
   summary:
-    "A subagent is a fresh context with a brief. It pays off for independent, checkable work and costs more than it saves for tightly coupled edits. A short test, a task table and a brief template.",
+    "Independent, checkable work pays off. Tightly coupled edits cost more than they save.",
   tags: ["Subagents", "AI agents", "Workflow"],
   sample: true,
 };
 
-A subagent is a fresh agent with its own context window. It receives a brief, does the work and returns a summary. The main thread never sees the files it read or the commands it ran. That is the benefit and the cost.
+A subagent is a fresh agent with its own context window. It receives a brief, does the work and returns a summary. The main thread never sees the files it read. That is the benefit and the cost.
 
 <Callout tone="sample" title="Sample draft">
-  This note is an editable draft that ships with the template. It describes a
-  way of working and makes no claims about measured results. Edit it in
-  `content/blog/when-a-subagent-earns-its-place.mdx`.
+  Editable placeholder. No measured results.
 </Callout>
 
 ## The test
 
 I delegate when three things are true.
 
-1. The work is independent. It does not need what the main thread learned in the last hour.
-2. The result is checkable. It is a diff, a list of findings or a command that passes.
-3. The detail is disposable. I want the conclusion, not the forty files that produced it.
+1. The work is independent of what the main thread just learned.
+2. The result is checkable: a diff, a list of findings or a passing command.
+3. The detail is disposable. I want the conclusion, not the forty files behind it.
 
-If one of them fails, I do the work in the main thread.
+If one fails, I do the work in the main thread.
 
 ## What I delegate and what I keep
 
 | Task | Delegate | Why |
 | --- | --- | --- |
-| Find every use of an API across the repo | Yes | The output is large and the answer is short |
-| Audit components for missing states | Yes | Independent work that returns a list |
-| Rename a prop used in thirty files | Yes, to one agent | Mechanical and verified by the typechecker |
-| Design a data model | No | It needs the full context and a judgment call |
+| Find every use of an API across the repo | Yes | Large output, short answer |
+| Audit components for missing states | Yes | Independent, returns a list |
+| Rename a prop used in thirty files | Yes, to one agent | Mechanical, verified by the typechecker |
+| Design a data model | No | Needs full context and judgment |
 | Fix a bug I cannot explain yet | Not yet | The investigation is the work |
-| Two agents editing the same file | No | Shared writes have to be serialized |
+| Two agents editing the same file | No | Shared writes must be serialized |
 
 ## Write the brief like a handoff
 
-The subagent starts with nothing. Whatever is not in the brief does not exist for it. A good brief fits on one screen.
+The subagent starts with nothing. A good brief fits on one screen and points at files instead of pasting them.
 
 ```txt title="brief.txt"
 Goal
@@ -48,28 +46,19 @@ Scope
 components/content/work-archive.tsx only.
 
 Constraints
-Use the existing tokens. No new dependencies. No code comments.
+Use the existing tokens. No new dependencies.
 
 Done when
-Typecheck and lint pass, and the empty state renders with the filter applied.
+Typecheck and lint pass, and the empty state renders.
 
 Report
-List the files changed and anything you could not verify.
+Files changed and anything you could not verify.
 ```
 
-Pointing at files beats pasting their contents. The agent reads the current version instead of a stale copy.
-
-## You still own the result
-
 <Callout tone="tip" title="Read the diff, not the summary">
-  A summary describes what the agent meant to do. The diff shows what it did.
-  When they disagree, trust the diff and run the checks yourself.
+  A summary says what the agent meant to do. The diff shows what it did.
 </Callout>
-
-An agent that writes files gets its own worktree, so its edits cannot land in a lane that someone else is using. I review that diff the same way I review a colleague's pull request.
 
 ## When it costs more than it saves
 
-Every subagent needs a brief, an isolated place to write and a review pass. For a three-line change that overhead is larger than the work. I make the edit myself.
-
-The same goes for tightly coupled changes. If step two depends on a decision made in step one, splitting them across agents only moves the coordination cost somewhere harder to see.
+Every subagent needs a brief, an isolated place to write and a review pass. For a three-line change I make the edit myself. The same goes for coupled changes: splitting step two from step one only hides the coordination cost.

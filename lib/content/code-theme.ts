@@ -1,15 +1,16 @@
 import type { ThemeRegistration } from "shiki";
 
 const palette = {
-  comment: "#7d7a76",
-  constant: "#cfbb9a",
-  foreground: "#f2f0ec",
-  keyword: "#83a3bb",
-  property: "#b0aeaa",
-  punctuation: "#8a8783",
-  rust: "#c76749",
-  string: "#7bb587",
-  variable: "#d9d6d0",
+  comment: "#646361",
+  constant: "#844100",
+  foreground: "#121212",
+  keyword: "#3250d8",
+  property: "#3d3d3b",
+  punctuation: "#646361",
+  rust: "#b53700",
+  string: "#b53700",
+  type: "#0d5665",
+  variable: "#121212",
 } as const;
 
 export const codeTheme: ThemeRegistration = {
@@ -17,7 +18,7 @@ export const codeTheme: ThemeRegistration = {
     "editor.background": "#00000000",
     "editor.foreground": palette.foreground,
   },
-  name: "workshop-dark",
+  name: "workshop-paper",
   tokenColors: [
     {
       scope: ["comment", "punctuation.definition.comment"],
@@ -61,7 +62,7 @@ export const codeTheme: ThemeRegistration = {
         "support.function",
         "meta.function-call entity.name.function",
       ],
-      settings: { foreground: palette.foreground },
+      settings: { fontStyle: "bold", foreground: palette.foreground },
     },
     {
       scope: [
@@ -71,7 +72,7 @@ export const codeTheme: ThemeRegistration = {
         "support.class",
         "entity.other.inherited-class",
       ],
-      settings: { foreground: palette.keyword },
+      settings: { foreground: palette.type },
     },
     {
       scope: ["variable", "variable.other.readwrite", "variable.parameter"],
@@ -117,12 +118,12 @@ export const codeTheme: ThemeRegistration = {
     },
     {
       scope: ["markup.inserted", "meta.diff.header.to-file"],
-      settings: { foreground: palette.string },
+      settings: { foreground: palette.type },
     },
     {
       scope: ["markup.deleted", "meta.diff.header.from-file", "invalid"],
       settings: { foreground: palette.rust },
     },
   ],
-  type: "dark",
+  type: "light",
 };

@@ -2,10 +2,8 @@
 
 import { useId } from "react";
 
+import { chipClassName } from "@/components/site/styles";
 import type { FacetCount } from "@/lib/content/facets";
-
-const chipClassName =
-  "label border-rule-strong text-muted-foreground hover:border-foreground/40 hover:text-foreground aria-pressed:border-foreground aria-pressed:bg-foreground aria-pressed:text-background inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 transition-colors md:min-h-8";
 
 export const FilterBar = ({
   active,
@@ -26,7 +24,7 @@ export const FilterBar = ({
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
-      <p className="label text-muted-foreground shrink-0" id={labelId}>
+      <p className="label text-mist shrink-0" id={labelId}>
         {label}
       </p>
       <fieldset
@@ -40,7 +38,7 @@ export const FilterBar = ({
           type="button"
         >
           All
-          <span className="tabular-nums">{total}</span>
+          <span className="tabular-nums">{String(total).padStart(2, "0")}</span>
         </button>
         {facets.map((facet) => (
           <button
@@ -51,7 +49,9 @@ export const FilterBar = ({
             type="button"
           >
             {facet.name}
-            <span className="tabular-nums">{facet.count}</span>
+            <span className="tabular-nums">
+              {String(facet.count).padStart(2, "0")}
+            </span>
           </button>
         ))}
       </fieldset>

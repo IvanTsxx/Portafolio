@@ -2,6 +2,7 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import type { ComponentProps } from "react";
 
+import { linkClassName } from "@/components/site/styles";
 import { cn } from "@/lib/utils";
 
 type CodeFigureProps = ComponentProps<"figure"> & {
@@ -20,11 +21,11 @@ const isInternalHref = (href: string) =>
   href.startsWith("/") || href.startsWith("#");
 
 const lineNumberVariant =
-  "[&[data-line-numbers]>[data-line]]:before:mr-4 [&[data-line-numbers]>[data-line]]:before:inline-block [&[data-line-numbers]>[data-line]]:before:w-4 [&[data-line-numbers]>[data-line]]:before:text-right [&[data-line-numbers]>[data-line]]:before:text-faint [&[data-line-numbers]>[data-line]]:before:content-[counter(line)] [&[data-line-numbers]>[data-line]]:before:[counter-increment:line] [&[data-line-numbers]]:[counter-reset:line]";
+  "[&[data-line-numbers]>[data-line]]:before:mr-4 [&[data-line-numbers]>[data-line]]:before:inline-block [&[data-line-numbers]>[data-line]]:before:w-4 [&[data-line-numbers]>[data-line]]:before:text-right [&[data-line-numbers]>[data-line]]:before:text-mist [&[data-line-numbers]>[data-line]]:before:content-[counter(line)] [&[data-line-numbers]>[data-line]]:before:[counter-increment:line] [&[data-line-numbers]]:[counter-reset:line]";
 
 const sectionHeadingClassName = cn(
-  "display text-foreground border-rule mt-16 mb-6 scroll-mt-24 border-t pt-6 text-3xl [counter-increment:section] first:mt-0 md:text-4xl",
-  "group-data-[numbered]/prose:before:label group-data-[numbered]/prose:before:text-faint group-data-[numbered]/prose:before:mb-4 group-data-[numbered]/prose:before:block group-data-[numbered]/prose:before:content-[counter(section,decimal-leading-zero)]"
+  "text-ink border-rule-strong mt-16 mb-6 scroll-mt-24 border-t pt-4 text-3xl leading-tight font-light tracking-tight text-balance [counter-increment:section] first:mt-0 md:text-4xl",
+  "group-data-[numbered]/prose:before:label group-data-[numbered]/prose:before:text-mist group-data-[numbered]/prose:before:mb-3 group-data-[numbered]/prose:before:block group-data-[numbered]/prose:before:tabular-nums group-data-[numbered]/prose:before:content-['[_'_counter(section,decimal-leading-zero)_'_]']"
 );
 
 export const ProseAnchor = ({
@@ -33,14 +34,11 @@ export const ProseAnchor = ({
   href = "",
   ...props
 }: ComponentProps<"a">) => {
-  const linkClassName = cn(
-    "text-foreground decoration-rule-strong hover:decoration-clay hover:text-clay underline underline-offset-4 transition-colors",
-    className
-  );
+  const anchorClassName = cn(linkClassName, "text-ink", className);
 
   if (isInternalHref(href)) {
     return (
-      <Link className={linkClassName} href={href} {...props}>
+      <Link className={anchorClassName} href={href} {...props}>
         {children}
       </Link>
     );
@@ -48,7 +46,7 @@ export const ProseAnchor = ({
 
   return (
     <a
-      className={linkClassName}
+      className={anchorClassName}
       href={href}
       rel="noopener noreferrer"
       target="_blank"
@@ -69,7 +67,7 @@ export const ProseBlockquote = ({
 }: ComponentProps<"blockquote">) => (
   <blockquote
     className={cn(
-      "border-rule-strong text-muted-foreground my-8 border-l pl-6 text-lg italic",
+      "border-ink text-graphite my-8 border-l-2 pl-6 text-lg italic",
       className
     )}
     {...props}
@@ -80,7 +78,7 @@ export const ProseCode = ({ className, ...props }: CodeProps) =>
   props["data-language"] === undefined ? (
     <code
       className={cn(
-        "bg-graphite text-foreground rounded-sm px-1.5 py-0.5 font-mono text-[0.875em]",
+        "border-rule bg-paper-deep text-ink border px-1.5 py-0.5 font-mono text-[0.875em]",
         className
       )}
       {...props}
@@ -90,7 +88,7 @@ export const ProseCode = ({ className, ...props }: CodeProps) =>
       className={cn(
         "grid w-max min-w-full font-mono text-sm/6",
         lineNumberVariant,
-        "[&_[data-highlighted-chars]]:bg-accent [&_[data-highlighted-line]]:bg-accent [&_[data-highlighted-chars]]:rounded-sm [&_[data-line]]:px-4",
+        "[&_[data-highlighted-chars]]:bg-ink/10 [&_[data-highlighted-line]]:bg-ink/5 [&_[data-line]]:px-4",
         className
       )}
       {...props}
@@ -101,7 +99,7 @@ export const ProseEmphasis = ({
   className,
   ...props
 }: ComponentProps<"em">) => (
-  <em className={cn("text-foreground italic", className)} {...props} />
+  <em className={cn("text-ink italic", className)} {...props} />
 );
 
 export const ProseFigcaption = ({ className, ...props }: CodeTitleProps) =>
@@ -110,7 +108,7 @@ export const ProseFigcaption = ({ className, ...props }: CodeTitleProps) =>
   ) : (
     <figcaption
       className={cn(
-        "label border-rule text-muted-foreground border-b px-4 py-3 normal-case",
+        "label border-rule-strong bg-paper-deep text-graphite border-b px-4 py-3 normal-case",
         className
       )}
       {...props}
@@ -123,7 +121,7 @@ export const ProseFigure = ({ className, ...props }: CodeFigureProps) =>
   ) : (
     <figure
       className={cn(
-        "border-rule bg-card my-8 overflow-hidden rounded-sm border",
+        "border-rule-strong bg-popover my-8 overflow-hidden border",
         className
       )}
       {...props}
@@ -147,7 +145,7 @@ export const ProseH3 = ({
 }: ComponentProps<"h3">) => (
   <h3
     className={cn(
-      "text-foreground mt-10 mb-3 scroll-mt-24 text-xl font-semibold tracking-tight text-balance",
+      "text-ink mt-10 mb-3 scroll-mt-24 text-xl font-medium tracking-tight text-balance",
       className
     )}
     {...props}
@@ -162,10 +160,7 @@ export const ProseH4 = ({
   ...props
 }: ComponentProps<"h4">) => (
   <h4
-    className={cn(
-      "label text-muted-foreground mt-8 mb-2 scroll-mt-24",
-      className
-    )}
+    className={cn("label text-graphite mt-8 mb-2 scroll-mt-24", className)}
     {...props}
   >
     {children}
@@ -173,14 +168,17 @@ export const ProseH4 = ({
 );
 
 export const ProseRule = ({ className, ...props }: ComponentProps<"hr">) => (
-  <hr className={cn("border-rule my-12", className)} {...props} />
+  <hr
+    className={cn("border-rule-strong my-12 border-dotted", className)}
+    {...props}
+  />
 );
 
 export const ProseListItem = ({
   className,
   ...props
 }: ComponentProps<"li">) => (
-  <li className={cn("text-foreground/90 pl-1", className)} {...props} />
+  <li className={cn("text-ink pl-1", className)} {...props} />
 );
 
 export const ProseOrderedList = ({
@@ -189,7 +187,7 @@ export const ProseOrderedList = ({
 }: ComponentProps<"ol">) => (
   <ol
     className={cn(
-      "marker:text-faint my-5 list-decimal space-y-2 pl-6 text-base/7 marker:font-mono md:text-lg/8",
+      "marker:text-mist my-5 list-decimal space-y-2 pl-6 text-base/7 marker:font-mono md:text-lg/8",
       className
     )}
     {...props}
@@ -202,7 +200,7 @@ export const ProseUnorderedList = ({
 }: ComponentProps<"ul">) => (
   <ul
     className={cn(
-      "marker:text-faint my-5 list-disc space-y-2 pl-6 text-base/7 md:text-lg/8",
+      "marker:text-ink my-5 list-disc space-y-2 pl-6 text-base/7 md:text-lg/8",
       className
     )}
     {...props}
@@ -215,7 +213,7 @@ export const ProseParagraph = ({
 }: ComponentProps<"p">) => (
   <p
     className={cn(
-      "text-foreground/90 my-5 text-base/7 text-pretty md:text-lg/8",
+      "text-ink my-5 text-base/7 text-pretty md:text-lg/8",
       className
     )}
     {...props}
@@ -236,17 +234,14 @@ export const ProseStrong = ({
   className,
   ...props
 }: ComponentProps<"strong">) => (
-  <strong
-    className={cn("text-foreground font-semibold", className)}
-    {...props}
-  />
+  <strong className={cn("text-ink font-medium", className)} {...props} />
 );
 
 export const ProseTable = ({
   className,
   ...props
 }: ComponentProps<"table">) => (
-  <div className="border-rule my-8 overflow-x-auto border">
+  <div className="border-rule-strong my-8 overflow-x-auto border">
     <table
       className={cn(
         "w-full border-collapse text-left text-sm [&_tbody_tr:last-child_td]:border-b-0",
@@ -263,7 +258,7 @@ export const ProseTableCell = ({
 }: ComponentProps<"td">) => (
   <td
     className={cn(
-      "border-rule text-foreground/90 border-b px-4 py-3 align-top tabular-nums",
+      "border-rule text-ink border-b px-4 py-3 align-top tabular-nums",
       className
     )}
     {...props}
@@ -276,7 +271,7 @@ export const ProseTableHeading = ({
 }: ComponentProps<"th">) => (
   <th
     className={cn(
-      "label bg-graphite text-muted-foreground border-rule-strong border-b px-4 py-3 font-normal whitespace-nowrap",
+      "label bg-paper-deep text-graphite border-rule-strong border-b px-4 py-3 font-normal whitespace-nowrap",
       className
     )}
     {...props}

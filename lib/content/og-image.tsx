@@ -2,20 +2,62 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { ImageResponse } from "next/og";
+import type { CSSProperties } from "react";
 
 import { siteConfig } from "@/lib/site/config";
 
 const ogSize = { height: 630, width: 1200 } as const;
 
 const palette = {
-  background: "#0b0a09",
-  clay: "#e57f4f",
-  faint: "#5a5855",
-  foreground: "#f2f0ec",
-  muted: "#94928e",
-  rule: "#1d1b1a",
-  steel: "#83a3bb",
+  graphite: "#3d3d3b",
+  grid: "rgba(18, 18, 18, 0.07)",
+  ink: "#121212",
+  mist: "#646361",
+  paper: "#ededeb",
+  ruleStrong: "rgba(18, 18, 18, 0.7)",
 } as const;
+
+const cornerSize = 20;
+const cornerInset = 32;
+
+const cornerPlacements = [
+  {
+    id: "top-left",
+    style: {
+      borderLeftWidth: 2,
+      borderTopWidth: 2,
+      left: cornerInset,
+      top: cornerInset,
+    },
+  },
+  {
+    id: "top-right",
+    style: {
+      borderRightWidth: 2,
+      borderTopWidth: 2,
+      right: cornerInset,
+      top: cornerInset,
+    },
+  },
+  {
+    id: "bottom-left",
+    style: {
+      borderBottomWidth: 2,
+      borderLeftWidth: 2,
+      bottom: cornerInset,
+      left: cornerInset,
+    },
+  },
+  {
+    id: "bottom-right",
+    style: {
+      borderBottomWidth: 2,
+      borderRightWidth: 2,
+      bottom: cornerInset,
+      right: cornerInset,
+    },
+  },
+] satisfies { id: string; style: CSSProperties }[];
 
 const readGeistFont = (family: "geist-mono" | "geist-sans", file: string) =>
   readFile(
@@ -28,99 +70,114 @@ export interface OgImageContent {
   title: string;
 }
 
+const monoLine = {
+  fontFamily: "Geist Mono",
+  fontSize: 22,
+  letterSpacing: 3.5,
+  textTransform: "uppercase",
+} as const;
+
 export const renderOgImage = async ({
   eyebrow,
   sample = false,
   title,
 }: OgImageContent) => {
-  const [sansSemiBold, monoRegular] = await Promise.all([
-    readGeistFont("geist-sans", "Geist-SemiBold.ttf"),
+  const [sansLight, monoRegular] = await Promise.all([
+    readGeistFont("geist-sans", "Geist-Light.ttf"),
     readGeistFont("geist-mono", "GeistMono-Regular.ttf"),
   ]);
 
   return new ImageResponse(
     <div
       style={{
-        backgroundColor: palette.background,
-        backgroundImage: `linear-gradient(to right, ${palette.rule} 1px, transparent 1px), linear-gradient(to bottom, ${palette.rule} 1px, transparent 1px)`,
+        backgroundColor: palette.paper,
+        backgroundImage: `linear-gradient(to right, ${palette.grid} 1px, transparent 1px), linear-gradient(to bottom, ${palette.grid} 1px, transparent 1px)`,
         backgroundSize: "60px 60px",
-        color: palette.foreground,
+        color: palette.ink,
         display: "flex",
         flexDirection: "column",
         fontFamily: "Geist",
         height: "100%",
         justifyContent: "space-between",
         padding: 72,
+        position: "relative",
         width: "100%",
       }}
     >
+      {cornerPlacements.map((placement) => (
+        <div
+          key={placement.id}
+          style={{
+            borderColor: palette.ink,
+            borderStyle: "solid",
+            display: "flex",
+            height: cornerSize,
+            position: "absolute",
+            width: cornerSize,
+            ...placement.style,
+          }}
+        />
+      ))}
       <div
         style={{
-          alignItems: "center",
+          ...monoLine,
+          alignItems: "baseline",
+          borderBottom: `2px solid ${palette.ruleStrong}`,
           display: "flex",
-          fontFamily: "Geist Mono",
-          fontSize: 24,
           justifyContent: "space-between",
-          letterSpacing: 2,
-          textTransform: "uppercase",
+          paddingBottom: 12,
         }}
       >
-        <div style={{ alignItems: "center", display: "flex", gap: 16 }}>
-          <div
-            style={{
-              backgroundColor: palette.clay,
-              borderRadius: 4,
-              height: 24,
-              width: 24,
-            }}
-          />
-          <span>{siteConfig.shortName}</span>
-          <span style={{ color: palette.faint }}>/workshop</span>
+        <div style={{ display: "flex", gap: 20 }}>
+          <span style={{ color: palette.mist }}>[ DOC ]</span>
+          <span>{siteConfig.name}</span>
         </div>
-        {sample ? (
-          <span style={{ color: palette.steel }}>Sample content</span>
-        ) : null}
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-        <span
-          style={{
-            color: palette.muted,
-            fontFamily: "Geist Mono",
-            fontSize: 24,
-            letterSpacing: 2,
-            textTransform: "uppercase",
-          }}
-        >
-          {eyebrow}
+        <span style={{ color: palette.mist }}>
+          {sample ? "Sample content" : "Archive of builds"}
         </span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+        <span style={{ ...monoLine, color: palette.graphite }}>{eyebrow}</span>
         <span
           style={{
-            fontSize: title.length > 48 ? 64 : 88,
-            fontWeight: 600,
-            letterSpacing: -2,
-            lineHeight: 1.05,
+            fontSize: title.length > 48 ? 72 : 104,
+            fontWeight: 300,
+            letterSpacing: -4,
+            lineHeight: 1,
           }}
         >
           {title}
         </span>
+        <div
+          style={{
+            backgroundImage: `repeating-linear-gradient(-45deg, ${palette.ink} 0px, ${palette.ink} 2px, transparent 2px, transparent 6px)`,
+            display: "flex",
+            height: 8,
+            width: 96,
+          }}
+        />
       </div>
       <div
         style={{
-          color: palette.faint,
+          ...monoLine,
+          borderTop: `1px solid ${palette.ruleStrong}`,
+          color: palette.mist,
           display: "flex",
-          fontFamily: "Geist Mono",
-          fontSize: 24,
+          fontSize: 20,
           justifyContent: "space-between",
+          paddingTop: 12,
         }}
       >
-        <span>{siteConfig.name}</span>
-        <span>{new URL(siteConfig.url).host}</span>
+        <span>{siteConfig.location}</span>
+        <span style={{ textTransform: "none" }}>
+          {new URL(siteConfig.url).host}
+        </span>
       </div>
     </div>,
     {
       ...ogSize,
       fonts: [
-        { data: sansSemiBold, name: "Geist", style: "normal", weight: 600 },
+        { data: sansLight, name: "Geist", style: "normal", weight: 300 },
         { data: monoRegular, name: "Geist Mono", style: "normal", weight: 400 },
       ],
     }

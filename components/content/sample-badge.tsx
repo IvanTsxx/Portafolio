@@ -9,12 +9,12 @@ export const SampleBadge = ({
 }) => (
   <span
     className={cn(
-      "label border-rule-strong text-signal-steel inline-flex w-fit items-center gap-2 rounded-sm border px-2 py-1 whitespace-nowrap",
+      "label text-ink border-ink inline-flex w-fit items-center gap-2 border border-dashed px-2 py-1 whitespace-nowrap",
       className
     )}
     title={`Placeholder entry. Edit or replace ${source}.`}
   >
-    <span aria-hidden className="bg-signal-steel size-1.5 rounded-full" />
+    <span aria-hidden className="border-ink size-1.5 border" />
     Sample content
   </span>
 );

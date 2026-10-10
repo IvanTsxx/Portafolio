@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { CornerMarks } from "@/components/site/corner-marks";
 import { cn } from "@/lib/utils";
 
 export interface VideoProps {
@@ -24,7 +25,8 @@ export const Video = ({
   width,
 }: VideoProps) => (
   <figure className={cn("my-10", className)}>
-    <div className="border-rule bg-card overflow-hidden rounded-sm border">
+    <div className="border-rule-strong bg-popover relative border p-2">
+      <CornerMarks />
       <video
         aria-label={alt}
         className="h-auto w-full"
@@ -43,7 +45,7 @@ export const Video = ({
       </video>
     </div>
     {caption ? (
-      <figcaption className="text-muted-foreground mt-3 text-sm text-pretty">
+      <figcaption className="label text-graphite mt-3 normal-case">
         {caption}
       </figcaption>
     ) : null}
