@@ -57,7 +57,7 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
     <DocumentLayout
       dossier={
         <CompactDossier code="LAB-02">
-          <DossierPanel jp="仕様" label="Facts">
+          <DossierPanel collapsible jp="仕様" label="Facts">
             <LeaderList>
               <LeaderRow jp="年" label="Year">
                 {experiment.year}

@@ -87,34 +87,38 @@ export const CompactDossier = ({
   code: string;
 }) => (
   <section aria-label="Dossier" className="flex flex-col gap-6">
-    <DossierStrip code={code} />
-    <div className="grid grid-cols-[6rem_1fr] items-end gap-4 lg:grid-cols-[8rem_1fr]">
-      <PortraitPlate
-        label={`Dithered portrait of ${siteConfig.name}`}
-        monogram={monogram}
-        size="compact"
-        src={PORTRAIT_SRC}
-      />
-      <div className="flex min-w-0 flex-col gap-1 pb-2">
-        <p className="text-ink text-2xl leading-tight font-light tracking-tight text-balance">
-          {siteConfig.name}
-        </p>
-        <p className="label text-graphite normal-case">@{siteConfig.handle}</p>
+    <div className="hidden flex-col gap-6 lg:flex">
+      <DossierStrip code={code} />
+      <div className="grid grid-cols-[8rem_1fr] items-end gap-4">
+        <PortraitPlate
+          label={`Dithered portrait of ${siteConfig.name}`}
+          monogram={monogram}
+          size="compact"
+          src={PORTRAIT_SRC}
+        />
+        <div className="flex min-w-0 flex-col gap-1 pb-2">
+          <p className="text-ink text-2xl leading-tight font-light tracking-tight text-balance">
+            {siteConfig.name}
+          </p>
+          <p className="label text-graphite normal-case">
+            @{siteConfig.handle}
+          </p>
+        </div>
       </div>
-    </div>
-    <LeaderList>
-      <LeaderRow jp="役割" label="Role">
-        {siteConfig.role}
-      </LeaderRow>
-      {currentRole ? (
-        <LeaderRow jp="所属" label="Company">
-          {currentRole.company}
+      <LeaderList>
+        <LeaderRow jp="役割" label="Role">
+          {siteConfig.role}
         </LeaderRow>
-      ) : null}
-      <LeaderRow jp="所在地" label="Location">
-        {siteConfig.location}
-      </LeaderRow>
-    </LeaderList>
+        {currentRole ? (
+          <LeaderRow jp="所属" label="Company">
+            {currentRole.company}
+          </LeaderRow>
+        ) : null}
+        <LeaderRow jp="所在地" label="Location">
+          {siteConfig.location}
+        </LeaderRow>
+      </LeaderList>
+    </div>
     {children}
   </section>
 );

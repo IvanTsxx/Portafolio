@@ -140,6 +140,7 @@ export const CaseStudySections = ({
       index={`${code}.1`}
       jp="担当"
       label="Responsibilities"
+      waypoint={{ action: "inspect", role: "researcher", side: "right" }}
     >
       <ul className="grid gap-x-8 sm:grid-cols-2">
         {caseStudy.responsibilities.map((responsibility) => (
@@ -174,7 +175,7 @@ export const NoteDossier = ({
   note: Note;
 }) => (
   <CompactDossier code="NT-02">
-    <DossierPanel jp="仕様" label="Facts">
+    <DossierPanel collapsible jp="仕様" label="Facts">
       <LeaderList>
         <LeaderRow jp="種別" label="Kind">
           {noteKinds[note.kind].label}

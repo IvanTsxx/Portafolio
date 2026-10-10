@@ -57,7 +57,7 @@ const RegistryPage = async () => {
       <DocumentLayout
         dossier={
           <CompactDossier code="REG-02">
-            <DossierPanel jp="絞込" label="Filter">
+            <DossierPanel collapsible jp="絞込" label="Filter">
               <RegistryFilters
                 categories={categories}
                 total={registryItems.length}

@@ -146,7 +146,7 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
       <DocumentLayout
         dossier={
           <CompactDossier code="REG-02">
-            <DossierPanel jp="仕様" label="Facts">
+            <DossierPanel collapsible jp="仕様" label="Facts">
               <LeaderList>
                 <LeaderRow jp="種別" label="Type">
                   {item.type}

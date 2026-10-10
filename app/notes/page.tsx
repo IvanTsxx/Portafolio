@@ -42,7 +42,7 @@ const NotesPage = async () => {
     <DocumentLayout
       dossier={
         <CompactDossier code="NT-02">
-          <DossierPanel jp="絞込" label="Filter">
+          <DossierPanel collapsible jp="絞込" label="Filter">
             <NoteFilters facets={facets} total={notes.length} />
           </DossierPanel>
         </CompactDossier>

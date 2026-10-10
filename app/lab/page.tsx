@@ -33,7 +33,7 @@ const LabPage = () => (
   <DocumentLayout
     dossier={
       <CompactDossier code="LAB-02">
-        <DossierPanel jp="絞込" label="Filter">
+        <DossierPanel collapsible jp="絞込" label="Filter">
           <LabTopicFilter topics={topicCounts} total={experiments.length} />
         </DossierPanel>
       </CompactDossier>

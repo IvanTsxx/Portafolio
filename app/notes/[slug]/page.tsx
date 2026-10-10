@@ -30,7 +30,6 @@ import {
   getNoteSlugs,
   getRelatedNotes,
 } from "@/lib/content/notes";
-import { cn } from "@/lib/utils";
 
 export const dynamicParams = false;
 
@@ -73,8 +72,8 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
     ...tags.map((topic) => ({ param: "tag", topic })),
     ...stack.map((topic) => ({ param: "stack", topic })),
   ];
-  const sectionIndex = (offset: number) =>
-    `${code}.${leadSectionCount(note) + offset}`;
+  const proseSectionCount = note.kind === "note" ? 1 : 0;
+  const relatedIndex = `${code}.${leadSectionCount(note) + proseSectionCount + 1}`;
 
   return (
     <DocumentLayout
@@ -123,23 +122,26 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
         <CaseStudySections caseStudy={note} code={code} />
       ) : null}
 
-      <DocumentSection
-        id="text"
-        index={sectionIndex(1)}
-        jp="本文"
-        label="Text"
-        waypoint={{ action: "read", role: "researcher", side: "right" }}
-      >
+      {note.kind === "case-study" ? (
         <div
-          className={cn(
-            "min-w-0 [&_img]:h-auto [&_img]:max-w-full",
-            note.kind === "case-study" && "group/prose [counter-reset:section]"
-          )}
-          data-numbered={note.kind === "case-study" ? true : undefined}
+          className="group/prose min-w-0 [counter-reset:section] [&_img]:h-auto [&_img]:max-w-full"
+          data-numbered
         >
           <Content />
         </div>
-      </DocumentSection>
+      ) : (
+        <DocumentSection
+          id="text"
+          index={`${code}.1`}
+          jp="本文"
+          label="Text"
+          waypoint={{ action: "read", role: "researcher", side: "right" }}
+        >
+          <div className="min-w-0 [&_img]:h-auto [&_img]:max-w-full">
+            <Content />
+          </div>
+        </DocumentSection>
+      )}
 
       {adjacent.newer || adjacent.older ? (
         <nav aria-label="More notes" className="grid gap-4 md:grid-cols-2">
@@ -152,7 +154,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
         <DocumentSection
           aside={pad(related.length)}
           id="related"
-          index={sectionIndex(2)}
+          index={relatedIndex}
           jp="関連"
           label="Related"
         >
