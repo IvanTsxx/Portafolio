@@ -7,6 +7,7 @@ import type { Group, Object3D } from "three";
 import { MathUtils } from "three";
 
 import type { AgentAction } from "./types";
+
 import type { AgentMotion } from "./use-agent-rig";
 
 type Triple = readonly [number, number, number];

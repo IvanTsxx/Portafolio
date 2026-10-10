@@ -10,7 +10,7 @@ export const StackSheet = () => (
   <DocumentSection
     aside={<PanelCount current={stack.length} total={stack.length} />}
     id="stack"
-    index="GH-10"
+    index="GH-11"
     waypoint={{ action: "carry", role: "builder", side: "right" }}
     jp="技術"
     label="Stack"

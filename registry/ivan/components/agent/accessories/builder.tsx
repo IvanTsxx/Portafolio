@@ -4,11 +4,12 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { Group } from "three";
 
+import type { AgentAction } from "../types";
+
 import { roundedBox } from "../geometry";
 import { useAgentLive } from "../held-pose";
 import { Part } from "../part";
 import { bodySize } from "../rig";
-import type { AgentAction } from "../types";
 import { HardHat } from "./shapes";
 
 export const YellowHardHat = () => <HardHat material="hardHatYellow" />;

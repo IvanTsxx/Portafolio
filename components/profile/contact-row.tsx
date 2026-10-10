@@ -11,7 +11,7 @@ export const ContactRow = () => (
     <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
       <div className="flex flex-col gap-2">
         <h2 className="label text-mist" id="contact-heading">
-          [ GH-11 ] Contact <span className="jp">連絡</span>
+          [ GH-12 ] Contact <span className="jp">連絡</span>
         </h2>
         <a
           className="display text-ink decoration-graphite/40 hover:decoration-ink text-3xl break-all underline decoration-1 underline-offset-8 transition-[text-decoration-color] duration-100 sm:text-4xl md:text-6xl"
