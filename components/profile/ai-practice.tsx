@@ -258,7 +258,7 @@ export const AiPractice = () => {
         <PanelCount current={aiPractice.length} total={aiPractice.length} />
       }
       id="ai-practice"
-      index="GH-08"
+      index="GH-09"
       jp="AI実務"
       label="AI practice"
     >
