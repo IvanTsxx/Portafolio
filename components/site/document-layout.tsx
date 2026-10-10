@@ -16,7 +16,9 @@ export const DocumentLayout = ({
   hero: ReactNode;
 }) => (
   <div className="flex-1">
-    {hero}
+    <div className={`${containerClassName} pt-6 pb-10 md:pt-8 md:pb-14`}>
+      {hero}
+    </div>
     <div
       className={`${containerClassName} grid gap-x-6 gap-y-16 pb-24 lg:grid-cols-12`}
     >

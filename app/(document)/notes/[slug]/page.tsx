@@ -5,13 +5,11 @@ import { notFound } from "next/navigation";
 import {
   AdjacentLink,
   CaseStudySections,
-  NoteDossier,
 } from "@/components/content/note-detail";
 import { NoteJsonLd } from "@/components/content/note-json-ld";
 import { NoteRow } from "@/components/content/note-row";
 import { SampleBadge } from "@/components/content/sample-badge";
 import { DocumentHero } from "@/components/site/document-hero";
-import { DocumentLayout } from "@/components/site/document-layout";
 import { DocumentSection } from "@/components/site/document-section";
 import { chipClassName } from "@/components/site/styles";
 import { buildNoteMetadata, isIndexable } from "@/lib/content/metadata";
@@ -55,7 +53,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
     notFound();
   }
 
-  const { Content, entry: note, headings } = document;
+  const { Content, entry: note } = document;
   const [notes, adjacent] = await Promise.all([
     getNotes(),
     getAdjacentNotes(note.slug),
@@ -76,45 +74,38 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
   const relatedIndex = `${code}.${leadSectionCount(note) + proseSectionCount + 1}`;
 
   return (
-    <DocumentLayout
-      dossier={<NoteDossier headings={headings} note={note} />}
-      dossierLabel="Note details"
-      hero={
-        <DocumentHero
-          back={{ href: "/notes", label: "Notes" }}
-          code={code}
-          jp={kind.jp}
-          lede={kind.label}
-          meta={[
-            { label: "Kind", value: kind.label },
-            { label: "Stamp", value: stampOf(note).label },
-          ]}
-          size="title"
-          title={note.title}
-        >
-          <p className="text-graphite max-w-prose text-base text-pretty">
-            {note.summary}
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            {note.sample ? (
-              <SampleBadge source={noteSource(note.slug)} />
-            ) : null}
-            <ul className="flex flex-wrap gap-2">
-              {topicLinks.map(({ param, topic }) => (
-                <li key={topic}>
-                  <Link
-                    className={chipClassName}
-                    href={`/notes?${param}=${encodeURIComponent(topic)}`}
-                  >
-                    {topic}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </DocumentHero>
-      }
-    >
+    <>
+      <DocumentHero
+        back={{ href: "/notes", label: "Notes" }}
+        code={code}
+        jp={kind.jp}
+        lede={kind.label}
+        meta={[
+          { label: "Kind", value: kind.label },
+          { label: "Stamp", value: stampOf(note).label },
+        ]}
+        size="title"
+        title={note.title}
+      >
+        <p className="text-graphite max-w-prose text-base text-pretty">
+          {note.summary}
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          {note.sample ? <SampleBadge source={noteSource(note.slug)} /> : null}
+          <ul className="flex flex-wrap gap-2">
+            {topicLinks.map(({ param, topic }) => (
+              <li key={topic}>
+                <Link
+                  className={chipClassName}
+                  href={`/notes?${param}=${encodeURIComponent(topic)}`}
+                >
+                  {topic}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </DocumentHero>
       {note.kind === "note" && isIndexable(note) ? (
         <NoteJsonLd note={note} />
       ) : null}
@@ -172,7 +163,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
           </ul>
         </DocumentSection>
       ) : null}
-    </DocumentLayout>
+    </>
   );
 };
 

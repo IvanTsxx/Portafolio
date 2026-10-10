@@ -1,21 +1,11 @@
-import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { TableOfContents } from "@/components/content/table-of-contents";
 import { ExperimentCard } from "@/components/lab/experiment-card";
-import {
-  CompactDossier,
-  DossierPanel,
-} from "@/components/site/compact-dossier";
 import { DocumentHero } from "@/components/site/document-hero";
-import { DocumentLayout } from "@/components/site/document-layout";
 import { DocumentSection } from "@/components/site/document-section";
-import { LeaderList, LeaderRow } from "@/components/site/leader-list";
-import { linkClassName } from "@/components/site/styles";
-import type { Heading } from "@/lib/content/text";
 import { experiments, getExperiment } from "@/lib/lab/experiments";
-import { cn } from "@/lib/utils";
+import { relatedExperimentsOf } from "@/lib/site/sections";
 
 export const dynamicParams = false;
 
@@ -40,76 +30,23 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
   if (!experiment) {
     notFound();
   }
-  const related = experiment.related
-    .map((relatedSlug) => getExperiment(relatedSlug))
-    .filter((entry) => entry !== undefined);
-  const sections: Heading[] = [
-    { depth: 2, id: "preview", text: "Preview" },
-    { depth: 2, id: "implementation", text: "Implementation" },
-    { depth: 2, id: "notes", text: "Notes" },
-    { depth: 2, id: "stack", text: "Stack" },
-    ...(related.length > 0
-      ? [{ depth: 2, id: "related", text: "Related" } satisfies Heading]
-      : []),
-  ];
+  const related = relatedExperimentsOf(experiment);
 
   return (
-    <DocumentLayout
-      dossier={
-        <CompactDossier code="LAB-02">
-          <DossierPanel collapsible jp="仕様" label="Facts">
-            <LeaderList>
-              <LeaderRow jp="年" label="Year">
-                {experiment.year}
-              </LeaderRow>
-              <LeaderRow jp="分野" label="Topics">
-                {experiment.topics.join(" / ")}
-              </LeaderRow>
-              <LeaderRow jp="操作" label="Controls">
-                {experiment.hasControls ? "Panel" : "Direct"}
-              </LeaderRow>
-              <LeaderRow jp="出典" label="Source">
-                {experiment.sourceUrl ? (
-                  <a
-                    className={cn(
-                      linkClassName,
-                      "inline-flex items-center gap-1"
-                    )}
-                    href={experiment.sourceUrl}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    View
-                    <ArrowUpRightIcon aria-hidden className="size-3.5" />
-                  </a>
-                ) : (
-                  "Unpublished"
-                )}
-              </LeaderRow>
-            </LeaderList>
-          </DossierPanel>
-          <DossierPanel collapsible jp="目次" label="On this page">
-            <TableOfContents headings={sections} />
-          </DossierPanel>
-        </CompactDossier>
-      }
-      dossierLabel="Experiment details"
-      hero={
-        <DocumentHero
-          back={{ href: "/lab", label: "Lab" }}
-          code={experiment.index}
-          jp="実験"
-          lede={experiment.topics.join(" / ")}
-          meta={[{ label: "Year", value: String(experiment.year) }]}
-          size="title"
-          title={experiment.title}
-        >
-          <p className="text-graphite max-w-prose text-base text-pretty">
-            {experiment.summary}
-          </p>
-        </DocumentHero>
-      }
-    >
+    <>
+      <DocumentHero
+        back={{ href: "/lab", label: "Lab" }}
+        code={experiment.index}
+        jp="実験"
+        lede={experiment.topics.join(" / ")}
+        meta={[{ label: "Year", value: String(experiment.year) }]}
+        size="title"
+        title={experiment.title}
+      >
+        <p className="text-graphite max-w-prose text-base text-pretty">
+          {experiment.summary}
+        </p>
+      </DocumentHero>
       <DocumentSection
         id="preview"
         index={`${experiment.index}.1`}
@@ -202,7 +139,7 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
           </ul>
         </DocumentSection>
       ) : null}
-    </DocumentLayout>
+    </>
   );
 };
 
