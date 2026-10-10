@@ -1,34 +1,19 @@
 import type { ReactNode, Ref } from "react";
 
 import type { StageActivity } from "@/components/lab/use-stage-activity";
+import { CornerMarks } from "@/components/site/corner-marks";
 import { cn } from "@/lib/utils";
 
 const activityCopy = {
-  offscreen: { label: "Paused offscreen", tone: "bg-faint" },
-  reduced: { label: "Reduced motion", tone: "bg-signal-steel" },
-  running: { label: "Live", tone: "bg-signal-moss" },
+  offscreen: { label: "Paused offscreen", tone: "bg-transparent" },
+  reduced: {
+    label: "Reduced motion",
+    tone: "bg-[repeating-linear-gradient(135deg,var(--ink)_0_1px,transparent_1px_3px)]",
+  },
+  running: { label: "Live", tone: "bg-ink motion-safe:animate-pulse" },
 } as const satisfies Record<StageActivity, { label: string; tone: string }>;
 
-export const CornerMarkers = () => (
-  <>
-    <span
-      aria-hidden
-      className="border-rule-strong pointer-events-none absolute top-2 left-2 size-3 border-t border-l"
-    />
-    <span
-      aria-hidden
-      className="border-rule-strong pointer-events-none absolute top-2 right-2 size-3 border-t border-r"
-    />
-    <span
-      aria-hidden
-      className="border-rule-strong pointer-events-none absolute bottom-2 left-2 size-3 border-b border-l"
-    />
-    <span
-      aria-hidden
-      className="border-rule-strong pointer-events-none absolute right-2 bottom-2 size-3 border-r border-b"
-    />
-  </>
-);
+export const CornerMarkers = () => <CornerMarks />;
 
 interface ExperimentStageProps {
   activity: StageActivity;
@@ -51,10 +36,10 @@ export const ExperimentStage = ({
 }: ExperimentStageProps) => {
   const status = activityCopy[activity];
   return (
-    <div className="grid gap-px lg:grid-cols-12">
+    <div className="grid gap-px lg:grid-cols-12 lg:gap-0">
       <div
         className={cn(
-          "border-rule bg-background relative aspect-4/5 overflow-hidden border sm:aspect-video lg:col-span-8",
+          "border-rule-strong bg-popover relative aspect-4/5 overflow-hidden border sm:aspect-video lg:col-span-8",
           !controls && "lg:col-span-12",
           className
         )}
@@ -63,16 +48,16 @@ export const ExperimentStage = ({
         <figure aria-label={stageLabel} className="m-0 size-full">
           {children}
         </figure>
-        <CornerMarkers />
-        <p className="label bg-background/80 text-muted-foreground pointer-events-none absolute top-4 left-6 flex items-center gap-2 px-2 py-1 backdrop-blur-sm">
+        <CornerMarks />
+        <p className="label bg-paper/90 text-graphite border-rule-strong pointer-events-none absolute top-4 left-5 flex items-center gap-2 border px-2 py-1 backdrop-blur-sm">
           <span
             aria-hidden
-            className={cn("size-1.5 rounded-full", status.tone)}
+            className={cn("border-ink size-1.5 border", status.tone)}
           />
           {status.label}
         </p>
         {activity === "reduced" ? (
-          <p className="bg-background/90 text-muted-foreground border-rule pointer-events-none absolute right-6 bottom-6 left-6 max-w-sm border px-3 py-2 text-xs/relaxed backdrop-blur-sm">
+          <p className="bg-paper/90 text-graphite border-rule-strong pointer-events-none absolute right-5 bottom-5 left-5 max-w-sm border px-3 py-2 text-xs/relaxed backdrop-blur-sm">
             {reducedNote}
           </p>
         ) : null}
@@ -80,10 +65,12 @@ export const ExperimentStage = ({
       {controls ? (
         <section
           aria-label="Controls"
-          className="border-rule bg-card flex flex-col border lg:col-span-4"
+          className="border-rule-strong bg-popover flex flex-col border lg:col-span-4 lg:border-l-0"
         >
-          <h2 className="label text-faint border-rule border-b px-5 py-3">
-            Controls
+          <h2 className="label border-rule-strong flex items-baseline gap-3 border-b px-5 py-3">
+            <span className="text-mist tabular-nums">[ CTL ]</span>
+            <span className="text-ink font-normal">Controls</span>
+            <span className="jp text-graphite">操作</span>
           </h2>
           <div className="divide-rule flex flex-col divide-y">{controls}</div>
         </section>

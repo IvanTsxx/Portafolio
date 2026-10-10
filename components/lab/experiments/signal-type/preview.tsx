@@ -10,6 +10,7 @@ import {
 } from "@/components/lab/lab-controls";
 import { useStageActivity } from "@/components/lab/use-stage-activity";
 import { motionKit } from "@/lib/motion/gsap";
+import { cn } from "@/lib/utils";
 
 import {
   axesAt,
@@ -18,6 +19,7 @@ import {
   weightAxis,
   widthAxis,
 } from "./axes";
+import { archivo } from "./font";
 
 const { gsap, useGSAP } = motionKit;
 
@@ -147,7 +149,7 @@ const SignalTypePreview = () => {
   return (
     <ExperimentStage
       activity={activity}
-      className="blueprint-grid touch-pan-y"
+      className="blueprint-grid touch-pan-y [--grid-size:24px]"
       controls={
         <>
           <ToggleControl
@@ -184,7 +186,7 @@ const SignalTypePreview = () => {
             label="Assembly"
             onAction={() => setAssemblyCount((count) => count + 1)}
           />
-          <p className="label text-faint px-5 py-4 tabular-nums">
+          <p className="label text-mist px-5 py-4 tabular-nums">
             wdth {widthAxis.min}–{widthAxis.max} · wght {weightAxis.min}–
             {weightAxis.max}
           </p>
@@ -196,7 +198,10 @@ const SignalTypePreview = () => {
     >
       <div className="flex size-full items-center justify-center overflow-hidden px-6">
         <p
-          className="font-display text-foreground flex overflow-hidden py-4 text-6xl leading-none select-none sm:text-8xl lg:text-9xl"
+          className={cn(
+            archivo.className,
+            "text-ink flex overflow-hidden py-4 text-6xl leading-none select-none sm:text-8xl lg:text-9xl"
+          )}
           key={word}
           ref={wordRef}
         >

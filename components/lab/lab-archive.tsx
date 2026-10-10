@@ -3,6 +3,8 @@
 import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { PanelHeading } from "@/components/site/panel-heading";
+import { chipClassName } from "@/components/site/styles";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { parseTopicParam, topicParam } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
@@ -45,6 +47,8 @@ interface ArchiveViewProps {
   onSelect?: (topic: LabTopic | null) => void;
 }
 
+const pad = (value: number) => String(value).padStart(2, "0");
+
 const ArchiveView = ({
   items,
   topics,
@@ -55,49 +59,53 @@ const ArchiveView = ({
     ? items.filter((item) => item.topics.includes(selected))
     : items;
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <ToggleGroup
-          aria-label="Filter experiments by topic"
-          className="flex-wrap"
-          disabled={!onSelect}
-          onValueChange={(next) => onSelect?.(parseTopicParam(next[0] ?? null))}
-          spacing={1}
-          value={[selected ? topicParam(selected) : allValue]}
-          variant="outline"
-        >
+    <section
+      aria-label="Experiments"
+      className="mx-auto flex w-full max-w-screen-2xl flex-col gap-6 px-4 pb-8 md:px-8"
+    >
+      <PanelHeading
+        aside={`${pad(visible.length)} / ${pad(items.length)}`}
+        as="h2"
+        index="LAB-01"
+        jp="一覧"
+        label="Index"
+      />
+      <ToggleGroup
+        aria-label="Filter experiments by topic"
+        className="flex-wrap"
+        disabled={!onSelect}
+        onValueChange={(next) => onSelect?.(parseTopicParam(next[0] ?? null))}
+        spacing={2}
+        value={[selected ? topicParam(selected) : allValue]}
+        variant="outline"
+      >
+        <ToggleGroupItem className={chipClassName} value={allValue}>
+          All <span className="tabular-nums">{pad(items.length)}</span>
+        </ToggleGroupItem>
+        {topics.map(({ topic, count }) => (
           <ToggleGroupItem
-            className="label aria-pressed:bg-foreground aria-pressed:text-background"
-            value={allValue}
+            className={chipClassName}
+            key={topic}
+            value={topicParam(topic)}
           >
-            All <span className="tabular-nums opacity-60">{items.length}</span>
+            {topic} <span className="tabular-nums">{pad(count)}</span>
           </ToggleGroupItem>
-          {topics.map(({ topic, count }) => (
-            <ToggleGroupItem
-              className="label aria-pressed:bg-foreground aria-pressed:text-background"
-              key={topic}
-              value={topicParam(topic)}
-            >
-              {topic} <span className="tabular-nums opacity-60">{count}</span>
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-        <p aria-live="polite" className="label text-faint tabular-nums">
-          {visible.length} of {items.length} experiments
-          {selected ? ` · ${selected}` : ""}
-        </p>
-      </div>
-      <ul className="bg-rule border-rule grid gap-px border lg:grid-cols-12">
+        ))}
+      </ToggleGroup>
+      <ul className="border-graphite/30 grid border-t border-l lg:grid-cols-12">
         {visible.map((item, itemIndex) => (
           <li
-            className={cn("min-w-0", spanFor(itemIndex, visible.length))}
+            className={cn(
+              "border-graphite/30 min-w-0 border-r border-b",
+              spanFor(itemIndex, visible.length)
+            )}
             key={item.slug}
           >
             {item.card}
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 };
 

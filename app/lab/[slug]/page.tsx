@@ -5,10 +5,13 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
 
 import { ExperimentCard } from "@/components/lab/experiment-card";
+import { LeaderList, LeaderRow } from "@/components/site/leader-list";
+import { PanelHeading } from "@/components/site/panel-heading";
+import { focusRingClassName, linkClassName } from "@/components/site/styles";
 import { experiments, getExperiment } from "@/lib/lab/experiments";
+import { cn } from "@/lib/utils";
 
 export const dynamicParams = false;
 
@@ -25,18 +28,7 @@ export const generateMetadata = async ({
     : {};
 };
 
-const DetailSection = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) => (
-  <section className="border-rule flex flex-col gap-4 border-t pt-5">
-    <h2 className="label text-faint">{title}</h2>
-    {children}
-  </section>
-);
+const pad = (value: number) => String(value).padStart(2, "0");
 
 const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
   const { slug } = await params;
@@ -49,126 +41,165 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
     .filter((entry) => entry !== undefined);
 
   return (
-    <article className="mx-auto flex w-full max-w-screen-2xl flex-col gap-12 px-4 py-12 md:px-6 md:py-16">
-      <Link
-        className="label text-muted-foreground hover:text-foreground flex w-fit items-center gap-2 transition-colors"
-        href="/lab"
-      >
-        <ArrowLeftIcon aria-hidden className="size-3.5" />
-        All experiments
-      </Link>
-
-      <header className="grid gap-8 lg:grid-cols-12 lg:items-end">
-        <h1 className="display text-6xl [word-spacing:0.12em] sm:text-7xl lg:col-span-7 lg:text-8xl">
-          {experiment.title}
-        </h1>
-        <div className="flex flex-col gap-5 lg:col-span-5">
-          <p className="text-muted-foreground max-w-prose text-base/relaxed text-pretty">
-            {experiment.summary}
-          </p>
-          <dl className="label grid grid-cols-3 gap-4 tabular-nums">
-            <div className="flex flex-col gap-1">
-              <dt className="text-faint">Index</dt>
-              <dd className="text-foreground">{experiment.index}</dd>
-            </div>
-            <div className="flex flex-col gap-1">
-              <dt className="text-faint">Year</dt>
-              <dd className="text-foreground">{experiment.year}</dd>
-            </div>
-            <div className="flex flex-col gap-1">
-              <dt className="text-faint">Topics</dt>
-              <dd className="text-foreground">
-                {experiment.topics.join(" / ")}
-              </dd>
-            </div>
-          </dl>
+    <article className="mx-auto flex w-full max-w-screen-2xl flex-col gap-16 px-4 pt-6 pb-8 md:px-8 md:pt-8">
+      <header>
+        <div className="label border-rule-strong flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b pb-2">
+          <Link
+            className={cn(
+              focusRingClassName,
+              "text-ink hover:text-graphite ease-mechanical inline-flex min-h-11 items-center gap-2 transition-colors duration-100 md:min-h-8"
+            )}
+            href="/lab"
+          >
+            <ArrowLeftIcon aria-hidden className="size-4" />
+            Lab
+          </Link>
+          <span className="flex gap-2">
+            <span className="text-mist">Doc</span>
+            <span className="text-ink tabular-nums">{experiment.index}</span>
+          </span>
+        </div>
+        <div className="mt-10 grid gap-x-6 gap-y-10 md:mt-16 lg:grid-cols-12 lg:items-end">
+          <div className="flex flex-col gap-6 lg:col-span-7">
+            <h1 className="display text-ink text-5xl [word-spacing:0.12em] sm:text-7xl lg:text-8xl">
+              {experiment.title}
+            </h1>
+            <p className="text-graphite max-w-prose text-base text-pretty">
+              {experiment.summary}
+            </p>
+          </div>
+          <LeaderList className="lg:col-span-5">
+            <LeaderRow jp="年" label="Year">
+              {experiment.year}
+            </LeaderRow>
+            <LeaderRow jp="分野" label="Topics">
+              {experiment.topics.join(" / ")}
+            </LeaderRow>
+            <LeaderRow jp="操作" label="Controls">
+              {experiment.hasControls ? "Panel" : "Direct"}
+            </LeaderRow>
+            <LeaderRow jp="出典" label="Source">
+              {experiment.sourceUrl ? (
+                <a
+                  className={cn(
+                    linkClassName,
+                    "inline-flex items-center gap-1"
+                  )}
+                  href={experiment.sourceUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  View
+                  <ArrowUpRightIcon aria-hidden className="size-3.5" />
+                </a>
+              ) : (
+                "Unpublished"
+              )}
+            </LeaderRow>
+          </LeaderList>
         </div>
       </header>
 
-      <experiment.Preview />
+      <section aria-labelledby="preview" className="flex flex-col gap-6">
+        <PanelHeading
+          id="preview"
+          index={`${experiment.index}.1`}
+          jp="見本"
+          label="Preview"
+        />
+        <experiment.Preview />
+      </section>
 
-      <div className="grid gap-12 lg:grid-cols-12">
-        <div className="flex flex-col gap-12 lg:col-span-7">
-          <DetailSection title="About">
-            <p className="text-foreground max-w-prose text-lg/relaxed text-pretty">
-              {experiment.description}
-            </p>
-          </DetailSection>
-          <DetailSection title="Implementation">
-            <ol className="flex max-w-prose flex-col gap-4">
-              {experiment.implementation.map((step, stepIndex) => (
-                <li className="grid grid-cols-[2rem_1fr] gap-2" key={step}>
-                  <span className="label text-faint pt-1 tabular-nums">
-                    {(stepIndex + 1).toString().padStart(2, "0")}
-                  </span>
-                  <p className="text-muted-foreground text-sm/relaxed text-pretty">
-                    {step}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </DetailSection>
-        </div>
-        <aside className="flex flex-col gap-12 lg:col-span-4 lg:col-start-9">
-          <DetailSection title="Technical notes">
-            <ul className="flex flex-col gap-3">
+      <div className="grid gap-x-8 gap-y-16 lg:grid-cols-12">
+        <section
+          aria-labelledby="implementation"
+          className="flex flex-col gap-6 lg:col-span-7"
+        >
+          <PanelHeading
+            aside={pad(experiment.implementation.length)}
+            id="implementation"
+            index={`${experiment.index}.2`}
+            jp="実装"
+            label="Implementation"
+          />
+          <ol className="flex max-w-prose flex-col">
+            {experiment.implementation.map((step, stepIndex) => (
+              <li
+                className="border-rule grid grid-cols-[3rem_1fr] gap-2 border-b border-dotted py-4"
+                key={step}
+              >
+                <span className="label text-mist pt-0.5 tabular-nums">
+                  [ {pad(stepIndex + 1)} ]
+                </span>
+                <p className="text-graphite text-sm/relaxed text-pretty">
+                  {step}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <aside className="flex flex-col gap-16 lg:col-span-4 lg:col-start-9">
+          <section aria-labelledby="notes" className="flex flex-col gap-6">
+            <PanelHeading
+              aside={pad(experiment.technicalNotes.length)}
+              id="notes"
+              index={`${experiment.index}.3`}
+              jp="注記"
+              label="Notes"
+            />
+            <ul className="flex flex-col">
               {experiment.technicalNotes.map((note) => (
                 <li
-                  className="text-muted-foreground text-sm/relaxed text-pretty"
+                  className="border-rule text-graphite flex gap-3 border-b border-dotted py-3 text-sm/relaxed text-pretty"
                   key={note}
                 >
+                  <span aria-hidden className="bg-ink mt-2 size-1.5 shrink-0" />
                   {note}
                 </li>
               ))}
             </ul>
-          </DetailSection>
-          <DetailSection title="Interaction">
-            <p className="text-muted-foreground text-sm/relaxed text-pretty">
-              {experiment.hasControls
-                ? "Use the controls beside the preview. Every control is keyboard accessible and labeled."
-                : "No controls. The experiment responds to hover, click and arrow keys directly."}
-            </p>
-          </DetailSection>
-          <DetailSection title="Technologies">
+          </section>
+          <section aria-labelledby="stack" className="flex flex-col gap-6">
+            <PanelHeading
+              id="stack"
+              index={`${experiment.index}.4`}
+              jp="技術"
+              label="Stack"
+            />
             <ul className="flex flex-wrap gap-2">
               {experiment.technologies.map((technology) => (
                 <li
-                  className="border-rule-strong text-foreground border px-2 py-1 text-xs"
+                  className="label border-rule-strong text-ink border px-2 py-1"
                   key={technology}
                 >
                   {technology}
                 </li>
               ))}
             </ul>
-          </DetailSection>
-          <DetailSection title="Source">
-            {experiment.sourceUrl ? (
-              <a
-                className="text-foreground hover:text-clay decoration-rule-strong flex w-fit items-center gap-2 text-sm underline underline-offset-4 transition-colors"
-                href={experiment.sourceUrl}
-                rel="noreferrer"
-                target="_blank"
-              >
-                View source
-                <ArrowUpRightIcon aria-hidden className="size-3.5" />
-              </a>
-            ) : (
-              <p className="text-faint text-sm">Source not published yet.</p>
-            )}
-          </DetailSection>
+          </section>
         </aside>
       </div>
 
       {related.length > 0 ? (
-        <DetailSection title="Related experiments">
-          <ul className="bg-rule border-rule grid gap-px border md:grid-cols-2">
+        <section aria-labelledby="related" className="flex flex-col gap-6">
+          <PanelHeading
+            aside={pad(related.length)}
+            id="related"
+            index={`${experiment.index}.5`}
+            jp="関連"
+            label="Related"
+          />
+          <ul className="border-graphite/30 grid border-t border-l md:grid-cols-2">
             {related.map((entry) => (
-              <li className="min-w-0" key={entry.slug}>
+              <li
+                className="border-graphite/30 min-w-0 border-r border-b"
+                key={entry.slug}
+              >
                 <ExperimentCard experiment={entry} />
               </li>
             ))}
           </ul>
-        </DetailSection>
+        </section>
       ) : null}
     </article>
   );

@@ -3,9 +3,14 @@
 import { useId } from "react";
 import type { ReactNode } from "react";
 
+import {
+  chipClassName,
+  technicalButtonVariants,
+} from "@/components/site/styles";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
 
 interface ControlRowProps {
   labelId: string;
@@ -24,17 +29,15 @@ const ControlRow = ({
 }: ControlRowProps) => (
   <div className="flex flex-col gap-3 px-5 py-4">
     <div className="flex items-baseline justify-between gap-4">
-      <span className="text-foreground text-sm" id={labelId}>
+      <span className="label text-ink" id={labelId}>
         {label}
       </span>
       {readout === undefined ? null : (
-        <span className="label text-muted-foreground tabular-nums">
-          {readout}
-        </span>
+        <span className="label text-graphite tabular-nums">{readout}</span>
       )}
     </div>
     {children}
-    {hint ? <p className="text-faint text-xs/relaxed">{hint}</p> : null}
+    {hint ? <p className="text-mist text-xs/relaxed">{hint}</p> : null}
   </div>
 );
 
@@ -103,7 +106,7 @@ export const SwitchControl = ({
   return (
     <div className="flex flex-col gap-2 px-5 py-4">
       <div className="flex items-center justify-between gap-4">
-        <span className="text-foreground text-sm" id={labelId}>
+        <span className="label text-ink" id={labelId}>
           {label}
         </span>
         <Switch
@@ -113,7 +116,7 @@ export const SwitchControl = ({
           onCheckedChange={onChange}
         />
       </div>
-      {hint ? <p className="text-faint text-xs/relaxed">{hint}</p> : null}
+      {hint ? <p className="text-mist text-xs/relaxed">{hint}</p> : null}
     </div>
   );
 };
@@ -148,13 +151,13 @@ export const ToggleControl = <Value extends string>({
             onChange(selected.value);
           }
         }}
-        spacing={0}
+        spacing={1}
         value={[value]}
         variant="outline"
       >
         {options.map((option) => (
           <ToggleGroupItem
-            className="label aria-pressed:bg-foreground aria-pressed:text-background flex-1"
+            className={cn(chipClassName, "flex-1 justify-center")}
             key={option.value}
             value={option.value}
           >
@@ -180,9 +183,9 @@ export const ActionControl = ({
   onAction,
 }: ActionControlProps) => (
   <div className="flex items-center justify-between gap-4 px-5 py-4">
-    <span className="text-foreground text-sm">{label}</span>
+    <span className="label text-ink">{label}</span>
     <button
-      className="label border-rule-strong text-foreground hover:border-clay hover:text-clay border px-3 py-1.5 transition-colors disabled:pointer-events-none disabled:opacity-50"
+      className={technicalButtonVariants({ size: "sm" })}
       disabled={disabled}
       onClick={onAction}
       type="button"

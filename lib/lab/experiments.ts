@@ -22,7 +22,6 @@ export interface Experiment {
   index: string;
   title: string;
   summary: string;
-  description: string;
   topics: readonly LabTopic[];
   technologies: readonly string[];
   year: number;
@@ -39,24 +38,21 @@ const experimentsBySlug = {
   "blueprint-intersections": {
     Poster: BlueprintIntersectionsPoster,
     Preview: BlueprintIntersections,
-    description:
-      "A blueprint sheet where every intersection is a target. Hovering a cell draws a crosshair through the whole sheet, clicking pins it, and the sheet assembles itself as it scrolls into view. There is no JavaScript in it: the page ships plain HTML and the browser does the rest.",
     hasControls: false,
     implementation: [
-      "The sheet is a server-rendered grid of labels, each wrapping a visually hidden radio input. Checking one pins the crosshair because the selection lives in the form state, not in React.",
-      "The hovered cell, or the checked one when nothing is hovered, takes anchor-name --lab-cell. Two hairlines and a coordinate tag are positioned against it with anchor(), so the crosshair follows any cell without a rule per row or column.",
-      "The parent grid uses :has() to dim every other cell while one is active and to swap the readout between hover and pinned states.",
-      "Rows reveal on a view() timeline set inline, so the entrance is driven by scroll position and never runs while the sheet is offscreen.",
+      "A server-rendered grid of labels, each wrapping a hidden radio. The pinned cell lives in form state, not React.",
+      "The hovered or checked cell takes anchor-name --lab-cell. Two hairlines and a coordinate tag position against it with anchor().",
+      ":has() on the grid dims every other cell and swaps the readout. Rows reveal on a view() timeline.",
     ],
     index: "LAB-03",
     related: ["module-assembly", "signal-type"],
     slug: "blueprint-intersections",
     summary:
-      "A crosshair that follows any grid cell using anchor positioning and :has(), with zero JavaScript.",
+      "A crosshair that follows any grid cell with anchor positioning and :has(). No JavaScript.",
     technicalNotes: [
-      "Anchor positioning is required for the crosshair. Browsers without it keep the per-cell highlight and coordinates, and the hairlines stay hidden behind @supports.",
-      "Scroll-driven entrances fall back to a fully visible sheet where animation-timeline is unsupported, because the base state is the final state.",
-      "Under reduced motion the scroll entrance is removed; hover and pin still work since they change color, not position.",
+      "Without anchor positioning the per-cell highlight stays and the hairlines hide behind @supports.",
+      "Without animation-timeline the sheet is fully visible, because the base state is the final state.",
+      "Reduced motion removes the scroll entrance. Hover and pin still work.",
     ],
     technologies: [
       "CSS anchor positioning",
@@ -71,24 +67,20 @@ const experimentsBySlug = {
   "dither-field": {
     Poster: DitherFieldPoster,
     Preview: DitherFieldLive,
-    description:
-      "A noise field rendered through an ordered Bayer matrix, the way print and early screens faked tone with two inks. The pointer pushes a pressure wave through the field, and the cells that cross the highest threshold switch to clay.",
     hasControls: true,
     implementation: [
-      "One full-viewport plane with a custom ShaderMaterial. The fragment shader snaps gl_FragCoord to a cell grid, samples a fractal value-noise field at the cell center, and compares it against a recursive Bayer threshold.",
-      "Matrix size is a uniform. bayer2, bayer4 and bayer8 are composed from the same 2x2 function, so switching matrices costs no recompilation.",
-      "The pointer is damped toward its target inside useFrame and written straight to a uniform. React state only changes when a control changes.",
-      "Ink, paper and clay come from the site tokens. The canvas renders flat, without tone mapping, so the two inks match the surrounding page exactly.",
+      "One full-viewport plane with a custom ShaderMaterial. The fragment shader snaps to a cell grid and compares value noise against a recursive Bayer threshold.",
+      "Matrix size is a uniform. bayer2, bayer4 and bayer8 share one 2x2 function, so switching costs no recompilation.",
+      "The pointer damps toward its target in useFrame and writes straight to a uniform. React state changes only with the controls.",
     ],
     index: "LAB-01",
     related: ["module-assembly", "signal-type"],
     slug: "dither-field",
-    summary:
-      "Ordered Bayer dithering over a noise field that reacts to the pointer, in two inks and one clay accent.",
+    summary: "Bayer dithering over a noise field that reacts to the pointer.",
     technicalNotes: [
-      "Dithering is resolution dependent, so cell size is expressed in CSS pixels and multiplied by the device pixel ratio inside the shader.",
-      "The render loop switches to on-demand when the canvas leaves the viewport, which drops GPU work to zero while the page scrolls past it.",
-      "Under reduced motion the field stops drifting and renders a single frame. The pointer still moves the wave because the user drives it.",
+      "Cell size is in CSS pixels and multiplied by the device pixel ratio inside the shader.",
+      "The render loop goes on-demand when the canvas leaves the viewport.",
+      "Reduced motion renders a single frame. The pointer still moves the wave.",
     ],
     technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
     title: "Dither field",
@@ -98,24 +90,21 @@ const experimentsBySlug = {
   "module-assembly": {
     Poster: ModuleAssemblyPoster,
     Preview: ModuleAssemblyLive,
-    description:
-      "Loose modules gather into a finished interface: a card, a stacked panel, a bento grid. A builder agent stands by with the parts. The assembly can be scrubbed by hand or left to cycle on its own.",
     hasControls: true,
     implementation: [
-      "Every module is one instance of a single InstancedMesh, so a whole layout is one draw call. Layouts are plain arrays of rectangles that are padded to the same instance count.",
-      "Each instance damps its position, rotation and scale toward a target that mixes its scattered pose with its layout slot. Switching layouts mid-assembly simply retargets the damping, so nothing snaps.",
-      "Progress is staggered by instance index, which reads as modules arriving in sequence instead of a single morph.",
-      "The agent is the shared Agent component used through its public props. It stays the only clay object in the scene.",
+      "Every module is one instance of a single InstancedMesh, so a layout is one draw call.",
+      "Each instance damps toward a target that mixes its scattered pose with its layout slot. Switching layouts retargets the damping.",
+      "Progress is staggered by instance index, so modules arrive in sequence.",
     ],
     index: "LAB-04",
     related: ["dither-field", "blueprint-intersections"],
     slug: "module-assembly",
     summary:
-      "Instanced modules that assemble into interface layouts, scrubbed by hand or cycled automatically.",
+      "Instanced modules that assemble into interface layouts, scrubbed by hand or cycled.",
     technicalNotes: [
-      "Matrices are composed into scratch objects reused across frames, so the loop allocates nothing.",
-      "The scene renders on demand when it is offscreen or when auto-cycle is off and every module has settled.",
-      "Under reduced motion modules jump straight to their target pose and auto-cycle is unavailable.",
+      "Matrices are composed into scratch objects reused across frames. The loop allocates nothing.",
+      "The scene renders on demand when offscreen, or when every module has settled.",
+      "Reduced motion jumps modules to their target pose and disables auto-cycle.",
     ],
     technologies: ["React Three Fiber", "Three.js", "InstancedMesh", "Drei"],
     title: "Module assembly",
@@ -125,24 +114,22 @@ const experimentsBySlug = {
   "signal-type": {
     Poster: SignalTypePoster,
     Preview: SignalTypeLive,
-    description:
-      "A word set in Archivo whose width and weight axes respond to the pointer. Letters near the cursor stretch and thicken, letters further away condense. A wave mode drives the same axes on a loop, and the word can be reassembled from its letters.",
     hasControls: true,
     implementation: [
-      "Each letter is a span whose font-variation-settings read two custom properties. GSAP quickTo setters write those properties, so pointer moves become damped tweens without a React render.",
-      "Letter centers are read once per pointer move, before GSAP writes on the next tick, which keeps layout reads and writes in separate phases.",
-      "Wave mode is a single repeating timeline staggered across letters. It is paused whenever the stage is offscreen.",
-      "Everything lives in one useGSAP scope tied to the stage ref, so switching words reverts every tween and listener.",
+      "Each letter is a span whose font-variation-settings read two custom properties. GSAP quickTo writes them, so pointer moves need no React render.",
+      "Letter centers are read once per pointer move, before GSAP writes on the next tick.",
+      "Wave mode is one repeating staggered timeline, paused whenever the stage is offscreen.",
+      "One useGSAP scope tied to the stage ref reverts every tween and listener when the word changes.",
     ],
     index: "LAB-02",
     related: ["blueprint-intersections", "dither-field"],
     slug: "signal-type",
     summary:
-      "Variable-font width and weight driven by pointer proximity with GSAP, plus a looping wave mode.",
+      "Variable-font width and weight driven by pointer proximity with GSAP, plus a wave mode.",
     technicalNotes: [
-      "Changing the width axis changes layout. It stays cheap because the stage holds one short word and nothing else reflows around it.",
-      "Custom properties are set on leaf spans only, so a change never forces style recalculation on descendants.",
-      "Under reduced motion the word renders as a fixed width ramp with no tweening, and wave mode is disabled.",
+      "The width axis changes layout. It stays cheap because the stage holds one short word.",
+      "Custom properties are set on leaf spans only, so descendants never recalculate style.",
+      "Reduced motion renders a fixed width ramp with no tweening. Wave mode is off.",
     ],
     technologies: ["GSAP", "useGSAP", "Variable fonts", "Archivo"],
     title: "Signal type",

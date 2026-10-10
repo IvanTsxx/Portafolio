@@ -30,14 +30,14 @@ export const BlueprintIntersectionsPoster = () => (
       ))}
     </g>
     <rect
-      className="fill-clay/15 stroke-clay"
+      className="fill-ink/10 stroke-ink"
       height={1}
       strokeWidth={0.04}
       width={1}
       x={pinned.column}
       y={pinned.row}
     />
-    <g className="stroke-clay" strokeWidth={0.03}>
+    <g className="stroke-ink" strokeWidth={0.03}>
       <line
         x1={pinned.column + 0.5}
         x2={pinned.column + 0.5}
@@ -52,7 +52,7 @@ export const BlueprintIntersectionsPoster = () => (
       />
     </g>
     <text
-      className="fill-muted-foreground font-mono"
+      className="fill-graphite font-mono"
       fontSize={0.32}
       x={pinned.column + 1.15}
       y={pinned.row - 0.2}
