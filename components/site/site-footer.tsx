@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { PanelHeading } from "@/components/site/panel-heading";
-import { focusRingClassName, linkClassName } from "@/components/site/styles";
+import { SocialLinks } from "@/components/site/social-links";
+import { linkClassName } from "@/components/site/styles";
 import { primaryRoutes, siteConfig } from "@/lib/site/config";
 import { cn } from "@/lib/utils";
 
@@ -36,40 +37,8 @@ export const SiteFooter = () => (
           ))}
         </ul>
       </nav>
-      <ul className="label grid grid-cols-2 gap-x-6 gap-y-1 md:col-span-4">
-        {siteConfig.socials.map((social) => (
-          <li key={social.href}>
-            <a
-              className={cn(
-                linkClassName,
-                "inline-flex min-h-11 items-center md:min-h-8"
-              )}
-              href={social.href}
-              rel="noopener"
-              target="_blank"
-            >
-              {social.label}
-            </a>
-          </li>
-        ))}
-        <li className="col-span-2">
-          <a
-            className={cn(
-              focusRingClassName,
-              "text-mist hover:text-ink ease-mechanical inline-flex min-h-11 items-center normal-case transition-colors duration-100 md:min-h-8"
-            )}
-            href={`mailto:${siteConfig.email}`}
-          >
-            {siteConfig.email}
-          </a>
-        </li>
-      </ul>
+      <SocialLinks className="md:col-span-4" variant="footer" />
     </div>
-    <div className="mt-8 flex flex-col gap-3">
-      <span aria-hidden className="hazard-stripe text-ink block h-1.5" />
-      <p className="label text-mist">
-        Mascots are an independent homage, not affiliated with Anthropic.
-      </p>
-    </div>
+    <span aria-hidden className="hazard-stripe text-ink mt-8 block h-1.5" />
   </footer>
 );

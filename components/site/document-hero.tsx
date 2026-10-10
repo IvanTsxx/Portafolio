@@ -18,8 +18,8 @@ const titleVariants = cva("display text-ink text-balance", {
   defaultVariants: { size: "display" },
   variants: {
     size: {
-      display: "text-6xl sm:text-7xl md:text-8xl xl:text-9xl",
-      title: "text-5xl md:text-7xl",
+      display: "text-6xl @xl:text-7xl @3xl:text-8xl @6xl:text-9xl",
+      title: "text-5xl @3xl:text-6xl @5xl:text-7xl",
     },
   },
 });
@@ -48,7 +48,7 @@ export const DocumentHero = ({
   title,
   waypoint,
 }: DocumentHeroProps) => (
-  <header className="relative mx-auto w-full max-w-screen-2xl px-4 pt-6 pb-10 md:px-8 md:pt-8 md:pb-14">
+  <header className="@container relative w-full">
     <div className="label border-rule-strong flex flex-wrap items-center justify-between gap-x-8 gap-y-2 border-b pb-2">
       <span className="flex flex-wrap items-center gap-x-6 gap-y-1">
         {back ? (
@@ -75,17 +75,17 @@ export const DocumentHero = ({
       ) : null}
     </div>
 
-    <div className="mt-10 grid items-end gap-x-6 gap-y-8 md:mt-16 lg:grid-cols-12">
-      <div className="flex min-w-0 flex-col items-start gap-6 lg:col-span-8">
+    <div className="mt-10 grid items-end gap-x-6 gap-y-8 md:mt-16 @3xl:grid-cols-12">
+      <div className="flex min-w-0 flex-col items-start gap-6 @3xl:col-span-8">
         <h1 className={titleVariants({ size })}>{title}</h1>
         {children}
       </div>
       {jp || lede ? (
-        <div className="flex flex-col gap-4 lg:col-span-4">
+        <div className="flex flex-col gap-4 @3xl:col-span-4">
           {jp ? (
             <p
               aria-hidden
-              className="jp text-graphite text-5xl leading-none font-light tracking-widest select-none md:text-6xl"
+              className="jp text-graphite text-5xl leading-none font-light tracking-widest select-none @3xl:text-6xl"
             >
               {jp}
             </p>

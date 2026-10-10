@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 
 import { DocumentSection } from "@/components/site/document-section";
@@ -18,6 +18,7 @@ import {
   monthLabelsFor,
 } from "./contributions";
 import { TechnicalButton } from "./technical-button";
+import { countUp, selectAll, useEnterReveal } from "./use-enter-reveal";
 
 interface CellPosition {
   week: number;
@@ -104,6 +105,35 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
   const width = GUTTER_LEFT + calendar.weeks.length * PITCH;
   const height = GUTTER_TOP + DAYS_PER_WEEK * PITCH;
 
+  const revealRef = useRef<HTMLDivElement>(null);
+  const totalLabel = countFormat.format(calendar.total);
+
+  useEnterReveal(revealRef, (root, timeline) => {
+    timeline
+      .from(
+        selectAll(root, "[data-week]"),
+        {
+          clearProps: "opacity,transform",
+          duration: 0.5,
+          opacity: 0,
+          scale: 0.2,
+          stagger: (_, cell: SVGRectElement) =>
+            Number(cell.dataset.week) * 0.014 + Number(cell.dataset.day) * 0.01,
+          transformOrigin: "50% 50%",
+        },
+        0
+      )
+      .from(
+        selectAll(root, "[data-matrix-cursor]"),
+        { duration: 0.4, ease: "power2.out", opacity: 0 },
+        0.7
+      );
+    return countUp(timeline, selectAll(root, "[data-count-to]"), {
+      duration: 1.2,
+      position: 0,
+    });
+  });
+
   const selectYear = (next: number) => {
     setSelectedYear(next);
     setCursor(null);
@@ -158,148 +188,160 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
       jp="貢献行列"
       label="Contribution matrix"
     >
-      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-        <p className="flex flex-col gap-1">
-          <span className="text-ink font-mono text-5xl font-light tracking-tight tabular-nums md:text-6xl">
-            {countFormat.format(calendar.total)}
-          </span>
-          <span className="label text-graphite">
-            Contributions {caption.en}
-            <span className="jp"> / {caption.jp}</span>
-          </span>
-        </p>
-        <div className="flex flex-col gap-1 sm:min-w-48 sm:items-end sm:text-right">
-          <span className="text-ink font-mono text-3xl font-light tracking-tight tabular-nums">
-            {String(activeDay?.count ?? 0).padStart(2, "0")}
-            <span className="text-graphite ml-1 text-xs tracking-widest">
-              contrib
+      <div className="flex flex-col gap-6" ref={revealRef}>
+        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+          <p className="flex flex-col gap-1">
+            <span
+              className="text-ink font-mono text-5xl font-light tracking-tight tabular-nums md:text-6xl"
+              data-count-group
+              data-count-to={calendar.total}
+              style={{ minWidth: `${totalLabel.length}ch` }}
+            >
+              {totalLabel}
             </span>
-          </span>
-          <span className="label text-graphite tabular-nums">
-            {activeDay ? formatDayLabel(activeDay.date) : "—"} · L
-            {activeDay?.level ?? 0}
-          </span>
+            <span className="label text-graphite">
+              Contributions {caption.en}
+              <span className="jp"> / {caption.jp}</span>
+            </span>
+          </p>
+          <div className="flex flex-col gap-1 sm:min-w-48 sm:items-end sm:text-right">
+            <span className="text-ink font-mono text-3xl font-light tracking-tight tabular-nums">
+              {String(activeDay?.count ?? 0).padStart(2, "0")}
+              <span className="text-graphite ml-1 text-xs tracking-widest">
+                contrib
+              </span>
+            </span>
+            <span className="label text-graphite tabular-nums">
+              {activeDay ? formatDayLabel(activeDay.date) : "—"} · L
+              {activeDay?.level ?? 0}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div className="border-rule relative border-t border-b py-4">
-        <div
-          className="has-focus-visible:outline-clay overflow-x-auto outline-offset-2 has-focus-visible:outline-2"
-          key={year}
-          ref={scrollToLatest}
-        >
-          <input
-            aria-label={`Contribution matrix, ${countFormat.format(calendar.total)} contributions ${caption.en}. Arrow keys read each day, Home and End jump.`}
-            aria-valuetext={
-              activeDay
-                ? `${formatDayLabel(activeDay.date)}, ${activeDay.count} contributions`
-                : "No day selected"
-            }
-            className="sr-only"
-            max={Math.max(filled.length - 1, 0)}
-            min={0}
-            onBlur={() => setCursor(null)}
-            onChange={(event) =>
-              setCursor(filled[Number(event.target.value)] ?? null)
-            }
-            onKeyDown={handleKeyDown}
-            type="range"
-            value={Math.max(activeIndex, 0)}
-          />
-          <svg
-            aria-hidden
-            className="block w-full min-w-160 cursor-crosshair"
-            viewBox={`0 0 ${width} ${height}`}
+        <div className="border-rule relative border-t border-b py-4">
+          <div
+            className="has-focus-visible:outline-clay overflow-x-auto outline-offset-2 has-focus-visible:outline-2"
+            key={year}
+            ref={scrollToLatest}
           >
-            {months.map((month) => (
-              <text
-                className="fill-graphite font-mono uppercase"
-                fontSize={AXIS_FONT_SIZE}
-                key={`${month.label}-${month.column}`}
-                x={GUTTER_LEFT + month.column * PITCH}
-                y={9}
-              >
-                {month.label}
-              </text>
-            ))}
-            {rowLabels.map((row) => (
-              <text
-                className="fill-mist font-mono uppercase"
-                fontSize={AXIS_FONT_SIZE}
-                key={row.label}
-                x={0}
-                y={GUTTER_TOP + row.day * PITCH + CELL - 1}
-              >
-                {row.label}
-              </text>
-            ))}
-            <line
-              className="stroke-ink/40"
-              strokeDasharray="1 2"
-              vectorEffect="non-scaling-stroke"
-              x1={GUTTER_LEFT + active.week * PITCH + CELL / 2}
-              x2={GUTTER_LEFT + active.week * PITCH + CELL / 2}
-              y1={GUTTER_TOP - 4}
-              y2={height}
+            <input
+              aria-label={`Contribution matrix, ${countFormat.format(calendar.total)} contributions ${caption.en}. Arrow keys read each day, Home and End jump.`}
+              aria-valuetext={
+                activeDay
+                  ? `${formatDayLabel(activeDay.date)}, ${activeDay.count} contributions`
+                  : "No day selected"
+              }
+              className="sr-only"
+              max={Math.max(filled.length - 1, 0)}
+              min={0}
+              onBlur={() => setCursor(null)}
+              onChange={(event) =>
+                setCursor(filled[Number(event.target.value)] ?? null)
+              }
+              onKeyDown={handleKeyDown}
+              type="range"
+              value={Math.max(activeIndex, 0)}
             />
-            <line
-              className="stroke-ink/40"
-              strokeDasharray="1 2"
-              vectorEffect="non-scaling-stroke"
-              x1={GUTTER_LEFT - 4}
-              x2={width}
-              y1={GUTTER_TOP + active.day * PITCH + CELL / 2}
-              y2={GUTTER_TOP + active.day * PITCH + CELL / 2}
-            />
-            <g onPointerLeave={() => setCursor(null)}>
-              {calendar.weeks.map((week, weekIndex) =>
-                week.map((day, dayIndex) =>
-                  day ? (
-                    <rect
-                      className={cn(
-                        levelFills[day.level],
-                        "ease-mechanical transition-[fill] duration-100"
-                      )}
-                      height={CELL}
-                      key={day.date}
-                      onPointerEnter={() =>
-                        setCursor({ day: dayIndex, week: weekIndex })
-                      }
-                      width={CELL}
-                      x={GUTTER_LEFT + weekIndex * PITCH}
-                      y={GUTTER_TOP + dayIndex * PITCH}
-                    />
-                  ) : null
-                )
-              )}
-            </g>
-            <rect
-              className="stroke-ink pointer-events-none"
-              fill="none"
-              height={CELL + 4}
-              vectorEffect="non-scaling-stroke"
-              width={CELL + 4}
-              x={GUTTER_LEFT + active.week * PITCH - 2}
-              y={GUTTER_TOP + active.day * PITCH - 2}
-            />
-          </svg>
-        </div>
-      </div>
-
-      <div className="label text-mist flex flex-wrap items-center justify-between gap-4">
-        <span>Hover or ← → ↑ ↓</span>
-        <span className="flex items-center gap-2">
-          Less <span className="jp">少</span>
-          <span aria-hidden className="flex gap-1">
-            {contributionLevels.map((level) => (
-              <span
-                className={cn("size-2.5", levelSwatches[level])}
-                key={level}
+            <svg
+              aria-hidden
+              className="block w-full min-w-160 cursor-crosshair"
+              viewBox={`0 0 ${width} ${height}`}
+            >
+              {months.map((month) => (
+                <text
+                  className="fill-graphite font-mono uppercase"
+                  fontSize={AXIS_FONT_SIZE}
+                  key={`${month.label}-${month.column}`}
+                  x={GUTTER_LEFT + month.column * PITCH}
+                  y={9}
+                >
+                  {month.label}
+                </text>
+              ))}
+              {rowLabels.map((row) => (
+                <text
+                  className="fill-mist font-mono uppercase"
+                  fontSize={AXIS_FONT_SIZE}
+                  key={row.label}
+                  x={0}
+                  y={GUTTER_TOP + row.day * PITCH + CELL - 1}
+                >
+                  {row.label}
+                </text>
+              ))}
+              <line
+                className="stroke-ink/40"
+                data-matrix-cursor
+                strokeDasharray="1 2"
+                vectorEffect="non-scaling-stroke"
+                x1={GUTTER_LEFT + active.week * PITCH + CELL / 2}
+                x2={GUTTER_LEFT + active.week * PITCH + CELL / 2}
+                y1={GUTTER_TOP - 4}
+                y2={height}
               />
-            ))}
+              <line
+                className="stroke-ink/40"
+                data-matrix-cursor
+                strokeDasharray="1 2"
+                vectorEffect="non-scaling-stroke"
+                x1={GUTTER_LEFT - 4}
+                x2={width}
+                y1={GUTTER_TOP + active.day * PITCH + CELL / 2}
+                y2={GUTTER_TOP + active.day * PITCH + CELL / 2}
+              />
+              <g onPointerLeave={() => setCursor(null)}>
+                {calendar.weeks.map((week, weekIndex) =>
+                  week.map((day, dayIndex) =>
+                    day ? (
+                      <rect
+                        className={cn(
+                          levelFills[day.level],
+                          "ease-mechanical transition-[fill] duration-100"
+                        )}
+                        data-day={dayIndex}
+                        data-week={weekIndex}
+                        height={CELL}
+                        key={day.date}
+                        onPointerEnter={() =>
+                          setCursor({ day: dayIndex, week: weekIndex })
+                        }
+                        width={CELL}
+                        x={GUTTER_LEFT + weekIndex * PITCH}
+                        y={GUTTER_TOP + dayIndex * PITCH}
+                      />
+                    ) : null
+                  )
+                )}
+              </g>
+              <rect
+                className="stroke-ink pointer-events-none"
+                data-matrix-cursor
+                fill="none"
+                height={CELL + 4}
+                vectorEffect="non-scaling-stroke"
+                width={CELL + 4}
+                x={GUTTER_LEFT + active.week * PITCH - 2}
+                y={GUTTER_TOP + active.day * PITCH - 2}
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div className="label text-mist flex flex-wrap items-center justify-between gap-4">
+          <span>Hover or ← → ↑ ↓</span>
+          <span className="flex items-center gap-2">
+            Less <span className="jp">少</span>
+            <span aria-hidden className="flex gap-1">
+              {contributionLevels.map((level) => (
+                <span
+                  className={cn("size-2.5", levelSwatches[level])}
+                  key={level}
+                />
+              ))}
+            </span>
+            More <span className="jp">多</span>
           </span>
-          More <span className="jp">多</span>
-        </span>
+        </div>
       </div>
 
       <ContributionStatsReadout calendar={calendar} />
