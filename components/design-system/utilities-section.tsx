@@ -15,7 +15,7 @@ const previews = {
   "blueprint-grid": (
     <div className="blueprint-grid absolute inset-0 [--grid-size:16px]" />
   ),
-  display: <p className="display text-ink text-6xl">Ivan</p>,
+  display: <p className="display text-ink text-6xl">Ivo</p>,
   grain: <div className="grain bg-paper-deep absolute inset-0" />,
   "h-below-header": (
     <div className="border-rule-strong absolute inset-3 flex flex-col border">

@@ -1,7 +1,7 @@
 import { renderOgImage } from "@/lib/content/og-image";
 import { siteConfig } from "@/lib/site/config";
 
-export const alt = `${siteConfig.name} · Agent Workshop`;
+export const alt = `${siteConfig.nickname} · Agent Workshop`;
 export const size = { height: 630, width: 1200 };
 export const contentType = "image/png";
 

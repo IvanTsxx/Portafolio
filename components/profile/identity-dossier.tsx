@@ -81,8 +81,7 @@ const barcodeOf = (login: string) => {
 };
 
 export const IdentityDossier = ({ identity }: { identity: GithubIdentity }) => {
-  const name = identity.name ?? identity.login;
-  const monogram = name
+  const monogram = siteConfig.name
     .split(/\s+/u)
     .map((part) => part[0])
     .join("")
@@ -94,7 +93,7 @@ export const IdentityDossier = ({ identity }: { identity: GithubIdentity }) => {
       <DossierStrip code="GH-02" />
 
       <PortraitPlate
-        label={`Dithered portrait of ${name}`}
+        label={`Dithered portrait of ${siteConfig.nickname}`}
         monogram={monogram}
         src={PORTRAIT_SRC}
       />
@@ -104,9 +103,14 @@ export const IdentityDossier = ({ identity }: { identity: GithubIdentity }) => {
           className="text-ink text-3xl leading-tight font-light tracking-tight text-balance"
           id="dossier-heading"
         >
-          {name}
+          {siteConfig.name}
         </h2>
-        <p className="label text-graphite normal-case">@{identity.login}</p>
+        <p className="label flex flex-wrap items-baseline gap-x-3">
+          <span className="text-graphite normal-case">@{identity.login}</span>
+          <span className="text-mist">
+            aka {siteConfig.nickname} <span className="jp">通称</span>
+          </span>
+        </p>
       </div>
 
       {identity.bio && (
