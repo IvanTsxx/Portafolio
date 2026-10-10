@@ -78,8 +78,9 @@ export const homeSections = [
     label: "Contribution activity",
   },
   { id: "how-i-work", index: "GH-09", jp: "仕事の流儀", label: "How I work" },
-  { id: "stack", index: "GH-10", jp: "技術", label: "Stack" },
-  { id: "contact", index: "GH-11", jp: "連絡", label: "Contact" },
+  { id: "workshop", index: "GH-10", jp: "工房", label: "Workshop" },
+  { id: "stack", index: "GH-11", jp: "技術", label: "Stack" },
+  { id: "contact", index: "GH-12", jp: "連絡", label: "Contact" },
 ] as const;
 
 export type Social = (typeof siteConfig.socials)[number];

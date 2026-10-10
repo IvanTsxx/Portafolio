@@ -1,10 +1,9 @@
 import type { ComponentType } from "react";
 import { createElement, Fragment } from "react";
 
-import type { AgentRole } from "../types";
-
 import type { Outfit, OutfitPieceId, OutfitSlot } from "../outfit";
 import { outfitSlots, rolePresets } from "../outfit";
+import type { AgentRole } from "../types";
 import * as analystParts from "./analyst";
 import * as architectParts from "./architect";
 import * as builderParts from "./builder";

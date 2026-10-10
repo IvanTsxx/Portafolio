@@ -1,12 +1,12 @@
 # Agent Workshop · Direction v2 (paper and ink)
 
-Ivan Bongiovanni's portfolio. The visual language comes from his GitHub-profile experiment in `~/Projects/visual-taste-vault/src/components/experiments/github-profile` (and `src/components/styles/futuristic-editorial`): a technical document on paper. Small orange 3D agents (the only color) live across the page, working.
+Ivo's portfolio (Ivan Bongiovanni; the surname appears once, in the dossier). The visual language comes from his GitHub-profile experiment in `~/Projects/visual-taste-vault/src/components/experiments/github-profile` (and `src/components/styles/futuristic-editorial`): a technical document on paper. Small orange 3D agents (the only color) live across the page, working.
 
 ## Content rules
 
-- Basement Studio may appear only as Ivan's employer: company name, role, dates, type, link, the `@basementstudio` company field, the `basementstudio` org badge and his avatar. Never show Basement code, projects, repos, clients or the kind of companies they work with. `lib/github/privacy.ts` drops anything matching `basement` (case-insensitive) outside those affiliation fields.
+- Basement Studio may appear only as Ivo's employer: company name, role, dates, type, link, the `@basementstudio` company field, the `basementstudio` org badge and his avatar. Never show Basement code, projects, repos, clients or the kind of companies they work with. `lib/github/privacy.ts` drops anything matching `basement` (case-insensitive) outside those affiliation fields.
 - Less text. Let animation and 3D carry the story. Labels and short lines, not paragraphs.
-- How I work and stack copy come from `lib/site/practice.ts` (Ivan's own words). Identity from `lib/site/config.ts`.
+- How I work and stack copy come from `lib/site/practice.ts` (Ivo's own words). Identity from `lib/site/config.ts`.
 - Never invent clients, metrics or achievements. Placeholder content is labeled sample.
 
 ## Visual system

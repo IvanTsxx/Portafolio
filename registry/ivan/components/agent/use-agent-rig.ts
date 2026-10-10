@@ -6,8 +6,6 @@ import type { RefObject } from "react";
 import type { Group } from "three";
 import { MathUtils } from "three";
 
-import type { AgentAction, AgentReaction } from "./types";
-
 import type { HopPlan } from "./actions";
 import {
   actionClips,
@@ -19,6 +17,7 @@ import {
 import { createHopPlanner, createReactionDeck } from "./reaction-deck";
 import type { Pose } from "./rig";
 import { blendPoses, createPose } from "./rig";
+import type { AgentAction, AgentReaction } from "./types";
 
 export type AgentMotion = "full" | "reduced";
 

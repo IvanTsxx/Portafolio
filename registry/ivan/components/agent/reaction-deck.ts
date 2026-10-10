@@ -1,7 +1,6 @@
+import type { HopPlan } from "./actions";
 import type { AgentReaction } from "./types";
 import { agentReactions } from "./types";
-
-import type { HopPlan } from "./actions";
 
 const swapAt = (deck: AgentReaction[], from: number, to: number) => {
   const held = deck[from];

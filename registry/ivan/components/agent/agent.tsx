@@ -7,7 +7,6 @@ import type { RefObject } from "react";
 import { BoxGeometry, MathUtils, MeshBasicMaterial, Vector3 } from "three";
 
 import { usePrefersReducedMotion } from "@/registry/ivan/hooks/use-prefers-reduced-motion";
-import type { AgentAction, AgentRole } from "./types";
 
 import type { WornPart } from "./accessories/registry";
 import { wornParts } from "./accessories/registry";
@@ -28,6 +27,7 @@ import {
   shoulder,
 } from "./rig";
 import { createRadialFadeTexture } from "./textures";
+import type { AgentAction, AgentRole } from "./types";
 import type { AgentMotion, AgentPointer } from "./use-agent-rig";
 import { useAgentRig } from "./use-agent-rig";
 

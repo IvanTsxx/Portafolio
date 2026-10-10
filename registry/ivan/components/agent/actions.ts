@@ -1,7 +1,6 @@
-import type { AgentAction, AgentReaction } from "./types";
-
 import type { Pose } from "./rig";
 import { resetPose, restArmRaise } from "./rig";
+import type { AgentAction, AgentReaction } from "./types";
 
 interface ActionClip {
   keyTime: number;
