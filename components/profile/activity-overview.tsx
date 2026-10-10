@@ -7,11 +7,15 @@ import type {
 } from "@/lib/github/model";
 import { cn } from "@/lib/utils";
 
+import { ActivityOverviewReveal } from "./activity-overview-reveal";
 import { inkPatterns, profileLink } from "./ink";
 import { Module } from "./module";
+import {
+  RADAR_CENTER as CENTER,
+  RADAR_REACH as REACH,
+  RADAR_VERTEX as VERTEX,
+} from "./radar";
 
-const CENTER = 100;
-const REACH = 70;
 const LISTED_REPOSITORIES = 3;
 const TICKS = 11;
 const LABEL_FONT_SIZE = 7;
@@ -92,6 +96,7 @@ const DistributionChart = ({ shares }: { shares: ActivityShare[] }) => {
       {[0.25, 0.5, 0.75, 1].map((ring) => (
         <rect
           className="stroke-graphite/30"
+          data-radar-ring
           fill="none"
           height={REACH * ring * 2}
           key={ring}
@@ -104,6 +109,7 @@ const DistributionChart = ({ shares }: { shares: ActivityShare[] }) => {
       ))}
       <line
         className="stroke-ink"
+        data-radar-axis="x"
         vectorEffect="non-scaling-stroke"
         x1={CENTER - REACH}
         x2={CENTER + REACH}
@@ -112,6 +118,7 @@ const DistributionChart = ({ shares }: { shares: ActivityShare[] }) => {
       />
       <line
         className="stroke-ink"
+        data-radar-axis="y"
         vectorEffect="non-scaling-stroke"
         x1={CENTER}
         x2={CENTER}
@@ -121,7 +128,7 @@ const DistributionChart = ({ shares }: { shares: ActivityShare[] }) => {
       {Array.from({ length: TICKS }, (_, index) => {
         const offset = (index - 5) * (REACH / 5);
         return (
-          <g className="stroke-ink" key={offset}>
+          <g className="stroke-ink" data-radar-tick key={offset}>
             <line
               vectorEffect="non-scaling-stroke"
               x1={CENTER + offset}
@@ -141,6 +148,7 @@ const DistributionChart = ({ shares }: { shares: ActivityShare[] }) => {
       })}
       <polygon
         className="fill-ink/10 stroke-ink"
+        data-radar-area
         points={points.map((point) => `${point.x},${point.y}`).join(" ")}
         strokeWidth={1.25}
         vectorEffect="non-scaling-stroke"
@@ -148,11 +156,12 @@ const DistributionChart = ({ shares }: { shares: ActivityShare[] }) => {
       {points.map((point, index) => (
         <rect
           className="fill-ink"
-          height={5}
+          data-radar-vertex
+          height={VERTEX}
           key={shares[index]?.key}
-          width={5}
-          x={point.x - 2.5}
-          y={point.y - 2.5}
+          width={VERTEX}
+          x={point.x - VERTEX / 2}
+          y={point.y - VERTEX / 2}
         />
       ))}
       {shares.map((share) => {
@@ -160,6 +169,7 @@ const DistributionChart = ({ shares }: { shares: ActivityShare[] }) => {
         return (
           <text
             className="fill-ink font-mono uppercase"
+            data-radar-label
             fontSize={LABEL_FONT_SIZE}
             key={share.key}
             textAnchor={label.anchor}
@@ -169,7 +179,14 @@ const DistributionChart = ({ shares }: { shares: ActivityShare[] }) => {
             <tspan className="fill-mist" x={label.x}>
               {share.label}
             </tspan>
-            <tspan dy={9} fontSize={VALUE_FONT_SIZE} x={label.x}>
+            <tspan
+              data-count-pad={2}
+              data-count-suffix="%"
+              data-count-to={share.percent}
+              dy={9}
+              fontSize={VALUE_FONT_SIZE}
+              x={label.x}
+            >
               {percentLabel(share.percent)}
             </tspan>
           </text>
@@ -195,7 +212,7 @@ export const ActivityOverview = ({
       jp="活動概要"
       label="Activity overview"
     >
-      <div className="border-rule relative grid grid-cols-1 border-t border-l md:grid-cols-2">
+      <ActivityOverviewReveal className="border-rule relative grid grid-cols-1 border-t border-l md:grid-cols-2">
         <Module id="A-01" jp="分布" title="Distribution">
           <DistributionChart shares={shares} />
         </Module>
@@ -203,19 +220,21 @@ export const ActivityOverview = ({
         <Module id="A-02" jp="比率" title="Ratio">
           <div className="flex flex-col gap-6">
             <div aria-hidden className="border-ink flex h-4 w-full border">
-              {recorded.map((share) => (
-                <span
-                  className={cn(
-                    "border-ink h-full border-r last:border-r-0",
-                    axes[share.key].fill.className
-                  )}
-                  key={share.key}
-                  style={{
-                    ...axes[share.key].fill.style,
-                    width: `${share.percent}%`,
-                  }}
-                />
-              ))}
+              <div className="flex size-full" data-ratio-bar>
+                {recorded.map((share) => (
+                  <span
+                    className={cn(
+                      "border-ink h-full border-r last:border-r-0",
+                      axes[share.key].fill.className
+                    )}
+                    key={share.key}
+                    style={{
+                      ...axes[share.key].fill.style,
+                      width: `${share.percent}%`,
+                    }}
+                  />
+                ))}
+              </div>
             </div>
             <table className="label w-full border-collapse tabular-nums">
               <caption className="sr-only">
@@ -223,7 +242,11 @@ export const ActivityOverview = ({
               </caption>
               <tbody>
                 {shares.toReversed().map((share) => (
-                  <tr className="border-rule border-t" key={share.key}>
+                  <tr
+                    className="border-rule border-t"
+                    data-ratio-row
+                    key={share.key}
+                  >
                     <th
                       className="text-ink py-2 text-left font-normal"
                       scope="row"
@@ -241,7 +264,12 @@ export const ActivityOverview = ({
                         <span className="jp text-mist">{share.jp}</span>
                       </span>
                     </th>
-                    <td className="text-ink py-2 text-right">
+                    <td
+                      className="text-ink py-2 text-right"
+                      data-count-pad={2}
+                      data-count-suffix="%"
+                      data-count-to={share.percent}
+                    >
                       {percentLabel(share.percent)}
                     </td>
                   </tr>
@@ -281,7 +309,7 @@ export const ActivityOverview = ({
             </dl>
           </div>
         </Module>
-      </div>
+      </ActivityOverviewReveal>
     </DocumentSection>
   );
 };
