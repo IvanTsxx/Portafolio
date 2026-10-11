@@ -325,8 +325,8 @@ export const AgentWorkshop = ({
       label="Workshop"
     >
       <div className="border-rule grid border xl:grid-cols-12">
-        <div className="border-rule bg-paper relative z-10 max-xl:sticky max-xl:top-12 max-xl:border-b xl:col-span-6 xl:border-r">
-          <div className="bg-paper-deep/40 xl:sticky xl:top-12">
+        <div className="border-rule max-xl:bg-paper xl:bg-paper-deep/40 relative z-10 max-xl:sticky max-xl:top-12 max-xl:border-b xl:col-span-6 xl:border-r">
+          <div className="max-xl:bg-paper-deep/40 xl:sticky xl:top-12">
             <AgentStageSlot
               action={state.action}
               className="h-[42svh] max-h-120 min-h-64 w-full xl:h-[min(38rem,calc(100svh-6rem))] xl:max-h-none"
