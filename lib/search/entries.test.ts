@@ -19,7 +19,8 @@ import type { SearchEntry } from "./types";
 
 const profileDirectory = path.join(process.cwd(), "components", "profile");
 
-const profileSources = readdirSync(profileDirectory)
+const profileSources = readdirSync(profileDirectory, { recursive: true })
+  .map(String)
   .filter((file) => file.endsWith(".tsx"))
   .map((file) => readFileSync(path.join(profileDirectory, file), "utf-8"))
   .join("\n");

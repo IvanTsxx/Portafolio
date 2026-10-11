@@ -51,8 +51,7 @@ export const primaryRoutes = [
 ] as const;
 
 export const homeSections = [
-  { id: "experience", index: "GH-03", jp: "経歴", label: "Experience" },
-  { id: "pinned", index: "GH-04", jp: "固定標本", label: "Pinned specimens" },
+  { id: "timeline", index: "GH-03", jp: "年表", label: "Timeline" },
   {
     id: "matrix",
     index: "GH-05",
