@@ -134,7 +134,7 @@ export const HowIWork = () => {
         />
       }
       id="how-i-work"
-      index="GH-09"
+      index="GH-06"
       jp="仕事の流儀"
       label="How I work"
     >

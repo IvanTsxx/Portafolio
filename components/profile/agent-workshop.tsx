@@ -40,7 +40,7 @@ import { SectionFrame } from "./section-frame";
 import { SpecimenCorners } from "./specimen-corners";
 import { TechnicalButton } from "./technical-button";
 
-export const workshopSectionIndex = "GH-10";
+export const workshopSectionIndex = "GH-07";
 
 const copyStatusSeconds = 2;
 

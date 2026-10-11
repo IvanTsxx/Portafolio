@@ -54,33 +54,14 @@ export const homeSections = [
   { id: "experience", index: "GH-03", jp: "経歴", label: "Experience" },
   { id: "pinned", index: "GH-04", jp: "固定標本", label: "Pinned specimens" },
   {
-    id: "spectrum",
-    index: "GH-05",
-    jp: "言語分布",
-    label: "Language spectrum",
-  },
-  {
     id: "matrix",
-    index: "GH-06",
+    index: "GH-05",
     jp: "貢献行列",
     label: "Contribution matrix",
   },
-  {
-    id: "overview",
-    index: "GH-07",
-    jp: "活動概要",
-    label: "Activity overview",
-  },
-  {
-    id: "timeline",
-    index: "GH-08",
-    jp: "活動記録",
-    label: "Contribution activity",
-  },
-  { id: "how-i-work", index: "GH-09", jp: "仕事の流儀", label: "How I work" },
-  { id: "workshop", index: "GH-10", jp: "工房", label: "Workshop" },
-  { id: "stack", index: "GH-11", jp: "技術", label: "Stack" },
-  { id: "contact", index: "GH-12", jp: "連絡", label: "Contact" },
+  { id: "how-i-work", index: "GH-06", jp: "仕事の流儀", label: "How I work" },
+  { id: "workshop", index: "GH-07", jp: "工房", label: "Workshop" },
+  { id: "contact", index: "GH-08", jp: "連絡", label: "Contact" },
 ] as const;
 
 export type Social = (typeof siteConfig.socials)[number];

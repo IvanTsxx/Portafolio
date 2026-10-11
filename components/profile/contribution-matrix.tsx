@@ -11,7 +11,6 @@ import type {
 } from "@/lib/github/model";
 import { cn } from "@/lib/utils";
 
-import { ContributionStatsReadout } from "./contribution-stats";
 import {
   calendarCaption,
   formatDayLabel,
@@ -184,7 +183,7 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
         </fieldset>
       }
       id="matrix"
-      index="GH-06"
+      index="GH-05"
       jp="貢献行列"
       label="Contribution matrix"
     >
@@ -343,8 +342,6 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
           </span>
         </div>
       </div>
-
-      <ContributionStatsReadout calendar={calendar} />
     </DocumentSection>
   );
 };
