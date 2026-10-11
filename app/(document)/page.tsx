@@ -1,9 +1,10 @@
 import { AgentWorkshop } from "@/components/profile/agent-workshop";
 import { ContactRow } from "@/components/profile/contact-row";
 import { ContributionMatrix } from "@/components/profile/contribution-matrix";
+import { ExperienceSection } from "@/components/profile/experience-stairs/experience-section";
 import { HowIWork } from "@/components/profile/how-i-work";
 import { ProfileHero } from "@/components/profile/profile-hero";
-import { TimelineSection } from "@/components/profile/timeline/timeline-section";
+import { PinnedSection } from "@/components/profile/repo-shelf/pinned-section";
 import { getGithubProfile } from "@/lib/site/github-profile";
 
 export const revalidate = 3600;
@@ -18,7 +19,8 @@ const HomePage = async () => {
         identity={profile.identity}
         source={source}
       />
-      <TimelineSection repositories={profile.pinned} />
+      <ExperienceSection />
+      <PinnedSection repositories={profile.pinned} />
       <ContributionMatrix calendars={profile.calendars} />
       <HowIWork />
       <AgentWorkshop />
