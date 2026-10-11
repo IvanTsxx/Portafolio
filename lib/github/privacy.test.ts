@@ -49,6 +49,7 @@ const pinnedNode = (
   nameWithOwner: string,
   description: string | null = null
 ) => ({
+  createdAt: "2025-03-14T12:00:00Z",
   description,
   isPrivate: false,
   isTemplate: false,
@@ -310,6 +311,7 @@ describe("assertPublicProfile", () => {
       ...snapshotProfile(),
       pinned: [
         {
+          createdAt: "2025-03-14",
           description: null,
           language: null,
           name: "site",

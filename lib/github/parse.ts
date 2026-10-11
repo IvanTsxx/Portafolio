@@ -124,6 +124,7 @@ const visibilityOf = (node: RawPinned) => {
 export const parsePinned = (nodes: readonly RawPinned[]): PinnedRepository[] =>
   keepPublic(
     nodes.map((node): PinnedRepository => ({
+      createdAt: node.createdAt.slice(0, 10),
       description: node.description,
       language: node.primaryLanguage?.name ?? null,
       name: node.name,

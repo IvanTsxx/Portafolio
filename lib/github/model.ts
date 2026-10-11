@@ -64,6 +64,7 @@ const repositoryVisibilitySchema = z.enum([
 export type RepositoryVisibility = z.infer<typeof repositoryVisibilitySchema>;
 
 const pinnedRepositorySchema = z.object({
+  createdAt: z.iso.date(),
   description: z.string().nullable(),
   language: z.string().nullable(),
   name: z.string(),

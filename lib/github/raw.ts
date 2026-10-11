@@ -51,6 +51,7 @@ export const rawCalendarSchema = z.object({
 export type RawCalendar = z.infer<typeof rawCalendarSchema>;
 
 const rawPinnedSchema = z.object({
+  createdAt: z.iso.datetime(),
   description: optionalTextSchema,
   isPrivate: z.boolean(),
   isTemplate: z.boolean(),

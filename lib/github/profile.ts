@@ -41,7 +41,7 @@ const profileQuery = `query($login: String!) {
     starredRepositories { totalCount }
     organizations(first: 20) { nodes { login } }
     pinnedItems(first: 6, types: REPOSITORY) {
-      nodes { ... on Repository { name nameWithOwner description isTemplate isPrivate stargazerCount primaryLanguage { name } } }
+      nodes { ... on Repository { name nameWithOwner description createdAt isTemplate isPrivate stargazerCount primaryLanguage { name } } }
     }
     contributionsCollection {
       contributionYears
