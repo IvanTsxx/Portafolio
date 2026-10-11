@@ -2,13 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { RegistryItemPanels } from "@/components/page-panels/registry-item";
 import { DependenciesPanel } from "@/components/registry-docs/dependencies-panel";
 import { BulletList } from "@/components/registry-docs/docs-section";
 import {
   AnimationTable,
   PropsTables,
-  VariantsTable,
 } from "@/components/registry-docs/docs-tables";
 import { ExampleBlock } from "@/components/registry-docs/example-block";
 import { InstallSection } from "@/components/registry-docs/install-section";
@@ -36,7 +34,7 @@ import {
 import { buildItemCodeFiles } from "@/lib/registry/source";
 import {
   registrySectionAnnotations,
-  registrySectionsOf,
+  registrySections,
 } from "@/lib/site/sections";
 import type { RegistrySectionId } from "@/lib/site/sections";
 import { cn } from "@/lib/utils";
@@ -102,11 +100,10 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
     highlightCode(registriesSource, "json"),
   ]);
 
-  const sections = registrySectionsOf(item);
   const sectionProps = (id: RegistrySectionId) => {
-    const section = sections.find((entry) => entry.id === id);
+    const section = registrySections.find((entry) => entry.id === id);
     const number = String(
-      sections.findIndex((entry) => entry.id === id) + 1
+      registrySections.findIndex((entry) => entry.id === id) + 1
     ).padStart(2, "0");
     return {
       id,
@@ -132,7 +129,6 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
           {item.description}
         </p>
       </DocumentHero>
-      <RegistryItemPanels slug={slug} />
       <DocumentSection
         {...sectionProps("preview")}
         waypoint={{ action: "inspect", role: "inspector", side: "left" }}
@@ -158,11 +154,6 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
           ))}
         </div>
       </DocumentSection>
-      {docs.variants.length > 0 ? (
-        <DocumentSection {...sectionProps("variants")}>
-          <VariantsTable variants={docs.variants} />
-        </DocumentSection>
-      ) : null}
       <DocumentSection {...sectionProps("props")}>
         <PropsTables groups={docs.props} />
       </DocumentSection>

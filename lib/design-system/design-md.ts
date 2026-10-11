@@ -191,7 +191,7 @@ export const renderDesignMarkdown = (system: DesignSystem) =>
     "",
     "## Layout",
     "",
-    "A 12-column document grid. A sticky identity dossier fills 4 columns on the left; numbered sections fill 8 on the right and stack on mobile. Spacing follows a 4px scale. Sections are separated by 64px and open with a panel heading: `[ XX-NN ]  LABEL  日本語 ........ 06 / 06` over a strong rule.",
+    "Index pages use a 12-column document grid. A compact identity dossier fills 4 columns on the left and sticks only when it fits the viewport; it never scrolls on its own. Numbered sections fill 8 on the right and stack on mobile. Detail pages drop the dossier and run in one centered column. Spacing follows a 4px scale. Sections are separated by 64px and open with a panel heading: `[ XX-NN ]  LABEL  日本語 ........ 06 / 06` over a strong rule.",
     "",
     "## Elevation & Depth",
     "",

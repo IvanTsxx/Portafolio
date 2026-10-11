@@ -18,7 +18,7 @@ export const NoteFilters = ({
     useNoteFilter(facets);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="grid items-start gap-6 lg:grid-cols-3">
       <FilterBar
         active={filter.kind ?? ""}
         facets={facets.kinds.map(({ count, kind }) => ({
@@ -50,7 +50,7 @@ export const NoteFilters = ({
       <button
         className={cn(
           chipClassName,
-          "w-fit disabled:cursor-not-allowed disabled:opacity-40"
+          "w-fit disabled:cursor-not-allowed disabled:opacity-40 lg:col-span-3"
         )}
         disabled={!isFiltered}
         onClick={clear}

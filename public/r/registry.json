@@ -7,7 +7,7 @@
       "name": "technical-grid",
       "type": "registry:ui",
       "title": "Animated Technical Grid",
-      "description": "Hairline blueprint grid with a scan line, pulsing nodes and corner marks.",
+      "description": "Hairline blueprint grid with a scan line and pulsing nodes.",
       "categories": ["backgrounds", "motion"],
       "dependencies": ["class-variance-authority"],
       "registryDependencies": [],
@@ -82,71 +82,71 @@
           "props": [
             {
               "component": "TechnicalGrid",
-              "description": "A div that paints the grid behind its children.",
+              "description": "Paints the grid behind its children.",
               "props": [
                 {
                   "name": "tone",
                   "type": "\"muted\" | \"strong\" | \"clay\"",
                   "default": "\"muted\"",
-                  "description": "Line intensity and ink. clay tints the lines, scan and nodes."
+                  "description": "Line intensity and ink."
                 },
                 {
                   "name": "fade",
                   "type": "\"none\" | \"edges\" | \"top\" | \"bottom\"",
                   "default": "\"none\"",
-                  "description": "Fades the grid toward the edges or one side."
+                  "description": "Fades the grid toward an edge."
                 },
                 {
                   "name": "cellSize",
                   "type": "number",
                   "default": "32",
-                  "description": "Minor cell size in px. Clamped between 8 and 160."
+                  "description": "Minor cell size in px, 8 to 160."
                 },
                 {
                   "name": "majorEvery",
                   "type": "number",
                   "default": "4",
-                  "description": "Every Nth line is drawn stronger. 0 or 1 disables major lines."
+                  "description": "Every Nth line is stronger."
                 },
                 {
                   "name": "scan",
                   "type": "\"none\" | \"horizontal\" | \"vertical\" | \"both\"",
                   "default": "\"horizontal\"",
-                  "description": "Direction of the sweeping scan line."
+                  "description": "Scan line direction."
                 },
                 {
                   "name": "scanDuration",
                   "type": "number",
                   "default": "8",
-                  "description": "Seconds per sweep. Clamped between 1 and 60."
+                  "description": "Seconds per sweep, 1 to 60."
                 },
                 {
                   "name": "nodes",
                   "type": "number",
                   "default": "5",
-                  "description": "Pulsing nodes snapped to grid lines. Maximum 24."
+                  "description": "Pulsing nodes, up to 24."
                 },
                 {
                   "name": "markers",
                   "type": "boolean",
                   "default": "true",
-                  "description": "Registration marks in the four corners."
+                  "description": "Corner registration marks."
                 },
                 {
                   "name": "label",
                   "type": "string",
-                  "description": "Mono caption pinned to the top left."
+                  "description": "Caption, top left."
                 },
                 {
                   "name": "caption",
                   "type": "string",
-                  "description": "Mono caption pinned to the bottom right."
+                  "description": "Caption, bottom right."
                 },
                 {
                   "name": "animated",
                   "type": "boolean",
                   "default": "true",
-                  "description": "Turns the scan and pulses off. The static grid stays."
+                  "description": "Turns the scan and pulses off."
                 }
               ]
             }
@@ -156,13 +156,13 @@
               "name": "tone",
               "default": "muted",
               "options": ["muted", "strong", "clay"],
-              "description": "Ink at 6 and 12 percent, 10 and 22 percent, or clay."
+              "description": "Line ink: muted, strong or clay."
             },
             {
               "name": "fade",
               "default": "none",
               "options": ["none", "edges", "top", "bottom"],
-              "description": "Mask on the grid field only, never on children."
+              "description": "Mask on the grid only."
             }
           ],
           "examples": [
@@ -176,24 +176,23 @@
             }
           ],
           "accessibility": [
-            "Grid, scan line, nodes and marks are aria-hidden and ignore pointer events.",
-            "label and caption are real text at 4.5:1 or more.",
-            "Reduced motion hides the scan and pulses. The static grid stays."
+            "Decorative layers are aria-hidden and ignore pointer events.",
+            "Reduced motion hides the scan and pulses."
           ],
           "animation": [
             {
               "target": "Scan line",
               "properties": "transform, opacity",
-              "timing": "scanDuration seconds, linear, infinite",
+              "timing": "scanDuration seconds, linear",
               "trigger": "On mount",
               "reducedMotion": "Hidden."
             },
             {
               "target": "Node pulse ring",
               "properties": "transform, opacity",
-              "timing": "3 to 5 seconds, ease-out, infinite",
+              "timing": "3 to 5 seconds, ease-out",
               "trigger": "On mount",
-              "reducedMotion": "Ring hidden. Dot stays."
+              "reducedMotion": "Ring hidden."
             }
           ]
         }
@@ -203,7 +202,7 @@
       "name": "agent-status-card",
       "type": "registry:ui",
       "title": "Agent Status Card",
-      "description": "Status card for an agent run with a task line, segmented progress and mono metadata.",
+      "description": "Status card for an agent run.",
       "categories": ["cards", "data"],
       "dependencies": ["class-variance-authority"],
       "registryDependencies": [],
@@ -236,62 +235,62 @@
           "props": [
             {
               "component": "AgentStatusCard",
-              "description": "Header, body, optional metadata and footer.",
+              "description": "Header, body, metadata and footer.",
               "props": [
                 {
                   "name": "agentId",
                   "type": "string",
                   "required": true,
-                  "description": "Designation shown above the name, for example AG-03."
+                  "description": "Designation, such as AG-03."
                 },
                 {
                   "name": "name",
                   "type": "string",
                   "required": true,
-                  "description": "Role or agent name. Labels the article and truncates when long."
+                  "description": "Agent name. Labels the article."
                 },
                 {
                   "name": "task",
                   "type": "string",
                   "required": true,
-                  "description": "One line describing what the agent is doing."
+                  "description": "One line describing the work."
                 },
                 {
                   "name": "status",
                   "type": "\"idle\" | \"running\" | \"review\" | \"blocked\" | \"done\"",
                   "default": "\"idle\"",
-                  "description": "Drives the tone color, the status dot and the default status label."
+                  "description": "Drives tone, dot and label."
                 },
                 {
                   "name": "statusLabel",
                   "type": "string",
-                  "description": "Overrides the default status text."
+                  "description": "Overrides the status text."
                 },
                 {
                   "name": "progress",
                   "type": "number",
-                  "description": "0 to 100. Omit to hide the bar."
+                  "description": "0 to 100. Omit to hide."
                 },
                 {
                   "name": "meta",
                   "type": "{ label: string; value: string }[]",
-                  "description": "Mono key and value pairs in equal columns."
+                  "description": "Mono key and value pairs."
                 },
                 {
                   "name": "footer",
                   "type": "ReactNode",
-                  "description": "Slot under a hairline for actions."
+                  "description": "Slot for actions."
                 },
                 {
                   "name": "announce",
                   "type": "boolean",
                   "default": "false",
-                  "description": "Makes the status a polite live region."
+                  "description": "Makes status a live region."
                 },
                 {
                   "name": "children",
                   "type": "ReactNode",
-                  "description": "Extra content rendered in the body under the progress bar."
+                  "description": "Extra body content."
                 }
               ]
             }
@@ -301,7 +300,7 @@
               "name": "status",
               "default": "idle",
               "options": ["idle", "running", "review", "blocked", "done"],
-              "description": "Tone paints the hairline, cube, dot and progress. idle muted, running clay, review steel, blocked destructive, done moss."
+              "description": "Tone of the hairline, dot and progress."
             }
           ],
           "examples": [
@@ -316,24 +315,22 @@
           ],
           "accessibility": [
             "An article labelled by the name heading.",
-            "Status is always text. Dot and tone are redundant cues.",
-            "announce makes the status a polite live region. Off by default.",
-            "Tone colors keep 4.5:1 against the card in both themes."
+            "Status is always text. Dot and tone are redundant cues."
           ],
           "animation": [
             {
               "target": "Running status dot",
               "properties": "transform, opacity",
-              "timing": "animate-ping, 1 second, infinite",
-              "trigger": "While status is running",
-              "reducedMotion": "Ring removed. Dot stays."
+              "timing": "1 second, infinite",
+              "trigger": "While running",
+              "reducedMotion": "Ring removed."
             },
             {
               "target": "Active progress segment",
               "properties": "opacity",
-              "timing": "animate-pulse, 2 seconds, infinite",
-              "trigger": "First unfilled segment while running",
-              "reducedMotion": "Steady at 60 percent."
+              "timing": "2 seconds, infinite",
+              "trigger": "While running",
+              "reducedMotion": "Steady."
             }
           ]
         }
@@ -343,7 +340,7 @@
       "name": "magnetic-button",
       "type": "registry:ui",
       "title": "Industrial Magnetic Button",
-      "description": "Hairline button that leans toward the pointer and sweeps a fill on hover. Button and link.",
+      "description": "Hairline button that leans toward the pointer.",
       "categories": ["buttons", "motion"],
       "dependencies": ["class-variance-authority"],
       "registryDependencies": [],
@@ -382,30 +379,30 @@
                   "name": "variant",
                   "type": "\"outline\" | \"solid\" | \"accent\" | \"ghost\"",
                   "default": "\"outline\"",
-                  "description": "Surface treatment. All but ghost fill with clay on hover."
+                  "description": "Surface treatment."
                 },
                 {
                   "name": "size",
                   "type": "\"sm\" | \"md\" | \"lg\"",
                   "default": "\"md\"",
-                  "description": "Visual height of 36, 44 or 56 px. The hit area is at least 44 px."
+                  "description": "Height: 36, 44 or 56 px."
                 },
                 {
                   "name": "strength",
                   "type": "number",
                   "default": "8",
-                  "description": "Maximum pull in px, 0 to 24. 0 turns the magnet off."
+                  "description": "Maximum pull in px. 0 turns it off."
                 },
                 {
                   "name": "index",
                   "type": "string",
-                  "description": "Decorative mono index before the label."
+                  "description": "Decorative mono index."
                 },
                 {
                   "name": "type",
                   "type": "\"button\" | \"submit\" | \"reset\"",
                   "default": "\"button\"",
-                  "description": "Native button type. Defaults to button."
+                  "description": "Native button type."
                 }
               ]
             },
@@ -417,7 +414,7 @@
                   "name": "href",
                   "type": "string",
                   "required": true,
-                  "description": "Destination. Other props match MagneticButton."
+                  "description": "Destination."
                 }
               ]
             }
@@ -427,13 +424,13 @@
               "name": "variant",
               "default": "outline",
               "options": ["outline", "solid", "accent", "ghost"],
-              "description": "outline hairline, solid filled, accent clay, ghost borderless."
+              "description": "Surface treatment."
             },
             {
               "name": "size",
               "default": "md",
               "options": ["sm", "md", "lg"],
-              "description": "Height, padding and label size."
+              "description": "Height and padding."
             }
           ],
           "examples": [
@@ -447,33 +444,23 @@
             }
           ],
           "accessibility": [
-            "A native button or anchor. Keyboard, focus and disabled come from the platform.",
-            "The hit area is at least 44 by 44 px at every size.",
-            "Hover effects mirror on focus-visible.",
-            "Label contrast on the fill is 4.5:1 or more.",
-            "Only mouse and pen pull the button. Touch never moves it."
+            "A native button or anchor. The hit area is at least 44 by 44 px.",
+            "Only mouse and pen pull the button."
           ],
           "animation": [
             {
               "target": "Surface magnet",
               "properties": "translate",
-              "timing": "100 ms moving, 500 ms release, ease-out-expo",
-              "trigger": "Pointer move, written as CSS variables",
+              "timing": "100 ms in, 500 ms out",
+              "trigger": "Pointer move",
               "reducedMotion": "No magnet."
             },
             {
               "target": "Fill sweep",
-              "properties": "transform (scaleX)",
+              "properties": "transform",
               "timing": "300 ms, ease-out-expo",
-              "trigger": "Hover, focus and press",
+              "trigger": "Hover, focus, press",
               "reducedMotion": "Instant."
-            },
-            {
-              "target": "Corner marks and press",
-              "properties": "opacity, translate, scale 0.97",
-              "timing": "300 ms, ease-out-expo",
-              "trigger": "Hover, focus-visible, pointer down",
-              "reducedMotion": "Transitions removed."
             }
           ]
         }
@@ -483,7 +470,7 @@
       "name": "text-scramble",
       "type": "registry:ui",
       "title": "Text Scramble Reveal",
-      "description": "Monospace text that resolves out of noise glyphs. The real text is always in the DOM.",
+      "description": "Monospace text that resolves out of noise.",
       "categories": ["text", "motion"],
       "dependencies": ["class-variance-authority"],
       "registryDependencies": [],
@@ -515,7 +502,7 @@
           "props": [
             {
               "component": "TextScramble",
-              "description": "Animates its text. Extends every span prop except children.",
+              "description": "Animates its text. Extends span props.",
               "props": [
                 {
                   "name": "text",
@@ -527,13 +514,13 @@
                   "name": "trigger",
                   "type": "\"mount\" | \"visible\" | \"hover\" | \"manual\"",
                   "default": "\"visible\"",
-                  "description": "When it runs. visible waits for half the text on screen. manual runs when replayKey changes."
+                  "description": "When it runs: visible or manual."
                 },
                 {
                   "name": "duration",
                   "type": "number",
                   "default": "900",
-                  "description": "Milliseconds until the last glyph resolves."
+                  "description": "Milliseconds to resolve."
                 },
                 {
                   "name": "charset",
@@ -544,13 +531,13 @@
                 {
                   "name": "characters",
                   "type": "string",
-                  "description": "Custom noise alphabet. Overrides charset."
+                  "description": "Custom noise alphabet."
                 },
                 {
                   "name": "once",
                   "type": "boolean",
                   "default": "true",
-                  "description": "With visible, stop observing after the first reveal."
+                  "description": "Stop observing after the first reveal."
                 },
                 {
                   "name": "replayKey",
@@ -561,19 +548,19 @@
                   "name": "as",
                   "type": "\"span\" | \"p\" | \"div\" | \"h1\" | \"h2\" | \"h3\" | \"h4\"",
                   "default": "\"span\"",
-                  "description": "Element to render, so headings keep their semantics."
+                  "description": "Element to render."
                 },
                 {
                   "name": "variant",
                   "type": "\"label\" | \"heading\" | \"body\"",
                   "default": "\"label\"",
-                  "description": "Type treatment. All three are monospace."
+                  "description": "Type treatment."
                 },
                 {
                   "name": "tone",
                   "type": "\"default\" | \"muted\" | \"accent\"",
                   "default": "\"default\"",
-                  "description": "Resolved text color. Noise glyphs use clay, or foreground for accent."
+                  "description": "Resolved text color."
                 }
               ]
             }
@@ -583,13 +570,13 @@
               "name": "variant",
               "default": "label",
               "options": ["label", "heading", "body"],
-              "description": "label 12 px uppercase, heading 24 px medium, body 14 px."
+              "description": "Label 12 px, heading 24 px, body 14 px."
             },
             {
               "name": "tone",
               "default": "default",
               "options": ["default", "muted", "accent"],
-              "description": "Foreground, muted foreground or clay."
+              "description": "Text color."
             }
           ],
           "examples": [
@@ -603,25 +590,16 @@
             }
           ],
           "accessibility": [
-            "The final text is the element's real content. The animated copy is aria-hidden.",
-            "Both copies share one grid cell, so nothing shifts.",
-            "Reduced motion shows the final text immediately.",
-            "Use as to keep real heading levels."
+            "The final text is the real content. The animated copy is aria-hidden.",
+            "Reduced motion shows the final text immediately."
           ],
           "animation": [
             {
               "target": "Glyph resolve",
-              "properties": "Text of one span per glyph",
-              "timing": "One rAF loop. Noise reshuffles every 45 ms. 70 percent stagger, 30 percent jitter.",
-              "trigger": "Mount, half visible, pointer enter, focus or replayKey",
+              "properties": "Text per glyph",
+              "timing": "One rAF loop, noise every 45 ms",
+              "trigger": "Mount, visible, hover, focus or replayKey",
               "reducedMotion": "Skipped."
-            },
-            {
-              "target": "Unresolved glyph color",
-              "properties": "color",
-              "timing": "Switches when a glyph resolves",
-              "trigger": "Per glyph",
-              "reducedMotion": "Not applicable."
             }
           ]
         }
@@ -631,7 +609,7 @@
       "name": "blueprint-panel",
       "type": "registry:ui",
       "title": "Blueprint Panel",
-      "description": "Hairline panel with registration marks, a mono header and a footer.",
+      "description": "Hairline panel with registration marks.",
       "categories": ["layout", "cards"],
       "dependencies": ["class-variance-authority"],
       "registryDependencies": [],
@@ -658,47 +636,47 @@
           "props": [
             {
               "component": "BlueprintPanel",
-              "description": "The frame. A section that extends every section prop.",
+              "description": "The frame. Extends section props.",
               "props": [
                 {
                   "name": "tone",
                   "type": "\"default\" | \"inset\" | \"clay\"",
                   "default": "\"default\"",
-                  "description": "default and clay sit on the card surface, inset on a recessed one. clay tints the marks."
+                  "description": "Surface and mark color."
                 },
                 {
                   "name": "markers",
                   "type": "boolean",
                   "default": "true",
-                  "description": "Registration marks outside the four corners."
+                  "description": "Corner registration marks."
                 }
               ]
             },
             {
               "component": "BlueprintPanelHeader",
-              "description": "A mono header row with a bottom hairline.",
+              "description": "Mono header row.",
               "props": [
                 {
                   "name": "index",
                   "type": "string",
-                  "description": "Muted index before the title, such as SH-01."
+                  "description": "Muted index, such as SH-01."
                 },
                 {
                   "name": "meta",
                   "type": "ReactNode",
-                  "description": "Right aligned muted content such as a revision."
+                  "description": "Right-aligned content."
                 },
                 {
                   "name": "headingLevel",
                   "type": "\"h2\" | \"h3\" | \"h4\"",
                   "default": "\"h3\"",
-                  "description": "Heading element for the title."
+                  "description": "Heading element."
                 }
               ]
             },
             {
               "component": "BlueprintPanelContent",
-              "description": "Padded body that fills the panel.",
+              "description": "Padded body.",
               "props": [
                 {
                   "name": "className",
@@ -709,7 +687,7 @@
             },
             {
               "component": "BlueprintPanelFooter",
-              "description": "Mono footer row with a top hairline.",
+              "description": "Mono footer row.",
               "props": [
                 {
                   "name": "className",
@@ -735,8 +713,7 @@
           ],
           "accessibility": [
             "A section. Give it aria-label or aria-labelledby.",
-            "The header title is a real heading. headingLevel keeps the outline correct.",
-            "Marks are aria-hidden and ignore pointer events."
+            "The header title is a real heading."
           ],
           "animation": []
         }
@@ -746,7 +723,7 @@
       "name": "agent",
       "type": "registry:component",
       "title": "Agent",
-      "description": "Procedural 3D mascot for React Three Fiber. Seven role presets, mixable outfit pieces, twelve typed actions, held props and reduced motion.",
+      "description": "Procedural 3D mascot for React Three Fiber.",
       "categories": ["characters", "three"],
       "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
       "devDependencies": ["@types/three@^0.186.0"],
@@ -884,90 +861,90 @@
           "props": [
             {
               "component": "Agent",
-              "description": "A group of meshes. Render it inside a React Three Fiber Canvas with lights. It stands on y = 0 and is about 2.4 units tall with its headgear.",
+              "description": "A group of meshes. Render it inside a Canvas with lights.",
               "props": [
                 {
                   "name": "role",
                   "type": "\"orchestrator\" | \"architect\" | \"researcher\" | \"builder\" | \"debugger\" | \"inspector\" | \"analyst\"",
                   "required": true,
-                  "description": "Which preset outfit the mascot wears, from rolePresets in outfit.ts. The rig, clips and materials are shared."
+                  "description": "Preset outfit from rolePresets."
                 },
                 {
                   "name": "outfit",
                   "type": "Outfit",
                   "default": "rolePresets[role]",
-                  "description": "Mix pieces across roles: { head, face, torso, held, offhand }, each a piece id from outfitPieceIds or \"none\". Overrides the role preset. Held props keep their per-action poses."
+                  "description": "Mix pieces across roles. Overrides the preset."
                 },
                 {
                   "name": "animateOutfit",
                   "type": "boolean",
                   "default": "false",
-                  "description": "When the outfit changes, the agent hops with a small squash and each new piece drops into place. Off under reduced motion."
+                  "description": "Hops and drops pieces when the outfit changes."
                 },
                 {
                   "name": "action",
                   "type": "AgentAction",
                   "default": "\"idle\"",
-                  "description": "Clip to play. Changing it crossfades over 0.38 seconds."
+                  "description": "Clip to play. Crossfades over 0.38 seconds."
                 },
                 {
                   "name": "actionRef",
                   "type": "RefObject<AgentAction>",
-                  "description": "Drives the action from a ref that is read every frame, so switching never re-renders. Wins over action."
+                  "description": "Drives the action from a ref without re-rendering."
                 },
                 {
                   "name": "motion",
                   "type": "\"full\" | \"reduced\"",
                   "default": "prefers-reduced-motion",
-                  "description": "reduced holds each clip's key pose with no blink, breathing or loops."
+                  "description": "reduced holds each key pose."
                 },
                 {
                   "name": "shadow",
                   "type": "boolean",
                   "default": "true",
-                  "description": "Blob contact shadow under the feet. No shadow maps are used."
+                  "description": "Blob contact shadow."
                 },
                 {
                   "name": "position",
                   "type": "[number, number, number]",
                   "default": "[0, 0, 0]",
-                  "description": "Placement. Every React Three Fiber group prop except children is accepted, including rotation, scale and pointer handlers."
+                  "description": "Placement. Accepts group props."
                 }
               ]
             },
             {
               "component": "Outfit",
-              "description": "Typed outfit in outfit.ts: one piece id per slot. Each piece in accessories/registry.ts is an AccessoryKit that attaches meshes to anchors (head, face, torso, body, rightArm, leftArm), so a coat can bring its sleeves. The mapped types fail the build until every piece id has meshes.",
+              "description": "One piece id per slot.",
               "props": [
                 {
                   "name": "head",
                   "type": "\"none\" | \"yellow-hard-hat\" | \"white-hard-hat\" | \"safety-helmet\" | \"deerstalker\" | \"mortarboard\" | \"headset\" | \"goggles\"",
                   "required": true,
-                  "description": "Hats and helmets on top of the body."
+                  "description": "Hats and helmets."
                 },
                 {
                   "name": "face",
                   "type": "\"none\" | \"round-glasses\" | \"pixel-shades\" | \"teal-visor\"",
                   "required": true,
-                  "description": "Glasses and shades on the eye line."
+                  "description": "Glasses and shades."
                 },
                 {
                   "name": "torso",
                   "type": "\"none\" | \"safety-vest\" | \"tweed-vest\" | \"lab-coat\" | \"plaid-coat\" | \"knit-sweater\"",
                   "required": true,
-                  "description": "Coats and vests. Coats and the sweater add sleeves to both arms."
+                  "description": "Coats and vests."
                 },
                 {
                   "name": "held",
                   "type": "\"none\" | \"laptop\" | \"book\" | \"magnifier\" | \"tape-measure\" | \"pointer\" | \"pencil\"",
                   "required": true,
-                  "description": "Main prop: in the right hand, or in front of the body for the laptop and book."
+                  "description": "Main prop."
                 },
                 {
                   "name": "offhand",
                   "type": "\"none\" | \"clipboard\" | \"blueprint-roll\" | \"tablet\"",
                   "required": true,
-                  "description": "Prop in the mirrored left hand."
+                  "description": "Left-hand prop."
                 }
               ]
             }
@@ -985,7 +962,7 @@
                 "inspector",
                 "analyst"
               ],
-              "description": "Selects the preset outfit: headgear, coat, glasses and the props in each hand. Pass outfit to mix pieces."
+              "description": "Selects the preset outfit."
             },
             {
               "name": "action",
@@ -1004,66 +981,47 @@
                 "measure",
                 "check"
               ],
-              "description": "Selects the clip. Held props re-aim with it, so the builder stows the laptop while carrying and walking."
+              "description": "Selects the clip."
             },
             {
               "name": "motion",
               "default": "prefers-reduced-motion",
               "options": ["full", "reduced"],
-              "description": "full plays the clips. reduced holds the key pose."
+              "description": "Full plays clips. Reduced holds the key pose."
             }
           ],
           "examples": [
             {
               "title": "Agent in your own Canvas",
-              "description": "Any React Three Fiber canvas works. The agent stands on y = 0, so lower it to centre it under the camera.",
               "file": "registry/ivan/examples/agent/basic.tsx"
             },
             {
               "title": "Switch actions without re-rendering",
-              "description": "Write to actionRef from event handlers. The rig reads it every frame and crossfades.",
               "file": "registry/ivan/examples/agent/action-ref.tsx"
             },
             {
               "title": "Mix an outfit",
-              "description": "Spread a role preset and swap single pieces. animateOutfit hops the agent and drops each new piece in.",
               "file": "registry/ivan/examples/agent/outfit.tsx"
             }
           ],
           "accessibility": [
-            "The mascot is decorative. Wrap the Canvas in an element with role=img and a label, or mark it aria-hidden.",
-            "Put anything the agent communicates in text next to the canvas.",
-            "motion=reduced, or the prefers-reduced-motion query when motion is omitted, holds each action's key pose. No blink, breathing, bobbing or loops.",
-            "The agent adds no focusable elements and never captures focus. Pointer handlers pass through to the group."
+            "The mascot is decorative. Label the Canvas wrapper or mark it aria-hidden.",
+            "Reduced motion holds each key pose."
           ],
           "animation": [
             {
               "target": "Action clip",
               "properties": "Arm, leg, body and eye transforms",
-              "timing": "One useFrame per agent. 0.38 second smoothstep crossfade between clips.",
+              "timing": "0.38 second crossfade",
               "trigger": "action or actionRef changes",
-              "reducedMotion": "Holds the clip's key pose."
-            },
-            {
-              "target": "Blink",
-              "properties": "Eye scale",
-              "timing": "0.13 seconds every 3.4 to 5.6 seconds, offset per agent.",
-              "trigger": "Always",
-              "reducedMotion": "No blink."
-            },
-            {
-              "target": "Held props",
-              "properties": "Prop position, rotation, visibility",
-              "timing": "Exponential settle at rate 9.",
-              "trigger": "Action changes",
-              "reducedMotion": "Snap to the pose."
+              "reducedMotion": "Key pose."
             },
             {
               "target": "Outfit change",
-              "properties": "Agent hop and squash, new piece position and scale",
-              "timing": "0.34 second hop. Each new piece falls 0.5 units over 0.46 seconds with an ease-out-back overshoot.",
-              "trigger": "outfit changes while animateOutfit is set",
-              "reducedMotion": "Pieces swap in place with no hop."
+              "properties": "Hop, squash and drop",
+              "timing": "0.34 second hop, 0.46 second drop",
+              "trigger": "outfit changes",
+              "reducedMotion": "Pieces swap in place."
             }
           ]
         }
@@ -1073,7 +1031,7 @@
       "name": "agent-stage",
       "type": "registry:block",
       "title": "Agent Stage",
-      "description": "Ready canvas for one agent: warm key light, room reflections, contact shadow, auto framing, paused offscreen, poster fallback.",
+      "description": "Ready canvas for one agent.",
       "categories": ["characters", "three"],
       "dependencies": [
         "three@^0.186.1",
@@ -1116,55 +1074,55 @@
                   "name": "role",
                   "type": "AgentRole",
                   "required": true,
-                  "description": "Which accessory kit the agent wears."
+                  "description": "Accessory kit."
                 },
                 {
                   "name": "action",
                   "type": "AgentAction",
                   "default": "the role's signature action",
-                  "description": "Clip to play. debugger inspects, builder types, architect measures."
+                  "description": "Clip to play."
                 },
                 {
                   "name": "motion",
                   "type": "\"full\" | \"reduced\"",
                   "default": "prefers-reduced-motion",
-                  "description": "reduced holds the key pose and renders only when something changes."
+                  "description": "reduced holds the key pose."
                 },
                 {
                   "name": "shadow",
                   "type": "boolean",
                   "default": "true",
-                  "description": "Blob contact shadow under the feet."
+                  "description": "Blob contact shadow."
                 },
                 {
                   "name": "label",
                   "type": "string",
                   "default": "\"{Role} agent\"",
-                  "description": "Accessible name of the figure that wraps the Canvas."
+                  "description": "Accessible name of the figure."
                 },
                 {
                   "name": "fallback",
                   "type": "ReactNode",
                   "default": "<AgentPoster />",
-                  "description": "Shown when WebGL is unavailable."
+                  "description": "Shown without WebGL."
                 },
                 {
                   "name": "className",
                   "type": "string",
                   "default": "\"relative aspect-4/3 w-full\"",
-                  "description": "Merged with the base. Give the stage a size."
+                  "description": "Give the stage a size."
                 }
               ]
             },
             {
               "component": "AgentStageScene",
-              "description": "Camera, lights and agent without the Canvas. Mount it inside your own Canvas or a drei View when a page needs several stages.",
+              "description": "Camera, lights and agent without the Canvas.",
               "props": [
                 {
                   "name": "role",
                   "type": "AgentRole",
                   "required": true,
-                  "description": "Which accessory kit the agent wears."
+                  "description": "Accessory kit."
                 },
                 {
                   "name": "action",
@@ -1187,7 +1145,7 @@
             },
             {
               "component": "AgentPoster",
-              "description": "Static SVG of the role, used as the WebGL fallback and for thumbnails.",
+              "description": "Static SVG of the role, used as the WebGL fallback.",
               "props": [
                 {
                   "name": "role",
@@ -1198,7 +1156,7 @@
                 {
                   "name": "label",
                   "type": "string",
-                  "description": "Makes the poster an img with this name. Omit it to hide the poster from assistive tech."
+                  "description": "Names the poster as an img."
                 },
                 {
                   "name": "className",
@@ -1221,7 +1179,7 @@
                 "inspector",
                 "analyst"
               ],
-              "description": "Selects the accessory kit. Framing and lights are shared."
+              "description": "Selects the accessory kit."
             },
             {
               "name": "action",
@@ -1240,41 +1198,37 @@
                 "measure",
                 "check"
               ],
-              "description": "Selects the clip. Omit it to play the role's signature action."
+              "description": "Clip to play. Defaults to the signature action."
             }
           ],
           "examples": [
             {
               "title": "One agent, one line",
-              "description": "The stage frames the agent for any width and height.",
               "file": "registry/ivan/examples/agent-stage/basic.tsx"
             },
             {
               "title": "Switch role with typed props",
-              "description": "agentRoles is a const tuple, so the buttons and the prop type cannot drift.",
               "file": "registry/ivan/examples/agent-stage/role-picker.tsx"
             }
           ],
           "accessibility": [
-            "The stage is a figure with an accessible name. Override it with label.",
-            "The Canvas is decorative. Put anything the agent communicates in text beside it.",
-            "Without WebGL the poster replaces the Canvas. A custom fallback should keep the same name.",
+            "A figure with an accessible name. Override it with label.",
             "Reduced motion holds the key pose and stops continuous rendering."
           ],
           "animation": [
             {
               "target": "Render loop",
               "properties": "Canvas frameloop",
-              "timing": "always while visible, demand with reduced motion, never offscreen.",
-              "trigger": "IntersectionObserver with a 10 percent margin",
-              "reducedMotion": "Renders one frame per change."
+              "timing": "Always while visible, never offscreen",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One frame per change."
             },
             {
               "target": "Agent clips and focus",
-              "properties": "Arm, leg, body and eye transforms",
-              "timing": "0.38 second crossfade. 0.42 second hop on focus.",
-              "trigger": "action changes or the pointer enters the stage",
-              "reducedMotion": "Holds the key pose. No hop."
+              "properties": "Body transforms",
+              "timing": "0.38 second crossfade, 0.42 second hop",
+              "trigger": "action changes or pointer enters",
+              "reducedMotion": "Key pose. No hop."
             }
           ]
         }

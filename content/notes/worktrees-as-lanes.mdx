@@ -2,13 +2,12 @@ export const meta = {
   kind: "note",
   title: "Worktrees as lanes: how I run parallel agents in Conductor",
   date: "2026-10-09",
-  summary:
-    "Two agents in one checkout collide. A git worktree gives each agent its own lane.",
+  summary: "A git worktree gives each agent its own lane.",
   tags: ["Conductor", "Git worktrees", "AI agents", "Workflow"],
   sample: true,
 };
 
-Two agents in one checkout will edit the same file, or fight over the branch, the dev server port and `node_modules`. A git worktree gives each agent its own directory. I call each one a lane.
+Two agents in one checkout will edit the same file or fight over the branch and the dev server port. A git worktree gives each agent its own directory. I call each one a lane.
 
 <Callout tone="sample" title="Sample draft">
   Editable placeholder. No measured results.
@@ -16,7 +15,7 @@ Two agents in one checkout will edit the same file, or fight over the branch, th
 
 ## What a lane is
 
-A worktree is a second working directory on the same repository, with its own branch, files and untracked state. Conductor creates one per workspace, so a lane is one branch, one agent and one diff to review.
+One branch, one agent and one diff to review.
 
 <Diagram
   caption="Every lane has its own files and branch. The repository underneath is shared."
@@ -119,16 +118,14 @@ A worktree is a second working directory on the same repository, with its own br
   </svg>
 </Diagram>
 
-## What is isolated and what is shared
+## Isolated and shared
 
-| Thing | Scope | What it means |
-| --- | --- | --- |
-| Working files | Per lane | No overwriting another lane |
-| Checked-out branch | Per lane | One worktree per branch |
-| `node_modules` and build output | Per lane | Install in every new lane |
-| Dev server port | Per lane, if you choose it | Two servers on one port fail |
-| Git objects and remotes | Shared | A fetch shows in all lanes |
-| Stash stack | Shared | See the warning below |
+| Thing                           | Scope    |
+| ------------------------------- | -------- |
+| Working files and branch        | Per lane |
+| `node_modules` and build output | Per lane |
+| Git objects and remotes         | Shared   |
+| Stash stack                     | Shared   |
 
 <Callout tone="warning" title="The stash is shared">
   A bare `git stash pop` can apply another lane's work. Commit a
@@ -137,15 +134,6 @@ A worktree is a second working directory on the same repository, with its own br
 
 ## Setting up a lane
 
-<Steps>
-  <Step title="Create the worktree">Branch from the remote default.</Step>
-  <Step title="Install and pick a port">
-    A new lane has no `node_modules`. Give its dev server its own port.
-  </Step>
-  <Step title="Write the brief">Goal, files in scope, how to verify.</Step>
-  <Step title="Review the diff">Not delegated.</Step>
-</Steps>
-
 ```bash title="new-lane.sh"
 git worktree add ../lane-hero -b lane/hero origin/main
 cd ../lane-hero
@@ -153,24 +141,4 @@ bun install
 bun dev --port 3105
 ```
 
-## Cut lanes along files, not features
-
-Two lanes that edit the same layout file conflict at merge time, however clean the worktrees are. Before I fan out, I list the files each lane owns. Shared files get one owner.
-
-```txt
-lane/hero   app/page.tsx, components/hero/**
-lane/nav    components/site/**
-owner       app/layout.tsx, app/globals.css
-```
-
-## Merge and clean up
-
-Merge one lane at a time and run the checks after each. Then remove the lane.
-
-```bash title="finish-lane.sh"
-git worktree list
-git worktree remove ../lane-hero
-git branch -d lane/hero
-```
-
-Worktrees isolate files, not decisions. Reading the diff is the part I keep.
+Cut lanes along files, not features. Shared files get one owner.

@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "agent",
   "title": "Agent",
-  "description": "Procedural 3D mascot for React Three Fiber. Seven role presets, mixable outfit pieces, twelve typed actions, held props and reduced motion.",
+  "description": "Procedural 3D mascot for React Three Fiber.",
   "dependencies": [
     "three@^0.186.1",
     "@react-three/fiber@^9.8.1"
@@ -168,90 +168,90 @@
       "props": [
         {
           "component": "Agent",
-          "description": "A group of meshes. Render it inside a React Three Fiber Canvas with lights. It stands on y = 0 and is about 2.4 units tall with its headgear.",
+          "description": "A group of meshes. Render it inside a Canvas with lights.",
           "props": [
             {
               "name": "role",
               "type": "\"orchestrator\" | \"architect\" | \"researcher\" | \"builder\" | \"debugger\" | \"inspector\" | \"analyst\"",
               "required": true,
-              "description": "Which preset outfit the mascot wears, from rolePresets in outfit.ts. The rig, clips and materials are shared."
+              "description": "Preset outfit from rolePresets."
             },
             {
               "name": "outfit",
               "type": "Outfit",
               "default": "rolePresets[role]",
-              "description": "Mix pieces across roles: { head, face, torso, held, offhand }, each a piece id from outfitPieceIds or \"none\". Overrides the role preset. Held props keep their per-action poses."
+              "description": "Mix pieces across roles. Overrides the preset."
             },
             {
               "name": "animateOutfit",
               "type": "boolean",
               "default": "false",
-              "description": "When the outfit changes, the agent hops with a small squash and each new piece drops into place. Off under reduced motion."
+              "description": "Hops and drops pieces when the outfit changes."
             },
             {
               "name": "action",
               "type": "AgentAction",
               "default": "\"idle\"",
-              "description": "Clip to play. Changing it crossfades over 0.38 seconds."
+              "description": "Clip to play. Crossfades over 0.38 seconds."
             },
             {
               "name": "actionRef",
               "type": "RefObject<AgentAction>",
-              "description": "Drives the action from a ref that is read every frame, so switching never re-renders. Wins over action."
+              "description": "Drives the action from a ref without re-rendering."
             },
             {
               "name": "motion",
               "type": "\"full\" | \"reduced\"",
               "default": "prefers-reduced-motion",
-              "description": "reduced holds each clip's key pose with no blink, breathing or loops."
+              "description": "reduced holds each key pose."
             },
             {
               "name": "shadow",
               "type": "boolean",
               "default": "true",
-              "description": "Blob contact shadow under the feet. No shadow maps are used."
+              "description": "Blob contact shadow."
             },
             {
               "name": "position",
               "type": "[number, number, number]",
               "default": "[0, 0, 0]",
-              "description": "Placement. Every React Three Fiber group prop except children is accepted, including rotation, scale and pointer handlers."
+              "description": "Placement. Accepts group props."
             }
           ]
         },
         {
           "component": "Outfit",
-          "description": "Typed outfit in outfit.ts: one piece id per slot. Each piece in accessories/registry.ts is an AccessoryKit that attaches meshes to anchors (head, face, torso, body, rightArm, leftArm), so a coat can bring its sleeves. The mapped types fail the build until every piece id has meshes.",
+          "description": "One piece id per slot.",
           "props": [
             {
               "name": "head",
               "type": "\"none\" | \"yellow-hard-hat\" | \"white-hard-hat\" | \"safety-helmet\" | \"deerstalker\" | \"mortarboard\" | \"headset\" | \"goggles\"",
               "required": true,
-              "description": "Hats and helmets on top of the body."
+              "description": "Hats and helmets."
             },
             {
               "name": "face",
               "type": "\"none\" | \"round-glasses\" | \"pixel-shades\" | \"teal-visor\"",
               "required": true,
-              "description": "Glasses and shades on the eye line."
+              "description": "Glasses and shades."
             },
             {
               "name": "torso",
               "type": "\"none\" | \"safety-vest\" | \"tweed-vest\" | \"lab-coat\" | \"plaid-coat\" | \"knit-sweater\"",
               "required": true,
-              "description": "Coats and vests. Coats and the sweater add sleeves to both arms."
+              "description": "Coats and vests."
             },
             {
               "name": "held",
               "type": "\"none\" | \"laptop\" | \"book\" | \"magnifier\" | \"tape-measure\" | \"pointer\" | \"pencil\"",
               "required": true,
-              "description": "Main prop: in the right hand, or in front of the body for the laptop and book."
+              "description": "Main prop."
             },
             {
               "name": "offhand",
               "type": "\"none\" | \"clipboard\" | \"blueprint-roll\" | \"tablet\"",
               "required": true,
-              "description": "Prop in the mirrored left hand."
+              "description": "Left-hand prop."
             }
           ]
         }
@@ -269,7 +269,7 @@
             "inspector",
             "analyst"
           ],
-          "description": "Selects the preset outfit: headgear, coat, glasses and the props in each hand. Pass outfit to mix pieces."
+          "description": "Selects the preset outfit."
         },
         {
           "name": "action",
@@ -288,7 +288,7 @@
             "measure",
             "check"
           ],
-          "description": "Selects the clip. Held props re-aim with it, so the builder stows the laptop while carrying and walking."
+          "description": "Selects the clip."
         },
         {
           "name": "motion",
@@ -297,60 +297,41 @@
             "full",
             "reduced"
           ],
-          "description": "full plays the clips. reduced holds the key pose."
+          "description": "Full plays clips. Reduced holds the key pose."
         }
       ],
       "examples": [
         {
           "title": "Agent in your own Canvas",
-          "description": "Any React Three Fiber canvas works. The agent stands on y = 0, so lower it to centre it under the camera.",
           "file": "registry/ivan/examples/agent/basic.tsx"
         },
         {
           "title": "Switch actions without re-rendering",
-          "description": "Write to actionRef from event handlers. The rig reads it every frame and crossfades.",
           "file": "registry/ivan/examples/agent/action-ref.tsx"
         },
         {
           "title": "Mix an outfit",
-          "description": "Spread a role preset and swap single pieces. animateOutfit hops the agent and drops each new piece in.",
           "file": "registry/ivan/examples/agent/outfit.tsx"
         }
       ],
       "accessibility": [
-        "The mascot is decorative. Wrap the Canvas in an element with role=img and a label, or mark it aria-hidden.",
-        "Put anything the agent communicates in text next to the canvas.",
-        "motion=reduced, or the prefers-reduced-motion query when motion is omitted, holds each action's key pose. No blink, breathing, bobbing or loops.",
-        "The agent adds no focusable elements and never captures focus. Pointer handlers pass through to the group."
+        "The mascot is decorative. Label the Canvas wrapper or mark it aria-hidden.",
+        "Reduced motion holds each key pose."
       ],
       "animation": [
         {
           "target": "Action clip",
           "properties": "Arm, leg, body and eye transforms",
-          "timing": "One useFrame per agent. 0.38 second smoothstep crossfade between clips.",
+          "timing": "0.38 second crossfade",
           "trigger": "action or actionRef changes",
-          "reducedMotion": "Holds the clip's key pose."
-        },
-        {
-          "target": "Blink",
-          "properties": "Eye scale",
-          "timing": "0.13 seconds every 3.4 to 5.6 seconds, offset per agent.",
-          "trigger": "Always",
-          "reducedMotion": "No blink."
-        },
-        {
-          "target": "Held props",
-          "properties": "Prop position, rotation, visibility",
-          "timing": "Exponential settle at rate 9.",
-          "trigger": "Action changes",
-          "reducedMotion": "Snap to the pose."
+          "reducedMotion": "Key pose."
         },
         {
           "target": "Outfit change",
-          "properties": "Agent hop and squash, new piece position and scale",
-          "timing": "0.34 second hop. Each new piece falls 0.5 units over 0.46 seconds with an ease-out-back overshoot.",
-          "trigger": "outfit changes while animateOutfit is set",
-          "reducedMotion": "Pieces swap in place with no hop."
+          "properties": "Hop, squash and drop",
+          "timing": "0.34 second hop, 0.46 second drop",
+          "trigger": "outfit changes",
+          "reducedMotion": "Pieces swap in place."
         }
       ]
     }

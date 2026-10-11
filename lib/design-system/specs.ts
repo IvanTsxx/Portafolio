@@ -41,55 +41,55 @@ export const colorSpecs: readonly ColorSpec[] = [
     group: "surface",
     name: "paper-deep",
     prefix: "bg",
-    role: "Recessed fill, hover rows, active cells",
+    role: "Recessed fill and hover rows",
   },
   {
     group: "ink",
     name: "ink",
     prefix: "text",
-    role: "Primary text, solid fills, focus ring, strong borders",
+    role: "Primary text and fills",
   },
   {
     group: "ink",
     name: "graphite",
     prefix: "text",
-    role: "Secondary text, outline borders, selected fills",
+    role: "Secondary text",
   },
   {
     group: "ink",
     name: "mist",
     prefix: "text",
-    role: "Indices, captions, tertiary labels",
+    role: "Indices and captions",
   },
   {
     group: "ink",
     name: "faint",
     prefix: "text",
-    role: "Alias of mist for muted marks",
+    role: "Alias of mist",
   },
   {
     group: "rule",
     name: "rule",
     prefix: "border",
-    role: "Hairlines between cells and rows",
+    role: "Hairlines",
   },
   {
     group: "rule",
     name: "rule-strong",
     prefix: "border",
-    role: "Panel heading underline, dashed frames, leaders",
+    role: "Heading rules and leaders",
   },
   {
     group: "agent",
     name: "clay",
     prefix: "bg",
-    role: "Reserved for the 3D agents and their status marks",
+    role: "3D agents only",
   },
   {
     group: "agent",
     name: "clay-deep",
     prefix: "bg",
-    role: "Agent shade: legs, arms, deep surfaces",
+    role: "Agent shade",
   },
   {
     group: "signal",
@@ -145,7 +145,7 @@ export const colorSpecs: readonly ColorSpec[] = [
     group: "semantic",
     name: "popover",
     prefix: "bg",
-    role: "Raised surface: popovers, callouts, previews",
+    role: "Raised surface",
   },
   {
     group: "semantic",
@@ -264,23 +264,23 @@ export interface EasingSpec {
 export const easingSpecs = [
   {
     name: "mechanical",
-    use: "State flips: hover, press, focus, ink swap. Pairs with 100ms.",
+    use: "State flips. Pairs with 100ms.",
   },
   {
     name: "out-quart",
-    use: "Fades and arrow nudges that settle softly. 150 to 500ms.",
+    use: "Fades and nudges. 150 to 500ms.",
   },
   {
     name: "out-quint",
-    use: "Reveals and underline draws. Pairs with 300ms.",
+    use: "Reveals. Pairs with 300ms.",
   },
   {
     name: "out-expo",
-    use: "Scale and magnetic settles with a long tail. Pairs with 500ms.",
+    use: "Scale settles. Pairs with 500ms.",
   },
   {
     name: "in-out-quart",
-    use: "Reserved for on-screen moves that start and stop.",
+    use: "On-screen moves.",
   },
 ] as const satisfies readonly EasingSpec[];
 
@@ -300,42 +300,42 @@ export const durationSpecs = [
     ease: "mechanical",
     ms: 100,
     name: "instant",
-    use: "Hover, focus, press, ink swaps",
+    use: "Hover, focus, press",
   },
   {
     className: "duration-150",
     ease: "out-quart",
     ms: 150,
     name: "quick",
-    use: "Covers, overlays, cell highlights",
+    use: "Overlays",
   },
   {
     className: "duration-200",
     ease: "out-quart",
     ms: 200,
     name: "short",
-    use: "Icon nudges, small translates",
+    use: "Icon nudges",
   },
   {
     className: "duration-300",
     ease: "out-quint",
     ms: 300,
     name: "base",
-    use: "Reveals, fade and slide, row arrows",
+    use: "Reveals",
   },
   {
     className: "duration-500",
     ease: "out-expo",
     ms: 500,
     name: "slow",
-    use: "Image fades, scale settles",
+    use: "Image fades",
   },
   {
     className: "duration-700",
     ease: "mechanical",
     ms: 700,
     name: "scan",
-    use: "Portrait scan and clip reveals",
+    use: "Portrait scan",
   },
 ] as const satisfies readonly DurationSpec[];
 
@@ -354,7 +354,7 @@ export const fontFamilySpecs = [
     className: "font-sans",
     cssVar: "--font-sans",
     name: "Zen Kaku Gothic New",
-    role: "Body and display. Light for big names.",
+    role: "Body and display",
     sample: "Agent Workshop",
     sourceVar: "--font-zen-kaku",
     weights: "300 400 500 700",
@@ -363,7 +363,7 @@ export const fontFamilySpecs = [
     className: "font-mono",
     cssVar: "--font-mono",
     name: "Geist Mono",
-    role: "Labels, numerals, code",
+    role: "Labels and numerals",
     sample: "[ DS-03 ] 0123",
     sourceVar: "--font-geist-mono",
     weights: "Variable",
@@ -372,7 +372,7 @@ export const fontFamilySpecs = [
     className: "font-jp",
     cssVar: "--font-jp",
     name: "Noto Sans JP",
-    role: "Japanese annotations beside section labels",
+    role: "Japanese annotations",
     sample: "日本語の注釈",
     sourceVar: "--font-noto-jp",
     weights: "300 400 500",
@@ -402,31 +402,31 @@ export const typeScaleSpecs = [
     className: "display text-9xl",
     sample: "Ivo",
     size: "128",
-    use: "Hero title, xl and up",
+    use: "Hero, xl",
   },
   {
     className: "display text-8xl",
     sample: "Ivo",
     size: "96",
-    use: "Hero title, md",
+    use: "Hero, md",
   },
   {
     className: "display text-7xl",
     sample: "Ivo",
     size: "72",
-    use: "Hero title, sm. Detail page title, md",
+    use: "Hero, sm",
   },
   {
     className: "display text-6xl",
     sample: "Ivo",
     size: "60",
-    use: "Hero title, base",
+    use: "Hero, base",
   },
   {
     className: "display text-5xl",
     sample: "Ivo",
     size: "48",
-    use: "Detail page title, base",
+    use: "Detail title",
   },
   {
     className: "font-mono text-3xl font-light tracking-tight tabular-nums",
@@ -438,13 +438,13 @@ export const typeScaleSpecs = [
     className: "text-3xl leading-tight font-light tracking-tight",
     sample: "Name plate",
     size: "30",
-    use: "Dossier name",
+    use: "Name plate",
   },
   {
     className: "text-xl leading-tight font-light tracking-tight",
     sample: "Card title",
     size: "20",
-    use: "Cell and card titles",
+    use: "Card titles",
   },
   {
     className: "text-base",
@@ -456,13 +456,13 @@ export const typeScaleSpecs = [
     className: "text-graphite text-sm leading-relaxed",
     sample: "Secondary copy in graphite.",
     size: "14",
-    use: "Summaries, notes",
+    use: "Summaries",
   },
   {
     className: "label",
     sample: "Label 10px tracked",
     size: "10",
-    use: "Every annotation, heading, button and chip",
+    use: "Annotations and buttons",
   },
 ] as const satisfies readonly TypeStepSpec[];
 
@@ -476,59 +476,59 @@ export interface UtilitySpec {
 export const utilitySpecs = [
   {
     name: "label",
-    summary: "Geist Mono, 10px, tracked caps. Annotations, headings, chips.",
+    summary: "Geist Mono, 10px, tracked caps.",
     usage: '<span className="label text-mist">Doc</span>',
   },
   {
     name: "display",
-    summary: "Zen Kaku light, tight tracking, 0.88 leading, balanced.",
+    summary: "Zen Kaku light, 0.88 leading.",
     usage: '<h1 className="display text-ink text-8xl">Title</h1>',
   },
   {
     name: "jp",
-    summary: "Noto Sans JP, normal tracking, no case transform.",
+    summary: "Noto Sans JP, normal tracking.",
     usage: '<span className="jp text-graphite">哲学</span>',
   },
   {
     name: "hatch",
-    summary: "Diagonal hairline fill in rule color.",
+    summary: "Diagonal hairline fill.",
     usage: '<div className="hatch border border-dashed" />',
   },
   {
     name: "hazard-stripe",
-    summary: "Diagonal stripes in the current text color.",
+    summary: "Diagonal stripes.",
     usage: '<span className="hazard-stripe text-ink block h-1.5 w-24" />',
   },
   {
     name: "blueprint-grid",
-    summary: "Square hairline grid. Cell size is a CSS variable.",
+    summary: "Square hairline grid.",
     usage: '<div className="blueprint-grid [--grid-size:24px]" />',
     variable: "--grid-size",
   },
   {
     name: "blueprint-dots",
-    summary: "Dot grid in rule color. Spacing is a CSS variable.",
+    summary: "Dot grid.",
     usage: '<div className="blueprint-dots [--grid-size:16px]" />',
     variable: "--grid-size",
   },
   {
     name: "grain",
-    summary: "Paper noise tile from the --grain data URL.",
+    summary: "Paper noise tile.",
     usage: '<div className="grain bg-paper-deep" />',
   },
   {
     name: "hairline",
-    summary: "Border color set to the rule token.",
+    summary: "Border in the rule color.",
     usage: '<div className="hairline border" />',
   },
   {
     name: "min-h-below-header",
-    summary: "Minimum height of the viewport minus the 48px header.",
+    summary: "Viewport minus the 48px header, minimum.",
     usage: '<section className="min-h-below-header" />',
   },
   {
     name: "h-below-header",
-    summary: "Height of the viewport minus the 48px header.",
+    summary: "Viewport minus the 48px header.",
     usage: '<section className="h-below-header" />',
   },
 ] as const satisfies readonly UtilitySpec[];
@@ -542,16 +542,16 @@ export interface SpacingStepSpec {
 }
 
 export const spacingSpecs = [
-  { px: 4, step: "1", use: "Hairline gaps, icon nudges" },
-  { px: 8, step: "2", use: "Chip gaps, label to value" },
-  { px: 12, step: "3", use: "Inner stacks, hit-area growth" },
-  { px: 16, step: "4", use: "Cell padding, page gutter" },
-  { px: 20, step: "5", use: "Cell padding from md" },
-  { px: 24, step: "6", use: "Panel stack, column gutter" },
-  { px: 32, step: "8", use: "Page gutter from md" },
-  { px: 44, step: "11", use: "Minimum touch target" },
-  { px: 64, step: "16", use: "Gap between sections" },
-  { px: 96, step: "24", use: "Page bottom padding" },
+  { px: 4, step: "1", use: "Hairline gaps" },
+  { px: 8, step: "2", use: "Chip gaps" },
+  { px: 12, step: "3", use: "Inner stacks" },
+  { px: 16, step: "4", use: "Cell padding" },
+  { px: 20, step: "5", use: "Cell padding, md" },
+  { px: 24, step: "6", use: "Panel stack" },
+  { px: 32, step: "8", use: "Page gutter, md" },
+  { px: 44, step: "11", use: "Touch target" },
+  { px: 64, step: "16", use: "Between sections" },
+  { px: 96, step: "24", use: "Page bottom" },
 ] as const satisfies readonly SpacingStepSpec[];
 
 export const radiusStepNames = ["sm", "md", "lg", "xl", "2xl"] as const;
@@ -566,22 +566,22 @@ export interface BreakpointSpec {
 
 export const breakpointSpecs = [
   {
-    changes: "Companion walks between waypoints. Below it sits small and swaps",
+    changes: "Companion walks between waypoints",
     name: "sm",
     px: 640,
   },
   {
-    changes: "Page gutter 16 to 32. Chip targets shrink from 44 to 32",
+    changes: "Gutter 16 to 32",
     name: "md",
     px: 768,
   },
   {
-    changes: "12-column grid, sticky dossier",
+    changes: "12-column grid, dossier column",
     name: "lg",
     px: 1024,
   },
-  { changes: "Largest hero title", name: "xl", px: 1280 },
-  { changes: "Container stops growing at 1536", name: "2xl", px: 1536 },
+  { changes: "Largest title", name: "xl", px: 1280 },
+  { changes: "Container stops at 1536", name: "2xl", px: 1536 },
 ] as const satisfies readonly BreakpointSpec[];
 
 export const documentGridSpec = {

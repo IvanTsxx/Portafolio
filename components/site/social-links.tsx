@@ -14,19 +14,19 @@ import { siteConfig } from "@/lib/site/config";
 import type { Social, SocialId } from "@/lib/site/config";
 import { cn } from "@/lib/utils";
 
-const socialMarks = {
-  email: { Icon: EnvelopeSimpleIcon, jp: "連絡" },
-  github: { Icon: GithubLogoIcon, jp: "開発" },
-  linkedin: { Icon: LinkedinLogoIcon, jp: "経歴" },
-  x: { Icon: XLogoIcon, jp: "発信" },
-} as const satisfies Record<SocialId, { Icon: Icon; jp: string }>;
+const socialIcons = {
+  email: EnvelopeSimpleIcon,
+  github: GithubLogoIcon,
+  linkedin: LinkedinLogoIcon,
+  x: XLogoIcon,
+} as const satisfies Record<SocialId, Icon>;
 
 const socialListVariants = cva("", {
   defaultVariants: { variant: "inline" },
   variants: {
     variant: {
       contact: "flex flex-wrap gap-x-8 gap-y-2",
-      dossier: "border-rule flex flex-col border-t",
+      dossier: "border-rule grid grid-cols-2 border-t",
       footer: "grid grid-cols-2 gap-x-6",
       inline: "flex flex-wrap gap-x-6 gap-y-2",
     },
@@ -58,7 +58,7 @@ const iconFrameVariants = cva(
     variants: {
       variant: {
         contact: "size-5",
-        dossier: "size-8",
+        dossier: "size-5",
         footer: "size-5",
         inline: "size-5",
       },
@@ -79,8 +79,7 @@ const SocialLink = ({
   social: Social;
   variant: SocialVariant;
 }) => {
-  const { Icon, jp } = socialMarks[social.id];
-  const showsHandle = variant === "dossier";
+  const Icon = socialIcons[social.id];
   return (
     <a
       className={socialLinkVariants({ variant })}
@@ -92,20 +91,7 @@ const SocialLink = ({
         <Icon className="size-4" weight="light" />
       </span>
       <span className="shrink-0">{social.label}</span>
-      {showsHandle ? (
-        <>
-          <span aria-hidden className="jp text-mist shrink-0">
-            {jp}
-          </span>
-          <span
-            aria-hidden
-            className="border-rule-strong mt-2 h-px min-w-4 flex-1 self-center border-b border-dotted"
-          />
-          <span className="min-w-0 truncate normal-case">{social.handle}</span>
-        </>
-      ) : (
-        <span className="sr-only">{social.handle}</span>
-      )}
+      <span className="sr-only">{social.handle}</span>
       <ArrowUpRightIcon
         aria-hidden
         className={cn(

@@ -6,6 +6,7 @@ Ivo's portfolio (Ivan Bongiovanni; the surname appears once, in the dossier). Th
 
 - Basement Studio may appear only as Ivo's employer: company name, role, dates, type, link, the `@basementstudio` company field, the `basementstudio` org badge and his avatar. Never show Basement code, projects, repos, clients or the kind of companies they work with. `lib/github/privacy.ts` drops anything matching `basement` (case-insensitive) outside those affiliation fields.
 - Less text. Let animation and 3D carry the story. Labels and short lines, not paragraphs.
+- The dossier is compact, never scrolls on its own and sticks only when it fits the viewport. Index pages (`app/(document)`) carry it. Detail pages (`app/(detail)`: `/registry/[slug]`, `/lab/[slug]`, `/notes/[slug]`) render without it, so the surname appears nowhere on them.
 - How I work and stack copy come from `lib/site/practice.ts` (Ivo's own words). Identity from `lib/site/config.ts`.
 - Never invent clients, metrics or achievements. Placeholder content is labeled sample.
 

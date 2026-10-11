@@ -84,54 +84,6 @@ export const PropsTables = ({
   </div>
 );
 
-export const VariantsTable = ({
-  variants,
-}: {
-  variants: RegistryItemDocs["variants"];
-}) => (
-  <Frame>
-    <Table>
-      <TableHeader>
-        <TableRow className="hover:bg-transparent">
-          <TableHead className={headCellClassName}>Variant</TableHead>
-          <TableHead className={headCellClassName}>Options</TableHead>
-          <TableHead className={headCellClassName}>Default</TableHead>
-          <TableHead className={headCellClassName}>Behavior</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {variants.map((variant) => (
-          <TableRow key={variant.name}>
-            <TableCell className={cellClassName}>
-              <Mono>{variant.name}</Mono>
-            </TableCell>
-            <TableCell className={`${cellClassName} min-w-48`}>
-              <ul className="flex flex-wrap gap-1">
-                {variant.options.map((option) => (
-                  <li
-                    className="border-rule-strong text-graphite border px-1.5 py-0.5 font-mono text-xs"
-                    key={option}
-                  >
-                    {option}
-                  </li>
-                ))}
-              </ul>
-            </TableCell>
-            <TableCell className={cellClassName}>
-              <Mono>{variant.default}</Mono>
-            </TableCell>
-            <TableCell
-              className={`${cellClassName} text-graphite min-w-64 text-sm text-pretty`}
-            >
-              {variant.description}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </Frame>
-);
-
 export const AnimationTable = ({
   animations,
 }: {
@@ -142,9 +94,7 @@ export const AnimationTable = ({
       <TableHeader>
         <TableRow className="hover:bg-transparent">
           <TableHead className={headCellClassName}>Target</TableHead>
-          <TableHead className={headCellClassName}>Properties</TableHead>
           <TableHead className={headCellClassName}>Timing</TableHead>
-          <TableHead className={headCellClassName}>Trigger</TableHead>
           <TableHead className={headCellClassName}>Reduced motion</TableHead>
         </TableRow>
       </TableHeader>
@@ -154,12 +104,7 @@ export const AnimationTable = ({
             <TableCell className={`${cellClassName} text-ink text-sm`}>
               {animation.target}
             </TableCell>
-            {[
-              animation.properties,
-              animation.timing,
-              animation.trigger,
-              animation.reducedMotion,
-            ].map((value) => (
+            {[animation.timing, animation.reducedMotion].map((value) => (
               <TableCell
                 className={`${cellClassName} text-graphite min-w-48 text-sm text-pretty`}
                 key={value}

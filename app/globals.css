@@ -4,6 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 @custom-variant pointer-fine (@media (hover: hover) and (pointer: fine));
+@custom-variant dossier-fits (@media (min-height: 40rem));
 
 @theme inline {
   --color-background: var(--background);

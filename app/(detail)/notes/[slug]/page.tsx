@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 
 import {
   AdjacentLink,
+  CaseStudyLinks,
   CaseStudySections,
 } from "@/components/content/note-detail";
 import { NoteJsonLd } from "@/components/content/note-json-ld";
 import { NoteRow } from "@/components/content/note-row";
 import { SampleBadge } from "@/components/content/sample-badge";
-import { NotePanels } from "@/components/page-panels/note";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { chipClassName } from "@/components/site/styles";
@@ -80,10 +80,10 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
         back={{ href: "/notes", label: "Notes" }}
         code={code}
         jp={kind.jp}
-        lede={kind.label}
         meta={[
           { label: "Kind", value: kind.label },
           { label: "Stamp", value: stampOf(note).label },
+          { label: "Read", value: `${pad(note.readingTimeMinutes)} min` },
         ]}
         size="title"
         title={note.title}
@@ -106,8 +106,10 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
             ))}
           </ul>
         </div>
+        {note.kind === "case-study" ? (
+          <CaseStudyLinks caseStudy={note} />
+        ) : null}
       </DocumentHero>
-      <NotePanels slug={slug} />
       {note.kind === "note" && isIndexable(note) ? (
         <NoteJsonLd note={note} />
       ) : null}
@@ -117,7 +119,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
 
       {note.kind === "case-study" ? (
         <div
-          className="group/prose min-w-0 [counter-reset:section] [&_img]:h-auto [&_img]:max-w-full"
+          className="group/prose max-w-3xl min-w-0 [counter-reset:section] [&_img]:h-auto [&_img]:max-w-full"
           data-numbered
         >
           <Content />
@@ -130,7 +132,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
           label="Text"
           waypoint={{ action: "read", role: "researcher", side: "right" }}
         >
-          <div className="min-w-0 [&_img]:h-auto [&_img]:max-w-full">
+          <div className="max-w-3xl min-w-0 [&_img]:h-auto [&_img]:max-w-full">
             <Content />
           </div>
         </DocumentSection>

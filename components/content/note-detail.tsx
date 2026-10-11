@@ -6,46 +6,19 @@ import {
 import Link from "next/link";
 
 import { Figure } from "@/components/content/figure";
-import { TableOfContents } from "@/components/content/table-of-contents";
 import { Video } from "@/components/content/video";
-import { DossierPanel } from "@/components/site/compact-dossier";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { DocumentSection } from "@/components/site/document-section";
-import { LeaderList, LeaderRow } from "@/components/site/leader-list";
-import { PageAside } from "@/components/site/page-aside";
 import { focusRingClassName, linkClassName } from "@/components/site/styles";
 import {
   hasPreviewSection,
   noteKinds,
   notePath,
-  stampOf,
 } from "@/lib/content/note-domain";
 import type { CaseStudy, Note } from "@/lib/content/note-domain";
-import type { Heading } from "@/lib/content/text";
 import { cn } from "@/lib/utils";
 
 const pad = (value: number) => String(value).padStart(2, "0");
-
-const factsOf = (note: Note) =>
-  note.kind === "case-study"
-    ? [
-        { jp: "年", label: "Year", value: String(note.year) },
-        { jp: "文脈", label: "Context", value: note.context },
-        { jp: "役割", label: "Role", value: note.role },
-        {
-          jp: "読了",
-          label: "Read",
-          value: `${pad(note.readingTimeMinutes)} min`,
-        },
-      ]
-    : [
-        { jp: "日付", label: "Date", value: stampOf(note).label },
-        {
-          jp: "読了",
-          label: "Read",
-          value: `${pad(note.readingTimeMinutes)} min`,
-        },
-      ];
 
 const Previews = ({ caseStudy }: { caseStudy: CaseStudy }) => {
   if (caseStudy.previews.length === 0) {
@@ -165,52 +138,24 @@ export const CaseStudySections = ({
   </>
 );
 
-export const NoteAside = ({
-  headings,
-  note,
-}: {
-  headings: readonly Heading[];
-  note: Note;
-}) => (
-  <PageAside code="NT-02" label="Note details">
-    <DossierPanel collapsible jp="仕様" label="Facts">
-      <LeaderList>
-        <LeaderRow jp="種別" label="Kind">
-          {noteKinds[note.kind].label}
-        </LeaderRow>
-        {factsOf(note).map((fact) => (
-          <LeaderRow jp={fact.jp} key={fact.label} label={fact.label}>
-            {fact.value}
-          </LeaderRow>
-        ))}
-      </LeaderList>
-    </DossierPanel>
-    {headings.length > 0 ? (
-      <DossierPanel collapsible jp="目次" label="On this page">
-        <TableOfContents headings={headings} />
-      </DossierPanel>
-    ) : null}
-    {note.kind === "case-study" && note.links.length > 0 ? (
-      <DossierPanel jp="外部" label="Links">
-        <ul>
-          {note.links.map((link) => (
-            <li key={link.href}>
-              <a
-                className={cn(
-                  linkClassName,
-                  "text-ink inline-flex items-center gap-1 py-2 text-sm"
-                )}
-                href={link.href}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                {link.label}
-                <ArrowUpRightIcon aria-hidden className="size-3.5" />
-              </a>
-            </li>
-          ))}
-        </ul>
-      </DossierPanel>
-    ) : null}
-  </PageAside>
-);
+export const CaseStudyLinks = ({ caseStudy }: { caseStudy: CaseStudy }) =>
+  caseStudy.links.length > 0 ? (
+    <ul className="flex flex-wrap gap-x-6">
+      {caseStudy.links.map((link) => (
+        <li key={link.href}>
+          <a
+            className={cn(
+              linkClassName,
+              "text-ink inline-flex min-h-11 items-center gap-1 text-sm"
+            )}
+            href={link.href}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {link.label}
+            <ArrowUpRightIcon aria-hidden className="size-3.5" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : null;

@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "technical-grid",
   "title": "Animated Technical Grid",
-  "description": "Hairline blueprint grid with a scan line, pulsing nodes and corner marks.",
+  "description": "Hairline blueprint grid with a scan line and pulsing nodes.",
   "dependencies": [
     "class-variance-authority"
   ],
@@ -79,71 +79,71 @@
       "props": [
         {
           "component": "TechnicalGrid",
-          "description": "A div that paints the grid behind its children.",
+          "description": "Paints the grid behind its children.",
           "props": [
             {
               "name": "tone",
               "type": "\"muted\" | \"strong\" | \"clay\"",
               "default": "\"muted\"",
-              "description": "Line intensity and ink. clay tints the lines, scan and nodes."
+              "description": "Line intensity and ink."
             },
             {
               "name": "fade",
               "type": "\"none\" | \"edges\" | \"top\" | \"bottom\"",
               "default": "\"none\"",
-              "description": "Fades the grid toward the edges or one side."
+              "description": "Fades the grid toward an edge."
             },
             {
               "name": "cellSize",
               "type": "number",
               "default": "32",
-              "description": "Minor cell size in px. Clamped between 8 and 160."
+              "description": "Minor cell size in px, 8 to 160."
             },
             {
               "name": "majorEvery",
               "type": "number",
               "default": "4",
-              "description": "Every Nth line is drawn stronger. 0 or 1 disables major lines."
+              "description": "Every Nth line is stronger."
             },
             {
               "name": "scan",
               "type": "\"none\" | \"horizontal\" | \"vertical\" | \"both\"",
               "default": "\"horizontal\"",
-              "description": "Direction of the sweeping scan line."
+              "description": "Scan line direction."
             },
             {
               "name": "scanDuration",
               "type": "number",
               "default": "8",
-              "description": "Seconds per sweep. Clamped between 1 and 60."
+              "description": "Seconds per sweep, 1 to 60."
             },
             {
               "name": "nodes",
               "type": "number",
               "default": "5",
-              "description": "Pulsing nodes snapped to grid lines. Maximum 24."
+              "description": "Pulsing nodes, up to 24."
             },
             {
               "name": "markers",
               "type": "boolean",
               "default": "true",
-              "description": "Registration marks in the four corners."
+              "description": "Corner registration marks."
             },
             {
               "name": "label",
               "type": "string",
-              "description": "Mono caption pinned to the top left."
+              "description": "Caption, top left."
             },
             {
               "name": "caption",
               "type": "string",
-              "description": "Mono caption pinned to the bottom right."
+              "description": "Caption, bottom right."
             },
             {
               "name": "animated",
               "type": "boolean",
               "default": "true",
-              "description": "Turns the scan and pulses off. The static grid stays."
+              "description": "Turns the scan and pulses off."
             }
           ]
         }
@@ -157,7 +157,7 @@
             "strong",
             "clay"
           ],
-          "description": "Ink at 6 and 12 percent, 10 and 22 percent, or clay."
+          "description": "Line ink: muted, strong or clay."
         },
         {
           "name": "fade",
@@ -168,7 +168,7 @@
             "top",
             "bottom"
           ],
-          "description": "Mask on the grid field only, never on children."
+          "description": "Mask on the grid only."
         }
       ],
       "examples": [
@@ -182,24 +182,23 @@
         }
       ],
       "accessibility": [
-        "Grid, scan line, nodes and marks are aria-hidden and ignore pointer events.",
-        "label and caption are real text at 4.5:1 or more.",
-        "Reduced motion hides the scan and pulses. The static grid stays."
+        "Decorative layers are aria-hidden and ignore pointer events.",
+        "Reduced motion hides the scan and pulses."
       ],
       "animation": [
         {
           "target": "Scan line",
           "properties": "transform, opacity",
-          "timing": "scanDuration seconds, linear, infinite",
+          "timing": "scanDuration seconds, linear",
           "trigger": "On mount",
           "reducedMotion": "Hidden."
         },
         {
           "target": "Node pulse ring",
           "properties": "transform, opacity",
-          "timing": "3 to 5 seconds, ease-out, infinite",
+          "timing": "3 to 5 seconds, ease-out",
           "trigger": "On mount",
-          "reducedMotion": "Ring hidden. Dot stays."
+          "reducedMotion": "Ring hidden."
         }
       ]
     }

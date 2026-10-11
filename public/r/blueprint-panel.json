@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "blueprint-panel",
   "title": "Blueprint Panel",
-  "description": "Hairline panel with registration marks, a mono header and a footer.",
+  "description": "Hairline panel with registration marks.",
   "dependencies": [
     "class-variance-authority"
   ],
@@ -31,47 +31,47 @@
       "props": [
         {
           "component": "BlueprintPanel",
-          "description": "The frame. A section that extends every section prop.",
+          "description": "The frame. Extends section props.",
           "props": [
             {
               "name": "tone",
               "type": "\"default\" | \"inset\" | \"clay\"",
               "default": "\"default\"",
-              "description": "default and clay sit on the card surface, inset on a recessed one. clay tints the marks."
+              "description": "Surface and mark color."
             },
             {
               "name": "markers",
               "type": "boolean",
               "default": "true",
-              "description": "Registration marks outside the four corners."
+              "description": "Corner registration marks."
             }
           ]
         },
         {
           "component": "BlueprintPanelHeader",
-          "description": "A mono header row with a bottom hairline.",
+          "description": "Mono header row.",
           "props": [
             {
               "name": "index",
               "type": "string",
-              "description": "Muted index before the title, such as SH-01."
+              "description": "Muted index, such as SH-01."
             },
             {
               "name": "meta",
               "type": "ReactNode",
-              "description": "Right aligned muted content such as a revision."
+              "description": "Right-aligned content."
             },
             {
               "name": "headingLevel",
               "type": "\"h2\" | \"h3\" | \"h4\"",
               "default": "\"h3\"",
-              "description": "Heading element for the title."
+              "description": "Heading element."
             }
           ]
         },
         {
           "component": "BlueprintPanelContent",
-          "description": "Padded body that fills the panel.",
+          "description": "Padded body.",
           "props": [
             {
               "name": "className",
@@ -82,7 +82,7 @@
         },
         {
           "component": "BlueprintPanelFooter",
-          "description": "Mono footer row with a top hairline.",
+          "description": "Mono footer row.",
           "props": [
             {
               "name": "className",
@@ -112,8 +112,7 @@
       ],
       "accessibility": [
         "A section. Give it aria-label or aria-labelledby.",
-        "The header title is a real heading. headingLevel keeps the outline correct.",
-        "Marks are aria-hidden and ignore pointer events."
+        "The header title is a real heading."
       ],
       "animation": []
     }
