@@ -6,7 +6,7 @@ import type { UtilityDoc } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import type { UtilityName } from "@/lib/design-system/specs";
 
-import { ClassTag, PreviewBox, SpecCell, SpecGrid } from "./spec-frame";
+import { PreviewBox, SpecCell, SpecGrid } from "./spec-frame";
 
 const previews = {
   "blueprint-dots": (
@@ -68,7 +68,6 @@ export const UtilitiesSection = ({
             <p className="text-graphite text-sm leading-snug text-pretty">
               {utility.summary}
             </p>
-            <ClassTag className="self-start">{utility.name}</ClassTag>
           </SpecCell>
         ))}
       </SpecGrid>

@@ -2,13 +2,12 @@ export const meta = {
   kind: "note",
   title: "When a subagent earns its place",
   date: "2026-10-07",
-  summary:
-    "Independent, checkable work pays off. Tightly coupled edits cost more than they save.",
+  summary: "Delegate independent, checkable work.",
   tags: ["Subagents", "AI agents", "Workflow"],
   sample: true,
 };
 
-A subagent is a fresh agent with its own context window. It receives a brief, does the work and returns a summary. The main thread never sees the files it read. That is the benefit and the cost.
+A subagent is a fresh agent with its own context window. It receives a brief, does the work and returns a summary.
 
 <Callout tone="sample" title="Sample draft">
   Editable placeholder. No measured results.
@@ -20,46 +19,17 @@ I delegate when three things are true.
 
 1. The work is independent of what the main thread just learned.
 2. The result is checkable: a diff, a list of findings or a passing command.
-3. The detail is disposable. I want the conclusion, not the forty files behind it.
-
-If one fails, I do the work in the main thread.
+3. I want the conclusion, not the forty files behind it.
 
 ## What I delegate and what I keep
 
 | Task | Delegate | Why |
 | --- | --- | --- |
-| Find every use of an API across the repo | Yes | Large output, short answer |
-| Audit components for missing states | Yes | Independent, returns a list |
-| Rename a prop used in thirty files | Yes, to one agent | Mechanical, verified by the typechecker |
-| Design a data model | No | Needs full context and judgment |
-| Fix a bug I cannot explain yet | Not yet | The investigation is the work |
-| Two agents editing the same file | No | Shared writes must be serialized |
-
-## Write the brief like a handoff
-
-The subagent starts with nothing. A good brief fits on one screen and points at files instead of pasting them.
-
-```txt title="brief.txt"
-Goal
-Add an empty state to the work archive when a filter matches nothing.
-
-Scope
-components/content/work-archive.tsx only.
-
-Constraints
-Use the existing tokens. No new dependencies.
-
-Done when
-Typecheck and lint pass, and the empty state renders.
-
-Report
-Files changed and anything you could not verify.
-```
+| Find every use of an API | Yes | Large output, short answer |
+| Rename a prop used in thirty files | Yes, to one agent | The typechecker verifies it |
+| Design a data model | No | Needs full context |
+| Two agents editing the same file | No | Shared writes serialize |
 
 <Callout tone="tip" title="Read the diff, not the summary">
   A summary says what the agent meant to do. The diff shows what it did.
 </Callout>
-
-## When it costs more than it saves
-
-Every subagent needs a brief, an isolated place to write and a review pass. For a three-line change I make the edit myself. The same goes for coupled changes: splitting step two from step one only hides the coordination cost.

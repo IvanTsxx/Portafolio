@@ -4,24 +4,21 @@ export const meta = {
   year: 2026,
   context: "Sample, 3D product page",
   role: "Frontend engineer",
-  summary: "A real-time 3D configurator over a complete static page.",
+  summary: "A 3D configurator over a static page.",
   stack: ["React Three Fiber", "Drei", "Next.js", "TypeScript", "Motion"],
   responsibilities: [
     "Scene graph and camera rig",
     "Lazy canvas with a static fallback",
     "Material and variant switching",
-    "Frame budget and mobile adaptation",
   ],
   previews: [],
   links: [],
   motionNotes: [
     "Camera moves between named viewpoints with a damped spring.",
-    "Material changes crossfade and respect reduced motion.",
     "The render loop pauses when the canvas leaves the viewport.",
   ],
   aiWorkflowNotes: [
     "An agent lists objects that allocate on every frame.",
-    "A researcher subagent summarizes loader options. The engineer decides.",
     "A person measures performance on real devices.",
   ],
   featured: false,
@@ -32,12 +29,6 @@ export const meta = {
 ## Context
 
 Asset budget, supported devices and the page without WebGL set the constraints.
-
-## Challenges
-
-- A first paint that does not wait for the scene.
-- Smooth interaction on mid-range phones.
-- Variant changes that never leave the scene half updated.
 
 ## Architecture
 
@@ -62,28 +53,16 @@ Asset budget, supported devices and the page without WebGL set the constraints.
 
 ## Implementation
 
-### Loading the canvas
-
 A client wrapper loads the canvas with `ssr: false` over the static image.
 
-```tsx title="configurator-canvas.tsx" {4-6}
-import dynamic from "next/dynamic";
-
+```tsx title="configurator-canvas.tsx"
 export const ConfiguratorCanvas = dynamic(
   () => import("./configurator-scene"),
   { ssr: false, loading: () => <ConfiguratorPoster /> }
 );
 ```
 
-### Keeping interface and scene in sync
-
 Variant state lives outside the scene. The scene reads it and never owns it.
-
-| State            | Owner | Read by           |
-| ---------------- | ----- | ----------------- |
-| Selected variant | Page  | Scene and summary |
-| Camera viewpoint | Page  | Scene             |
-| Loaded assets    | Scene | Poster fallback   |
 
 ## Motion and interaction
 

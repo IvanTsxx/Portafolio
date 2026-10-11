@@ -4,25 +4,21 @@ export const meta = {
   year: 2026,
   context: "Sample, marketing site",
   role: "Frontend engineer",
-  summary:
-    "One timing scale for CSS and GSAP, with a reduced-motion composition.",
+  summary: "One timing scale for CSS and GSAP.",
   stack: ["Next.js", "GSAP", "Tailwind CSS", "TypeScript"],
   responsibilities: [
     "Timing and easing tokens for CSS and GSAP",
     "Scroll-linked sequences with ScrollTrigger",
     "Reduced-motion composition per sequence",
-    "Motion notes for design handoff",
   ],
   previews: [],
   links: [],
   motionNotes: [
     "One exponential ease-out and a short duration scale.",
-    "Hover and focus in CSS. GSAP for scroll-linked sequences.",
     "Reduced motion renders the final composition.",
   ],
   aiWorkflowNotes: [
     "An agent audits animations against the timing scale.",
-    "A subagent drafts reduced-motion variants in its own worktree.",
     "A person signs off every timing decision.",
   ],
   featured: true,
@@ -34,19 +30,13 @@ import placeholder from "./media/blueprint-placeholder.png";
 
 ## Context
 
-A motion layer for an editorial site. Target devices, performance budget and moving content set the constraints.
+A motion layer for an editorial site.
 
 <Figure
   alt="Blueprint grid with a black box and a dashed target frame, used as a placeholder image"
   caption="Placeholder image."
   src={placeholder}
 />
-
-## Challenges
-
-- Motion that reads well with every animation off.
-- One timing scale for CSS and GSAP.
-- Scroll effects that never hijack scrolling on touch.
 
 ## Architecture
 
@@ -84,26 +74,11 @@ A motion layer for an editorial site. Target devices, performance budget and mov
   </Step>
 </Steps>
 
-```ts title="motion-tokens.ts"
-export const durations = {
-  fast: 0.2,
-  base: 0.4,
-  slow: 0.8,
-} as const;
-
-export const easings = {
-  outQuart: "power3.out",
-  outExpo: "expo.out",
-} as const;
-```
-
 | Token  | Value | Used for                 |
 | ------ | ----- | ------------------------ |
 | `fast` | 0.2 s | Hover and focus feedback |
 | `base` | 0.4 s | Entrances                |
 | `slow` | 0.8 s | Scroll-linked reveals    |
-
-<Demo title="Live demo slot">Interactive demo goes here.</Demo>
 
 ## Motion and interaction
 

@@ -25,16 +25,13 @@ export const SiteHeader = async () => {
         <div className="mx-auto grid h-12 max-w-screen-2xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 md:px-8">
           <Link
             className={cn(
-              "group col-start-1 flex min-w-0 items-baseline gap-3 justify-self-start",
+              "col-start-1 min-w-0 justify-self-start",
               focusRingClassName
             )}
             href="/"
           >
             <span className="font-wordmark text-xl leading-none whitespace-nowrap italic">
               {siteConfig.nickname}
-            </span>
-            <span className="label text-mist group-hover:text-ink ease-mechanical hidden whitespace-nowrap transition-colors duration-100 sm:inline lg:hidden xl:inline">
-              Archive of builds
             </span>
           </Link>
           <nav

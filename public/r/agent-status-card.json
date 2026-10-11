@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "agent-status-card",
   "title": "Agent Status Card",
-  "description": "Status card for an agent run with a task line, segmented progress and mono metadata.",
+  "description": "Status card for an agent run.",
   "dependencies": [
     "class-variance-authority"
   ],
@@ -37,62 +37,62 @@
       "props": [
         {
           "component": "AgentStatusCard",
-          "description": "Header, body, optional metadata and footer.",
+          "description": "Header, body, metadata and footer.",
           "props": [
             {
               "name": "agentId",
               "type": "string",
               "required": true,
-              "description": "Designation shown above the name, for example AG-03."
+              "description": "Designation, such as AG-03."
             },
             {
               "name": "name",
               "type": "string",
               "required": true,
-              "description": "Role or agent name. Labels the article and truncates when long."
+              "description": "Agent name. Labels the article."
             },
             {
               "name": "task",
               "type": "string",
               "required": true,
-              "description": "One line describing what the agent is doing."
+              "description": "One line describing the work."
             },
             {
               "name": "status",
               "type": "\"idle\" | \"running\" | \"review\" | \"blocked\" | \"done\"",
               "default": "\"idle\"",
-              "description": "Drives the tone color, the status dot and the default status label."
+              "description": "Drives tone, dot and label."
             },
             {
               "name": "statusLabel",
               "type": "string",
-              "description": "Overrides the default status text."
+              "description": "Overrides the status text."
             },
             {
               "name": "progress",
               "type": "number",
-              "description": "0 to 100. Omit to hide the bar."
+              "description": "0 to 100. Omit to hide."
             },
             {
               "name": "meta",
               "type": "{ label: string; value: string }[]",
-              "description": "Mono key and value pairs in equal columns."
+              "description": "Mono key and value pairs."
             },
             {
               "name": "footer",
               "type": "ReactNode",
-              "description": "Slot under a hairline for actions."
+              "description": "Slot for actions."
             },
             {
               "name": "announce",
               "type": "boolean",
               "default": "false",
-              "description": "Makes the status a polite live region."
+              "description": "Makes status a live region."
             },
             {
               "name": "children",
               "type": "ReactNode",
-              "description": "Extra content rendered in the body under the progress bar."
+              "description": "Extra body content."
             }
           ]
         }
@@ -108,7 +108,7 @@
             "blocked",
             "done"
           ],
-          "description": "Tone paints the hairline, cube, dot and progress. idle muted, running clay, review steel, blocked destructive, done moss."
+          "description": "Tone of the hairline, dot and progress."
         }
       ],
       "examples": [
@@ -123,24 +123,22 @@
       ],
       "accessibility": [
         "An article labelled by the name heading.",
-        "Status is always text. Dot and tone are redundant cues.",
-        "announce makes the status a polite live region. Off by default.",
-        "Tone colors keep 4.5:1 against the card in both themes."
+        "Status is always text. Dot and tone are redundant cues."
       ],
       "animation": [
         {
           "target": "Running status dot",
           "properties": "transform, opacity",
-          "timing": "animate-ping, 1 second, infinite",
-          "trigger": "While status is running",
-          "reducedMotion": "Ring removed. Dot stays."
+          "timing": "1 second, infinite",
+          "trigger": "While running",
+          "reducedMotion": "Ring removed."
         },
         {
           "target": "Active progress segment",
           "properties": "opacity",
-          "timing": "animate-pulse, 2 seconds, infinite",
-          "trigger": "First unfilled segment while running",
-          "reducedMotion": "Steady at 60 percent."
+          "timing": "2 seconds, infinite",
+          "trigger": "While running",
+          "reducedMotion": "Steady."
         }
       ]
     }

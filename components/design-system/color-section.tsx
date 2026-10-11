@@ -61,13 +61,9 @@ const Swatch = ({ index, token }: { index: number; token: ColorToken }) => (
   >
     <Chip className="border-rule-strong block h-16 border" token={token} />
     <div className="flex flex-col gap-1">
-      <p className="label text-graphite break-words normal-case">
-        {token.cssVar}
-      </p>
       <p className="label">
         <ContrastMark token={token} />
       </p>
-      <p className="label text-mist break-words normal-case">{token.oklch}</p>
       <p className="text-graphite text-sm leading-snug text-pretty">
         {token.role}
       </p>
@@ -75,53 +71,23 @@ const Swatch = ({ index, token }: { index: number; token: ColorToken }) => (
   </SpecCell>
 );
 
-const SemanticTable = ({ tokens }: { tokens: readonly ColorToken[] }) => (
-  <table className="label w-full border-collapse tabular-nums">
-    <caption className="sr-only">Semantic color aliases</caption>
-    <thead>
-      <tr className="text-mist text-left">
-        <th className="pb-2 font-normal" scope="col">
-          Token
-        </th>
-        <th className="hidden pb-2 font-normal sm:table-cell" scope="col">
-          Alias
-        </th>
-        <th className="hidden pb-2 font-normal md:table-cell" scope="col">
-          OKLCH
-        </th>
-        <th className="pb-2 text-right font-normal" scope="col">
-          Contrast
-        </th>
-      </tr>
-    </thead>
-    <tbody>
+const AliasList = ({ tokens }: { tokens: readonly ColorToken[] }) => (
+  <div className="@container">
+    <ul className="border-rule grid grid-cols-2 border-t border-l @2xl:grid-cols-3 @4xl:grid-cols-4">
       {tokens.map((token) => (
-        <tr className="border-rule border-t" key={token.name}>
-          <td className="py-2">
-            <span className="flex items-center gap-2">
-              <Chip
-                className="border-rule-strong size-3 shrink-0 border"
-                token={token}
-              />
-              <span className="text-ink normal-case">{token.name}</span>
-            </span>
-          </td>
-          <td className="text-mist hidden py-2 normal-case sm:table-cell">
-            {token.alias ?? "Own value"}
-          </td>
-          <td className="text-mist hidden py-2 normal-case md:table-cell">
-            {token.oklch}
-          </td>
-          <td className="py-2 text-right">
-            <ContrastMark token={token} />
-            {token.against === "paper" ? null : (
-              <span className="text-mist"> on {token.against}</span>
-            )}
-          </td>
-        </tr>
+        <li
+          className="border-rule flex items-center gap-2 border-r border-b px-3 py-2"
+          key={token.name}
+        >
+          <Chip
+            className="border-rule-strong size-3 shrink-0 border"
+            token={token}
+          />
+          <span className="label text-ink normal-case">{token.name}</span>
+        </li>
       ))}
-    </tbody>
-  </table>
+    </ul>
+  </div>
 );
 
 const ChartStrip = ({ tokens }: { tokens: readonly ColorToken[] }) => (
@@ -152,7 +118,6 @@ export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
       label={section.label}
     >
       <p className="label text-mist flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <span>Source app/globals.css</span>
         <span>Contrast vs paper</span>
         <span className="tabular-nums">
           AAA 7 · AA 4.5 · AA·L 3 · Decor below
@@ -181,7 +146,7 @@ export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
           jp={colorGroupLabels.semantic.jp}
           label={colorGroupLabels.semantic.label}
         />
-        <SemanticTable tokens={inGroup("semantic")} />
+        <AliasList tokens={inGroup("semantic")} />
       </div>
       <div className="flex flex-col gap-3">
         <SubHeading

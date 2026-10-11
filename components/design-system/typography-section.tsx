@@ -37,7 +37,6 @@ export const TypographySection = ({
           {fonts.map((font, index) => (
             <SpecCell
               code={`F-${padCount(index + 1)}`}
-              footer={font.cssVar}
               key={font.className}
               name={font.name}
             >

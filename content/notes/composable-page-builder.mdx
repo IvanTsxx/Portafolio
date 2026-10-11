@@ -4,24 +4,18 @@ export const meta = {
   year: 2026,
   context: "Sample, Sanity-backed site",
   role: "Frontend engineer",
-  summary:
-    "Every block is one module. Adding a block never touches existing code.",
+  summary: "Every block is one module.",
   stack: ["Next.js", "Sanity", "TypeScript", "Tailwind CSS", "shadcn"],
   responsibilities: [
     "Block module contract",
     "Registry behind the schema list and page query",
     "Typed content from schema to component",
-    "Editor previews and fallbacks",
   ],
   previews: [],
   links: [],
-  motionNotes: [
-    "One shared entrance utility for every block.",
-    "Hover and focus in CSS. JavaScript only where CSS cannot.",
-  ],
+  motionNotes: ["One shared entrance utility for every block."],
   aiWorkflowNotes: [
     "An agent reads one complete block before it scaffolds the next.",
-    "Each block gets its own worktree and one reviewed diff.",
     "A skill encodes the block contract.",
   ],
   featured: false,
@@ -31,13 +25,7 @@ export const meta = {
 
 ## Context
 
-Editors recombine blocks without asking for code changes.
-
-## Challenges
-
-- Adding a block never edits an existing file.
-- A block's shape is declared once.
-- Safe previews and clear empty states.
+Editors recombine blocks without asking for code changes. A block's shape is declared once, and adding a block never edits an existing file.
 
 ## Architecture
 
@@ -70,24 +58,15 @@ Editors recombine blocks without asking for code changes.
   <Step title="Write the block module">
     Schema, query fragment, types and component in one file.
   </Step>
-  <Step title="Register it">
-    The module exports a definition. The registry collects them.
-  </Step>
-  <Step title="Render by type">
-    The renderer looks the block up by type. No switch.
-  </Step>
+  <Step title="Register it">The registry collects every definition.</Step>
+  <Step title="Render by type">No switch.</Step>
 </Steps>
 
 ```ts title="blocks/registry.ts"
-import type { ComponentType } from "react";
-
 export interface BlockDefinition<Data> {
   type: string;
   Component: ComponentType<Data>;
 }
-
-export const defineBlock = <Data>(definition: BlockDefinition<Data>) =>
-  definition;
 ```
 
 ## Motion and interaction

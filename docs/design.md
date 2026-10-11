@@ -120,32 +120,32 @@ components:
 
 A personal portfolio rendered as a technical document on paper: numbered panels, mono labels with Japanese annotations, hairline rules, hatch fills and dithered imagery. Ink and paper carry the interface. Small orange 3D agents are the only color and the only playful element.
 
-- **Technical document on paper.** Paper ground, ink type, numbered sheets. Every page reads as a technical document.
-- **80/20 minimalism.** Cut until the remaining 20 percent carries 80 percent of the meaning.
-- **Ink only, clay for agents.** Ink and paper everywhere. Clay orange belongs to the 3D agents alone.
-- **One shared canvas.** One WebGL canvas for the whole site. Views track DOM boxes. Never a second Canvas.
-- **Motion with purpose.** Motion explains state or shows work. Every animation has a reduced-motion twin.
-- **Less text, more visuals.** Labels and short lines. Specimens, 3D and diagrams carry the story.
-- **Hairlines, not shadows.** Radius 0. Rules, hatch and corner marks build structure. No soft shadows.
+- **Technical document on paper.** Paper ground, ink type, numbered sheets.
+- **80/20 minimalism.** Cut until 20 percent carries 80 percent.
+- **Ink only, clay for agents.** Ink and paper. Clay belongs to the 3D agents.
+- **One shared canvas.** One WebGL canvas for the whole site.
+- **Motion with purpose.** Every animation has a reduced-motion twin.
+- **Less text, more visuals.** Labels and short lines. Visuals carry the story.
+- **Hairlines, not shadows.** Radius 0. Rules and hatch, no soft shadows.
 
 ## Colors
 
 High-contrast neutrals on warm paper. Clay orange is reserved for the 3D agents and never used for UI chrome.
 
 - **paper (#ebebe9):** Page and card ground.
-- **paper-deep (#e0e0dd):** Recessed fill, hover rows, active cells.
-- **ink (#121212):** Primary text, solid fills, focus ring, strong borders.
-- **graphite (#3d3d3b):** Secondary text, outline borders, selected fills.
-- **mist (#646361):** Indices, captions, tertiary labels.
-- **rule (#cdcdcb):** Hairlines between cells and rows.
-- **rule-strong (#535352):** Panel heading underline, dashed frames, leaders.
-- **clay (#db703b):** Reserved for the 3D agents and their status marks.
-- **clay-deep (#a54a24):** Agent shade: legs, arms, deep surfaces.
+- **paper-deep (#e0e0dd):** Recessed fill and hover rows.
+- **ink (#121212):** Primary text and fills.
+- **graphite (#3d3d3b):** Secondary text.
+- **mist (#646361):** Indices and captions.
+- **rule (#cdcdcb):** Hairlines.
+- **rule-strong (#535352):** Heading rules and leaders.
+- **clay (#db703b):** 3D agents only.
+- **clay-deep (#a54a24):** Agent shade.
 - **signal-steel (#345a73):** In review.
 - **signal-moss (#346c42):** Done.
 - **signal-rust (#ae4024):** Vermilion accent, sparingly.
 - **destructive (#cc291f):** Blocked and invalid.
-- **popover (#f7f7f5):** Raised surface: popovers, callouts, previews.
+- **popover (#f7f7f5):** Raised surface.
 - **border (#cdcdcb):** Default border.
 - **input (#bbbbba):** Input border.
 - **chart-2 (#3d3d3b):** Series 2.
@@ -159,7 +159,7 @@ Zen Kaku Gothic New, light and tightly tracked, for names and titles. Geist Mono
 
 ## Layout
 
-A 12-column document grid. A sticky identity dossier fills 4 columns on the left; numbered sections fill 8 on the right and stack on mobile. Spacing follows a 4px scale. Sections are separated by 64px and open with a panel heading: `[ XX-NN ]  LABEL  日本語 ........ 06 / 06` over a strong rule.
+Index pages use a 12-column document grid. A compact identity dossier fills 4 columns on the left and sticks only when it fits the viewport; it never scrolls on its own. Numbered sections fill 8 on the right and stack on mobile. Detail pages drop the dossier and run in one centered column. Spacing follows a 4px scale. Sections are separated by 64px and open with a panel heading: `[ XX-NN ]  LABEL  日本語 ........ 06 / 06` over a strong rule.
 
 ## Elevation & Depth
 

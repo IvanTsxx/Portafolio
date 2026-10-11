@@ -2,68 +2,41 @@ export const meta = {
   kind: "note",
   title: "Skills vs MCPs",
   date: "2026-10-02",
-  summary:
-    "A skill teaches an agent how. An MCP server gives it something to do it with.",
+  summary: "A skill teaches how. An MCP server gives access.",
   tags: ["Skills", "MCP", "AI agents"],
   sample: true,
 };
-
-A skill teaches an agent how to do something. An MCP server gives it something to do it with. They answer different questions.
 
 <Callout tone="sample" title="Sample draft">
   Editable placeholder. No measured results.
 </Callout>
 
-## Skills carry procedure and taste
+## Skills carry procedure
 
-A skill is a folder with a `SKILL.md`. The agent reads the description up front and loads the rest only when the task matches. It costs tokens only when it loads.
+A skill is a folder with a `SKILL.md`. The agent loads it only when the task matches.
 
 ```md title=".claude/skills/ui-states/SKILL.md"
 ---
 name: ui-states
-description: Trigger when writing or reviewing UI code. Apply the states and accessibility checklist.
+description: Trigger when writing or reviewing UI code.
 ---
 
-# UI states
-
 1. List the states before writing code.
-2. Resolve combinations: disabled, loading, focus, selected, hover.
-3. Make states explicit with data attributes.
+2. Make states explicit with data attributes.
 ```
 
 ## MCP servers carry access
 
-A server exposes tools and resources over a standard interface. Design tools, issue trackers and content systems are typical. Its tool definitions sit in context, and it needs credentials.
-
-```json title=".mcp.json"
-{
-  "mcpServers": {
-    "docs": {
-      "type": "http",
-      "url": "https://example.com/mcp"
-    }
-  }
-}
-```
+A server exposes tools over a standard interface. It needs credentials.
 
 ## How I decide
 
-| Question | Reach for |
-| --- | --- |
-| The agent keeps making the same mistake | A skill |
-| The information lives in another system | An MCP server |
-| The task needs a procedure or a point of view | A skill |
-| The task needs to read or write somewhere else | An MCP server |
-| The task needs both | A skill that names the MCP tools to call |
+| Question                                | Reach for                        |
+| --------------------------------------- | -------------------------------- |
+| The agent repeats the same mistake      | A skill                          |
+| The information lives in another system | An MCP server                    |
+| The task needs both                     | A skill that names the MCP tools |
 
 <Callout tone="tip" title="Rule of thumb">
   Write a skill the second time you correct the same mistake.
 </Callout>
-
-## Using them together
-
-A design-to-code skill can say: read the frame with the design tool, map values to the repository tokens, then verify. The skill carries the judgment. The server carries the access.
-
-## What I keep connected
-
-Only the servers a task needs. Fewer tools in context means fewer wrong turns.

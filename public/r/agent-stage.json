@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "agent-stage",
   "title": "Agent Stage",
-  "description": "Ready canvas for one agent: warm key light, room reflections, contact shadow, auto framing, paused offscreen, poster fallback.",
+  "description": "Ready canvas for one agent.",
   "dependencies": [
     "three@^0.186.1",
     "@react-three/fiber@^9.8.1",
@@ -51,55 +51,55 @@
               "name": "role",
               "type": "AgentRole",
               "required": true,
-              "description": "Which accessory kit the agent wears."
+              "description": "Accessory kit."
             },
             {
               "name": "action",
               "type": "AgentAction",
               "default": "the role's signature action",
-              "description": "Clip to play. debugger inspects, builder types, architect measures."
+              "description": "Clip to play."
             },
             {
               "name": "motion",
               "type": "\"full\" | \"reduced\"",
               "default": "prefers-reduced-motion",
-              "description": "reduced holds the key pose and renders only when something changes."
+              "description": "reduced holds the key pose."
             },
             {
               "name": "shadow",
               "type": "boolean",
               "default": "true",
-              "description": "Blob contact shadow under the feet."
+              "description": "Blob contact shadow."
             },
             {
               "name": "label",
               "type": "string",
               "default": "\"{Role} agent\"",
-              "description": "Accessible name of the figure that wraps the Canvas."
+              "description": "Accessible name of the figure."
             },
             {
               "name": "fallback",
               "type": "ReactNode",
               "default": "<AgentPoster />",
-              "description": "Shown when WebGL is unavailable."
+              "description": "Shown without WebGL."
             },
             {
               "name": "className",
               "type": "string",
               "default": "\"relative aspect-4/3 w-full\"",
-              "description": "Merged with the base. Give the stage a size."
+              "description": "Give the stage a size."
             }
           ]
         },
         {
           "component": "AgentStageScene",
-          "description": "Camera, lights and agent without the Canvas. Mount it inside your own Canvas or a drei View when a page needs several stages.",
+          "description": "Camera, lights and agent without the Canvas.",
           "props": [
             {
               "name": "role",
               "type": "AgentRole",
               "required": true,
-              "description": "Which accessory kit the agent wears."
+              "description": "Accessory kit."
             },
             {
               "name": "action",
@@ -122,7 +122,7 @@
         },
         {
           "component": "AgentPoster",
-          "description": "Static SVG of the role, used as the WebGL fallback and for thumbnails.",
+          "description": "Static SVG of the role, used as the WebGL fallback.",
           "props": [
             {
               "name": "role",
@@ -133,7 +133,7 @@
             {
               "name": "label",
               "type": "string",
-              "description": "Makes the poster an img with this name. Omit it to hide the poster from assistive tech."
+              "description": "Names the poster as an img."
             },
             {
               "name": "className",
@@ -156,7 +156,7 @@
             "inspector",
             "analyst"
           ],
-          "description": "Selects the accessory kit. Framing and lights are shared."
+          "description": "Selects the accessory kit."
         },
         {
           "name": "action",
@@ -175,41 +175,37 @@
             "measure",
             "check"
           ],
-          "description": "Selects the clip. Omit it to play the role's signature action."
+          "description": "Clip to play. Defaults to the signature action."
         }
       ],
       "examples": [
         {
           "title": "One agent, one line",
-          "description": "The stage frames the agent for any width and height.",
           "file": "registry/ivan/examples/agent-stage/basic.tsx"
         },
         {
           "title": "Switch role with typed props",
-          "description": "agentRoles is a const tuple, so the buttons and the prop type cannot drift.",
           "file": "registry/ivan/examples/agent-stage/role-picker.tsx"
         }
       ],
       "accessibility": [
-        "The stage is a figure with an accessible name. Override it with label.",
-        "The Canvas is decorative. Put anything the agent communicates in text beside it.",
-        "Without WebGL the poster replaces the Canvas. A custom fallback should keep the same name.",
+        "A figure with an accessible name. Override it with label.",
         "Reduced motion holds the key pose and stops continuous rendering."
       ],
       "animation": [
         {
           "target": "Render loop",
           "properties": "Canvas frameloop",
-          "timing": "always while visible, demand with reduced motion, never offscreen.",
-          "trigger": "IntersectionObserver with a 10 percent margin",
-          "reducedMotion": "Renders one frame per change."
+          "timing": "Always while visible, never offscreen",
+          "trigger": "IntersectionObserver",
+          "reducedMotion": "One frame per change."
         },
         {
           "target": "Agent clips and focus",
-          "properties": "Arm, leg, body and eye transforms",
-          "timing": "0.38 second crossfade. 0.42 second hop on focus.",
-          "trigger": "action changes or the pointer enters the stage",
-          "reducedMotion": "Holds the key pose. No hop."
+          "properties": "Body transforms",
+          "timing": "0.38 second crossfade, 0.42 second hop",
+          "trigger": "action changes or pointer enters",
+          "reducedMotion": "Key pose. No hop."
         }
       ]
     }
