@@ -23,6 +23,7 @@ import {
   defaultWorkshopState,
   matchingPreset,
   presetState,
+  withPiece,
   randomAction,
   randomOutfit,
 } from "@/lib/agents/workshop";
@@ -297,7 +298,7 @@ export const AgentWorkshop = ({
   const pickPiece = <Slot extends OutfitSlot>(
     slot: Slot,
     piece: OutfitPieceId<Slot>
-  ) => setState({ ...state, outfit: { ...state.outfit, [slot]: piece } });
+  ) => setState({ ...state, outfit: withPiece(state.outfit, slot, piece) });
 
   const copyLink = async () => {
     const url = new URL(window.location.href);

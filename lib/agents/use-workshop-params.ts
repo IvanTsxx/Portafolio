@@ -24,10 +24,11 @@ const replaceWorkshopState = (next: WorkshopState) => {
     new URLSearchParams(window.location.search),
     next
   );
+  const query = params.size > 0 ? `?${params}` : "";
   window.history.replaceState(
     null,
     "",
-    `${window.location.pathname}?${params}${window.location.hash}`
+    `${window.location.pathname}${query}${window.location.hash}`
   );
   for (const listener of listeners) {
     listener();

@@ -14,6 +14,7 @@ import {
   parseWorkshopParams,
   presetState,
   randomOutfit,
+  withPiece,
   writeWorkshopParams,
 } from "./workshop";
 
@@ -42,7 +43,9 @@ describe("workshop params", () => {
         new URLSearchParams(),
         presetState(role)
       );
-      expect(params.toString()).toBe(`agent=${role}`);
+      const expected =
+        role === defaultWorkshopState.role ? "" : `agent=${role}`;
+      expect(params.toString()).toBe(expected);
     }
   });
 
@@ -92,5 +95,58 @@ describe("workshop outfits", () => {
       }
       outfit = next;
     }
+  });
+});
+
+describe("workshop hands", () => {
+  const builder = presetState("builder").outfit;
+
+  test("a two-handed piece frees the offhand", () => {
+    const inspector = presetState("inspector").outfit;
+    expect(withPiece(inspector, "held", "laptop")).toMatchObject({
+      held: "laptop",
+      offhand: "none",
+    });
+  });
+
+  test("picking an offhand piece drops a two-handed piece", () => {
+    expect(withPiece(builder, "offhand", "clipboard")).toMatchObject({
+      held: "none",
+      offhand: "clipboard",
+    });
+  });
+
+  test("one-handed pieces keep the offhand", () => {
+    const architect = presetState("architect").outfit;
+    expect(withPiece(architect, "held", "pointer")).toMatchObject({
+      held: "pointer",
+      offhand: "blueprint-roll",
+    });
+  });
+
+  test("urls and random outfits never hold two things with busy hands", () => {
+    const parsed = parseWorkshopParams(
+      new URLSearchParams("agent=builder&offhand=tablet")
+    );
+    expect(parsed.outfit.offhand).toBe("none");
+    for (let seed = 0; seed < 200; seed += 1) {
+      let value = seed / 200;
+      const outfit = randomOutfit(builder, () => {
+        value = (value * 9301 + 0.4927) % 1;
+        return value;
+      });
+      const busy = outfit.held === "laptop" || outfit.held === "book";
+      expect(busy && outfit.offhand !== "none").toBe(false);
+    }
+  });
+});
+
+describe("workshop reset", () => {
+  test("the default state writes no params", () => {
+    const params = writeWorkshopParams(
+      new URLSearchParams("agent=debugger&head=goggles"),
+      defaultWorkshopState
+    );
+    expect(params.size).toBe(0);
   });
 });

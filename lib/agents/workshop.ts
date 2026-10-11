@@ -30,6 +30,30 @@ export const presetState = (role: AgentRole): WorkshopState => ({
 
 export const defaultWorkshopState = presetState(defaultWorkshopRole);
 
+const twoHandedPieces: ReadonlySet<OutfitPieceId<"held">> = new Set([
+  "laptop",
+  "book",
+]);
+
+export const isTwoHanded = (piece: OutfitPieceId<"held">) =>
+  twoHandedPieces.has(piece);
+
+export const freeHands = (outfit: Outfit): Outfit =>
+  isTwoHanded(outfit.held) && outfit.offhand !== "none"
+    ? { ...outfit, offhand: "none" }
+    : outfit;
+
+export const withPiece = <Slot extends OutfitSlot>(
+  outfit: Outfit,
+  slot: Slot,
+  piece: OutfitPieceId<Slot>
+): Outfit => {
+  const next: Outfit = { ...outfit, [slot]: piece };
+  const takesTheOffhand =
+    slot === "offhand" && piece !== "none" && isTwoHanded(outfit.held);
+  return takesTheOffhand ? { ...next, held: "none" } : freeHands(next);
+};
+
 const roleParam = "agent";
 const actionParam = "action";
 
@@ -55,13 +79,13 @@ export const parseWorkshopParams = (params: URLSearchParams): WorkshopState => {
   const actionValue = params.get(actionParam);
   return {
     action: isAgentAction(actionValue) ? actionValue : preset.action,
-    outfit: {
+    outfit: freeHands({
       face: pieceParam(params, "face", preset.outfit.face),
       head: pieceParam(params, "head", preset.outfit.head),
       held: pieceParam(params, "held", preset.outfit.held),
       offhand: pieceParam(params, "offhand", preset.outfit.offhand),
       torso: pieceParam(params, "torso", preset.outfit.torso),
-    },
+    }),
     role,
   };
 };
@@ -73,6 +97,14 @@ export const writeWorkshopParams = (
   const next = new URLSearchParams(params);
   for (const key of [roleParam, actionParam, ...outfitSlots]) {
     next.delete(key);
+  }
+  const preset = presetState(state.role);
+  const isDefault =
+    state.role === defaultWorkshopRole &&
+    state.action === preset.action &&
+    outfitsMatch(state.outfit, preset.outfit);
+  if (isDefault) {
+    return next;
   }
   next.set(roleParam, state.role);
   for (const slot of outfitSlots) {
@@ -99,13 +131,14 @@ const randomPiece = <Slot extends OutfitSlot>(
   pick<OutfitPieceId<Slot>>(outfitPieceIds[slot], random) ??
   rolePresets[defaultWorkshopRole][slot];
 
-const rollOutfit = (random: () => number): Outfit => ({
-  face: randomPiece("face", random),
-  head: randomPiece("head", random),
-  held: randomPiece("held", random),
-  offhand: randomPiece("offhand", random),
-  torso: randomPiece("torso", random),
-});
+const rollOutfit = (random: () => number): Outfit =>
+  freeHands({
+    face: randomPiece("face", random),
+    head: randomPiece("head", random),
+    held: randomPiece("held", random),
+    offhand: randomPiece("offhand", random),
+    torso: randomPiece("torso", random),
+  });
 
 const rerollLimit = 8;
 
