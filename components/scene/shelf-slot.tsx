@@ -1,62 +1,51 @@
 "use client";
 
 import { lazy, useId, useRef } from "react";
-import type { ReactNode, RefObject } from "react";
+import type { ReactNode } from "react";
 
-import type { Timeline } from "@/lib/timeline/timeline";
+import type { ShelfBook } from "@/components/profile/repo-shelf/shelf-model";
 import { cn } from "@/lib/utils";
 
 import { useAgentCast, useViewSlot } from "./view-registry";
 
-const TimelineContent = lazy(() => import("./timeline-content"));
+const ShelfContent = lazy(() => import("./shelf-content"));
 
-export type TimelineMode = "scrub" | "static";
-
-export interface TimelineScrub {
-  progress: number;
-}
-
-export interface TimelineSlotProps {
+export interface ShelfSlotProps {
   activeId: string | null;
-  card: RefObject<HTMLDivElement | null>;
+  books: readonly ShelfBook[];
   children?: ReactNode;
   className?: string;
   enabled: boolean;
+  isReduced: boolean;
   label: string;
-  mode: TimelineMode;
   onHover: (id: string | null) => void;
   onSelect: (id: string) => void;
-  scrub: RefObject<TimelineScrub>;
-  timeline: Timeline;
 }
 
-export const TimelineSlot = ({
+export const ShelfSlot = ({
   activeId,
-  card,
+  books,
   children,
   className,
   enabled,
+  isReduced,
   label,
-  mode,
   onHover,
   onSelect,
-  scrub,
-  timeline,
-}: TimelineSlotProps) => {
+}: ShelfSlotProps) => {
   const track = useRef<HTMLElement>(null);
   const id = useId();
 
   useViewSlot(
     id,
     track,
-    <TimelineContent
+    <ShelfContent
       activeId={activeId}
-      card={card}
-      mode={mode}
+      books={books}
+      isReduced={isReduced}
       onHover={onHover}
       onSelect={onSelect}
-      scrub={scrub}
-      timeline={timeline}
+      track={track}
     />,
     enabled
   );
@@ -66,7 +55,8 @@ export const TimelineSlot = ({
     <figure
       aria-label={label}
       className={cn("relative m-0", className)}
-      data-timeline-stage={mode}
+      data-shelf-active={activeId ?? undefined}
+      onPointerLeave={() => onHover(null)}
       ref={track}
     >
       {children}

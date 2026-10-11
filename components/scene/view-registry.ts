@@ -5,6 +5,8 @@ import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
 
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 
+import { ownVisibleShare } from "./companion-path";
+
 export const viewPriority = { overlay: 3, scene: 2 } as const;
 
 export interface ViewSlot {
@@ -140,6 +142,25 @@ const getHasWaypoints = () => waypoints.size > 0;
 export const getWaypoints = () => waypoints.values();
 
 export const getAgentCasts = () => agentCasts;
+
+const castLeadShare = 0.5;
+
+export const isLeadAgentCast = (element: HTMLElement | null) => {
+  if (!element) {
+    return false;
+  }
+  const viewport = { height: window.innerHeight, width: window.innerWidth };
+  let lead: HTMLElement | null = null;
+  let leadShare = castLeadShare;
+  for (const cast of agentCasts) {
+    const share = ownVisibleShare(cast.getBoundingClientRect(), viewport);
+    if (share >= leadShare) {
+      lead = cast;
+      leadShare = share;
+    }
+  }
+  return lead === element;
+};
 
 export const registerWaypoint = (id: string, waypoint: Waypoint) => {
   const isFirst = waypoints.size === 0;

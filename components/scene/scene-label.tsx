@@ -76,7 +76,7 @@ const labelTexture = (text: string, color: string) => {
 
 type MeshProps = Omit<ThreeElements["mesh"], "geometry" | "position" | "scale">;
 
-export interface TimelineLabelProps extends MeshProps {
+export interface SceneLabelProps extends MeshProps {
   text: string;
   color: string;
   height: number;
@@ -85,7 +85,7 @@ export interface TimelineLabelProps extends MeshProps {
   position?: readonly [number, number, number];
 }
 
-export const TimelineLabel = ({
+export const SceneLabel = ({
   text,
   color,
   height,
@@ -93,7 +93,7 @@ export const TimelineLabel = ({
   align = "start",
   position = origin,
   ...props
-}: TimelineLabelProps) => {
+}: SceneLabelProps) => {
   const { aspect, texture } = labelTexture(text.toUpperCase(), color);
   const width = Math.min(height * aspect, maxWidth);
   const fittedHeight = width / aspect;
