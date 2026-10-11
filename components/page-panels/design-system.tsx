@@ -22,14 +22,8 @@ export const DesignSystemPanels = async () => {
       </DossierPanel>
       <DossierPanel jp="出力" label="Export">
         <LeaderList>
-          <LeaderRow jp="形式" label="Format">
-            Markdown
-          </LeaderRow>
           <LeaderRow jp="容量" label="Size">
             {kilobytes} KB
-          </LeaderRow>
-          <LeaderRow jp="行数" label="Lines">
-            {markdown.split("\n").length}
           </LeaderRow>
           <LeaderRow jp="原文" label="Raw">
             <a className={linkClassName} href={rawMarkdownPath}>

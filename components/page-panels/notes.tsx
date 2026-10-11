@@ -7,7 +7,7 @@ import { getNotes } from "@/lib/content/notes";
 export const NotesPanels = async () => {
   const notes = await getNotes();
   return (
-    <PageAside code="NT-02" label="Notes filters">
+    <PageAside code="NT-02" columns="single" label="Notes filters">
       <DossierPanel collapsible jp="絞込" label="Filter">
         <NoteFilters facets={countNoteFacets(notes)} total={notes.length} />
       </DossierPanel>

@@ -24,6 +24,13 @@ const filesContaining = (needle: string) =>
     )
     .toSorted();
 
+const routePages = (group: string) =>
+  sourceFiles
+    .filter((file) => file.startsWith(`app/(${group})/`))
+    .filter((file) => file.endsWith("/page.tsx"))
+    .map((file) => file.slice(`app/(${group})/`.length, -"/page.tsx".length))
+    .toSorted();
+
 describe("site naming", () => {
   test("calls him by the nickname and keeps the legal name separate", () => {
     expect(siteConfig.nickname).toBe("Ivo");
@@ -41,6 +48,36 @@ describe("site naming", () => {
     expect(filesContaining("siteConfig.name")).toEqual([
       "components/profile/identity-dossier.tsx",
       "components/site/dossier-disclosure.tsx",
+    ]);
+  });
+
+  test("reaches the dossier only through the document group layout", () => {
+    expect(filesContaining("IdentityDossier")).toEqual([
+      "app/(document)/layout.tsx",
+      "components/profile/identity-dossier.tsx",
+    ]);
+    expect(filesContaining("DocumentShell")).toEqual([
+      "app/(document)/layout.tsx",
+      "components/site/document-shell.tsx",
+    ]);
+    expect(filesContaining("DossierDisclosure")).toEqual([
+      "components/site/document-shell.tsx",
+      "components/site/dossier-disclosure.tsx",
+    ]);
+  });
+
+  test("keeps every detail route outside the document group", () => {
+    expect(routePages("detail")).toEqual([
+      "lab/[slug]",
+      "notes/[slug]",
+      "registry/[slug]",
+    ]);
+    expect(
+      routePages("document").filter((route) => route.includes("["))
+    ).toEqual([]);
+    expect(filesContaining("DetailShell")).toEqual([
+      "app/(detail)/layout.tsx",
+      "components/site/detail-shell.tsx",
     ]);
   });
 });

@@ -111,7 +111,7 @@ export const RegistryFilters = ({
   const searchId = useId();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="grid items-start gap-6 lg:grid-cols-2">
       <div className="flex flex-col gap-3">
         <label className="label text-mist" htmlFor={searchId}>
           Search <span className="jp ml-1">検索</span>

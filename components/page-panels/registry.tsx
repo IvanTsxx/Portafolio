@@ -4,7 +4,7 @@ import { PageAside } from "@/components/site/page-aside";
 import { getRegistryCategories, registryItems } from "@/lib/registry/registry";
 
 export const RegistryPanels = () => (
-  <PageAside code="REG-02" label="Registry filters">
+  <PageAside code="REG-02" columns="single" label="Registry filters">
     <DossierPanel collapsible jp="絞込" label="Filter">
       <RegistryFilters
         categories={getRegistryCategories()}

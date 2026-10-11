@@ -10,7 +10,7 @@ const topicCounts = activeTopics.map((topic) => ({
 }));
 
 export const LabPanels = () => (
-  <PageAside code="LAB-02" label="Lab filters">
+  <PageAside code="LAB-02" columns="single" label="Lab filters">
     <DossierPanel collapsible jp="絞込" label="Filter">
       <LabTopicFilter topics={topicCounts} total={experiments.length} />
     </DossierPanel>

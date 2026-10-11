@@ -4,7 +4,7 @@ const NotesNotFound = () => (
   <ContentNotFound
     backHref="/notes"
     backLabel="All notes"
-    description="This note does not exist or was renamed. The archive lists every build and note."
+    description="This note does not exist."
     title="Note not found"
   />
 );

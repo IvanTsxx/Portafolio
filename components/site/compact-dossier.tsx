@@ -6,20 +6,8 @@ import { cn } from "@/lib/utils";
 
 export const PORTRAIT_SRC = "/avatar";
 
-export const DossierStrip = ({
-  code,
-  revision = "Rev 4.2",
-}: {
-  code: string;
-  revision?: string;
-}) => (
-  <PanelHeading
-    as="p"
-    aside={revision}
-    index={code}
-    jp="身元"
-    label="Dossier"
-  />
+export const DossierStrip = ({ code }: { code: string }) => (
+  <PanelHeading as="p" index={code} jp="身元" label="Dossier" />
 );
 
 export const DossierPanel = ({
