@@ -12,13 +12,17 @@ export interface AgentWaypointProps {
   role: AgentRole;
   action?: AgentAction;
   side?: WaypointSide;
+  lines?: readonly string[];
   className?: string;
 }
+
+const silent: readonly string[] = [];
 
 export const AgentWaypoint = ({
   role,
   action,
   side = "right",
+  lines = silent,
   className,
 }: AgentWaypointProps) => {
   const id = useId();
@@ -29,8 +33,8 @@ export const AgentWaypoint = ({
     if (!element) {
       return;
     }
-    return registerWaypoint(id, { action, element, role, side });
-  }, [action, id, role, side]);
+    return registerWaypoint(id, { action, element, lines, role, side });
+  }, [action, id, lines, role, side]);
 
   return (
     <span

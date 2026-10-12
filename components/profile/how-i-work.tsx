@@ -5,12 +5,15 @@ import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 
 import { AgentScene } from "@/components/scene/agent-scene";
+import {
+  DocumentSection,
+  PanelCount,
+} from "@/components/site/document-section";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { workSteps } from "@/lib/site/practice";
 import type { WorkStep } from "@/lib/site/practice";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
-
-import { PanelCount, SectionFrame } from "./section-frame";
 
 type StepId = WorkStep["id"];
 
@@ -126,7 +129,7 @@ export const HowIWork = () => {
   const isPlaying = isInView && !isHeld && !isReduced;
 
   return (
-    <SectionFrame
+    <DocumentSection
       aside={
         <PanelCount
           current={stepIndexOf(activeId) + 1}
@@ -137,6 +140,7 @@ export const HowIWork = () => {
       index="GH-06"
       jp="仕事の流儀"
       label="How I work"
+      script={sectionScripts.homeHowIWork}
     >
       <Tabs.Root
         className="border-rule grid border lg:grid-cols-12"
@@ -199,6 +203,6 @@ export const HowIWork = () => {
           </div>
         </div>
       </Tabs.Root>
-    </SectionFrame>
+    </DocumentSection>
   );
 };

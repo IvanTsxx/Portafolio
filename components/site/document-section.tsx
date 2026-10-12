@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 
-import type { AgentWaypointProps } from "@/components/scene/agent-waypoint";
 import { PanelHeading } from "@/components/site/panel-heading";
+import { SectionBuild } from "@/components/site/section-build";
+import type { SectionScript } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 interface DocumentSectionProps {
@@ -12,7 +13,7 @@ interface DocumentSectionProps {
   index: string;
   jp: string;
   label: string;
-  waypoint?: AgentWaypointProps;
+  script?: SectionScript;
 }
 
 export const DocumentSection = ({
@@ -23,7 +24,7 @@ export const DocumentSection = ({
   index,
   jp,
   label,
-  waypoint,
+  script,
 }: DocumentSectionProps) => (
   <section
     aria-labelledby={`${id}-heading`}
@@ -39,9 +40,13 @@ export const DocumentSection = ({
       index={index}
       jp={jp}
       label={label}
-      waypoint={waypoint}
+      waypoint={script}
     />
-    {children}
+    {script?.reveal === "build" ? (
+      <SectionBuild code={index}>{children}</SectionBuild>
+    ) : (
+      children
+    )}
   </section>
 );
 

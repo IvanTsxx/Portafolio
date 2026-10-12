@@ -3,7 +3,7 @@
 import type { ReactNode, RefObject } from "react";
 import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
 
-import type { AgentAction, AgentRole } from "@/lib/agents/roles";
+import type { AgentAction, AgentRole, WaypointSide } from "@/lib/agents/roles";
 
 import { ownVisibleShare } from "./companion-path";
 
@@ -16,11 +16,12 @@ export interface ViewSlot {
   track: RefObject<HTMLElement>;
 }
 
-export type WaypointSide = "left" | "right";
+export type { WaypointSide } from "@/lib/agents/roles";
 
 export interface Waypoint {
   action?: AgentAction;
   element: HTMLElement;
+  lines: readonly string[];
   role: AgentRole;
   side: WaypointSide;
 }

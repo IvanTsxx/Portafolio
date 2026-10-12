@@ -16,6 +16,7 @@ import type { ReactNode } from "react";
 import { outfitPieceIds, outfitSlots } from "@/components/agents/outfit";
 import type { OutfitPieceId, OutfitSlot } from "@/components/agents/outfit";
 import { AgentStageSlot } from "@/components/scene/agent-stage-slot";
+import { DocumentSection } from "@/components/site/document-section";
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 import { agentActions, agentProfiles, agentRoles } from "@/lib/agents/roles";
 import { useWorkshopParams } from "@/lib/agents/use-workshop-params";
@@ -33,10 +34,10 @@ import {
   roleJp,
   slotCopy,
 } from "@/lib/agents/workshop-copy";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 import { TickMark } from "./module";
-import { SectionFrame } from "./section-frame";
 import { SpecimenCorners } from "./specimen-corners";
 import { TechnicalButton } from "./technical-button";
 
@@ -312,7 +313,7 @@ export const AgentWorkshop = ({
   };
 
   return (
-    <SectionFrame
+    <DocumentSection
       aside={
         <span className="text-mist tabular-nums">
           {preset ? agentProfiles[preset].designation : "AG-XX"} /{" "}
@@ -323,6 +324,7 @@ export const AgentWorkshop = ({
       index={index}
       jp="工房"
       label="Workshop"
+      script={sectionScripts.homeWorkshop}
     >
       <div className="border-rule grid border xl:grid-cols-12">
         <div className="border-rule max-xl:bg-paper xl:bg-paper-deep/40 relative z-10 max-xl:sticky max-xl:top-12 max-xl:border-b xl:col-span-6 xl:border-r">
@@ -423,6 +425,6 @@ export const AgentWorkshop = ({
           </p>
         </div>
       </div>
-    </SectionFrame>
+    </DocumentSection>
   );
 };

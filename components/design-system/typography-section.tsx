@@ -4,6 +4,7 @@ import type { FontFamily, TextLabelToken } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import { typeScaleSpecs } from "@/lib/design-system/specs";
 import type { FontClassName } from "@/lib/design-system/specs";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 import { ClassTag, SpecCell, SpecGrid, SubHeading } from "./spec-frame";
@@ -30,6 +31,7 @@ export const TypographySection = ({
       index={section.index}
       jp={section.jp}
       label={section.label}
+      script={sectionScripts.designTypography}
     >
       <div className="flex flex-col gap-3">
         <SubHeading jp="書体族" label="Families" />

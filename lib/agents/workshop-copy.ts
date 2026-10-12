@@ -69,6 +69,7 @@ export const pieceAnnotation = <Slot extends OutfitSlot>(
 ): Annotated => pieceCopy[slot][piece];
 
 export const actionCopy = {
+  build: { jp: "建設", label: "Build" },
   carry: { jp: "運搬", label: "Carry" },
   celebrate: { jp: "祝賀", label: "Celebrate" },
   check: { jp: "確認", label: "Check" },

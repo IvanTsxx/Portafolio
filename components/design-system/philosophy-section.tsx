@@ -6,6 +6,7 @@ import { padCount } from "@/lib/design-system/format";
 import { principles } from "@/lib/design-system/philosophy";
 import type { PrincipleId } from "@/lib/design-system/philosophy";
 import { sectionById } from "@/lib/design-system/sections";
+import { sectionScripts } from "@/lib/site/section-scripts";
 
 const inkCells = [
   "ink-1",
@@ -89,7 +90,7 @@ export const PhilosophySection = () => {
       index={section.index}
       jp={section.jp}
       label={section.label}
-      waypoint={{ action: "measure", role: "architect", side: "right" }}
+      script={sectionScripts.designPhilosophy}
     >
       <ol className="border-rule border-t">
         {principles.map((principle, index) => (

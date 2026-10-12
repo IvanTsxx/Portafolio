@@ -6,6 +6,7 @@ import type { DesignSystem } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import { agentMotionSpecs } from "@/lib/design-system/specs";
 import { highlightCode } from "@/lib/registry/highlight";
+import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { MotionLab } from "./motion-lab";
 import { SubHeading } from "./spec-frame";
@@ -23,6 +24,7 @@ export const MotionSection = async ({ system }: { system: DesignSystem }) => {
       index={section.index}
       jp={section.jp}
       label={section.label}
+      script={sectionScripts.designMotion}
     >
       <div className="flex flex-col gap-3">
         <SubHeading jp="緩急と時間" label="Easings and durations" />

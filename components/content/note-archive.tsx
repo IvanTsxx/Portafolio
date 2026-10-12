@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/empty";
 import { formatNoteCode, matchesNoteFilter } from "@/lib/content/note-domain";
 import type { NoteFacets, NoteIndexItem } from "@/lib/content/note-domain";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -33,7 +34,7 @@ export const NoteArchive = ({
       index="NT-03"
       jp="記録"
       label="Archive"
-      waypoint={{ action: "read", role: "researcher", side: "right" }}
+      script={sectionScripts.notesArchive}
     >
       <output aria-live="polite" className="sr-only">
         Showing {visibleNotes.length} of {notes.length}

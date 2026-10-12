@@ -979,7 +979,8 @@
                 "direct",
                 "celebrate",
                 "measure",
-                "check"
+                "check",
+                "build"
               ],
               "description": "Selects the clip."
             },
@@ -1196,7 +1197,8 @@
                 "direct",
                 "celebrate",
                 "measure",
-                "check"
+                "check",
+                "build"
               ],
               "description": "Clip to play. Defaults to the signature action."
             }

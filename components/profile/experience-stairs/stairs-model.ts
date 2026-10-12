@@ -1,6 +1,6 @@
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 import type { Experience } from "@/lib/site/experience";
-import { experience } from "@/lib/site/experience";
+import { experience, formatMonth } from "@/lib/site/experience";
 
 type ExperienceId = (typeof experience)[number]["id"];
 
@@ -30,26 +30,6 @@ export interface Stair {
   website: string | null;
   year: string;
 }
-
-const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-] as const;
-
-const formatMonth = (stamp: string) => {
-  const [year = "", month = "1"] = stamp.split("-");
-  return `${monthNames[Number(month) - 1] ?? ""} ${year}`.trim();
-};
 
 export const formatDates = (start: string, end: string | null) =>
   `${formatMonth(start)} → ${end ? formatMonth(end) : "now"}`;

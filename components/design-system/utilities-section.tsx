@@ -5,6 +5,7 @@ import { padCount } from "@/lib/design-system/format";
 import type { UtilityDoc } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import type { UtilityName } from "@/lib/design-system/specs";
+import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { PreviewBox, SpecCell, SpecGrid } from "./spec-frame";
 
@@ -55,6 +56,7 @@ export const UtilitiesSection = ({
       index={section.index}
       jp={section.jp}
       label={section.label}
+      script={sectionScripts.designUtilities}
     >
       <SpecGrid className="grid-cols-1 @xl:grid-cols-2 @4xl:grid-cols-3">
         {utilities.map((utility, index) => (

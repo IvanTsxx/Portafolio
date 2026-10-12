@@ -9,6 +9,7 @@ import type {
   ContributionCalendar,
   ContributionLevel,
 } from "@/lib/github/model";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 import {
@@ -186,6 +187,7 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
       index="GH-05"
       jp="貢献行列"
       label="Contribution matrix"
+      script={sectionScripts.homeMatrix}
     >
       <div className="flex flex-col gap-6" ref={revealRef}>
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">

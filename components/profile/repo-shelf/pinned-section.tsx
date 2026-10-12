@@ -3,6 +3,7 @@ import {
   PanelCount,
 } from "@/components/site/document-section";
 import type { PinnedRepository } from "@/lib/github/model";
+import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { buildShelf } from "./shelf-model";
 import { ShelfStage } from "./shelf-stage";
@@ -21,6 +22,7 @@ export const PinnedSection = ({
       index="GH-04"
       jp="固定標本"
       label="Pinned"
+      script={sectionScripts.homePinned}
     >
       <ShelfStage books={books} />
     </DocumentSection>

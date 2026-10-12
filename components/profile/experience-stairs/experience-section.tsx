@@ -2,6 +2,7 @@ import {
   DocumentSection,
   PanelCount,
 } from "@/components/site/document-section";
+import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { stairs } from "./stairs-model";
 import { StairsStage } from "./stairs-stage";
@@ -13,6 +14,7 @@ export const ExperienceSection = () => (
     index="GH-03"
     jp="経歴"
     label="Experience"
+    script={sectionScripts.homeExperience}
   >
     <StairsStage stairs={stairs} />
   </DocumentSection>

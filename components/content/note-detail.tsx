@@ -16,6 +16,7 @@ import {
   notePath,
 } from "@/lib/content/note-domain";
 import type { CaseStudy, Note } from "@/lib/content/note-domain";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -111,7 +112,7 @@ export const CaseStudySections = ({
       index={`${code}.1`}
       jp="担当"
       label="Responsibilities"
-      waypoint={{ action: "inspect", role: "researcher", side: "right" }}
+      script={sectionScripts.noteResponsibilities}
     >
       <ul className="grid gap-x-8 sm:grid-cols-2">
         {caseStudy.responsibilities.map((responsibility) => (

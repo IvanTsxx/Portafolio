@@ -18,6 +18,7 @@ import {
   toCategoryLabel,
 } from "@/lib/registry/registry";
 import { siteConfig } from "@/lib/site/config";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { TechnicalGrid } from "@/registry/ivan/ui/technical-grid";
 
 export const metadata: Metadata = {
@@ -69,7 +70,13 @@ const RegistryPage = async () => {
         />
       </div>
       <RegistryPanels />
-      <DocumentSection id="install" index="REG-03" jp="導入" label="Install">
+      <DocumentSection
+        id="install"
+        index="REG-03"
+        jp="導入"
+        label="Install"
+        script={sectionScripts.registryInstall}
+      >
         <div className="flex flex-col gap-2">
           <CommandLine
             command={`bunx --bun shadcn@latest add ${getRegistryItemUrl("<name>")}`}

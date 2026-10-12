@@ -32,6 +32,7 @@ import {
   toCategoryLabel,
 } from "@/lib/registry/registry";
 import { buildItemCodeFiles } from "@/lib/registry/source";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import {
   registrySectionAnnotations,
   registrySections,
@@ -131,7 +132,7 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
       </DocumentHero>
       <DocumentSection
         {...sectionProps("preview")}
-        waypoint={{ action: "inspect", role: "inspector", side: "left" }}
+        script={sectionScripts.registryPreview}
       >
         <PreviewCodeTabs files={codeFiles} preview={<Demo />} />
       </DocumentSection>

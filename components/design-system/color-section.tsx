@@ -5,6 +5,7 @@ import type { ColorToken } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import { colorGroupLabels } from "@/lib/design-system/specs";
 import type { ColorGroup } from "@/lib/design-system/specs";
+import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { SpecCell, SpecGrid, SubHeading } from "./spec-frame";
 
@@ -116,6 +117,7 @@ export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
       index={section.index}
       jp={section.jp}
       label={section.label}
+      script={sectionScripts.designColor}
     >
       <p className="label text-mist flex flex-wrap items-baseline gap-x-4 gap-y-1">
         <span>Contrast vs paper</span>

@@ -7,6 +7,7 @@ import { useUrlFilter } from "@/components/content/use-url-filter";
 import { DocumentSection } from "@/components/site/document-section";
 import { parseTopicParam, topicParam } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 export interface ArchiveItem {
@@ -76,7 +77,7 @@ export const LabArchive = ({ items }: { items: readonly ArchiveItem[] }) => {
       index="LAB-03"
       jp="一覧"
       label="Index"
-      waypoint={{ action: "type", role: "builder", side: "right" }}
+      script={sectionScripts.labExperiments}
     >
       <output aria-live="polite" className="sr-only">
         Showing {visible.length} of {items.length}

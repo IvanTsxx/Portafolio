@@ -5,6 +5,7 @@ import { ExperimentCard } from "@/components/lab/experiment-card";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { experiments, getExperiment } from "@/lib/lab/experiments";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { relatedExperimentsOf } from "@/lib/site/sections";
 
 export const dynamicParams = false;
@@ -52,7 +53,7 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
         index={`${experiment.index}.1`}
         jp="見本"
         label="Preview"
-        waypoint={{ action: "type", role: "builder", side: "left" }}
+        script={sectionScripts.labPreview}
       >
         <experiment.Preview />
       </DocumentSection>

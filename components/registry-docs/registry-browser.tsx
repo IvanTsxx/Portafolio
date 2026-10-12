@@ -17,6 +17,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
+import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 export interface RegistryEntry {
@@ -111,7 +112,7 @@ export const RegistryFilters = ({
   const searchId = useId();
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-2">
+    <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3">
         <label className="label text-mist" htmlFor={searchId}>
           Search <span className="jp ml-1">検索</span>
@@ -173,7 +174,7 @@ export const RegistryGrid = ({
       index="REG-04"
       jp="部品"
       label="Components"
-      waypoint={{ action: "carry", role: "builder", side: "right" }}
+      script={sectionScripts.registryComponents}
     >
       <output aria-live="polite" className="sr-only">
         {visibleEntries.length} of {entries.length} items

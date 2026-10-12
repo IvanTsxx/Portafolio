@@ -29,6 +29,7 @@ import {
   getNoteSlugs,
   getRelatedNotes,
 } from "@/lib/content/notes";
+import { sectionScripts } from "@/lib/site/section-scripts";
 
 export const dynamicParams = false;
 
@@ -130,7 +131,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
           index={`${code}.1`}
           jp="本文"
           label="Text"
-          waypoint={{ action: "read", role: "researcher", side: "right" }}
+          script={sectionScripts.noteText}
         >
           <div className="max-w-3xl min-w-0 [&_img]:h-auto [&_img]:max-w-full">
             <Content />

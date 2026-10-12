@@ -23,6 +23,7 @@ export const agentActions = [
   "celebrate",
   "measure",
   "check",
+  "build",
 ] as const;
 
 export type AgentAction = (typeof agentActions)[number];

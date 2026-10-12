@@ -23,9 +23,12 @@ export const agentActions = [
   "celebrate",
   "measure",
   "check",
+  "build",
 ] as const;
 
 export type AgentAction = (typeof agentActions)[number];
+
+export type WaypointSide = "left" | "right";
 
 export const agentReactions = [
   "wave",

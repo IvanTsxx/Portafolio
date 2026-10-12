@@ -64,3 +64,23 @@ export const experience = [
     website: null,
   },
 ] as const satisfies readonly Experience[];
+
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+] as const;
+
+export const formatMonth = (stamp: string) => {
+  const [year = "", month = "1"] = stamp.split("-");
+  return `${monthNames[Number(month) - 1] ?? ""} ${year}`.trim();
+};

@@ -52,7 +52,38 @@ export const checkStroke = (time: number) => {
     : 0;
 };
 
+const buildCycle = 0.9;
+
+export const buildStrike = (time: number) => {
+  const phase = (time % buildCycle) / buildCycle;
+  if (phase < 0.6) {
+    const local = phase / 0.6;
+    return 1 - (1 - local) ** 2;
+  }
+  const local = (phase - 0.6) / 0.4;
+  return 1 - local ** 3;
+};
+
 export const actionClips = {
+  build: {
+    keyTime: 0.5,
+    pose: (time, out) => {
+      resetPose(out);
+      breathe(time, out, 0.3);
+      const raise = buildStrike(time);
+      const impact = 1 - Math.min(1, raise * 4);
+      out.armRightRaise = 0.1 + raise * 1.15;
+      out.armRightForward = 0.95 - raise * 0.35;
+      out.armLeftForward = 1.1;
+      out.armLeftRaise = 0.04;
+      out.bodyTiltX = 0.1 + impact * 0.04;
+      out.bodyYaw = -0.08;
+      out.bodySquash += impact * 0.02;
+      out.rootY = -impact * 0.015;
+      out.gazeX = -0.015;
+      out.gazeY = -0.035;
+    },
+  },
   carry: {
     keyTime: 0.4,
     pose: (time, out) => {
