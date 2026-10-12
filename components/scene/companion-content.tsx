@@ -39,11 +39,13 @@ import {
   perchPoint,
   pickWaypoint,
 } from "./companion-path";
+import { sayCompanionLine } from "./companion-signals";
 import { ViewLights } from "./view-lights";
 import type { Waypoint, WaypointSide } from "./view-registry";
 import { getAgentCasts, getWaypoints } from "./view-registry";
 
 export interface CompanionContentProps {
+  bubble: RefObject<HTMLDivElement | null>;
   hit: RefObject<HTMLDivElement | null>;
   pointer: RefObject<AgentPointer>;
   presses: RefObject<number>;
@@ -102,6 +104,31 @@ const placeHitBox = (
   hit.style.height = `${frame.agentHeight}px`;
   hit.style.pointerEvents = isInteractive ? "auto" : "none";
 };
+
+const speechSeconds = 7;
+const speechGap = 12;
+
+const placeBubble = (
+  bubble: HTMLDivElement | null,
+  point: ScreenPoint,
+  frame: CompanionFrame,
+  lift: number,
+  viewport: Viewport,
+  isShown: boolean
+) => {
+  if (!bubble) {
+    return;
+  }
+  const top = point.y - frame.agentHeight - lift - speechGap;
+  bubble.style.transform = `translate3d(${point.x}px, ${top}px, 0)`;
+  bubble.dataset.side = point.x > viewport.width / 2 ? "left" : "right";
+  bubble.dataset.shown = String(isShown);
+};
+
+const lineFor = (stop: Waypoint, visit: number) =>
+  stop.lines.length > 0
+    ? (stop.lines[visit % stop.lines.length] ?? null)
+    : null;
 
 const textSamples = 5;
 
@@ -167,7 +194,12 @@ const ClearDepth = () => {
   return null;
 };
 
-const CompanionContent = ({ hit, pointer, presses }: CompanionContentProps) => {
+const CompanionContent = ({
+  bubble,
+  hit,
+  pointer,
+  presses,
+}: CompanionContentProps) => {
   const isReduced = useReducedMotion();
   const camera = useRef<OrthographicCameraImpl>(null);
   const mover = useRef<Group>(null);
@@ -179,6 +211,8 @@ const CompanionContent = ({ hit, pointer, presses }: CompanionContentProps) => {
   const perch = useRef<Perch>({ shift: 0, side: "right" });
   const handledPresses = useRef(0);
   const tossCount = useRef(0);
+  const visits = useRef(new WeakMap<HTMLElement, number>());
+  const spokenAt = useRef(Number.NEGATIVE_INFINITY);
   const [outfit, setOutfit] = useState<Outfit>(() => ({
     role: findActiveWaypoint(readViewport(), null)?.role ?? "orchestrator",
     toss: null,
@@ -219,9 +253,17 @@ const CompanionContent = ({ hit, pointer, presses }: CompanionContentProps) => {
       view.zoom = zoom;
       view.updateProjectionMatrix();
     }
+    const time = frameState.clock.elapsedTime;
+    const speak = (speaker: Waypoint) => {
+      const visit = visits.current.get(speaker.element) ?? 0;
+      visits.current.set(speaker.element, visit + 1);
+      sayCompanionLine(lineFor(speaker, visit));
+      spokenAt.current = time;
+    };
     const stop = findActiveWaypoint(viewport, activeStop.current);
     if (stop && stop !== activeStop.current) {
       perch.current = { shift: 0, side: stop.side };
+      speak(stop);
     }
     activeStop.current = stop;
     const state = motion.current ?? createCompanionMotion(outfit.role);
@@ -229,13 +271,14 @@ const CompanionContent = ({ hit, pointer, presses }: CompanionContentProps) => {
     if (!stop) {
       spinner.visible = false;
       placeHitBox(hit.current, state.travel, frame, 0, false);
+      placeBubble(bubble.current, state.travel, frame, 0, viewport, false);
       return;
     }
 
-    const time = frameState.clock.elapsedTime;
     const rect = stop.element.getBoundingClientRect();
     if (presses.current !== handledPresses.current) {
       handledPresses.current = presses.current;
+      speak(stop);
       if (state.isPlaced && !isSwapActive(state, time)) {
         const next = pickFreePerch(
           hit.current,
@@ -279,7 +322,19 @@ const CompanionContent = ({ hit, pointer, presses }: CompanionContentProps) => {
       0
     );
     playCue(pose.cue, stop.side, group.position);
-    placeHitBox(hit.current, state.travel, frame, pose.lift, state.scale > 0.6);
+    const isVisible = state.scale > 0.6;
+    placeHitBox(hit.current, state.travel, frame, pose.lift, isVisible);
+    placeBubble(
+      bubble.current,
+      state.travel,
+      frame,
+      pose.lift,
+      viewport,
+      isVisible &&
+        stop.lines.length > 0 &&
+        !state.travel.isTraveling &&
+        time - spokenAt.current < speechSeconds
+    );
   });
 
   return (
