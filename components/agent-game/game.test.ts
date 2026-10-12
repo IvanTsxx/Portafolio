@@ -10,13 +10,13 @@ import {
   place,
   statusOf,
 } from "./game";
-import type { Board, Cell, CellIndex, GameState, Player } from "./game";
+import type { AgentPolicy, Board, CellIndex, GameState, Player } from "./game";
 
 const A = "agent";
 const H = "human";
 const _ = null;
 
-const board = (...cells: Cell[]) => cells as unknown as Board;
+const board = (...cells: Board): Board => cells;
 
 const play = (state: GameState, player: Player, cell: CellIndex) =>
   gameReducer(state, { cell, player, type: "play" });
@@ -163,14 +163,19 @@ describe("gameReducer", () => {
   });
 });
 
-const perfect = { blunderChance: 0, random: () => 0 };
-const perfectLast = { blunderChance: 0, random: () => 0.999 };
+const perfect: AgentPolicy = { blunderChance: 0, random: () => 0 };
+const perfectLast: AgentPolicy = { blunderChance: 0, random: () => 0.999 };
+
+interface Tally {
+  games: number;
+  humanWins: number;
+}
 
 const humanWinsReachable = (
   current: Board,
   turn: Player,
-  policy: typeof perfect
-): { games: number; humanWins: number } => {
+  policy: AgentPolicy
+): Tally => {
   const status = statusOf(current, turn);
   if (status.kind === "won") {
     return { games: 1, humanWins: status.winner === H ? 1 : 0 };
@@ -185,16 +190,13 @@ const humanWinsReachable = (
     }
     return humanWinsReachable(place(current, cell, A), H, policy);
   }
-  return emptyCells(current).reduce(
-    (total, cell) => {
-      const branch = humanWinsReachable(place(current, cell, H), A, policy);
-      return {
-        games: total.games + branch.games,
-        humanWins: total.humanWins + branch.humanWins,
-      };
-    },
-    { games: 0, humanWins: 0 }
-  );
+  const total: Tally = { games: 0, humanWins: 0 };
+  for (const cell of emptyCells(current)) {
+    const branch = humanWinsReachable(place(current, cell, H), A, policy);
+    total.games += branch.games;
+    total.humanWins += branch.humanWins;
+  }
+  return total;
 };
 
 describe("chooseAgentMove", () => {

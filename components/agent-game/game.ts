@@ -86,8 +86,11 @@ export const columnOf = (cell: CellIndex) => cell % 3;
 export const emptyCells = (board: Board): CellIndex[] =>
   CELL_INDICES.filter((cell) => board[cell] === null);
 
-export const place = (board: Board, cell: CellIndex, player: Player): Board =>
-  board.map((current, index) => (index === cell ? player : current)) as Board;
+export const place = (board: Board, cell: CellIndex, player: Player): Board => {
+  const at = (index: CellIndex): Cell =>
+    index === cell ? player : board[index];
+  return [at(0), at(1), at(2), at(3), at(4), at(5), at(6), at(7), at(8)];
+};
 
 export const findWin = (
   board: Board
@@ -116,9 +119,11 @@ export const statusOf = (board: Board, nextTurn: Player): GameStatus => {
 const completesLine = (board: Board, cell: CellIndex, player: Player) =>
   board[cell] === null && findWin(place(board, cell, player)) !== null;
 
+const ZERO_SCORE: Score = { agent: 0, draws: 0, human: 0 };
+
 export const createGame = (
   starter: Player = "human",
-  score: Score = { agent: 0, draws: 0, human: 0 },
+  score: Score = ZERO_SCORE,
   round = 1
 ): GameState => ({
   board: EMPTY_BOARD,
