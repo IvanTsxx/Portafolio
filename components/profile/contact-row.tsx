@@ -1,10 +1,14 @@
+import { AgentWaypoint } from "@/components/scene/agent-waypoint";
 import { SocialLinks } from "@/components/site/social-links";
 import { siteConfig } from "@/lib/site/config";
+import { sectionScripts } from "@/lib/site/section-scripts";
+
+const { homeContact } = sectionScripts;
 
 export const ContactRow = () => (
   <section
     aria-labelledby="contact-heading"
-    className="border-rule-strong flex flex-col gap-6 border-t pt-6"
+    className="border-rule-strong relative flex flex-col gap-6 border-t pt-6"
     id="contact"
   >
     <span aria-hidden className="hazard-stripe text-ink block h-3 w-full" />
@@ -22,5 +26,11 @@ export const ContactRow = () => (
       </div>
       <SocialLinks ids={["github", "x", "linkedin"]} variant="contact" />
     </div>
+    <AgentWaypoint
+      action={homeContact.action}
+      lines={homeContact.lines}
+      role={homeContact.role}
+      side={homeContact.side}
+    />
   </section>
 );

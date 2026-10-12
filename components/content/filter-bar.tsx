@@ -2,7 +2,8 @@
 
 import { useId } from "react";
 
-import { chipClassName } from "@/components/site/styles";
+import { dotItemClassName } from "@/components/site/styles";
+import { cn } from "@/lib/utils";
 
 export interface FilterFacet {
   count: number;
@@ -11,6 +12,28 @@ export interface FilterFacet {
 }
 
 const pad = (value: number) => String(value).padStart(2, "0");
+
+const FilterOption = ({
+  count,
+  isActive,
+  label,
+  onSelect,
+}: {
+  count: number;
+  isActive: boolean;
+  label: string;
+  onSelect: () => void;
+}) => (
+  <button
+    aria-pressed={isActive}
+    className={cn(dotItemClassName, "text-left xl:w-full")}
+    onClick={onSelect}
+    type="button"
+  >
+    <span className="min-w-0 truncate">{label}</span>
+    <span className="label text-mist ml-auto tabular-nums">{pad(count)}</span>
+  </button>
+);
 
 export const FilterBar = ({
   active,
@@ -30,35 +53,29 @@ export const FilterBar = ({
   const labelId = useId();
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <p className="label text-mist" id={labelId}>
         {label}
         {jp ? <span className="jp ml-1">{jp}</span> : null}
       </p>
       <fieldset
         aria-labelledby={labelId}
-        className="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0"
+        className="m-0 flex min-w-0 flex-wrap gap-x-6 border-0 p-0 xl:flex-col xl:gap-x-0"
       >
-        <button
-          aria-pressed={active === ""}
-          className={chipClassName}
-          onClick={() => onChange("")}
-          type="button"
-        >
-          All
-          <span className="tabular-nums">{pad(total)}</span>
-        </button>
+        <FilterOption
+          count={total}
+          isActive={active === ""}
+          label="All"
+          onSelect={() => onChange("")}
+        />
         {facets.map((facet) => (
-          <button
-            aria-pressed={active === facet.name}
-            className={chipClassName}
+          <FilterOption
+            count={facet.count}
+            isActive={active === facet.name}
             key={facet.name}
-            onClick={() => onChange(active === facet.name ? "" : facet.name)}
-            type="button"
-          >
-            {facet.label ?? facet.name}
-            <span className="tabular-nums">{pad(facet.count)}</span>
-          </button>
+            label={facet.label ?? facet.name}
+            onSelect={() => onChange(active === facet.name ? "" : facet.name)}
+          />
         ))}
       </fieldset>
     </div>

@@ -1,6 +1,5 @@
 import { LabTopicFilter } from "@/components/lab/lab-archive";
-import { DossierPanel } from "@/components/site/compact-dossier";
-import { PageAside } from "@/components/site/page-aside";
+import { AsidePanel, PageAside } from "@/components/site/page-aside";
 import { activeTopics, experiments } from "@/lib/lab/experiments";
 
 const topicCounts = activeTopics.map((topic) => ({
@@ -10,9 +9,9 @@ const topicCounts = activeTopics.map((topic) => ({
 }));
 
 export const LabPanels = () => (
-  <PageAside code="LAB-02" columns="single" label="Lab filters">
-    <DossierPanel collapsible jp="絞込" label="Filter">
+  <PageAside code="LAB-02" label="Lab filters">
+    <AsidePanel collapsible jp="絞込" label="Filter">
       <LabTopicFilter topics={topicCounts} total={experiments.length} />
-    </DossierPanel>
+    </AsidePanel>
   </PageAside>
 );

@@ -110,15 +110,19 @@ describe("documented values match the source", () => {
   });
 
   test("the document grid spec matches DocumentShell", async () => {
-    const layout = await readProjectFile("components/site/document-shell.tsx");
+    const [layout, css] = await Promise.all([
+      readProjectFile("components/site/document-shell.tsx"),
+      readProjectFile("app/globals.css"),
+    ]);
     for (const className of documentGridSpec.containerClasses) {
       expect(layout.split(/[\s"]+/u)).toContain(className);
     }
-    expect(layout).toContain(`lg:grid-cols-${documentGridSpec.columns}`);
-    expect(layout).toContain(`lg:col-span-${documentGridSpec.dossierSpan}`);
-    expect(layout).toContain(`lg:col-span-${documentGridSpec.contentSpan}`);
     expect(layout).toContain(documentGridSpec.gutter);
     expect(layout).toContain(documentGridSpec.sectionGap);
+    expect(css).toContain(
+      `--container-column: ${documentGridSpec.columnWidth}`
+    );
+    expect(css).toContain(`--container-aside: ${documentGridSpec.asideWidth}`);
   });
 
   test("every documented duration class is used by the site", async () => {

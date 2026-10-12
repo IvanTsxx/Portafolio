@@ -44,25 +44,20 @@ describe("site naming", () => {
     expect(filesContaining(surname)).toEqual(["lib/site/config.ts"]);
   });
 
-  test("reads the legal name only in the dossier heading and the mobile monogram", () => {
+  test("reads the legal name only in the home intro dossier", () => {
     expect(filesContaining("siteConfig.name")).toEqual([
-      "components/profile/identity-dossier.tsx",
-      "components/site/dossier-disclosure.tsx",
+      "components/profile/profile-intro.tsx",
     ]);
   });
 
-  test("reaches the dossier only through the document group layout", () => {
-    expect(filesContaining("IdentityDossier")).toEqual([
-      "app/(document)/layout.tsx",
-      "components/profile/identity-dossier.tsx",
+  test("reaches the dossier only through the home page", () => {
+    expect(filesContaining("ProfileIntro")).toEqual([
+      "app/(document)/page.tsx",
+      "components/profile/profile-intro.tsx",
     ]);
     expect(filesContaining("DocumentShell")).toEqual([
       "app/(document)/layout.tsx",
       "components/site/document-shell.tsx",
-    ]);
-    expect(filesContaining("DossierDisclosure")).toEqual([
-      "components/site/document-shell.tsx",
-      "components/site/dossier-disclosure.tsx",
     ]);
   });
 

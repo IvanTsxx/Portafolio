@@ -28,3 +28,5 @@ export const chipClassName = `label inline-flex min-h-11 items-center gap-2 bord
 
 export const hoverRowClassName =
   "transition-colors duration-100 ease-mechanical hover:bg-paper-deep/60 has-[a:focus-visible]:bg-paper-deep/60 has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-ink";
+
+export const dotItemClassName = `ease-mechanical text-graphite hover:text-ink aria-pressed:text-ink aria-[current=location]:text-ink before:bg-ink flex min-h-11 items-center gap-3 text-sm transition-colors duration-100 before:size-1.5 before:shrink-0 before:opacity-0 before:transition-opacity before:duration-100 aria-pressed:before:opacity-100 aria-[current=location]:before:opacity-100 xl:min-h-8 ${focusRingClassName}`;

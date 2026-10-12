@@ -576,27 +576,20 @@ export const breakpointSpecs = [
     px: 768,
   },
   {
-    changes: "12-column grid, dossier column",
+    changes: "Experience stairs pin while scrolling",
     name: "lg",
     px: 1024,
   },
-  { changes: "Largest title", name: "xl", px: 1280 },
+  { changes: "Index list sits beside the column", name: "xl", px: 1280 },
   { changes: "Container stops at 1536", name: "2xl", px: 1536 },
 ] as const satisfies readonly BreakpointSpec[];
 
 export const documentGridSpec = {
-  columns: 12,
-  containerClasses: [
-    "mx-auto",
-    "w-full",
-    "max-w-screen-2xl",
-    "px-4",
-    "md:px-8",
-  ],
-  contentSpan: 8,
-  dossierSpan: 4,
-  gutter: "gap-x-6",
-  sectionGap: "gap-16",
+  asideWidth: "12rem",
+  columnWidth: "44rem",
+  containerClasses: ["max-w-column", "relative", "mx-auto"],
+  gutter: "md:px-8",
+  sectionGap: "gap-24",
 } as const;
 
 export interface AgentMotionSpec {

@@ -29,7 +29,7 @@ bun run build           # shadcn build (public/r) + next build
 
 ## Where things live
 
-- Identity, links, routes, registry URL: `lib/site/config.ts`. The site calls him `nickname` ("Ivo"). The legal `name` renders once, in the dossier.
+- Identity, links, routes, registry URL: `lib/site/config.ts`. The site calls him `nickname` ("Ivo"). The legal `name` renders once, in the home intro dossier.
 - Global search palette (`⌘K`, `Ctrl+K`, `/`): the server builds the index in `lib/search/build-index.ts` from the content, lab, registry and config loaders, `lib/search/match.ts` matches and returns highlight ranges, and `components/command/**` renders it. A new route, section, note, experiment or registry item shows up without touching the palette, except a new home section, which is listed in `homeSections` in `lib/site/config.ts`.
 - Header stars chip: `lib/site/github-repo.ts` reads `stargazers_count` for `siteConfig.repository` hourly and hides the count when GitHub does not answer.
 - Design tokens and utilities (`label`, `display`, `blueprint-grid`, `grain`): `app/globals.css`. Direction notes: `docs/direction.md`.

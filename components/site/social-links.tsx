@@ -26,7 +26,6 @@ const socialListVariants = cva("", {
   variants: {
     variant: {
       contact: "flex flex-wrap gap-x-8 gap-y-2",
-      dossier: "border-rule grid grid-cols-2 border-t",
       footer: "grid grid-cols-2 gap-x-6",
       inline: "flex flex-wrap gap-x-6 gap-y-2",
     },
@@ -41,8 +40,6 @@ const socialLinkVariants = cva(
       variant: {
         contact:
           "border-rule-strong pointer-fine:hover:border-ink h-11 gap-2 border-b",
-        dossier:
-          "border-rule pointer-fine:hover:bg-paper-deep/60 min-h-11 border-b py-1.5",
         footer: "min-h-11 py-1 md:min-h-9",
         inline:
           "border-rule-strong pointer-fine:hover:border-ink min-h-11 gap-2 border-b",
@@ -58,7 +55,6 @@ const iconFrameVariants = cva(
     variants: {
       variant: {
         contact: "size-5",
-        dossier: "size-5",
         footer: "size-5",
         inline: "size-5",
       },

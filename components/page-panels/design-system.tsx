@@ -1,7 +1,6 @@
 import { TableOfContents } from "@/components/content/table-of-contents";
-import { DossierPanel } from "@/components/site/compact-dossier";
 import { LeaderList, LeaderRow } from "@/components/site/leader-list";
-import { PageAside } from "@/components/site/page-aside";
+import { AsidePanel, PageAside } from "@/components/site/page-aside";
 import { linkClassName } from "@/components/site/styles";
 import { loadDesignMarkdown } from "@/lib/design-system/load";
 import { documentCode, rawMarkdownPath } from "@/lib/design-system/sections";
@@ -17,10 +16,10 @@ export const DesignSystemPanels = async () => {
 
   return (
     <PageAside code={documentCode} label="Design system index">
-      <DossierPanel collapsible jp="目次" label="On this page">
+      <AsidePanel collapsible jp="目次" label="On this page">
         <TableOfContents headings={designSystemHeadings} />
-      </DossierPanel>
-      <DossierPanel jp="出力" label="Export">
+      </AsidePanel>
+      <AsidePanel jp="出力" label="Export">
         <LeaderList>
           <LeaderRow jp="容量" label="Size">
             {kilobytes} KB
@@ -31,7 +30,7 @@ export const DesignSystemPanels = async () => {
             </a>
           </LeaderRow>
         </LeaderList>
-      </DossierPanel>
+      </AsidePanel>
     </PageAside>
   );
 };

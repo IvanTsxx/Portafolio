@@ -4,7 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 @custom-variant pointer-fine (@media (hover: hover) and (pointer: fine));
-@custom-variant dossier-fits (@media (min-height: 40rem));
 
 @theme inline {
   --color-background: var(--background);
@@ -72,6 +71,8 @@
       transform: scaleX(1);
     }
   }
+  --container-column: 44rem;
+  --container-aside: 12rem;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }

@@ -4,8 +4,6 @@ import type { VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { AgentWaypoint } from "@/components/scene/agent-waypoint";
-import type { AgentWaypointProps } from "@/components/scene/agent-waypoint";
 import { focusRingClassName } from "@/components/site/styles";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +31,6 @@ interface DocumentHeroProps extends VariantProps<typeof titleVariants> {
   lede?: ReactNode;
   meta?: readonly DocumentMeta[];
   title: ReactNode;
-  waypoint?: AgentWaypointProps;
 }
 
 export const DocumentHero = ({
@@ -46,10 +43,9 @@ export const DocumentHero = ({
   meta,
   size,
   title,
-  waypoint,
 }: DocumentHeroProps) => (
-  <header className="@container relative w-full">
-    <div className="label border-rule-strong flex flex-wrap items-center justify-between gap-x-8 gap-y-2 border-b pb-2">
+  <header className="border-rule @container relative w-full border-b pb-16">
+    <div className="label flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
       <span className="flex flex-wrap items-center gap-x-6 gap-y-1">
         {back ? (
           <Link
@@ -75,7 +71,7 @@ export const DocumentHero = ({
       ) : null}
     </div>
 
-    <div className="mt-10 grid items-end gap-x-6 gap-y-8 md:mt-16 @3xl:grid-cols-12">
+    <div className="mt-12 grid items-end gap-x-6 gap-y-8 md:mt-16 @3xl:grid-cols-12">
       <div className="flex min-w-0 flex-col items-start gap-6 @3xl:col-span-8">
         <h1 className={titleVariants({ size })}>{title}</h1>
         {children}
@@ -98,6 +94,5 @@ export const DocumentHero = ({
         </div>
       ) : null}
     </div>
-    {waypoint ? <AgentWaypoint {...waypoint} /> : null}
   </header>
 );

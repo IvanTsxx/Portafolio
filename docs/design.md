@@ -159,7 +159,7 @@ Zen Kaku Gothic New, light and tightly tracked, for names and titles. Geist Mono
 
 ## Layout
 
-Index pages use a 12-column document grid. A compact identity dossier fills 4 columns on the left and sticks only when it fits the viewport; it never scrolls on its own. Numbered sections fill 8 on the right and stack on mobile. Detail pages drop the dossier and run in one centered column. Spacing follows a 4px scale. Sections are separated by 64px and open with a panel heading: `[ XX-NN ]  LABEL  日本語 ........ 06 / 06` over a strong rule.
+Index pages run in one centered reading column, 44rem wide. From xl a quiet index or filter list sits on its left and sticks while the column scrolls; below xl the list sits inline under the intro. The home intro carries the identity dossier: portrait, name, bio, GitHub readouts and links. A single hairline closes each page intro. Detail pages run in a wider centered column. Spacing follows a 4px scale. Sections are separated by 96px and open with a panel heading: `[ XX-NN ]  LABEL  日本語 ........ 06 / 06` over a strong rule. As a section scrolls in, its scaffold rules draw first and its content fills in while the companion agent builds it.
 
 ## Elevation & Depth
 

@@ -8,6 +8,7 @@ import {
   spacingSpecs,
 } from "@/lib/design-system/specs";
 import type { RadiusStepName } from "@/lib/design-system/specs";
+import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { ClassTag, SubHeading } from "./spec-frame";
 
@@ -18,11 +19,6 @@ const radiusClassNames = {
   sm: "rounded-sm",
   xl: "rounded-xl",
 } as const satisfies Record<RadiusStepName, string>;
-
-const columnNumbers = Array.from(
-  { length: documentGridSpec.columns },
-  (_, index) => index + 1
-);
 
 const maxBreakpoint = Math.max(...breakpointSpecs.map(({ px }) => px));
 
@@ -67,28 +63,17 @@ const RadiusScale = ({ steps }: { steps: DesignSystem["radius"]["steps"] }) => (
 
 const GridDiagram = () => (
   <div className="border-rule relative flex flex-col gap-3 border p-3 md:p-4">
-    <div className="grid grid-cols-12 gap-x-1.5 md:gap-x-3">
-      {columnNumbers.map((column) => (
-        <span
-          className="label text-mist border-rule bg-paper-deep/40 flex h-12 items-end justify-center border pb-1 tabular-nums"
-          key={column}
-        >
-          {column}
-        </span>
-      ))}
-    </div>
-    <div className="grid grid-cols-12 gap-x-1.5 md:gap-x-3">
-      <span className="hatch border-rule-strong label text-ink col-span-4 flex h-10 items-center justify-center border border-dashed">
-        Dossier {documentGridSpec.dossierSpan}
+    <div className="grid grid-cols-5 gap-x-1.5 md:gap-x-3">
+      <span className="hatch border-rule-strong label text-ink flex h-24 items-center justify-center border border-dashed text-center">
+        Aside {documentGridSpec.asideWidth}
       </span>
-      <span className="border-ink label text-ink col-span-8 flex h-10 items-center justify-center border">
-        Content {documentGridSpec.contentSpan}
+      <span className="border-ink label text-ink col-span-3 flex h-24 items-center justify-center border">
+        Column {documentGridSpec.columnWidth}
       </span>
+      <span aria-hidden className="border-rule h-24 border border-dashed" />
     </div>
     <p className="label text-mist flex flex-wrap justify-between gap-x-4 gap-y-1 normal-case">
-      <span>
-        {documentGridSpec.columns} columns from lg · {documentGridSpec.gutter}
-      </span>
+      <span>Aside beside the column from xl · {documentGridSpec.gutter}</span>
       <span>Sections {documentGridSpec.sectionGap}</span>
     </p>
   </div>
@@ -133,6 +118,7 @@ export const SpacingSection = ({
       index={section.index}
       jp={section.jp}
       label={section.label}
+      script={sectionScripts.designSpacing}
     >
       <div className="flex flex-col gap-3">
         <SubHeading
@@ -156,7 +142,7 @@ export const SpacingSection = ({
             <ClassTag>{documentGridSpec.containerClasses.join(" ")}</ClassTag>
           }
           jp="格子"
-          label="Document grid"
+          label="Document column"
         />
         <GridDiagram />
       </div>
