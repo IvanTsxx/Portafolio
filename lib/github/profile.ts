@@ -25,6 +25,7 @@ import snapshot from "./snapshot.json";
 export const GITHUB_LOGIN = siteConfig.github;
 
 const TIMELINE_MONTHS = 3;
+const PINNED_TOPICS = 8;
 
 const calendarFields =
   "totalContributions weeks { contributionDays { date weekday contributionCount contributionLevel } }";
@@ -41,7 +42,7 @@ const profileQuery = `query($login: String!) {
     starredRepositories { totalCount }
     organizations(first: 20) { nodes { login } }
     pinnedItems(first: 6, types: REPOSITORY) {
-      nodes { ... on Repository { name nameWithOwner description createdAt isTemplate isPrivate stargazerCount primaryLanguage { name } } }
+      nodes { ... on Repository { name nameWithOwner description createdAt pushedAt homepageUrl forkCount isTemplate isPrivate stargazerCount primaryLanguage { name } repositoryTopics(first: ${PINNED_TOPICS}) { nodes { topic { name } } } } }
     }
     contributionsCollection {
       contributionYears

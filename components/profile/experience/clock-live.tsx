@@ -5,15 +5,18 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { useFigureStation } from "@/components/iso/figure-stations";
 import type { FigureControl } from "@/components/iso/figure-stations";
 import type { Projection } from "@/components/iso/iso-kit";
+import type { DossierFile } from "@/components/profile/dossier-file";
 import { FigurePlate } from "@/components/profile/figure-plate";
+import { FileSheet } from "@/components/profile/file-sheet";
 
 import type { Tenure } from "./career";
-import { spanText } from "./career";
+import { spanText, spokenText } from "./career";
 import type { ClockParts } from "./clock-art";
 import { ClockDrawing } from "./clock-drawing";
 import type { Pocket } from "./clock-layout";
+import { readingOf } from "./clock-reading";
+import type { Shown } from "./clock-reading";
 import { ClockReadout } from "./clock-readout";
-import type { Shown } from "./clock-readout";
 import { useClockMotion } from "./use-clock-motion";
 import type { ClockNodes, DeskPhase } from "./use-clock-motion";
 import { useClockTour } from "./use-clock-tour";
@@ -25,9 +28,6 @@ const CONTROLS: readonly FigureControl[] = [
   { id: "previous", label: "Punch the previous card" },
   { id: "return", label: "Return the card to its rack" },
 ];
-
-const spokenOf = (tenure: Tenure) =>
-  `${tenure.company}, ${tenure.role}, ${tenure.dates.replace("→", "to")}, ${spanText(tenure)}, ${tenure.type}`;
 
 const punchedOf = (tenure: Tenure) => {
   const stack =
@@ -46,26 +46,24 @@ const shownOf = (
 };
 
 const CardButtons = ({
-  heldJob,
   onEscape,
+  onOpen,
   onPeek,
-  onToggle,
   tenures,
 }: {
-  heldJob: number | null;
   onEscape: () => void;
+  onOpen: (job: number) => void;
   onPeek: (job: number | null) => void;
-  onToggle: (job: number) => void;
   tenures: readonly Tenure[];
 }) => (
   <ul aria-label="Time cards" className="sr-only">
     {tenures.map((tenure, index) => (
       <li key={tenure.id}>
         <button
-          aria-label={spokenOf(tenure)}
-          aria-pressed={heldJob === index}
+          aria-haspopup="dialog"
+          aria-label={spokenText(tenure)}
           onBlur={() => onPeek(null)}
-          onClick={() => onToggle(index)}
+          onClick={() => onOpen(index)}
           onFocus={(event) => {
             if (event.currentTarget.matches(":focus-visible")) {
               onPeek(index);
@@ -85,6 +83,7 @@ const CardButtons = ({
 
 export interface ClockLiveProps {
   caption: string;
+  files: readonly DossierFile[];
   mask: string;
   parts: ClockParts;
   pockets: readonly Pocket[];
@@ -94,6 +93,7 @@ export interface ClockLiveProps {
 
 export const ClockLive = ({
   caption,
+  files,
   mask,
   parts,
   pockets,
@@ -126,6 +126,7 @@ export const ClockLive = ({
   });
   const [spoken, setSpoken] = useState("");
   const [isEngaged, setIsEngaged] = useState(false);
+  const [openJob, setOpenJob] = useState<number | null>(null);
   const lastFed = useRef(currentJob);
 
   const onPhase = useCallback(
@@ -148,7 +149,8 @@ export const ClockLive = ({
     count,
     current: currentJob,
     feed: motion.feed,
-    isActive: motion.isVisible && !motion.isReduced && !isEngaged,
+    isActive:
+      motion.isVisible && !motion.isReduced && !isEngaged && openJob === null,
     preview: setPeek,
     release: motion.release,
     root,
@@ -158,8 +160,6 @@ export const ClockLive = ({
     touch();
     setPeek(job);
   };
-
-  const heldJob = desk.phase === "held" ? desk.job : null;
 
   const punch = (job: number) => {
     touch();
@@ -172,12 +172,17 @@ export const ClockLive = ({
     motion.release();
   };
 
-  const toggle = (job: number) => {
-    if (heldJob === job) {
-      putBack();
-      return;
+  const openFile = (job: number) => {
+    setPeek(null);
+    setOpenJob(job);
+    if (desk.job !== job || desk.phase === "home") {
+      punch(job);
     }
-    punch(job);
+  };
+
+  const closeFile = () => {
+    setOpenJob(null);
+    putBack();
   };
 
   const step = (by: number) => {
@@ -205,64 +210,68 @@ export const ClockLive = ({
   });
 
   return (
-    <div
-      className="flex flex-col"
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) {
-          setIsEngaged(false);
-        }
-      }}
-      onFocus={() => {
-        touch();
-        setIsEngaged(true);
-      }}
-      onPointerEnter={(event) => {
-        if (event.pointerType === "mouse") {
+    <>
+      <div
+        className="flex flex-col"
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setIsEngaged(false);
+          }
+        }}
+        onFocus={() => {
           touch();
           setIsEngaged(true);
-        }
-      }}
-      onPointerLeave={() => {
-        touch();
-        setIsEngaged(false);
-      }}
-    >
-      <figure className="iso m-0" data-build-block data-build-self ref={root}>
-        <FigurePlate
-          readout={
-            <ClockReadout
-              current={tenures[currentJob]}
-              shown={shownOf(peek, desk)}
+        }}
+        onPointerEnter={(event) => {
+          if (event.pointerType === "mouse") {
+            touch();
+            setIsEngaged(true);
+          }
+        }}
+        onPointerLeave={() => {
+          touch();
+          setIsEngaged(false);
+        }}
+      >
+        <figure className="iso m-0" data-build-block data-build-self ref={root}>
+          <FigurePlate
+            readout={
+              <ClockReadout
+                reading={readingOf(
+                  shownOf(peek, desk),
+                  tenures,
+                  tenures[currentJob]
+                )}
+              />
+            }
+          >
+            <CardButtons
+              onEscape={putBack}
+              onOpen={openFile}
+              onPeek={peekByUser}
               tenures={tenures}
             />
-          }
-        >
-          <CardButtons
-            heldJob={heldJob}
-            onEscape={putBack}
-            onPeek={peekByUser}
-            onToggle={toggle}
-            tenures={tenures}
-          />
-          <ClockDrawing
-            consoleRef={consoleRef}
-            ids={ids}
-            mask={mask}
-            bind={bind}
-            onCard={toggle}
-            onConsole={() => step(1)}
-            onPeek={peekByUser}
-            parts={parts}
-            peek={peek}
-            pockets={pockets}
-            projection={projection}
-          />
-          <p aria-live="polite" className="sr-only">
-            {spoken}
-          </p>
-        </FigurePlate>
-        <figcaption className="sr-only">{caption}</figcaption>
-      </figure>
-    </div>
+            <ClockDrawing
+              consoleRef={consoleRef}
+              ids={ids}
+              mask={mask}
+              bind={bind}
+              onCard={openFile}
+              onConsole={() => step(1)}
+              onPeek={peekByUser}
+              parts={parts}
+              peek={peek}
+              pockets={pockets}
+              projection={projection}
+            />
+            <p aria-live="polite" className="sr-only">
+              {spoken}
+            </p>
+          </FigurePlate>
+          <figcaption className="sr-only">{caption}</figcaption>
+        </figure>
+      </div>
+      <FileSheet files={files} index={openJob} onClose={closeFile} />
+    </>
   );
 };

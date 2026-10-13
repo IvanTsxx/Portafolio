@@ -259,11 +259,11 @@ export const useCatalogMotion = ({
       (request !== null && taken.current !== request),
     isReduced,
     isVisible,
-    read: (slot: number, opens: boolean) => {
+    read: (slot: number) => {
       if (reading.current || (request && taken.current !== request)) {
         return false;
       }
-      setRequest(startRead(slot, opens));
+      setRequest(startRead(slot));
       return true;
     },
   };

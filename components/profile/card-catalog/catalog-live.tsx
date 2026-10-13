@@ -4,14 +4,22 @@ import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 
 import { useFigureStation } from "@/components/iso/figure-stations";
+import type { DossierFile } from "@/components/profile/dossier-file";
 import { FigurePlate, FigureReadout } from "@/components/profile/figure-plate";
+import { FileSheet } from "@/components/profile/file-sheet";
 
 import type { Catalog, CatalogCard } from "./catalog";
-import { cardDetail, catalogTitle, languageText, spokenCard } from "./catalog";
+import {
+  cardDetail,
+  cardLine,
+  catalogTitle,
+  languageText,
+  spokenCard,
+  tourStepOf,
+} from "./catalog";
 import type { CatalogParts } from "./catalog-art";
 import { CATALOG_HEIGHT, CATALOG_WIDTH } from "./catalog-geometry";
 import type { CatalogRig, CounterArt } from "./catalog-geometry";
-import type { Read } from "./catalog-motion";
 import { useCatalogMotion } from "./use-catalog-motion";
 import type { CatalogNodes } from "./use-catalog-motion";
 
@@ -88,6 +96,7 @@ export interface CatalogLiveProps {
   caption: string;
   catalog: Catalog;
   counter: CounterArt;
+  files: readonly DossierFile[];
   label: string;
   parts: CatalogParts;
   rig: CatalogRig;
@@ -97,6 +106,7 @@ export const CatalogLive = ({
   caption,
   catalog,
   counter,
+  files,
   label,
   parts,
   rig,
@@ -113,6 +123,7 @@ export const CatalogLive = ({
   const [readingSlot, setReadingSlot] = useState<number | null>(null);
   const [seatedSlot, setSeatedSlot] = useState<number | null>(null);
   const [spoken, setSpoken] = useState("");
+  const [openSlot, setOpenSlot] = useState<number | null>(null);
   const shown = hovered ?? toured;
   const lifted = readingSlot ?? (isEngaged ? null : toured);
 
@@ -122,13 +133,7 @@ export const CatalogLive = ({
       setSeatedSlot(null);
       setReadingSlot(null);
     },
-    onSeated: (read: Read) => {
-      setSeatedSlot(read.slot);
-      const card = catalog.cards[read.slot];
-      if (read.opens && card) {
-        window.open(card.url, "_blank", "noopener,noreferrer");
-      }
-    },
+    onSeated: (read) => setSeatedSlot(read.slot),
     rig,
     root,
     shown: lifted,
@@ -136,18 +141,13 @@ export const CatalogLive = ({
 
   const touch = () => stamp(lastTouch);
 
-  const feed = (slot: number, opens: boolean) => {
+  const feed = (slot: number) => {
     const card = catalog.cards[slot];
-    if (!(card && motion.read(slot, opens))) {
-      return false;
+    if (!(card && motion.read(slot))) {
+      return;
     }
     setReadingSlot(slot);
-    setSpoken(
-      opens
-        ? `Reading ${card.name}, opening it on GitHub.`
-        : `Reading ${card.name}. ${cardDetail(card)}.`
-    );
-    return true;
+    setSpoken(`Reading ${card.name}. ${cardDetail(card)}.`);
   };
 
   const step = (by: number) => {
@@ -169,21 +169,21 @@ export const CatalogLive = ({
       } else if (controlId === "previous") {
         step(-1);
       } else if (controlId === "read") {
-        feed(shown ?? 0, false);
+        feed(shown ?? 0);
       }
     },
     title: "Card catalog",
   });
 
-  const isTouring = motion.isVisible && !motion.isReduced && !isEngaged;
+  const isTouring =
+    motion.isVisible && !motion.isReduced && !isEngaged && openSlot === null;
   const isBusy = useEffectEvent(
     () => root.current?.dataset.assembled === undefined || motion.isReading()
   );
-  const tourStep = useEffectEvent((slot: number, reads: boolean) => {
+  const tourStep = useEffectEvent((stop: number) => {
+    const { reads, slot } = tourStepOf(stop, count, TOUR_READ_EVERY);
     setToured(slot);
-    return reads
-      ? window.setTimeout(() => feed(slot, false), TOUR_READ_AFTER_MS)
-      : 0;
+    return reads ? window.setTimeout(() => feed(slot), TOUR_READ_AFTER_MS) : 0;
   });
 
   useEffect(() => {
@@ -204,11 +204,8 @@ export const CatalogLive = ({
           later(TOUR_FIRST_MS);
           return;
         }
+        readTimer = tourStep(steps);
         steps += 1;
-        readTimer = tourStep(
-          (steps - 1) % count,
-          steps % TOUR_READ_EVERY === 0
-        );
         later(TOUR_EVERY_MS);
       }, delay);
     };
@@ -226,11 +223,15 @@ export const CatalogLive = ({
 
   const onCardClick = (event: MouseEvent<Element>, slot: number) => {
     touch();
-    if (!isPlainClick(event) || !motion.canAnimate || motion.isReading()) {
+    if (!isPlainClick(event)) {
       return;
     }
     event.preventDefault();
-    feed(slot, true);
+    setHovered(null);
+    setOpenSlot(slot);
+    if (motion.canAnimate && !motion.isReading()) {
+      feed(slot);
+    }
   };
 
   const onCardKey = (event: KeyboardEvent<Element>, slot: number) => {
@@ -253,122 +254,131 @@ export const CatalogLive = ({
     seatedSlot === null ? undefined : catalog.cards[seatedSlot];
 
   return (
-    <div
-      className="flex flex-col gap-3"
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) {
-          setIsEngaged(false);
-          preview(null);
-        }
-      }}
-      onFocus={() => {
-        touch();
-        setIsEngaged(true);
-      }}
-      onPointerEnter={(event: PointerEvent) => {
-        if (event.pointerType === "mouse") {
+    <>
+      <div
+        className="flex flex-col gap-3"
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setIsEngaged(false);
+            preview(null);
+          }
+        }}
+        onFocus={() => {
           touch();
           setIsEngaged(true);
-        }
-      }}
-      onPointerLeave={() => {
-        touch();
-        setIsEngaged(false);
-      }}
-    >
-      <figure
-        className="iso m-0"
-        data-build-block
-        data-build-self
-        data-figure={STATION_ID}
-        ref={root}
-      >
-        <FigurePlate
-          readout={
-            <FigureReadout
-              lead={shownCard ? shownCard.name : catalogTitle(catalog)}
-              trail={shownCard ? cardDetail(shownCard) : languageText(catalog)}
-            />
+        }}
+        onPointerEnter={(event: PointerEvent) => {
+          if (event.pointerType === "mouse") {
+            touch();
+            setIsEngaged(true);
           }
+        }}
+        onPointerLeave={() => {
+          touch();
+          setIsEngaged(false);
+        }}
+      >
+        <figure
+          className="iso m-0"
+          data-build-block
+          data-build-self
+          data-figure={STATION_ID}
+          ref={root}
         >
-          <p aria-live="polite" className="sr-only">
-            {spoken}
-          </p>
-          <svg
-            aria-label={label}
-            className="iso-svg"
-            viewBox={`0 0 ${CATALOG_WIDTH} ${CATALOG_HEIGHT}`}
+          <FigurePlate
+            readout={
+              <FigureReadout
+                lead={shownCard ? shownCard.name : catalogTitle(catalog)}
+                swapKey={shownCard ? shownCard.id : "catalog"}
+                trail={shownCard ? cardLine(shownCard) : languageText(catalog)}
+              />
+            }
           >
-            <defs>
-              <clipPath clipPathUnits="userSpaceOnUse" id={clipId}>
-                <path d={rig.clip} />
-              </clipPath>
-            </defs>
-            {parts.base}
-            <g data-part="tray">{parts.trayBack}</g>
-            {catalog.cards.map((card, slot) => (
-              <g data-part={`card-${slot}`} key={card.id}>
-                <a
-                  aria-label={spokenCard(card)}
-                  className="focus-visible:outline-ink cursor-pointer outline-none focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-solid"
-                  data-card={slot}
-                  href={card.url}
-                  onClick={(event) => onCardClick(event, slot)}
-                  onFocus={() => preview(slot)}
-                  onKeyDown={(event) => onCardKey(event, slot)}
-                  onPointerEnter={(event) => {
-                    if (event.pointerType === "mouse") {
-                      preview(slot);
-                    }
-                  }}
-                  onPointerLeave={() => preview(null)}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <g
-                    data-cursor={slot === hovered ? "" : undefined}
-                    data-on={slot === lifted ? "" : undefined}
-                    ref={bindCard(slot)}
+            <p aria-live="polite" className="sr-only">
+              {spoken}
+            </p>
+            <svg
+              aria-label={label}
+              className="iso-svg"
+              viewBox={`0 0 ${CATALOG_WIDTH} ${CATALOG_HEIGHT}`}
+            >
+              <defs>
+                <clipPath clipPathUnits="userSpaceOnUse" id={clipId}>
+                  <path d={rig.clip} />
+                </clipPath>
+              </defs>
+              {parts.base}
+              <g data-part="tray">{parts.trayBack}</g>
+              {catalog.cards.map((card, slot) => (
+                <g data-part={`card-${slot}`} key={card.id}>
+                  <a
+                    aria-haspopup="dialog"
+                    aria-label={spokenCard(card)}
+                    className="focus-visible:outline-ink cursor-pointer outline-none focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-solid"
+                    data-card={slot}
+                    href={card.url}
+                    onClick={(event) => onCardClick(event, slot)}
+                    onFocus={() => preview(slot)}
+                    onKeyDown={(event) => onCardKey(event, slot)}
+                    onPointerEnter={(event) => {
+                      if (event.pointerType === "mouse") {
+                        preview(slot);
+                      }
+                    }}
+                    onPointerLeave={() => preview(null)}
+                    rel="noreferrer"
+                    target="_blank"
                   >
-                    {parts.cards[slot]}
-                  </g>
-                </a>
+                    <g
+                      data-cursor={slot === shown ? "" : undefined}
+                      data-on={slot === lifted ? "" : undefined}
+                      ref={bindCard(slot)}
+                    >
+                      {parts.cards[slot]}
+                    </g>
+                  </a>
+                </g>
+              ))}
+              <g data-part="tray">{parts.trayFront}</g>
+              <g data-part="reader">
+                {parts.reader}
+                <Counter art={counter} text={counterText(seatedCard)} />
               </g>
-            ))}
-            <g data-part="tray">{parts.trayFront}</g>
-            <g data-part="reader">
-              {parts.reader}
-              <Counter art={counter} text={counterText(seatedCard)} />
-            </g>
-            <g aria-hidden clipPath={`url(#${clipId})`}>
-              <g
-                data-on=""
-                ref={(node) => {
-                  nodes.current.overlay = node;
-                }}
-                visibility="hidden"
-              >
-                {readingSlot === null ? null : parts.cards[readingSlot]}
+              <g aria-hidden clipPath={`url(#${clipId})`}>
+                <g
+                  data-on=""
+                  ref={(node) => {
+                    nodes.current.overlay = node;
+                  }}
+                  visibility="hidden"
+                >
+                  {readingSlot === null ? null : parts.cards[readingSlot]}
+                </g>
               </g>
-            </g>
-            <g data-part="reader">
-              <g data-on={seatedCard ? "" : undefined}>{parts.lamp}</g>
-              <g
-                className="transition-transform duration-150 ease-out motion-reduce:transition-none"
-                ref={key}
-                style={{
-                  transform: seatedCard
-                    ? `translateY(${KEY_TRAVEL}px)`
-                    : undefined,
-                }}
-              >
-                {parts.key}
+              <g data-part="reader">
+                <g data-on={seatedCard ? "" : undefined}>{parts.lamp}</g>
+                <g
+                  className="transition-transform duration-150 ease-out motion-reduce:transition-none"
+                  ref={key}
+                  style={{
+                    transform: seatedCard
+                      ? `translateY(${KEY_TRAVEL}px)`
+                      : undefined,
+                  }}
+                >
+                  {parts.key}
+                </g>
               </g>
-            </g>
-          </svg>
-        </FigurePlate>
-        <figcaption className="sr-only">{caption}</figcaption>
-      </figure>
-    </div>
+            </svg>
+          </FigurePlate>
+          <figcaption className="sr-only">{caption}</figcaption>
+        </figure>
+      </div>
+      <FileSheet
+        files={files}
+        index={openSlot}
+        onClose={() => setOpenSlot(null)}
+      />
+    </>
   );
 };

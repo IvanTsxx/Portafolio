@@ -121,18 +121,30 @@ const visibilityOf = (node: RawPinned) => {
   return node.isTemplate ? "public-template" : "public";
 };
 
+const homepageOf = (url: string | null) =>
+  url !== null && URL.canParse(url) ? url : null;
+
 export const parsePinned = (nodes: readonly RawPinned[]): PinnedRepository[] =>
   keepPublic(
     nodes.map((node): PinnedRepository => ({
       createdAt: node.createdAt.slice(0, 10),
       description: node.description,
+      forks: node.forkCount,
+      homepage: homepageOf(node.homepageUrl),
       language: node.primaryLanguage?.name ?? null,
       name: node.name,
       nameWithOwner: node.nameWithOwner,
+      pushedAt: node.pushedAt.slice(0, 10),
       stars: node.stargazerCount,
+      topics: node.repositoryTopics.nodes.map((entry) => entry.topic.name),
       visibility: visibilityOf(node),
     })),
-    (repository) => [repository.nameWithOwner, repository.description]
+    (repository) => [
+      repository.nameWithOwner,
+      repository.description,
+      repository.homepage,
+      ...repository.topics,
+    ]
   );
 
 export const parseActivity = (collection: RawCollection): ActivityOverview => {

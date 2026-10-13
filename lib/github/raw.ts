@@ -53,11 +53,17 @@ export type RawCalendar = z.infer<typeof rawCalendarSchema>;
 const rawPinnedSchema = z.object({
   createdAt: z.iso.datetime(),
   description: optionalTextSchema,
+  forkCount: z.number(),
+  homepageUrl: optionalTextSchema,
   isPrivate: z.boolean(),
   isTemplate: z.boolean(),
   name: z.string(),
   nameWithOwner: z.string(),
   primaryLanguage: z.object({ name: z.string() }).nullable(),
+  pushedAt: z.iso.datetime(),
+  repositoryTopics: z.object({
+    nodes: z.array(z.object({ topic: z.object({ name: z.string() }) })),
+  }),
   stargazerCount: z.number(),
 });
 

@@ -66,10 +66,14 @@ export type RepositoryVisibility = z.infer<typeof repositoryVisibilitySchema>;
 const pinnedRepositorySchema = z.object({
   createdAt: z.iso.date(),
   description: z.string().nullable(),
+  forks: z.number(),
+  homepage: z.url().nullable(),
   language: z.string().nullable(),
   name: z.string(),
   nameWithOwner: z.string(),
+  pushedAt: z.iso.date(),
   stars: z.number(),
+  topics: z.array(z.string()),
   visibility: repositoryVisibilitySchema,
 });
 

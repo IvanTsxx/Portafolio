@@ -1,4 +1,9 @@
-import type { PinnedRepository } from "@/lib/github/model";
+import type { DossierFile } from "@/components/profile/dossier-file";
+import { fileCode, formatDay, hostOf } from "@/components/profile/dossier-file";
+import type {
+  PinnedRepository,
+  RepositoryVisibility,
+} from "@/lib/github/model";
 
 export const MOST_NOTCHES = 8;
 const LEAST_NOTCHES = 5;
@@ -12,16 +17,22 @@ export interface LanguageCount {
 }
 
 export interface CatalogCard {
+  createdAt: string;
   description: string | null;
   descriptionRules: readonly number[];
+  forks: number;
+  homepage: string | null;
   id: string;
   isTemplate: boolean;
   language: string;
   name: string;
   nameRule: number;
+  pushedAt: string;
   stars: number;
   tab: number;
+  topics: readonly string[];
   url: string;
+  visibility: RepositoryVisibility;
 }
 
 export interface Catalog {
@@ -68,16 +79,22 @@ export const catalogOf = (
     languages.map((entry, index) => [entry.language, index])
   );
   const cards = repositories.map((repository): CatalogCard => ({
+    createdAt: repository.createdAt,
     description: repository.description,
     descriptionRules: descriptionRules(repository.description),
+    forks: repository.forks,
+    homepage: repository.homepage,
     id: repository.nameWithOwner,
     isTemplate: repository.visibility === "public-template",
     language: languageOf(repository),
     name: repository.name,
     nameRule: Math.min(1, repository.name.length / LONGEST_NAME),
+    pushedAt: repository.pushedAt,
     stars: repository.stars,
     tab: tabOf.get(languageOf(repository)) ?? 0,
+    topics: repository.topics,
     url: `https://github.com/${repository.nameWithOwner}`,
+    visibility: repository.visibility,
   }));
   const mostStars = Math.max(0, ...cards.map((card) => card.stars));
   return {
@@ -106,3 +123,47 @@ export const languageText = (catalog: Catalog) =>
 
 export const spokenCard = (card: CatalogCard) =>
   `${card.name}. ${cardDetail(card)}.${card.description ? ` ${card.description}` : ""}`;
+
+export const cardLine = (card: CatalogCard) =>
+  card.description ?? cardDetail(card);
+
+export const tourStepOf = (step: number, count: number, readEvery: number) => ({
+  reads: (step + 1) % readEvery === 0,
+  slot: step % count,
+});
+
+const visibilityLabels = {
+  private: "Private",
+  public: "Public",
+  "public-template": "Public template",
+} as const satisfies Record<RepositoryVisibility, string>;
+
+export const repositoryFile = (
+  card: CatalogCard,
+  slot: number,
+  count: number,
+  section: string
+): DossierFile => ({
+  chips:
+    card.topics.length > 0 ? { items: card.topics, label: "Topics" } : null,
+  code: fileCode(section, slot, count),
+  fields: [
+    { label: "Language", value: card.language },
+    { label: "Stars", value: String(card.stars) },
+    { label: "Forks", value: String(card.forks) },
+    { label: "Visibility", value: visibilityLabels[card.visibility] },
+    { label: "Created", value: formatDay(card.createdAt) },
+    { label: "Last push", value: formatDay(card.pushedAt) },
+  ],
+  kicker: card.id,
+  links: [
+    { href: card.url, label: "GitHub" },
+    ...(card.homepage
+      ? [{ href: card.homepage, label: hostOf(card.homepage) }]
+      : []),
+  ],
+  note: card.description
+    ? { label: "Description", text: card.description }
+    : null,
+  title: card.name,
+});
