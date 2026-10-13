@@ -1,13 +1,11 @@
 export const labTopics = [
-  "3D",
   "Motion",
   "WebGL",
   "GSAP",
-  "CSS",
   "Shader",
   "Typography",
-  "UI",
   "AI",
+  "Image",
 ] as const;
 
 export type LabTopic = (typeof labTopics)[number];

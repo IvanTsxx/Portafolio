@@ -45,7 +45,7 @@ export const siteConfig = {
 export const primaryRoutes = [
   { href: "/", index: "00", jp: "ホーム", label: "Home" },
   { href: "/notes", index: "01", jp: "手記", label: "Notes" },
-  { href: "/lab", index: "02", jp: "実験", label: "Lab" },
+  { href: "/experiments", index: "02", jp: "実験", label: "Experiments" },
   { href: "/registry", index: "03", jp: "登録簿", label: "Registry" },
   { href: "/design-system", index: "04", jp: "設計", label: "Design system" },
 ] as const;
@@ -61,7 +61,8 @@ export const homeSections = [
   { id: "how-i-work", index: "GH-06", label: "How I work" },
   { id: "workshop", index: "GH-07", label: "Workshop" },
   { id: "experiments", index: "GH-08", label: "Experiments" },
-  { id: "contact", index: "GH-09", label: "Contact" },
+  { id: "registry", index: "GH-09", label: "Registry" },
+  { id: "contact", index: "GH-10", label: "Contact" },
 ] as const;
 
 export type Social = (typeof siteConfig.socials)[number];

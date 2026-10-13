@@ -8,6 +8,7 @@ import {
 import { focusRingClassName } from "@/components/site/styles";
 import { experiments } from "@/lib/lab/experiments";
 import type { Experiment } from "@/lib/lab/experiments";
+import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +25,7 @@ const ExperimentCell = ({ experiment }: { experiment: Experiment }) => {
   const { Poster } = experiment;
   return (
     <li className="border-rule min-w-0 border-r border-b" data-build-block>
-      <Link className={cellClassName} href={`/lab/${experiment.slug}`}>
+      <Link className={cellClassName} href={`/experiments/${experiment.slug}`}>
         <CornerMarks reveal="hover" />
         <div className="bg-popover border-rule aspect-video overflow-hidden border-b">
           <Poster />
@@ -45,34 +46,37 @@ const ExperimentCell = ({ experiment }: { experiment: Experiment }) => {
   );
 };
 
-export const ExperimentsSection = () => (
-  <DocumentSection
-    aside={
-      <PanelCount current={experiments.length} total={experiments.length} />
-    }
-    id="experiments"
-    index="GH-08"
-    label="Experiments"
-    script={sectionScripts.homeExperiments}
-  >
-    <ul className="border-rule grid grid-cols-2 border-t border-l sm:grid-cols-3">
-      {newestFirst.map((experiment) => (
-        <ExperimentCell experiment={experiment} key={experiment.slug} />
-      ))}
-      <li className="border-rule border-r border-b" data-build-block>
-        <Link
-          className={cn(
-            cellClassName,
-            "label text-ink h-full min-h-32 justify-end p-3"
-          )}
-          href="/lab"
-        >
-          <CornerMarks reveal="hover" />
-          <span>
-            <span className="ink-underline">All experiments</span> →
-          </span>
-        </Link>
-      </li>
-    </ul>
-  </DocumentSection>
-);
+export const ExperimentsSection = () => {
+  const section = homeSectionById("experiments");
+  return (
+    <DocumentSection
+      aside={
+        <PanelCount current={experiments.length} total={experiments.length} />
+      }
+      id={section.id}
+      index={section.index}
+      label={section.label}
+      script={sectionScripts.homeExperiments}
+    >
+      <ul className="border-rule grid grid-cols-2 border-t border-l sm:grid-cols-3">
+        {newestFirst.map((experiment) => (
+          <ExperimentCell experiment={experiment} key={experiment.slug} />
+        ))}
+        <li className="border-rule border-r border-b" data-build-block>
+          <Link
+            className={cn(
+              cellClassName,
+              "label text-ink h-full min-h-32 justify-end p-3"
+            )}
+            href="/experiments"
+          >
+            <CornerMarks reveal="hover" />
+            <span>
+              <span className="ink-underline">All experiments</span> →
+            </span>
+          </Link>
+        </li>
+      </ul>
+    </DocumentSection>
+  );
+};

@@ -44,10 +44,9 @@ export const WorkStages = () => {
   const [root, isInView] = useInView();
   const isReduced = useReducedMotion();
   const [active, setActive] = useState<WorkStep>(firstStep);
-  const [isHeld, setIsHeld] = useState(false);
   const [progressBar, setProgressBar] = useState<HTMLSpanElement | null>(null);
   const timer = useRef<Animation | null>(null);
-  const isPlaying = isInView && !isHeld && !isReduced;
+  const isPlaying = isInView && !isReduced;
   const activeIndex = workSteps.indexOf(active);
 
   const advance = useEffectEvent(() => setActive(stepAfter(active.id)));
@@ -114,10 +113,6 @@ export const WorkStages = () => {
         aria-label="How I work"
         className="border-rule grid grid-cols-7 border-t"
         data-build-block
-        onBlur={() => setIsHeld(false)}
-        onFocus={() => setIsHeld(true)}
-        onPointerEnter={() => setIsHeld(true)}
-        onPointerLeave={() => setIsHeld(false)}
       >
         {workSteps.map((step, index) => {
           const isActive = step.id === active.id;
@@ -125,7 +120,7 @@ export const WorkStages = () => {
             <Tabs.Tab
               aria-label={step.title}
               className={cn(
-                "group/step border-rule ease-mechanical relative flex min-h-14 cursor-pointer flex-col items-start justify-center gap-0.5 border-l px-2 text-left transition-colors duration-100 first:border-l-0 md:px-3",
+                "group/step border-rule ease-mechanical relative flex min-h-12 cursor-pointer flex-col items-start justify-start gap-1 border-l px-2 pt-2.5 pb-3 text-left transition-colors duration-100 first:border-l-0 sm:min-h-16 md:px-3",
                 isActive
                   ? "bg-paper-deep/40"
                   : "pointer-fine:hover:bg-paper-deep/20",

@@ -1,9 +1,9 @@
 import type { RailTrack } from "./companion-placement";
-import type { RailAnchor } from "./companion-rail-math";
 import { requestSceneFrame } from "./view-registry";
 
 export interface CompanionRail {
-  anchors: readonly RailAnchor[];
+  ids: readonly string[];
+  marks: readonly number[];
   track: RailTrack;
 }
 
@@ -15,3 +15,8 @@ export const setCompanionRail = (next: CompanionRail | null) => {
 };
 
 export const getCompanionRail = () => rail;
+
+export const railMarkFor = (
+  { ids, marks }: Pick<CompanionRail, "ids" | "marks">,
+  sectionId: string | null
+) => (sectionId === null ? 0 : (marks[ids.indexOf(sectionId)] ?? 0));

@@ -2,7 +2,7 @@ export const searchGroupOrder = [
   "pages",
   "sections",
   "notes",
-  "lab",
+  "experiments",
   "registry",
   "channels",
 ] as const;
@@ -11,7 +11,7 @@ export type SearchGroupId = (typeof searchGroupOrder)[number];
 
 export const searchGroups = {
   channels: { label: "Channels" },
-  lab: { label: "Lab" },
+  experiments: { label: "Experiments" },
   notes: { label: "Notes" },
   pages: { label: "Pages" },
   registry: { label: "Registry" },

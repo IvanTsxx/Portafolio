@@ -9,7 +9,7 @@ describe("companion cast per route", () => {
       role: "orchestrator",
     });
     expect(companionCastFor("/notes").role).toBe("researcher");
-    expect(companionCastFor("/lab").role).toBe("builder");
+    expect(companionCastFor("/experiments").role).toBe("builder");
     expect(companionCastFor("/registry").role).toBe("inspector");
     expect(companionCastFor("/design-system").role).toBe("architect");
   });
@@ -18,8 +18,8 @@ describe("companion cast per route", () => {
     expect(companionCastFor("/notes/some-note")).toEqual(
       companionCastFor("/notes")
     );
-    expect(companionCastFor("/lab/an-experiment/")).toEqual(
-      companionCastFor("/lab")
+    expect(companionCastFor("/experiments/an-experiment/")).toEqual(
+      companionCastFor("/experiments")
     );
   });
 
@@ -32,10 +32,9 @@ describe("companion cast per route", () => {
     expect(showcasesTheRig("/dev/agents")).toBe(true);
     expect(showcasesTheRig("/registry/agent")).toBe(true);
     expect(showcasesTheRig("/registry/agent-stage/")).toBe(true);
-    expect(showcasesTheRig("/lab/module-assembly")).toBe(true);
     expect(showcasesTheRig("/registry")).toBe(false);
-    expect(showcasesTheRig("/registry/agent-status-card")).toBe(false);
-    expect(showcasesTheRig("/lab/dot-grid")).toBe(false);
+    expect(showcasesTheRig("/registry/magnetic-button")).toBe(false);
+    expect(showcasesTheRig("/experiments/dot-grid")).toBe(false);
     expect(showcasesTheRig("/")).toBe(false);
   });
 });

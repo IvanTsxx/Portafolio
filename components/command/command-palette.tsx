@@ -213,7 +213,7 @@ export const CommandPalette = ({
         <CommandInput
           className="text-base md:text-sm"
           onValueChange={handleQueryChange}
-          placeholder="Pages, notes, lab, registry, tags"
+          placeholder="Pages, notes, experiments, registry, tags"
           value={query}
         />
         <CommandList className="max-h-80">

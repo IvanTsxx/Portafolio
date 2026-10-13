@@ -85,11 +85,11 @@ export const noteEntry = (note: Note, position: number): SearchEntry => ({
 });
 
 export const experimentEntry = (experiment: ExperimentSource): SearchEntry => ({
-  action: { href: `/lab/${experiment.slug}`, type: "route" },
+  action: { href: `/experiments/${experiment.slug}`, type: "route" },
   code: experiment.index,
   detail: experiment.topics.join(", "),
-  group: "lab",
-  id: `lab:${experiment.slug}`,
+  group: "experiments",
+  id: `experiment:${experiment.slug}`,
   keywords: [
     experiment.summary,
     ...experiment.technologies,

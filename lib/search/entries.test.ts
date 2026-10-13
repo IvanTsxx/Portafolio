@@ -40,9 +40,12 @@ const note: FieldNote = {
 
 describe("home section entries", () => {
   test("every home anchor exists in the profile components", () => {
-    for (const section of homeSections) {
-      expect(profileSources).toContain(`id="${section.id}"`);
-    }
+    const missing = homeSections.filter(
+      (section) =>
+        !profileSources.includes(`id="${section.id}"`) &&
+        !profileSources.includes(`homeSectionById("${section.id}")`)
+    );
+    expect(missing).toEqual([]);
   });
 
   test("link to the matching anchor on the home page", () => {
@@ -80,7 +83,7 @@ describe("content entries", () => {
     expect(noteEntry(note, 0).keywords).toContain("One worktree per issue.");
   });
 
-  test("an experiment links to its lab page and searches its technologies", () => {
+  test("an experiment links to its experiment page and searches its technologies", () => {
     const entry = experimentEntry({
       index: "LAB-01",
       slug: "dither-field",
@@ -92,10 +95,10 @@ describe("content entries", () => {
     });
 
     expect(entry).toMatchObject({
-      action: { href: "/lab/dither-field", type: "route" },
+      action: { href: "/experiments/dither-field", type: "route" },
       code: "LAB-01",
       detail: "Shader, WebGL",
-      group: "lab",
+      group: "experiments",
     });
     expect(entry.keywords).toEqual(["Bayer dithering.", "GLSL", "2026"]);
   });
