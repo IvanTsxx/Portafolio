@@ -35,7 +35,7 @@ bun run build           # shadcn build (public/r) + next build
 - Design tokens and utilities (`label`, `display`, `blueprint-grid`, `grain`): `app/globals.css`. Direction notes: `docs/direction.md`.
 - Agent roles and scenes: `lib/agents/roles.ts`, `lib/agents/scenes.ts`.
 - Character rig, actions, materials, accessory kits: `components/agents/**`. Notes: `docs/characters.md`.
-- Shared canvas: `components/scene/scene-layer.tsx` is mounted once in the root layout and loads three.js only when a slot appears. Mark companion stops with `<AgentWaypoint role action side />` inside a `relative` section, and scenes with `<AgentScene scene label />` (`debugging`, `figma-to-code`, `feature`, `code-search`).
+- Shared canvas: `components/scene/scene-layer.tsx` is mounted once in the root layout and loads three.js only when a slot appears. The companion picks its role from the route and docks beside the reading column. Mark scenes with `<AgentScene scene label />` (`debugging`, `figma-to-code`, `feature`, `code-search`).
 - GitHub data: `lib/github/profile.ts` reads `GITHUB_TOKEN` from `.env.local`, revalidates hourly, and falls back to `lib/github/snapshot.json` (refresh with `bun lib/github/write-snapshot.ts`). `lib/github/privacy.ts` strips anything matching basement before render.
 - How I work and stack copy: `lib/site/practice.ts`.
 

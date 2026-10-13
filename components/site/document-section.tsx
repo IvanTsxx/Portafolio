@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { CompanionLines } from "@/components/scene/companion-lines";
 import { PanelHeading } from "@/components/site/panel-heading";
 import { SectionBuild } from "@/components/site/section-build";
 import type { SectionScript } from "@/lib/site/section-scripts";
@@ -40,8 +41,8 @@ export const DocumentSection = ({
       index={index}
       jp={jp}
       label={label}
-      waypoint={script}
     />
+    {script ? <CompanionLines lines={script.lines} /> : null}
     {script?.reveal === "build" ? (
       <SectionBuild id={id}>{children}</SectionBuild>
     ) : (

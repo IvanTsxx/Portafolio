@@ -3,10 +3,8 @@
 import type { ReactNode, RefObject } from "react";
 import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
 
-import type { AgentAction, AgentRole, WaypointSide } from "@/lib/agents/roles";
-
 import { useBuildHeld } from "./build-hold";
-import { ownVisibleShare } from "./companion-path";
+import { ownVisibleShare } from "./companion-placement";
 
 export const viewPriority = { overlay: 3, scene: 2 } as const;
 
@@ -17,22 +15,11 @@ export interface ViewSlot {
   track: RefObject<HTMLElement>;
 }
 
-export type { WaypointSide } from "@/lib/agents/roles";
-
-export interface Waypoint {
-  action?: AgentAction;
-  element: HTMLElement;
-  lines: readonly string[];
-  role: AgentRole;
-  side: WaypointSide;
-}
-
 interface SlotRecord extends ViewSlot {
   isNear: boolean;
 }
 
 const slots = new Map<string, SlotRecord>();
-const waypoints = new Map<string, Waypoint>();
 const agentCasts = new Set<HTMLElement>();
 const listeners = new Set<() => void>();
 let nearSnapshot: readonly ViewSlot[] = [];
@@ -139,10 +126,6 @@ const getNearSnapshot = () => nearSnapshot;
 const getServerNearSnapshot = (): readonly ViewSlot[] => [];
 const getHasSlots = () => slots.size > 0;
 const getServerHasSlots = () => false;
-const getHasWaypoints = () => waypoints.size > 0;
-
-export const getWaypoints = () => waypoints.values();
-
 export const getAgentCasts = () => agentCasts;
 
 const castLeadShare = 0.5;
@@ -163,24 +146,6 @@ export const isLeadAgentCast = (element: HTMLElement | null) => {
   }
   return lead === element;
 };
-
-export const registerWaypoint = (id: string, waypoint: Waypoint) => {
-  const isFirst = waypoints.size === 0;
-  waypoints.set(id, waypoint);
-  if (isFirst) {
-    notify();
-  }
-  requestSceneFrame();
-  return () => {
-    waypoints.delete(id);
-    if (waypoints.size === 0) {
-      notify();
-    }
-  };
-};
-
-export const useHasWaypoints = () =>
-  useSyncExternalStore(subscribe, getHasWaypoints, getServerHasSlots);
 
 export const useAgentCast = (
   track: RefObject<HTMLElement | null>,

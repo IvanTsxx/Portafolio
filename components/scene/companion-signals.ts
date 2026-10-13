@@ -49,16 +49,44 @@ const getServerLine = () => null;
 export const useCompanionLine = () =>
   useSyncExternalStore(subscribeLine, getLine, getServerLine);
 
-let companionWorksite: HTMLElement | null = null;
+export interface SpokenSection {
+  element: Element;
+  lines: readonly string[];
+}
 
-export const setCompanionWorksite = (site: HTMLElement | null) => {
-  companionWorksite = site;
-};
+const sections = new Map<Element, readonly string[]>();
+let activeSection: SpokenSection | null = null;
+let observer: IntersectionObserver | null = null;
 
-export const clearCompanionWorksite = (site: HTMLElement) => {
-  if (companionWorksite === site) {
-    companionWorksite = null;
+const handleCrossings = (entries: IntersectionObserverEntry[]) => {
+  for (const entry of entries) {
+    const lines = sections.get(entry.target);
+    if (entry.isIntersecting && lines) {
+      activeSection = { element: entry.target, lines };
+    }
   }
 };
 
-export const getCompanionWorksite = () => companionWorksite;
+const getObserver = () => {
+  observer ??= new IntersectionObserver(handleCrossings, {
+    rootMargin: "-45% 0px -45% 0px",
+  });
+  return observer;
+};
+
+export const registerSpokenSection = (
+  element: Element,
+  lines: readonly string[]
+) => {
+  sections.set(element, lines);
+  getObserver().observe(element);
+  return () => {
+    getObserver().unobserve(element);
+    sections.delete(element);
+    if (activeSection?.element === element) {
+      activeSection = null;
+    }
+  };
+};
+
+export const getSpokenSection = () => activeSection;

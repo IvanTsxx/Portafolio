@@ -1,4 +1,3 @@
-import type { AgentAction, AgentRole, WaypointSide } from "@/lib/agents/roles";
 import { agentRoles } from "@/lib/agents/roles";
 
 import { siteConfig } from "./config";
@@ -8,11 +7,8 @@ import { workSteps } from "./practice";
 export type SectionReveal = "build" | "static";
 
 export interface SectionScript {
-  action: AgentAction;
   lines: readonly string[];
   reveal: SectionReveal;
-  role: AgentRole;
-  side: WaypointSide;
 }
 
 const jobsOldestFirst = experience.toSorted((first, second) =>
@@ -38,59 +34,41 @@ const workStepLines = workSteps.flatMap((step) =>
   spokenSteps.has(step.id) ? [step.summary] : []
 );
 
-const builds = (
-  role: AgentRole,
-  lines: readonly string[] = [],
-  side: WaypointSide = "right"
-): SectionScript => ({ action: "build", lines, reveal: "build", role, side });
+const builds = (lines: readonly string[] = []): SectionScript => ({
+  lines,
+  reveal: "build",
+});
 
-const watches = (
-  role: AgentRole,
-  action: AgentAction,
-  side: WaypointSide
-): SectionScript => ({ action, lines: [], reveal: "static", role, side });
+const speaks = (lines: readonly string[] = []): SectionScript => ({
+  lines,
+  reveal: "static",
+});
 
 export const sectionScripts = {
-  designColor: builds("architect"),
-  designMotion: builds("builder"),
-  designPhilosophy: builds("architect"),
-  designSpacing: builds("architect"),
-  designTypography: builds("builder"),
-  designUtilities: builds("builder"),
-  homeContact: {
-    action: "wave",
-    lines: [`Say hi at ${siteConfig.email}.`],
-    reveal: "static",
-    role: "orchestrator",
-    side: "right",
-  },
-  homeExperience: builds("builder", [
+  designColor: builds(),
+  designMotion: builds(),
+  designPhilosophy: builds(),
+  designSpacing: builds(),
+  designTypography: builds(),
+  designUtilities: builds(),
+  homeContact: speaks([`Say hi at ${siteConfig.email}.`]),
+  homeExperience: builds([
     `${experience.length} roles since ${firstYear}.`,
     ...pastJobLines,
   ]),
-  homeHowIWork: builds("orchestrator", workStepLines),
-  homeIntro: {
-    action: "wave",
-    lines: [`From ${siteConfig.location}.`, ...currentJobLines],
-    reveal: "static",
-    role: "orchestrator",
-    side: "right",
-  },
-  homeMatrix: builds("analyst", [
+  homeHowIWork: builds(workStepLines),
+  homeIntro: speaks([`From ${siteConfig.location}.`, ...currentJobLines]),
+  homeMatrix: builds([
     `A year of commits from @${siteConfig.handle} on GitHub.`,
   ]),
-  homePinned: builds("builder", [`Pinned on github.com/${siteConfig.github}.`]),
-  homeWorkshop: builds("inspector", [
-    `${agentRoles.length} agents, one per role.`,
-  ]),
-  labExperiments: builds("builder"),
-  labPreview: watches("builder", "type", "left"),
-  noteResponsibilities: watches("researcher", "inspect", "right"),
-  noteText: watches("researcher", "read", "right"),
-  notesArchive: builds("researcher"),
-  registryComponents: builds("builder"),
-  registryInstall: builds("builder", [
-    `Install from ${siteConfig.registryNamespace}.`,
-  ]),
-  registryPreview: watches("inspector", "inspect", "left"),
+  homePinned: builds([`Pinned on github.com/${siteConfig.github}.`]),
+  homeWorkshop: builds([`${agentRoles.length} agents, one per role.`]),
+  labExperiments: builds(),
+  labPreview: speaks(),
+  noteResponsibilities: speaks(),
+  noteText: speaks(),
+  notesArchive: builds(),
+  registryComponents: builds(),
+  registryInstall: builds([`Install from ${siteConfig.registryNamespace}.`]),
+  registryPreview: speaks(),
 } as const satisfies Record<string, SectionScript>;

@@ -1,4 +1,4 @@
-import { AgentWaypoint } from "@/components/scene/agent-waypoint";
+import { CompanionLines } from "@/components/scene/companion-lines";
 import { SocialLinks } from "@/components/site/social-links";
 import { siteConfig } from "@/lib/site/config";
 import { sectionScripts } from "@/lib/site/section-scripts";
@@ -26,11 +26,6 @@ export const ContactRow = () => (
       </div>
       <SocialLinks ids={["github", "x", "linkedin"]} variant="contact" />
     </div>
-    <AgentWaypoint
-      action={homeContact.action}
-      lines={homeContact.lines}
-      role={homeContact.role}
-      side={homeContact.side}
-    />
+    <CompanionLines lines={homeContact.lines} />
   </section>
 );

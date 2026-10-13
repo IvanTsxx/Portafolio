@@ -3,20 +3,20 @@ import { describe, expect, test } from "bun:test";
 import type { CompanionInput, CompanionPose } from "./companion-motion";
 import {
   createCompanionMotion,
-  startLeap,
   stepCompanion,
   swapSeconds,
 } from "./companion-motion";
 
 const frameStep = 1 / 60;
+const rest = { scale: 1, x: 1200, y: 640, yaw: -0.32 };
 
 const input = (overrides: Partial<CompanionInput>): CompanionInput => ({
-  isHidden: false,
+  goal: rest,
   isReduced: false,
+  restAction: "wave",
+  role: "builder",
   scrollY: 0,
   step: frameStep,
-  stop: { role: "builder", side: "right" },
-  target: { x: 1300, y: 800 },
   time: 0,
   ...overrides,
 });
@@ -24,116 +24,116 @@ const input = (overrides: Partial<CompanionInput>): CompanionInput => ({
 const run = (
   frames: number,
   from: number,
-  make: (time: number) => CompanionInput,
+  make: (time: number, frame: number) => CompanionInput,
   state: ReturnType<typeof createCompanionMotion>
 ) => {
   const poses: CompanionPose[] = [];
   for (let frame = 0; frame < frames; frame += 1) {
-    poses.push(stepCompanion(state, make(from + frame * frameStep)));
+    poses.push(stepCompanion(state, make(from + frame * frameStep, frame)));
   }
   return poses;
 };
 
 describe("stepCompanion", () => {
-  test("swaps outfit once, mid spin, when the role changes", () => {
+  test("swaps outfit once, mid spin, when the page role changes", () => {
     const state = createCompanionMotion("builder");
     run(60, 0, (time) => input({ time }), state);
     const poses = run(
       90,
       1,
-      (time) => input({ stop: { role: "debugger", side: "right" }, time }),
+      (time) => input({ role: "researcher", time }),
       state
     );
     const swaps = poses.filter((pose) => pose.cue.kind === "swap");
     expect(swaps).toHaveLength(1);
     expect(swaps[0]?.cue).toEqual({
       kind: "swap",
-      role: "debugger",
+      role: "researcher",
       tossed: "builder",
     });
     const swapFrame = poses.findIndex((pose) => pose.cue.kind === "swap");
     expect(swapFrame * frameStep).toBeLessThan(swapSeconds);
     expect(Math.max(...poses.map((pose) => pose.spin))).toBeGreaterThan(5);
-    expect(state.role).toBe("debugger");
+    expect(state.role).toBe("researcher");
   });
 
-  test("walks to a new waypoint after settling instead of jumping", () => {
+  test("stays at its dock while the page is still", () => {
     const state = createCompanionMotion("builder");
-    run(30, 0, (time) => input({ time }), state);
-    const poses = run(
-      10,
+    const poses = run(120, 0, (time) => input({ time }), state);
+    expect(state.x).toBe(rest.x);
+    expect(state.y).toBeCloseTo(rest.y, 6);
+    expect(poses.every((pose) => pose.action === "wave")).toBe(true);
+    expect(Math.abs(poses.at(-1)?.lean ?? 1)).toBe(0);
+  });
+
+  test("trails a fast scroll with drift, lean and a walk, then settles back", () => {
+    const state = createCompanionMotion("builder");
+    run(10, 0, (time) => input({ time }), state);
+    const scrolling = run(
+      30,
       1,
-      (time) => input({ target: { x: 200, y: 400 }, time }),
+      (time, frame) => input({ scrollY: (frame + 1) * 30, time }),
       state
     );
-    expect(poses.at(-1)?.action).toBe("walk");
-    expect(state.travel.x).toBeGreaterThan(200);
-    expect(state.travel.x).toBeLessThan(1300);
+    const last = scrolling.at(-1);
+    expect(last?.action).toBe("walk");
+    expect(last?.lean).toBeLessThan(0);
+    expect(state.y).toBeLessThan(rest.y);
+    expect(rest.y - state.y).toBeLessThanOrEqual(36);
+    const settled = run(240, 2, (time) => input({ scrollY: 900, time }), state);
+    expect(settled.at(-1)?.action).toBe("wave");
+    expect(Math.abs(state.y - rest.y)).toBeLessThan(1);
   });
 
-  test("cuts straight to the waypoint with the new outfit under reduced motion", () => {
+  test("glides toward a new goal instead of jumping", () => {
+    const state = createCompanionMotion("builder");
+    run(10, 0, (time) => input({ time }), state);
+    const away = { scale: 0.6, x: 1200, y: 888, yaw: -0.75 };
+    run(6, 1, (time) => input({ goal: away, time }), state);
+    expect(state.y).toBeGreaterThan(rest.y);
+    expect(state.y).toBeLessThan(away.y);
+    run(240, 2, (time) => input({ goal: away, time }), state);
+    expect(state.y).toBeCloseTo(away.y, 0);
+    expect(state.scale).toBeCloseTo(0.6, 2);
+  });
+
+  test("snaps to the goal with the new outfit and no motion under reduced motion", () => {
     const state = createCompanionMotion("builder");
     stepCompanion(state, input({ isReduced: true }));
+    const goal = { scale: 0.6, x: 1180, y: 860, yaw: -0.75 };
     const pose = stepCompanion(
       state,
       input({
+        goal,
         isReduced: true,
-        stop: { action: "read", role: "researcher", side: "left" },
-        target: { x: 120, y: 500 },
+        restAction: "read",
+        role: "researcher",
+        scrollY: 4000,
         time: 1,
       })
     );
-    expect(pose.cue).toEqual({ kind: "wear", role: "researcher" });
-    expect(pose.action).toBe("read");
-    expect(pose.spin).toBe(0);
-    expect(pose.lift).toBe(0);
-    expect(state.travel).toMatchObject({ isTraveling: false, x: 120, y: 500 });
+    expect(pose).toEqual({
+      action: "read",
+      cue: { kind: "wear", role: "researcher" },
+      lean: 0,
+      lift: 0,
+      spin: 0,
+      squash: 1,
+    });
+    expect(state).toMatchObject({ scale: 0.6, x: 1180, y: 860 });
   });
 
-  test("changes outfit without ceremony while hidden behind a scene", () => {
+  test("changes outfit without ceremony while tucked away", () => {
     const state = createCompanionMotion("builder");
+    const hidden = { ...rest, scale: 0 };
     const poses = run(
       40,
       0,
-      (time) =>
-        input({
-          isHidden: true,
-          stop: { role: "analyst", side: "right" },
-          time,
-        }),
+      (time) => input({ goal: hidden, role: "analyst", time }),
       state
     );
     expect(poses.some((pose) => pose.cue.kind === "swap")).toBe(false);
     expect(poses[0]?.cue).toEqual({ kind: "wear", role: "analyst" });
     expect(state.scale).toBeLessThan(0.05);
-  });
-});
-
-describe("startLeap", () => {
-  test("arcs to the new spot, lands on it, then rests", () => {
-    const state = createCompanionMotion("builder");
-    run(30, 0, (time) => input({ time }), state);
-    const spot = { x: 1150, y: 800 };
-    startLeap(state, spot, 0.5);
-    const poses = run(60, 0.5, (time) => input({ target: spot, time }), state);
-    const peak = Math.max(...poses.map((pose) => pose.lift));
-    expect(peak).toBeGreaterThan(30);
-    expect(poses.some((pose) => pose.squash < 1)).toBe(true);
-    expect(poses.every((pose) => pose.action !== "walk")).toBe(true);
-    expect(state.leap).toBeNull();
-    expect(state.travel).toMatchObject({ x: spot.x, y: spot.y });
-    expect(poses.at(-1)?.lift).toBe(0);
-  });
-
-  test("cuts straight to the spot with reduced motion", () => {
-    const state = createCompanionMotion("builder");
-    run(5, 0, (time) => input({ isReduced: true, time }), state);
-    const spot = { x: 1150, y: 800 };
-    const pose = stepCompanion(
-      state,
-      input({ isReduced: true, target: spot, time: 1 })
-    );
-    expect(pose.lift).toBe(0);
-    expect(state.travel).toMatchObject({ x: spot.x, y: spot.y });
   });
 });

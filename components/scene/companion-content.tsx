@@ -14,39 +14,35 @@ import type { AgentPointer } from "@/components/agents/agent";
 import { Agent } from "@/components/agents/agent";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
+import type { CompanionCast } from "@/lib/site/companion-roles";
 
 import type { BurstHandle, HatToss, TossHandle } from "./companion-effects";
 import { FlyingHat, PaperPoof } from "./companion-effects";
 import type { CompanionCue, CompanionMotion } from "./companion-motion";
 import {
   createCompanionMotion,
-  isSwapActive,
-  startLeap,
   stepCompanion,
+  tuckSpeed,
 } from "./companion-motion";
 import type {
-  CompanionFrame,
-  Perch,
-  ScreenPoint,
-  ScreenRect,
+  ColumnBounds,
+  CompanionDock,
   Viewport,
-} from "./companion-path";
+} from "./companion-placement";
 import {
-  companionFrame,
+  companionDock,
+  dockGoal,
   ownVisibleShare,
-  perchBox,
-  perchCandidates,
-  perchPoint,
-  pickWaypoint,
-  viewportShare,
-} from "./companion-path";
-import { getCompanionWorksite, sayCompanionLine } from "./companion-signals";
+} from "./companion-placement";
+import type { SpokenSection } from "./companion-signals";
+import { getSpokenSection, sayCompanionLine } from "./companion-signals";
 import { ViewLights } from "./view-lights";
-import type { Waypoint, WaypointSide } from "./view-registry";
-import { getAgentCasts, getWaypoints } from "./view-registry";
+import { getAgentCasts } from "./view-registry";
 
 export interface CompanionContentProps {
   bubble: RefObject<HTMLDivElement | null>;
+  cast: CompanionCast;
+  column: RefObject<ColumnBounds | null>;
   hit: RefObject<HTMLDivElement | null>;
   pointer: RefObject<AgentPointer>;
   presses: RefObject<number>;
@@ -58,29 +54,22 @@ interface Outfit {
 }
 
 const modelHeight = 2.2;
-const castHideShare = 0.5;
+const castYieldShare = 0.35;
 const baseTilt = 0.16;
 const depthClearPriority = 2.5;
+const speechSeconds = 7;
+const speechGap = 12;
+const shownScale = 0.85;
 
 const readViewport = (): Viewport => ({
   height: window.innerHeight,
-  width: window.innerWidth,
+  width: document.documentElement.clientWidth,
 });
-
-const findActiveWaypoint = (viewport: Viewport, current: Waypoint | null) =>
-  pickWaypoint(
-    Array.from(getWaypoints(), (waypoint) => ({
-      key: waypoint,
-      rect: waypoint.element.getBoundingClientRect(),
-    })),
-    viewport,
-    current?.element.isConnected ? current : null
-  );
 
 const isCastInView = (viewport: Viewport) => {
   for (const cast of getAgentCasts()) {
     if (
-      ownVisibleShare(cast.getBoundingClientRect(), viewport) >= castHideShare
+      ownVisibleShare(cast.getBoundingClientRect(), viewport) >= castYieldShare
     ) {
       return true;
     }
@@ -90,140 +79,51 @@ const isCastInView = (viewport: Viewport) => {
 
 const placeHitBox = (
   hit: HTMLDivElement | null,
-  point: ScreenPoint,
-  frame: CompanionFrame,
-  lift: number,
-  isInteractive: boolean
+  state: CompanionMotion,
+  dock: CompanionDock | null,
+  lift: number
 ) => {
   if (!hit) {
     return;
   }
-  const left = point.x - frame.agentWidth / 2;
-  const top = point.y - frame.agentHeight - lift;
-  hit.style.transform = `translate3d(${left}px, ${top}px, 0)`;
-  hit.style.width = `${frame.agentWidth}px`;
-  hit.style.height = `${frame.agentHeight}px`;
-  hit.style.pointerEvents = isInteractive ? "auto" : "none";
+  if (!dock) {
+    hit.style.pointerEvents = "none";
+    return;
+  }
+  const width = dock.frame.agentWidth * state.scale;
+  const height = dock.frame.agentHeight * state.scale;
+  hit.style.transform = `translate3d(${state.x - width / 2}px, ${state.y - height - lift}px, 0)`;
+  hit.style.width = `${width}px`;
+  hit.style.height = `${height}px`;
+  hit.style.pointerEvents = state.scale > shownScale ? "auto" : "none";
 };
-
-const speechSeconds = 7;
-const speechGap = 12;
 
 const placeBubble = (
   bubble: HTMLDivElement | null,
-  point: ScreenPoint,
-  frame: CompanionFrame,
+  state: CompanionMotion,
+  dock: CompanionDock | null,
   lift: number,
-  viewport: Viewport,
   isShown: boolean
 ) => {
   if (!bubble) {
     return;
   }
-  const top = point.y - frame.agentHeight - lift - speechGap;
-  bubble.style.transform = `translate3d(${point.x}px, ${top}px, 0)`;
-  bubble.dataset.side = point.x > viewport.width / 2 ? "left" : "right";
+  const slot = dock?.kind === "gutter" ? dock.bubble : null;
+  if (!(dock && slot)) {
+    bubble.dataset.shown = "false";
+    return;
+  }
+  const top = state.y - dock.frame.agentHeight * state.scale - lift - speechGap;
+  bubble.style.transform = `translate3d(${slot.left}px, ${top}px, 0)`;
+  bubble.style.setProperty("--speech-width", `${slot.maxWidth}px`);
+  bubble.style.setProperty("--speech-tail", `${state.x - slot.left}px`);
   bubble.dataset.shown = String(isShown);
 };
 
-const lineFor = (stop: Waypoint, visit: number) =>
-  stop.lines.length > 0
-    ? (stop.lines[visit % stop.lines.length] ?? null)
-    : null;
-
-const textSamples = 5;
-
-const overlaps = (a: ScreenRect, b: ScreenRect) =>
-  a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
-
-const hasTextIn = (box: ScreenRect) => {
-  const touched = new Set<Element>();
-  const width = box.right - box.left;
-  const height = box.bottom - box.top;
-  for (let column = 0; column < textSamples; column += 1) {
-    for (let row = 0; row < textSamples; row += 1) {
-      const element = document.elementFromPoint(
-        box.left + (width * (column + 0.5)) / textSamples,
-        box.top + (height * (row + 0.5)) / textSamples
-      );
-      if (element) {
-        touched.add(element);
-      }
-    }
-  }
-  const range = document.createRange();
-  for (const element of touched) {
-    for (const node of element.childNodes) {
-      if (node.nodeType !== Node.TEXT_NODE || !node.textContent?.trim()) {
-        continue;
-      }
-      range.selectNodeContents(node);
-      for (const line of range.getClientRects()) {
-        if (overlaps(line, box)) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-};
-
-const pickFreePerch = (
-  hit: HTMLDivElement | null,
-  rect: ScreenRect,
-  current: Perch,
-  from: ScreenPoint,
-  viewport: Viewport,
-  frame: CompanionFrame
-) => {
-  if (hit) {
-    hit.style.pointerEvents = "none";
-  }
-  const free = perchCandidates(rect, current, from, viewport, frame).filter(
-    (perch) =>
-      !hasTextIn(perchBox(perchPoint(rect, perch, viewport, frame), frame))
-  );
-  return free[Math.floor(Math.random() * free.length)] ?? null;
-};
+const lineFor = (section: SpokenSection, visit: number) =>
+  section.lines[visit % section.lines.length] ?? null;
 
 const swapOrigin = new Vector3();
-
-const findWorksite = (viewport: Viewport) => {
-  const site = getCompanionWorksite();
-  if (!site?.isConnected) {
-    return null;
-  }
-  const rect = site.getBoundingClientRect();
-  return viewportShare(rect, viewport) > 0 ? rect : null;
-};
-
-const pickStop = (
-  viewport: Viewport,
-  current: Waypoint | null,
-  worksite: ScreenRect | null
-) => {
-  const held = worksite && current?.element.isConnected ? current : null;
-  return held ?? findActiveWaypoint(viewport, current);
-};
-
-const companionGoal = (
-  stop: Waypoint,
-  site: ScreenRect,
-  perch: Perch | null,
-  viewport: Viewport,
-  frame: CompanionFrame
-) =>
-  perch
-    ? { stop, target: perchPoint(site, perch, viewport, frame) }
-    : {
-        stop: { ...stop, action: "build" as const },
-        target: perchPoint(
-          site,
-          { shift: 0, side: stop.side },
-          viewport,
-          frame
-        ),
-      };
 
 const ClearDepth = () => {
   useFrame(({ gl }) => {
@@ -234,6 +134,8 @@ const ClearDepth = () => {
 
 const CompanionContent = ({
   bubble,
+  cast,
+  column,
   hit,
   pointer,
   presses,
@@ -244,20 +146,19 @@ const CompanionContent = ({
   const body = useRef<Group>(null);
   const poof = useRef<BurstHandle>(null);
   const hat = useRef<TossHandle>(null);
-  const actionRef = useRef<AgentAction>("idle");
-  const activeStop = useRef<Waypoint | null>(null);
-  const perch = useRef<Perch>({ shift: 0, side: "right" });
+  const actionRef = useRef<AgentAction>(cast.action);
+  const heardSection = useRef<Element | null>(null);
   const handledPresses = useRef(0);
   const tossCount = useRef(0);
-  const visits = useRef(new WeakMap<HTMLElement, number>());
+  const visits = useRef(new WeakMap<Element, number>());
   const spokenAt = useRef(Number.NEGATIVE_INFINITY);
-  const [outfit, setOutfit] = useState<Outfit>(() => ({
-    role: findActiveWaypoint(readViewport(), null)?.role ?? "orchestrator",
-    toss: null,
-  }));
   const motion = useRef<CompanionMotion | null>(null);
+  const [outfit, setOutfit] = useState<Outfit>({
+    role: cast.role,
+    toss: null,
+  });
 
-  const playCue = (cue: CompanionCue, side: WaypointSide, feet: Vector3) => {
+  const playCue = (cue: CompanionCue, feet: Vector3) => {
     if (cue.kind === "none") {
       return;
     }
@@ -274,7 +175,7 @@ const CompanionContent = ({
       swapOrigin.copy(feet).setY(feet.y + modelHeight * 0.55),
       1
     );
-    hat.current?.launch(feet, side === "right" ? -1 : 1, 1);
+    hat.current?.launch(feet, -1, 1);
   };
 
   useFrame((frameState, delta) => {
@@ -284,75 +185,56 @@ const CompanionContent = ({
     if (!(view && group && spinner)) {
       return;
     }
+    const time = frameState.clock.elapsedTime;
     const viewport = readViewport();
-    const frame = companionFrame(viewport);
-    const zoom = frame.agentHeight / modelHeight;
+    const bounds = column.current;
+    const dock = bounds ? companionDock(viewport, bounds) : null;
+    const state = motion.current ?? createCompanionMotion(cast.role);
+    motion.current = state;
+    if (!dock) {
+      spinner.visible = false;
+      placeHitBox(hit.current, state, null, 0);
+      placeBubble(bubble.current, state, null, 0, false);
+      return;
+    }
+    const zoom = dock.frame.agentHeight / modelHeight;
     if (Math.abs(view.zoom - zoom) > 0.001) {
       view.zoom = zoom;
       view.updateProjectionMatrix();
     }
-    const time = frameState.clock.elapsedTime;
-    const speak = (speaker: Waypoint) => {
-      const visit = visits.current.get(speaker.element) ?? 0;
-      visits.current.set(speaker.element, visit + 1);
-      sayCompanionLine(lineFor(speaker, visit));
+
+    const section = getSpokenSection();
+    const speak = () => {
+      if (!section) {
+        return;
+      }
+      const visit = visits.current.get(section.element) ?? 0;
+      visits.current.set(section.element, visit + 1);
+      sayCompanionLine(lineFor(section, visit));
       spokenAt.current = time;
     };
-    const worksite = findWorksite(viewport);
-    const stop = pickStop(viewport, activeStop.current, worksite);
-    if (stop && stop !== activeStop.current) {
-      perch.current = { shift: 0, side: stop.side };
-      speak(stop);
+    if (section && section.element !== heardSection.current) {
+      speak();
     }
-    activeStop.current = stop;
-    const state = motion.current ?? createCompanionMotion(outfit.role);
-    motion.current = state;
-    if (!stop) {
-      spinner.visible = false;
-      placeHitBox(hit.current, state.travel, frame, 0, false);
-      placeBubble(bubble.current, state.travel, frame, 0, viewport, false);
-      return;
-    }
-
-    const rect = stop.element.getBoundingClientRect();
+    heardSection.current = section?.element ?? null;
     if (presses.current !== handledPresses.current) {
       handledPresses.current = presses.current;
-      speak(stop);
-      if (state.isPlaced && !isSwapActive(state, time)) {
-        const next = pickFreePerch(
-          hit.current,
-          rect,
-          perch.current,
-          state.travel,
-          viewport,
-          frame
-        );
-        if (next) {
-          perch.current = next;
-        }
-        if (!isReduced) {
-          startLeap(
-            state,
-            perchPoint(rect, perch.current, viewport, frame),
-            time
-          );
-        }
-      }
+      speak();
     }
 
+    const isYielding = isCastInView(viewport);
+    const goal = dockGoal(dock, {
+      isTucked: !isReduced && state.scrollVelocity > tuckSpeed,
+      isYielding,
+    });
     const pose = stepCompanion(state, {
-      isHidden: isCastInView(viewport),
+      goal,
       isReduced,
+      restAction: cast.action,
+      role: cast.role,
       scrollY: window.scrollY,
       step: Math.min(delta, 0.1),
       time,
-      ...companionGoal(
-        stop,
-        worksite ?? rect,
-        worksite ? null : perch.current,
-        viewport,
-        frame
-      ),
     });
     actionRef.current = pose.action;
     spinner.visible = state.scale > 0.01;
@@ -361,22 +243,20 @@ const CompanionContent = ({
     spinner.scale.set(spread, size * pose.squash, spread);
     spinner.rotation.set(baseTilt, state.yaw + pose.spin, pose.lean);
     group.position.set(
-      (state.travel.x - viewport.width / 2) / zoom,
-      (viewport.height / 2 - state.travel.y + pose.lift) / zoom,
+      (state.x - viewport.width / 2) / zoom,
+      (viewport.height / 2 - state.y + pose.lift) / zoom,
       0
     );
-    playCue(pose.cue, stop.side, group.position);
-    const isVisible = state.scale > 0.6;
-    placeHitBox(hit.current, state.travel, frame, pose.lift, isVisible);
+    playCue(pose.cue, group.position);
+    placeHitBox(hit.current, state, dock, pose.lift);
     placeBubble(
       bubble.current,
-      state.travel,
-      frame,
+      state,
+      dock,
       pose.lift,
-      viewport,
-      isVisible &&
-        stop.lines.length > 0 &&
-        !state.travel.isTraveling &&
+      !isYielding &&
+        state.scale > shownScale &&
+        section !== null &&
         time - spokenAt.current < speechSeconds
     );
   });

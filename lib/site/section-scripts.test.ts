@@ -22,12 +22,4 @@ describe("section scripts", () => {
       "Doctor Qali: React · Performance · Architecture.",
     ]);
   });
-
-  test("every section that builds plays the build action", () => {
-    for (const script of Object.values(sectionScripts)) {
-      if (script.reveal === "build") {
-        expect(script.action).toBe("build");
-      }
-    }
-  });
 });

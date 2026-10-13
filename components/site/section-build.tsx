@@ -4,10 +4,6 @@ import { useRef } from "react";
 import type { ReactNode } from "react";
 
 import { holdBuild, releaseBuild } from "@/components/scene/build-hold";
-import {
-  clearCompanionWorksite,
-  setCompanionWorksite,
-} from "@/components/scene/companion-signals";
 import { motionKit } from "@/lib/motion/gsap";
 import type {
   BlockTiming,
@@ -282,7 +278,6 @@ export const SectionBuild = ({
       const place = contextSafe((scaffold: Scaffold) => {
         dismantle(scaffold);
         releaseBuild(scaffold.block);
-        clearCompanionWorksite(scaffold.block);
         dispatch({ type: "place" });
       });
 
@@ -318,7 +313,6 @@ export const SectionBuild = ({
           const timeline = gsap.timeline({
             delay: at - now,
             onComplete: () => place(scaffold),
-            onStart: () => setCompanionWorksite(scaffold.block),
           });
           drawFrame(timeline, scaffold, timing);
           printBlock(timeline, scaffold, timing);
@@ -375,7 +369,6 @@ export const SectionBuild = ({
         for (const scaffold of scaffolds) {
           dismantle(scaffold);
           releaseBuild(scaffold.block);
-          clearCompanionWorksite(scaffold.block);
         }
         releaseBuild(blocksRoot);
         delete root.dataset.construction;

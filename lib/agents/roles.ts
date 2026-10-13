@@ -28,8 +28,6 @@ export const agentActions = [
 
 export type AgentAction = (typeof agentActions)[number];
 
-export type WaypointSide = "left" | "right";
-
 export const agentReactions = [
   "wave",
   "jump",

@@ -566,7 +566,7 @@ export interface BreakpointSpec {
 
 export const breakpointSpecs = [
   {
-    changes: "Companion walks between waypoints",
+    changes: "Section stacks go side by side",
     name: "sm",
     px: 640,
   },

@@ -1,4 +1,4 @@
-import { AgentWaypoint } from "@/components/scene/agent-waypoint";
+import { CompanionLines } from "@/components/scene/companion-lines";
 import { SocialLinks } from "@/components/site/social-links";
 import type { GithubIdentity } from "@/lib/github/model";
 import { siteConfig } from "@/lib/site/config";
@@ -63,12 +63,7 @@ export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
       </div>
 
       <SocialLinks />
-      <AgentWaypoint
-        action={homeIntro.action}
-        lines={homeIntro.lines}
-        role={homeIntro.role}
-        side={homeIntro.side}
-      />
+      <CompanionLines lines={homeIntro.lines} />
     </header>
   );
 };

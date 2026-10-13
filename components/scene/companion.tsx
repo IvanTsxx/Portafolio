@@ -1,22 +1,58 @@
 "use client";
 
-import { lazy, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { lazy, useEffect, useEffectEvent, useRef } from "react";
 import type { PointerEvent, RefObject } from "react";
 
 import type { AgentPointer } from "@/components/agents/use-agent-rig";
+import { companionCastFor } from "@/lib/site/companion-roles";
 
+import type { ColumnBounds } from "./companion-placement";
 import { notifyCompanionActivate, useCompanionLine } from "./companion-signals";
-import {
-  requestSceneFrame,
-  useHasWaypoints,
-  useViewSlot,
-  viewPriority,
-} from "./view-registry";
+import { requestSceneFrame, useViewSlot, viewPriority } from "./view-registry";
 import { useWebGLSupport } from "./webgl-support";
 
 const CompanionContent = lazy(() => import("./companion-content"));
 
 const companionSlotId = "agent-companion";
+const readingColumnSelector = "[data-reading-column]";
+
+const measureColumn = (element: HTMLElement): ColumnBounds => {
+  const box = element.getBoundingClientRect();
+  const style = getComputedStyle(element);
+  return {
+    left: box.left + Number(style.paddingLeft.slice(0, -2)),
+    right: box.right - Number(style.paddingRight.slice(0, -2)),
+  };
+};
+
+const ReadingColumnProbe = ({
+  onMeasure,
+}: {
+  onMeasure: (bounds: ColumnBounds | null) => void;
+}) => {
+  const report = useEffectEvent(onMeasure);
+
+  useEffect(() => {
+    const element = document.querySelector<HTMLElement>(readingColumnSelector);
+    if (!element) {
+      report(null);
+      return;
+    }
+    const measure = () => {
+      report(measureColumn(element));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    observer.observe(document.documentElement);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  return null;
+};
 
 const SpeechBubble = ({
   bubble,
@@ -29,13 +65,12 @@ const SpeechBubble = ({
       className="group/speech pointer-events-none fixed top-0 left-0 z-30 size-0"
       data-agent-speech=""
       data-shown="false"
-      data-side="left"
       ref={bubble}
     >
       <p
         aria-atomic
         aria-live="polite"
-        className="border-ink bg-paper text-ink ease-out-quart before:bg-ink absolute bottom-0 m-0 w-max max-w-64 translate-y-1 border px-3 py-2 font-mono text-xs leading-snug text-pretty opacity-0 transition-[opacity,translate] duration-200 select-none group-data-[shown=true]/speech:translate-y-0 group-data-[shown=true]/speech:opacity-100 group-data-[side=left]/speech:right-0 group-data-[side=right]/speech:left-0 before:absolute before:-bottom-2 before:h-2 before:w-px group-data-[side=left]/speech:before:right-4 group-data-[side=right]/speech:before:left-4"
+        className="border-ink bg-paper text-ink ease-out-quart before:bg-ink absolute bottom-0 left-0 m-0 w-max max-w-(--speech-width) translate-y-1 border px-3 py-2 font-mono text-xs leading-snug text-pretty opacity-0 transition-[opacity,translate] duration-200 select-none group-data-[shown=true]/speech:translate-y-0 group-data-[shown=true]/speech:opacity-100 before:absolute before:-bottom-2 before:left-(--speech-tail) before:h-2 before:w-px motion-reduce:transition-opacity"
       >
         {line ? (
           <>
@@ -51,6 +86,9 @@ const SpeechBubble = ({
 };
 
 const CompanionStage = () => {
+  const pathname = usePathname();
+  const cast = companionCastFor(pathname);
+  const column = useRef<ColumnBounds | null>(null);
   const stage = useRef<HTMLDivElement>(null);
   const hit = useRef<HTMLDivElement>(null);
   const bubble = useRef<HTMLDivElement>(null);
@@ -67,6 +105,8 @@ const CompanionStage = () => {
     stage,
     <CompanionContent
       bubble={bubble}
+      cast={cast}
+      column={column}
       hit={hit}
       pointer={pointer}
       presses={presses}
@@ -88,6 +128,13 @@ const CompanionStage = () => {
         className="pointer-events-none fixed inset-0"
         data-agent-companion=""
         ref={stage}
+      />
+      <ReadingColumnProbe
+        key={pathname}
+        onMeasure={(bounds) => {
+          column.current = bounds;
+          requestSceneFrame();
+        }}
       />
       <SpeechBubble bubble={bubble} />
       <div
@@ -114,7 +161,6 @@ const CompanionStage = () => {
 };
 
 export const Companion = () => {
-  const hasWaypoints = useHasWaypoints();
   const hasWebGL = useWebGLSupport();
-  return hasWaypoints && hasWebGL ? <CompanionStage /> : null;
+  return hasWebGL ? <CompanionStage /> : null;
 };
