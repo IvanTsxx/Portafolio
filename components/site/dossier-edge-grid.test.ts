@@ -4,7 +4,7 @@ import {
   EDGE_DITHER_COLUMNS,
   EDGE_DITHER_ROWS,
   edgeDitherCells,
-  edgeDitherPath,
+  edgeDitherDotsPath,
 } from "./dossier-edge-grid";
 
 const inkInColumns = (cells: Uint8Array, from: number, to: number) => {
@@ -30,11 +30,11 @@ const inkInRows = (cells: Uint8Array, from: number, to: number) => {
 describe("edge dither tile", () => {
   const cells = edgeDitherCells();
 
-  test("ink gathers at the viewport edge and clears before the sheet", () => {
-    const outer = inkInColumns(cells, 0, 8);
+  test("ink gathers at the sheet edge and clears before the content", () => {
+    const outer = inkInColumns(cells, 0, 3);
     const inner = inkInColumns(
       cells,
-      EDGE_DITHER_COLUMNS - 4,
+      EDGE_DITHER_COLUMNS - 1,
       EDGE_DITHER_COLUMNS
     );
     expect(outer).toBeGreaterThan(0.15);
@@ -58,7 +58,7 @@ describe("edge dither tile", () => {
     expect(wrap).toBeLessThanOrEqual(Math.max(...steps));
   });
 
-  test("the tile path stays small enough to inline", () => {
-    expect(edgeDitherPath().length).toBeLessThan(24_000);
+  test("the swollen dots stay small enough to inline", () => {
+    expect(edgeDitherDotsPath(cells, 3).length).toBeLessThan(24_000);
   });
 });
