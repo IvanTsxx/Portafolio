@@ -6,6 +6,8 @@ import { SectionBuild } from "@/components/site/section-build";
 import type { SectionScript } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
+const silentLines: readonly string[] = [];
+
 interface DocumentSectionProps {
   aside?: ReactNode;
   children: ReactNode;
@@ -39,7 +41,7 @@ export const DocumentSection = ({
       index={index}
       label={label}
     />
-    {script ? <CompanionLines lines={script.lines} /> : null}
+    <CompanionLines lines={script?.lines ?? silentLines} />
     {script?.reveal === "build" ? (
       <SectionBuild id={id}>{children}</SectionBuild>
     ) : (

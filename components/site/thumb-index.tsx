@@ -4,22 +4,24 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent } from "react";
 
+import {
+  activeSpokenSection,
+  pinActiveSection,
+  subscribeActiveSection,
+} from "@/components/scene/active-section";
 import { setCompanionRail } from "@/components/scene/companion-rail";
 import type { RailLayout } from "@/components/scene/companion-rail-math";
 import {
-  activeStopIndex,
   railLayout,
   railShare,
+  sectionLandingOffset,
 } from "@/components/scene/companion-rail-math";
 import { focusRingClassName } from "@/components/site/styles";
 import { notchNumber, sectionsForRoute } from "@/lib/site/page-sections";
 import type { PageSection } from "@/lib/site/page-sections";
 import { cn } from "@/lib/utils";
 
-const landingOffset = 80;
 const notchGapPixels = 40;
-const activeLeadShare = 0.3;
-const userScrollEvents = ["wheel", "touchstart", "keydown"] as const;
 const backCoverSelector = "[data-back-cover]";
 
 const evenShare = (index: number, count: number) =>
@@ -42,10 +44,10 @@ const measureLayout = (
     const element = document.querySelector(`[id="${CSS.escape(section.id)}"]`);
     return element
       ? element.getBoundingClientRect().top + scrollY
-      : maxScroll + landingOffset;
+      : maxScroll + sectionLandingOffset;
   });
   return railLayout({
-    landingOffset,
+    landingOffset: sectionLandingOffset,
     maxScroll,
     minGap: stripLength > 0 ? notchGapPixels / stripLength : 0,
     sectionTops,
@@ -82,7 +84,6 @@ export const ThumbIndex = ({
   const edgeFill = useRef<HTMLSpanElement>(null);
   const progressFill = useRef<HTMLSpanElement>(null);
   const links = useRef<(HTMLAnchorElement | null)[]>([]);
-  const clickedIndex = useRef<number | null>(null);
   const [marks, setMarks] = useState<readonly number[] | null>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isCoverInView, setIsCoverInView] = useState(false);
@@ -104,13 +105,9 @@ export const ThumbIndex = ({
       const share = railShare(window.scrollY, layout.anchors);
       edgeFill.current?.style.setProperty("transform", `scaleY(${share})`);
       progressFill.current?.style.setProperty("transform", `scaleX(${share})`);
-      setActiveIndex(
-        clickedIndex.current ??
-          activeStopIndex(
-            window.scrollY + window.innerHeight * activeLeadShare,
-            layout.stops
-          )
-      );
+      const activeId =
+        activeSpokenSection(window.scrollY, window.innerHeight)?.id ?? null;
+      setActiveIndex(sections.findIndex((section) => section.id === activeId));
     };
 
     const measure = () => {
@@ -122,7 +119,8 @@ export const ThumbIndex = ({
       setCompanionRail(
         isLaneShown && laneBox.height > 0
           ? {
-              anchors: layout.anchors,
+              ids: sections.map((section) => section.id),
+              marks: layout.marks,
               track: {
                 bottom: laneBox.bottom,
                 left: laneBox.left,
@@ -139,9 +137,6 @@ export const ThumbIndex = ({
         frame = requestAnimationFrame(paint);
       }
     };
-    const releaseClick = () => {
-      clickedIndex.current = null;
-    };
 
     measure();
     const resizeObserver = new ResizeObserver(measure);
@@ -154,20 +149,16 @@ export const ThumbIndex = ({
     if (cover) {
       coverObserver.observe(cover);
     }
+    const unsubscribe = subscribeActiveSection(schedulePaint);
     window.addEventListener("scroll", schedulePaint, { passive: true });
     window.addEventListener("scrollend", measure);
-    for (const type of userScrollEvents) {
-      window.addEventListener(type, releaseClick, { passive: true });
-    }
     return () => {
       cancelAnimationFrame(frame);
       resizeObserver.disconnect();
       coverObserver.disconnect();
       window.removeEventListener("scroll", schedulePaint);
       window.removeEventListener("scrollend", measure);
-      for (const type of userScrollEvents) {
-        window.removeEventListener(type, releaseClick);
-      }
+      unsubscribe();
       setCompanionRail(null);
     };
   }, [sections]);
@@ -204,7 +195,7 @@ export const ThumbIndex = ({
                 )}
                 href={`#${section.id}`}
                 onClick={() => {
-                  clickedIndex.current = index;
+                  pinActiveSection(section.id);
                   setActiveIndex(index);
                 }}
                 onKeyDown={(event) => focusSibling(event, links.current)}

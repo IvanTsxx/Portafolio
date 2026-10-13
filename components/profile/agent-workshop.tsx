@@ -36,10 +36,11 @@ import {
   pieceAnnotation,
   slotCopy,
 } from "@/lib/agents/workshop-copy";
+import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
-export const workshopSectionIndex = "GH-07";
+const workshopSection = homeSectionById("workshop");
 
 const copyStatusSeconds = 2;
 const boothActorShare = 0.6;
@@ -233,11 +234,7 @@ const useFittingBooth = (state: WorkshopState) => {
   return { booth, floor };
 };
 
-export const AgentWorkshop = ({
-  index = workshopSectionIndex,
-}: {
-  index?: string;
-}) => {
+export const AgentWorkshop = () => {
   const [state, setState] = useWorkshopParams();
   const [drawer, setDrawer] = useState<Drawer>("preset");
   const [copyStatus, setCopyStatus] = useCopyStatus();
@@ -275,9 +272,9 @@ export const AgentWorkshop = ({
           {preset ? agentProfiles[preset].designation : "AG-XX"}
         </span>
       }
-      id="workshop"
-      index={index}
-      label="Workshop"
+      id={workshopSection.id}
+      index={workshopSection.index}
+      label={workshopSection.label}
       script={sectionScripts.homeWorkshop}
     >
       <div className="border-rule border">
