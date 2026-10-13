@@ -1,6 +1,6 @@
 export type Flat = readonly [number, number];
 export type Point3 = readonly [number, number, number];
-export type Plane = readonly [number, number];
+type Plane = readonly [number, number];
 
 export interface Projection {
   azimuth: number;
@@ -57,14 +57,9 @@ export const iso = ([x, y, z]: Point3, projection: Projection): Flat => {
   ];
 };
 
-export const towardViewer = (projection: Projection): Plane => {
+const towardViewer = (projection: Projection): Plane => {
   const { cosA, sinA } = cameraOf(projection);
   return [cosA, sinA];
-};
-
-export const depthOf = ([x, y, z]: Point3, projection: Projection) => {
-  const { cosA, cosE, sinA, sinE } = cameraOf(projection);
-  return (x * cosA + y * sinA) * cosE + z * sinE;
 };
 
 const tenth = (value: number) => {
@@ -72,7 +67,7 @@ const tenth = (value: number) => {
   return text === "-0" ? "0" : text;
 };
 
-export const pathOf = (points: readonly Flat[], closed = false) => {
+const pathOf = (points: readonly Flat[], closed = false) => {
   if (points.length === 0) {
     return "";
   }
@@ -82,7 +77,7 @@ export const pathOf = (points: readonly Flat[], closed = false) => {
   return closed ? `${body}Z` : body;
 };
 
-export const roundedPlan = ({ d, r, w, x, y }: Plan, steps = 8): Plane[] => {
+const roundedPlan = ({ d, r, w, x, y }: Plan, steps = 8): Plane[] => {
   const radius = Math.max(0, Math.min(r, w / 2, d / 2));
   const arcs: readonly (readonly [number, number, number])[] = [
     [x + w - radius, y + radius, -90],
@@ -230,7 +225,7 @@ const bevelOf = (
     .join("");
 };
 
-export const extrude = (
+const extrude = (
   ring: readonly Plane[],
   z: number,
   height: number,
@@ -294,7 +289,7 @@ export const slabOf = (
   bevel = 0
 ) => extrude(roundedPlan(plan, steps), z, height, projection, bevel);
 
-export const circleRing = (
+const circleRing = (
   cx: number,
   cy: number,
   radius: number,

@@ -2,12 +2,15 @@
 
 import { Dialog } from "@base-ui/react/dialog";
 import { cva } from "class-variance-authority";
-import { useState } from "react";
 
 import type { DossierFile, FileField } from "@/components/profile/dossier-file";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { technicalButtonVariants } from "@/components/site/styles";
 import { cn } from "@/lib/utils";
+
+export type FileModalHandle = Dialog.Handle<DossierFile>;
+
+export const FileTrigger = Dialog.Trigger<DossierFile>;
 
 const fileCellVariants = cva("bg-paper flex flex-col gap-1 p-4", {
   defaultVariants: { span: "half" },
@@ -40,7 +43,7 @@ const FileBody = ({ file }: { file: DossierFile }) => (
       <Dialog.Title className="display text-ink text-4xl wrap-break-word">
         {file.title}
       </Dialog.Title>
-      <Dialog.Description className="label text-graphite">
+      <Dialog.Description className="label text-graphite wrap-break-word">
         {file.kicker}
       </Dialog.Description>
     </header>
@@ -73,7 +76,7 @@ const FileBody = ({ file }: { file: DossierFile }) => (
     {file.links.length > 0 ? (
       <nav
         aria-label="Links"
-        className="mt-auto flex flex-col gap-2 px-6 py-6 sm:flex-row sm:flex-wrap"
+        className="flex flex-col gap-2 px-6 py-6 sm:flex-row sm:flex-wrap"
       >
         {file.links.map((link, index) => (
           <a
@@ -93,46 +96,23 @@ const FileBody = ({ file }: { file: DossierFile }) => (
   </>
 );
 
-export const FileSheet = ({
-  files,
-  index,
-  onClose,
-}: {
-  files: readonly DossierFile[];
-  index: number | null;
-  onClose: () => void;
-}) => {
-  const [lastIndex, setLastIndex] = useState(index);
-  if (index !== null && index !== lastIndex) {
-    setLastIndex(index);
-  }
-  const file = files[index ?? lastIndex ?? -1];
-
-  return (
-    <Dialog.Root
-      onOpenChange={(open) => {
-        if (!open) {
-          onClose();
-        }
-      }}
-      open={index !== null}
-    >
+export const FileModal = ({ handle }: { handle: FileModalHandle }) => (
+  <Dialog.Root handle={handle}>
+    {({ payload }) => (
       <Dialog.Portal>
-        <Dialog.Backdrop className="bg-paper-deep/80 ease-out-quart fixed inset-0 z-50 transition-opacity duration-300 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:opacity-0" />
+        <Dialog.Backdrop className="bg-paper-deep/80 ease-out-quart fixed inset-0 z-50 transition-opacity duration-250 data-ending-style:opacity-0 data-ending-style:duration-150 data-starting-style:opacity-0" />
         <Dialog.Popup
           className={cn(
-            "bg-paper text-ink border-rule-strong fixed inset-x-0 bottom-0 z-50 flex max-h-5/6 flex-col overflow-y-auto overscroll-contain border-t outline-none",
-            "sm:inset-y-0 sm:right-0 sm:left-auto sm:max-h-none sm:w-full sm:max-w-md sm:border-t-0 sm:border-l",
-            "ease-out-quart transition-[translate,opacity] duration-300 data-ending-style:duration-150",
-            "motion-safe:data-ending-style:translate-y-full motion-safe:data-starting-style:translate-y-full",
-            "motion-safe:sm:data-ending-style:translate-x-full motion-safe:sm:data-ending-style:translate-y-0 motion-safe:sm:data-starting-style:translate-x-full motion-safe:sm:data-starting-style:translate-y-0",
-            "motion-reduce:data-ending-style:opacity-0 motion-reduce:data-starting-style:opacity-0"
+            "bg-paper text-ink border-rule-strong fixed inset-x-4 top-1/2 z-50 mx-auto flex max-h-5/6 max-w-lg -translate-y-1/2 flex-col overflow-y-auto overscroll-contain border outline-none",
+            "ease-out-quart transition-[scale,opacity] duration-250 data-ending-style:duration-150",
+            "data-ending-style:opacity-0 data-starting-style:opacity-0",
+            "motion-safe:data-ending-style:scale-98 motion-safe:data-starting-style:scale-98"
           )}
         >
           <CornerMarks />
-          {file ? <FileBody file={file} /> : null}
+          {payload ? <FileBody file={payload} /> : null}
         </Dialog.Popup>
       </Dialog.Portal>
-    </Dialog.Root>
-  );
-};
+    )}
+  </Dialog.Root>
+);

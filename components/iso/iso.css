@@ -59,15 +59,6 @@
   fill: var(--iso-top);
 }
 
-.iso .iso-ball {
-  fill: var(--iso-shade-2);
-}
-
-.iso .iso-ball-shine {
-  fill: var(--iso-top);
-  stroke: none;
-}
-
 .iso .iso-halo {
   fill: var(--iso-halo);
   stroke: none;
@@ -112,22 +103,6 @@
 
 .iso .iso-dots[data-tone="lo"] circle {
   opacity: 0.25;
-}
-
-.iso [data-cursor] .iso-top,
-.iso [data-cursor] .iso-line,
-.iso [data-cursor] .iso-shade {
-  transition:
-    fill 150ms var(--ease-mechanical),
-    stroke 150ms var(--ease-mechanical);
-}
-
-.iso [data-cursor] .iso-solid > .iso-top {
-  fill: var(--iso-shade-3);
-}
-
-.iso [data-cursor] .iso-line {
-  stroke: var(--iso-hi);
 }
 
 .iso [data-on] .iso-solid > .iso-top {

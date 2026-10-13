@@ -79,35 +79,3 @@ export const Dots = ({
     ))}
   </g>
 );
-
-export const Ball = ({
-  center,
-  radius,
-  shine,
-}: {
-  center: Flat;
-  radius: number;
-  shine: Flat;
-}) => (
-  <g className="iso-solid">
-    <circle
-      className="iso-fill iso-ball"
-      cx={tenth(center[0])}
-      cy={tenth(center[1])}
-      r={tenth(radius)}
-    />
-    <circle
-      className="iso-line iso-edge"
-      cx={tenth(center[0])}
-      cy={tenth(center[1])}
-      data-tone="hi"
-      r={tenth(radius)}
-    />
-    <circle
-      className="iso-ball-shine"
-      cx={tenth(shine[0])}
-      cy={tenth(shine[1])}
-      r={tenth(radius * 0.32)}
-    />
-  </g>
-);
