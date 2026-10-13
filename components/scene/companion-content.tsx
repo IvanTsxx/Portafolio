@@ -29,11 +29,7 @@ import type {
   CompanionDock,
   Viewport,
 } from "./companion-placement";
-import {
-  companionDock,
-  dockGoal,
-  ownVisibleShare,
-} from "./companion-placement";
+import { companionDock, dockGoal, shouldYield } from "./companion-placement";
 import type { SpokenSection } from "./companion-signals";
 import { getSpokenSection, sayCompanionLine } from "./companion-signals";
 import { ViewLights } from "./view-lights";
@@ -54,7 +50,6 @@ interface Outfit {
 }
 
 const modelHeight = 2.2;
-const castYieldShare = 0.35;
 const baseTilt = 0.16;
 const depthClearPriority = 2.5;
 const speechSeconds = 7;
@@ -66,16 +61,8 @@ const readViewport = (): Viewport => ({
   width: document.documentElement.clientWidth,
 });
 
-const isCastInView = (viewport: Viewport) => {
-  for (const cast of getAgentCasts()) {
-    if (
-      ownVisibleShare(cast.getBoundingClientRect(), viewport) >= castYieldShare
-    ) {
-      return true;
-    }
-  }
-  return false;
-};
+const castRects = () =>
+  Array.from(getAgentCasts(), (cast) => cast.getBoundingClientRect());
 
 const placeHitBox = (
   hit: HTMLDivElement | null,
@@ -153,6 +140,7 @@ const CompanionContent = ({
   const visits = useRef(new WeakMap<Element, number>());
   const spokenAt = useRef(Number.NEGATIVE_INFINITY);
   const motion = useRef<CompanionMotion | null>(null);
+  const isYieldingRef = useRef(false);
   const [outfit, setOutfit] = useState<Outfit>({
     role: cast.role,
     toss: null,
@@ -213,8 +201,12 @@ const CompanionContent = ({
       sayCompanionLine(lineFor(section, visit));
       spokenAt.current = time;
     };
-    if (section && section.element !== heardSection.current) {
-      speak();
+    if ((section?.element ?? null) !== heardSection.current) {
+      if (section) {
+        speak();
+      } else {
+        sayCompanionLine(null);
+      }
     }
     heardSection.current = section?.element ?? null;
     if (presses.current !== handledPresses.current) {
@@ -222,7 +214,12 @@ const CompanionContent = ({
       speak();
     }
 
-    const isYielding = isCastInView(viewport);
+    const isYielding = shouldYield(
+      castRects(),
+      viewport,
+      isYieldingRef.current
+    );
+    isYieldingRef.current = isYielding;
     const goal = dockGoal(dock, {
       isTucked: !isReduced && state.scrollVelocity > tuckSpeed,
       isYielding,

@@ -56,7 +56,7 @@ const gutterFrames: readonly CompanionFrame[] = [
   { agentHeight: 64, agentWidth: 56 },
 ];
 const cornerFrame: CompanionFrame = { agentHeight: 56, agentWidth: 48 };
-const columnGap = 16;
+const columnGap = 24;
 const edgeInset = 12;
 const restShare = 0.72;
 const headerClearance = 56;
@@ -146,4 +146,33 @@ export const ownVisibleShare = (rect: ScreenRect, viewport: Viewport) => {
     Math.min(rect.bottom, viewport.height) - Math.max(rect.top, 0)
   );
   return (visibleWidth * visibleHeight) / (width * height);
+};
+
+const yieldEnterPresence = 0.6;
+const yieldLeavePresence = 0.4;
+
+export const castPresence = (rect: ScreenRect, viewport: Viewport) => {
+  const height = rect.bottom - rect.top;
+  if (height <= 0 || rect.right <= 0 || rect.left >= viewport.width) {
+    return 0;
+  }
+  const visibleHeight = Math.max(
+    0,
+    Math.min(rect.bottom, viewport.height) - Math.max(rect.top, 0)
+  );
+  return visibleHeight / Math.min(height, viewport.height);
+};
+
+export const shouldYield = (
+  casts: Iterable<ScreenRect>,
+  viewport: Viewport,
+  isYielding: boolean
+) => {
+  const threshold = isYielding ? yieldLeavePresence : yieldEnterPresence;
+  for (const rect of casts) {
+    if (castPresence(rect, viewport) >= threshold) {
+      return true;
+    }
+  }
+  return false;
 };

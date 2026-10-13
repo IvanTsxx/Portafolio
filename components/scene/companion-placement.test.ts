@@ -2,9 +2,11 @@ import { describe, expect, test } from "bun:test";
 
 import type { ColumnBounds, Viewport } from "./companion-placement";
 import {
+  castPresence,
   companionDock,
   dockGoal,
   ownVisibleShare,
+  shouldYield,
 } from "./companion-placement";
 
 const columnWidth = 704;
@@ -107,5 +109,40 @@ describe("own visible share", () => {
     expect(
       ownVisibleShare({ bottom: 0, left: 0, right: 0, top: 0 }, viewport)
     ).toBe(0);
+  });
+});
+
+const card = (top: number, height = 400) => ({
+  bottom: top + height,
+  left: 368,
+  right: 1072,
+  top,
+});
+
+describe("yield to section casts", () => {
+  const viewport = viewportOf(1440, 900);
+  test("a cast mostly on screen makes the companion yield", () => {
+    expect(shouldYield([card(200)], viewport, false)).toBe(true);
+  });
+
+  test("a sliver of a cast at the edge does not", () => {
+    expect(shouldYield([card(-300)], viewport, false)).toBe(false);
+    expect(shouldYield([card(800)], viewport, false)).toBe(false);
+  });
+
+  test("a cast taller than the viewport counts once it fills most of the screen", () => {
+    expect(shouldYield([card(-400, 2600)], viewport, false)).toBe(true);
+    expect(castPresence(card(600, 2600), viewport)).toBeCloseTo(1 / 3, 5);
+  });
+
+  test("hysteresis keeps the yield until the cast is well off screen", () => {
+    expect(castPresence(card(650), viewport)).toBeCloseTo(0.625, 5);
+    expect(shouldYield([card(700)], viewport, false)).toBe(false);
+    expect(shouldYield([card(700)], viewport, true)).toBe(true);
+    expect(shouldYield([card(760)], viewport, true)).toBe(false);
+  });
+
+  test("no casts, no yield", () => {
+    expect(shouldYield([], viewport, true)).toBe(false);
   });
 });
