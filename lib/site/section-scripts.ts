@@ -66,8 +66,8 @@ export const sectionScripts = {
   noteResponsibilities: speaks(),
   noteText: speaks(),
   notesArchive: builds(["Filing the notes."]),
-  registryComponents: builds(["Stocking the shelf."]),
-  registryInstall: builds([
+  registryComponents: builds([
+    "Stocking the shelf.",
     `Every piece installs from ${siteConfig.registryNamespace}.`,
   ]),
   registryPreview: speaks(),
