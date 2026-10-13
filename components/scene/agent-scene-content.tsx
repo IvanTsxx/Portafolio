@@ -8,12 +8,7 @@ import type { AgentSceneId } from "@/lib/agents/scenes";
 import { ViewLights } from "./view-lights";
 
 const sceneComponents = {
-  "code-search": lazy(() => import("./scenes/code-search-scene")),
   debugging: lazy(() => import("./scenes/debugging-scene")),
-  feature: lazy(() => import("./scenes/feature-scene")),
-  "figma-to-code": lazy(() => import("./scenes/figma-to-code-scene")),
-  orchestrate: lazy(() => import("./scenes/orchestrate-scene")),
-  review: lazy(() => import("./scenes/review-scene")),
 } as const satisfies Record<AgentSceneId, LazyExoticComponent<ComponentType>>;
 
 const AgentSceneContent = ({ scene }: { scene: AgentSceneId }) => {

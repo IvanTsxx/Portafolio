@@ -3,7 +3,7 @@ import { AgentWorkshop } from "@/components/profile/agent-workshop";
 import { ContactRow } from "@/components/profile/contact-row";
 import { ContributionMatrix } from "@/components/profile/contribution-matrix";
 import { ExperienceSection } from "@/components/profile/experience/experience-section";
-import { HowIWork } from "@/components/profile/how-i-work";
+import { HowIWork } from "@/components/profile/how-i-work/how-i-work-section";
 import { ProfileIntro } from "@/components/profile/profile-intro";
 import { PinnedSection } from "@/components/profile/card-catalog/pinned-section";
 import { getGithubProfile } from "@/lib/site/github-profile";
