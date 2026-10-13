@@ -208,6 +208,7 @@ export const renderDesignMarkdown = (system: DesignSystem) =>
     "- **Button:** 44px, square, mono uppercase label. Primary is ink on paper inverted; outline is a 1px ink frame. State flips in 100ms.",
     "- **Chip:** square hairline frame with a mono label; active chips invert to ink.",
     "- **Leader row:** mono key, dotted leader, value aligned right.",
+    "- **Hero field:** a 4×4 Bayer dither of seeded noise behind every page hero, ink at 10% on paper, dense in the top right and fading toward the title side and the bottom rule. Each page seeds it with its doc code. It is server-rendered SVG; a hovering mouse drifts its rows like the portrait, gentler, and reduced motion keeps the static field.",
     "- **Agent:** small orange box-shaped 3D mascot with role accessories. One per view, hover and click reactions, static fallback without WebGL.",
     "",
     "## Do's and Don'ts",

@@ -11,6 +11,19 @@ export interface DitherPalette {
   light: Rgb;
 }
 
+export const tokenRgb = (
+  context: CanvasRenderingContext2D,
+  token: string
+): Rgb => {
+  context.clearRect(0, 0, 1, 1);
+  context.fillStyle = getComputedStyle(document.documentElement)
+    .getPropertyValue(token)
+    .trim();
+  context.fillRect(0, 0, 1, 1);
+  const [red = 0, green = 0, blue = 0] = context.getImageData(0, 0, 1, 1).data;
+  return [red, green, blue];
+};
+
 const PIXEL_SCALE = 2;
 const TONE_CONTRAST = 18;
 const TONE_BRIGHTNESS = 8;
