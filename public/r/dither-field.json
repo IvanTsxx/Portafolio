@@ -1,0 +1,144 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dither-field",
+  "title": "Dither Field",
+  "description": "Animated ordered-dither noise field for hero backgrounds, with a pointer lens.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/ivan/ui/dither-field.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useRef, useState } from \"react\";\nimport type { ComponentProps } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { usePrefersReducedMotion } from \"@/registry/ivan/hooks/use-prefers-reduced-motion\";\nimport { resolveColor } from \"@/registry/ivan/lib/dither\";\nimport {\n  AMBIENT_FRAME_MS,\n  createDitherFieldGrid,\n  createLens,\n  isLensSettled,\n  lensSwell,\n  lensTravel,\n  packColor,\n  paintDitherField,\n  rampAt,\n  seedOf,\n  stepSpring,\n} from \"@/registry/ivan/lib/dither-field\";\nimport type {\n  DitherFieldAnchor,\n  DitherFieldGrid,\n} from \"@/registry/ivan/lib/dither-field\";\n\nconst maxStepSeconds = 0.05;\nconst minColumns = 16;\nconst maxColumns = 256;\nconst minRows = 8;\n\nconst pixelated = { imageRendering: \"pixelated\" } as const;\n\ninterface GridSize {\n  columns: number;\n  rows: number;\n}\n\nconst measureGrid = (width: number, height: number, cellSize: number) => {\n  const columns = Math.round(\n    Math.min(maxColumns, Math.max(minColumns, width / cellSize))\n  );\n  const cellPixels = width / columns;\n  const rows = Math.max(minRows, Math.round(height / Math.max(1, cellPixels)));\n  return { columns, rows };\n};\n\ninterface FieldSurface {\n  canvas: HTMLCanvasElement;\n  color: number;\n  context: CanvasRenderingContext2D;\n  grid: DitherFieldGrid;\n  host: HTMLElement;\n  isAnimated: boolean;\n  isInteractive: boolean;\n}\n\nconst startField = ({\n  canvas,\n  color,\n  context,\n  grid,\n  host,\n  isAnimated,\n  isInteractive,\n}: FieldSurface) => {\n  const image = context.createImageData(grid.columns, grid.rows);\n  const pixels = new Uint32Array(image.data.buffer);\n  const lens = createLens();\n  const pointer = { isInside: false, x: 0, y: 0 };\n  let seconds = 0;\n  let lastTick: number | null = null;\n  let lastPaint = 0;\n  let isInView = false;\n  let request: number | null = null;\n\n  const paint = () => {\n    paintDitherField(\n      grid,\n      { lens, ramp: isAnimated ? rampAt(seconds) : 0, time: seconds },\n      pixels,\n      color\n    );\n    context.putImageData(image, 0, 0);\n  };\n\n  canvas.width = grid.columns;\n  canvas.height = grid.rows;\n  paint();\n  canvas.dataset.live = \"true\";\n\n  if (!isAnimated) {\n    return () => {\n      canvas.dataset.live = \"false\";\n    };\n  }\n\n  const canRun = () => isInView && document.visibilityState === \"visible\";\n\n  const tick = (now: number) => {\n    const step =\n      lastTick === null ? 0 : Math.min(maxStepSeconds, (now - lastTick) / 1000);\n    lastTick = now;\n    seconds += step;\n    stepSpring(lens.x, pointer.x, lensTravel, step);\n    stepSpring(lens.y, pointer.y, lensTravel, step);\n    stepSpring(lens.strength, pointer.isInside ? 1 : 0, lensSwell, step);\n    const isLensMoving = pointer.isInside || !isLensSettled(lens);\n    if (isLensMoving || now - lastPaint >= AMBIENT_FRAME_MS - 1) {\n      paint();\n      lastPaint = now;\n    }\n    request = canRun() ? requestAnimationFrame(tick) : null;\n    if (request === null) {\n      lastTick = null;\n    }\n  };\n\n  const schedule = () => {\n    if (request !== null) {\n      return;\n    }\n    if (!canRun()) {\n      lastTick = null;\n      return;\n    }\n    request = requestAnimationFrame(tick);\n  };\n\n  const handleMove = (event: PointerEvent) => {\n    if (event.pointerType !== \"mouse\") {\n      return;\n    }\n    const bounds = canvas.getBoundingClientRect();\n    pointer.x = ((event.clientX - bounds.left) / bounds.width) * grid.columns;\n    pointer.y = ((event.clientY - bounds.top) / bounds.height) * grid.rows;\n    if (isLensSettled(lens)) {\n      lens.x.value = pointer.x;\n      lens.y.value = pointer.y;\n    }\n    pointer.isInside = true;\n    schedule();\n  };\n\n  const handleLeave = () => {\n    pointer.isInside = false;\n    schedule();\n  };\n\n  const observer = new IntersectionObserver(([entry]) => {\n    isInView = entry?.isIntersecting ?? false;\n    schedule();\n  });\n  observer.observe(host);\n  document.addEventListener(\"visibilitychange\", schedule);\n  if (isInteractive) {\n    host.addEventListener(\"pointermove\", handleMove);\n    host.addEventListener(\"pointerleave\", handleLeave);\n  }\n\n  return () => {\n    if (request !== null) {\n      cancelAnimationFrame(request);\n    }\n    observer.disconnect();\n    document.removeEventListener(\"visibilitychange\", schedule);\n    host.removeEventListener(\"pointermove\", handleMove);\n    host.removeEventListener(\"pointerleave\", handleLeave);\n    canvas.dataset.live = \"false\";\n  };\n};\n\nexport interface DitherFieldProps extends Omit<\n  ComponentProps<\"div\">,\n  \"children\"\n> {\n  seed?: string;\n  anchor?: DitherFieldAnchor;\n  density?: number;\n  cellSize?: number;\n  interactive?: boolean;\n  animated?: boolean;\n}\n\nexport const DitherField = ({\n  seed = \"field\",\n  anchor = \"top-right\",\n  density = 0.62,\n  cellSize = 4,\n  interactive = true,\n  animated = true,\n  className,\n  ...props\n}: DitherFieldProps) => {\n  const fieldRef = useRef<HTMLDivElement>(null);\n  const canvasRef = useRef<HTMLCanvasElement>(null);\n  const [size, setSize] = useState<GridSize | null>(null);\n  const isReduced = usePrefersReducedMotion();\n  const cellPixels = Math.min(32, Math.max(2, cellSize));\n  const fieldDensity = Math.min(1, Math.max(0, density));\n\n  useEffect(() => {\n    const field = fieldRef.current;\n    if (!field) {\n      return;\n    }\n    const observer = new ResizeObserver(([entry]) => {\n      const box = entry?.contentRect;\n      if (!box || box.width === 0 || box.height === 0) {\n        return;\n      }\n      const next = measureGrid(box.width, box.height, cellPixels);\n      setSize((current) =>\n        current?.columns === next.columns && current.rows === next.rows\n          ? current\n          : next\n      );\n    });\n    observer.observe(field);\n    return () => observer.disconnect();\n  }, [cellPixels]);\n\n  useEffect(() => {\n    const field = fieldRef.current;\n    const host = field?.parentElement;\n    const canvas = canvasRef.current;\n    const context = canvas?.getContext(\"2d\");\n    if (!(size && field && host && canvas && context)) {\n      return;\n    }\n    const grid = createDitherFieldGrid({\n      anchor,\n      columns: size.columns,\n      density: fieldDensity,\n      rows: size.rows,\n      seed: seedOf(seed),\n    });\n    const color = packColor(resolveColor(field, getComputedStyle(field).color));\n    return startField({\n      canvas,\n      color,\n      context,\n      grid,\n      host,\n      isAnimated: animated && !isReduced,\n      isInteractive: interactive,\n    });\n  }, [size, seed, anchor, fieldDensity, animated, interactive, isReduced]);\n\n  return (\n    <div\n      aria-hidden\n      className={cn(\n        \"text-foreground pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-20\",\n        className\n      )}\n      ref={fieldRef}\n      {...props}\n    >\n      <canvas\n        className=\"absolute inset-0 block size-full opacity-0 transition-opacity duration-300 ease-out data-[live=true]:opacity-100 motion-reduce:transition-none\"\n        data-live=\"false\"\n        ref={canvasRef}\n        style={pixelated}\n      />\n    </div>\n  );\n};\n",
+      "type": "registry:ui",
+      "target": "@ui/dither-field.tsx"
+    },
+    {
+      "path": "registry/ivan/lib/dither-field.ts",
+      "content": "import { bayerThreshold } from \"./dither\";\nimport type { Rgb } from \"./dither\";\n\nexport type DitherFieldAnchor =\n  | \"fill\"\n  | \"top\"\n  | \"bottom\"\n  | \"top-right\"\n  | \"center\";\n\nexport interface DitherFieldGrid {\n  bloom: Float32Array;\n  columns: number;\n  envelope: Float32Array;\n  relief: Float32Array;\n  rows: number;\n  thresholds: Float32Array;\n}\n\nexport interface Spring {\n  value: number;\n  velocity: number;\n}\n\nexport interface SpringConfig {\n  damping: number;\n  stiffness: number;\n}\n\nexport interface DitherFieldLens {\n  strength: Spring;\n  x: Spring;\n  y: Spring;\n}\n\nexport interface DitherFieldFrame {\n  lens: DitherFieldLens;\n  ramp: number;\n  time: number;\n}\n\nexport const AMBIENT_FRAME_MS = 1000 / 30;\nexport const RAMP_SECONDS = 2.4;\nexport const lensTravel: SpringConfig = { damping: 22, stiffness: 170 };\nexport const lensSwell: SpringConfig = { damping: 14, stiffness: 120 };\n\nconst BLOOM_LATTICE = 32;\nconst BLOOM_FLOOR = 0.4;\nconst BLOOM_SPAN = 1;\nconst LENS_RADIUS = 16;\nconst LENS_REACH = LENS_RADIUS * 2.6;\nconst LENS_PULL = 0.42;\nconst LENS_SMEAR = 0.08;\nconst LENS_SWELL = 0.18;\nconst LENS_RIPPLE = 0.16;\nconst RIPPLE_WAVELENGTH = 0.55;\nconst RIPPLE_SPEED = 3.2;\nconst SMEAR_LIMIT = 60;\nconst SETTLED = 0.002;\nconst GRAIN_SCALE = 14;\nconst OPAQUE = 0xff_00_00_00;\n\nconst bloomLayers = [\n  { scale: 1 / 34, weight: 0.6, x: 0.045, y: 0.018 },\n  { scale: 1 / 21, weight: 0.4, x: -0.03, y: 0.035 },\n] as const;\n\nconst smooth = (value: number) => value * value * (3 - 2 * value);\n\nconst fade = (edge0: number, edge1: number, value: number) =>\n  smooth(Math.min(1, Math.max(0, (value - edge0) / (edge1 - edge0))));\n\nexport const seedOf = (text: string) =>\n  [...text].reduce(\n    (total, character, index) =>\n      (total * 31 + (character.codePointAt(0) ?? 0) * (index + 7)) % 9973,\n    17\n  );\n\nconst lattice = (x: number, y: number, seed: number) => {\n  const wave = Math.sin(x * 127.1 + y * 311.7 + seed * 74.7) * 43_758.5453;\n  return wave - Math.floor(wave);\n};\n\nconst valueNoise = (x: number, y: number, seed: number) => {\n  const baseX = Math.floor(x);\n  const baseY = Math.floor(y);\n  const blendX = smooth(x - baseX);\n  const blendY = smooth(y - baseY);\n  const top =\n    lattice(baseX, baseY, seed) +\n    (lattice(baseX + 1, baseY, seed) - lattice(baseX, baseY, seed)) * blendX;\n  const bottom =\n    lattice(baseX, baseY + 1, seed) +\n    (lattice(baseX + 1, baseY + 1, seed) - lattice(baseX, baseY + 1, seed)) *\n      blendX;\n  return top + (bottom - top) * blendY;\n};\n\nconst fbm = (x: number, y: number, seed: number) =>\n  0.55 * valueNoise(x, y, seed) +\n  0.3 * valueNoise(x * 2.1 + 17, y * 2.1 + 9, seed) +\n  0.15 * valueNoise(x * 4.3 + 5, y * 4.3 + 31, seed);\n\nconst anchorEnvelopes: Record<\n  DitherFieldAnchor,\n  (across: number, down: number) => number\n> = {\n  bottom: (_across, down) => fade(0.2, 0.95, down),\n  center: (across, down) =>\n    1 - fade(0.2, 0.72, Math.hypot(across - 0.5, (down - 0.5) * 0.8) * 1.4),\n  fill: () => 1,\n  top: (_across, down) => 1 - fade(0.05, 0.8, down),\n  \"top-right\": (across, down) =>\n    fade(0.28, 0.92, across) * (1 - fade(0.05, 0.8, down)),\n};\n\nexport const createDitherFieldGrid = ({\n  anchor,\n  columns,\n  density,\n  rows,\n  seed,\n}: {\n  anchor: DitherFieldAnchor;\n  columns: number;\n  density: number;\n  rows: number;\n  seed: number;\n}): DitherFieldGrid => {\n  const cells = columns * rows;\n  const envelope = new Float32Array(cells);\n  const relief = new Float32Array(cells);\n  const thresholds = new Float32Array(cells);\n  const envelopeAt = anchorEnvelopes[anchor];\n  for (let row = 0; row < rows; row += 1) {\n    for (let column = 0; column < columns; column += 1) {\n      const index = row * columns + column;\n      const grain = fbm(column / GRAIN_SCALE, row / GRAIN_SCALE, seed);\n      envelope[index] =\n        envelopeAt(\n          column / Math.max(1, columns - 1),\n          row / Math.max(1, rows - 1)\n        ) * density;\n      relief[index] = Math.min(1, Math.max(0, (grain - 0.42) * 2.4 + 0.4));\n      thresholds[index] = bayerThreshold(column, row);\n    }\n  }\n  const bloom = new Float32Array(BLOOM_LATTICE * BLOOM_LATTICE);\n  for (const index of bloom.keys()) {\n    const wave = Math.sin((index + 1) * 12.9898 + seed * 78.233) * 43_758.5453;\n    bloom[index] = wave - Math.floor(wave);\n  }\n  return { bloom, columns, envelope, relief, rows, thresholds };\n};\n\nexport const createLens = (): DitherFieldLens => ({\n  strength: { value: 0, velocity: 0 },\n  x: { value: 0, velocity: 0 },\n  y: { value: 0, velocity: 0 },\n});\n\nexport const stepSpring = (\n  spring: Spring,\n  target: number,\n  { damping, stiffness }: SpringConfig,\n  seconds: number\n) => {\n  const acceleration =\n    stiffness * (target - spring.value) - damping * spring.velocity;\n  spring.velocity += acceleration * seconds;\n  spring.value += spring.velocity * seconds;\n};\n\nexport const isLensSettled = ({ strength }: DitherFieldLens) =>\n  Math.abs(strength.value) < SETTLED && Math.abs(strength.velocity) < SETTLED;\n\nexport const rampAt = (seconds: number) =>\n  smooth(Math.min(1, Math.max(0, seconds / RAMP_SECONDS)));\n\nconst wrapLattice = (value: number) =>\n  ((value % BLOOM_LATTICE) + BLOOM_LATTICE) % BLOOM_LATTICE;\n\nconst latticeAt = (bloom: Float32Array, x: number, y: number) =>\n  bloom[wrapLattice(y) * BLOOM_LATTICE + wrapLattice(x)] ?? 0;\n\nconst bloomNoise = (bloom: Float32Array, x: number, y: number) => {\n  const baseX = Math.floor(x);\n  const baseY = Math.floor(y);\n  const blendX = smooth(x - baseX);\n  const blendY = smooth(y - baseY);\n  const top =\n    latticeAt(bloom, baseX, baseY) +\n    (latticeAt(bloom, baseX + 1, baseY) - latticeAt(bloom, baseX, baseY)) *\n      blendX;\n  const bottom =\n    latticeAt(bloom, baseX, baseY + 1) +\n    (latticeAt(bloom, baseX + 1, baseY + 1) -\n      latticeAt(bloom, baseX, baseY + 1)) *\n      blendX;\n  return top + (bottom - top) * blendY;\n};\n\nconst bloomGain = (\n  bloom: Float32Array,\n  column: number,\n  row: number,\n  time: number\n) => {\n  let total = 0;\n  for (const layer of bloomLayers) {\n    total +=\n      layer.weight *\n      bloomNoise(\n        bloom,\n        column * layer.scale + time * layer.x,\n        row * layer.scale + time * layer.y\n      );\n  }\n  const contrast = Math.min(1, Math.max(0, (total - 0.5) * 1.8 + 0.5));\n  return BLOOM_FLOOR + BLOOM_SPAN * smooth(contrast);\n};\n\nconst sampleAt = (\n  field: Float32Array,\n  columns: number,\n  rows: number,\n  x: number,\n  y: number\n) => {\n  const column = Math.min(columns - 1, Math.max(0, x));\n  const row = Math.min(rows - 1, Math.max(0, y));\n  const left = Math.floor(column);\n  const top = Math.floor(row);\n  const right = Math.min(columns - 1, left + 1);\n  const bottom = Math.min(rows - 1, top + 1);\n  const blendX = column - left;\n  const blendY = row - top;\n  const upper =\n    (field[top * columns + left] ?? 0) * (1 - blendX) +\n    (field[top * columns + right] ?? 0) * blendX;\n  const lower =\n    (field[bottom * columns + left] ?? 0) * (1 - blendX) +\n    (field[bottom * columns + right] ?? 0) * blendX;\n  return upper + (lower - upper) * blendY;\n};\n\nconst clampSmear = (velocity: number) =>\n  Math.min(SMEAR_LIMIT, Math.max(-SMEAR_LIMIT, velocity)) * LENS_SMEAR;\n\nexport const packColor = ([red, green, blue]: Rgb) =>\n  OPAQUE + blue * 0x1_00_00 + green * 0x1_00 + red;\n\nexport const paintDitherField = (\n  grid: DitherFieldGrid,\n  { lens, ramp, time }: DitherFieldFrame,\n  pixels: Uint32Array,\n  color: number\n) => {\n  const { bloom, columns, envelope, relief, rows, thresholds } = grid;\n  const strength = lens.strength.value;\n  const isLensOn = Math.abs(strength) >= SETTLED;\n  const lensX = lens.x.value;\n  const lensY = lens.y.value;\n  const smearX = clampSmear(lens.x.velocity);\n  const smearY = clampSmear(lens.y.velocity);\n  const ripplePhase = time * RIPPLE_SPEED;\n  for (let row = 0; row < rows; row += 1) {\n    const offsetY = row - lensY;\n    const isRowInLens = isLensOn && Math.abs(offsetY) < LENS_REACH;\n    for (let column = 0; column < columns; column += 1) {\n      const index = row * columns + column;\n      const cellEnvelope = envelope[index] ?? 0;\n      if (cellEnvelope === 0) {\n        pixels[index] = 0;\n        continue;\n      }\n      const gain =\n        ramp === 0 ? 1 : 1 + (bloomGain(bloom, column, row, time) - 1) * ramp;\n      let tone = Math.min(1, (relief[index] ?? 0) * gain) * cellEnvelope;\n      const offsetX = column - lensX;\n      if (isRowInLens && Math.abs(offsetX) < LENS_REACH) {\n        const distanceSquared = offsetX * offsetX + offsetY * offsetY;\n        const falloff =\n          Math.exp(-distanceSquared / (LENS_RADIUS * LENS_RADIUS)) * strength;\n        const sampleX =\n          column - offsetX * LENS_PULL * falloff - smearX * falloff;\n        const sampleY = row - offsetY * LENS_PULL * falloff - smearY * falloff;\n        const ripple = Math.sin(\n          Math.sqrt(distanceSquared) * RIPPLE_WAVELENGTH - ripplePhase\n        );\n        const swell = falloff * (LENS_SWELL + LENS_RIPPLE * ripple);\n        tone =\n          Math.min(\n            1,\n            sampleAt(relief, columns, rows, sampleX, sampleY) * gain + swell\n          ) *\n          Math.min(\n            cellEnvelope,\n            sampleAt(envelope, columns, rows, sampleX, sampleY)\n          );\n      }\n      pixels[index] = tone > (thresholds[index] ?? 1) ? color : 0;\n    }\n  }\n};\n",
+      "type": "registry:lib",
+      "target": "@lib/dither-field.ts"
+    },
+    {
+      "path": "registry/ivan/lib/dither.ts",
+      "content": "export type Rgb = readonly [number, number, number];\n\nexport interface DitherFrame {\n  data: Uint8ClampedArray;\n  height: number;\n  width: number;\n}\n\nexport interface DitherPalette {\n  dark: Rgb;\n  light: Rgb;\n}\n\nexport interface DitherOptions {\n  contrast: number;\n  pixelSize: number;\n}\n\nexport const BAYER_SIDE = 4;\n\nconst TONE_CONTRAST = 18;\nconst TONE_BRIGHTNESS = 8;\n\nconst clampByte = (value: number) => Math.min(255, Math.max(0, value));\n\nconst contrastFactor = (contrast: number) => {\n  const scaled = contrast * 2.55;\n  return (259 * (scaled + 255)) / (255 * (259 - scaled));\n};\n\nconst buildBayerThresholds = () => {\n  let current = [0];\n  let side = 1;\n  while (side < BAYER_SIDE) {\n    const doubled = side * 2;\n    const next: number[] = Array.from({ length: doubled * doubled }, () => 0);\n    for (let y = 0; y < side; y += 1) {\n      for (let x = 0; x < side; x += 1) {\n        const value = (current[y * side + x] ?? 0) * 4;\n        next[y * doubled + x] = value;\n        next[y * doubled + x + side] = value + 2;\n        next[(y + side) * doubled + x] = value + 3;\n        next[(y + side) * doubled + x + side] = value + 1;\n      }\n    }\n    current = next;\n    side = doubled;\n  }\n  return current.map((value) => (value + 0.5) / current.length);\n};\n\nexport const bayerThresholds: readonly number[] = buildBayerThresholds();\n\nexport const bayerThreshold = (x: number, y: number) =>\n  bayerThresholds[(y % BAYER_SIDE) * BAYER_SIDE + (x % BAYER_SIDE)] ?? 0.5;\n\nexport const luminance = ([red, green, blue]: Rgb) =>\n  0.2126 * red + 0.7152 * green + 0.0722 * blue;\n\nexport const orderPalette = (first: Rgb, second: Rgb): DitherPalette =>\n  luminance(first) <= luminance(second)\n    ? { dark: first, light: second }\n    : { dark: second, light: first };\n\nexport const resolveColor = (element: Element, color: string): Rgb => {\n  const probe = document.createElement(\"canvas\");\n  probe.width = 1;\n  probe.height = 1;\n  const context = probe.getContext(\"2d\", { willReadFrequently: true });\n  if (!context) {\n    return [0, 0, 0];\n  }\n  context.fillStyle = color.startsWith(\"--\")\n    ? getComputedStyle(element).getPropertyValue(color).trim()\n    : color;\n  context.fillRect(0, 0, 1, 1);\n  const [red = 0, green = 0, blue = 0] = context.getImageData(0, 0, 1, 1).data;\n  return [red, green, blue];\n};\n\nconst pixelLuminance = (data: Uint8ClampedArray, index: number) =>\n  luminance([data[index] ?? 0, data[index + 1] ?? 0, data[index + 2] ?? 0]);\n\nconst blockTone = (\n  frame: DitherFrame,\n  blockX: number,\n  blockY: number,\n  pixelSize: number,\n  toneFactor: number,\n  ditherFactor: number\n) => {\n  const x0 = blockX * pixelSize;\n  const y0 = blockY * pixelSize;\n  const x1 = Math.min(x0 + pixelSize, frame.width);\n  const y1 = Math.min(y0 + pixelSize, frame.height);\n  let sum = 0;\n  for (let y = y0; y < y1; y += 1) {\n    for (let x = x0; x < x1; x += 1) {\n      const level = pixelLuminance(frame.data, (y * frame.width + x) * 4);\n      sum += clampByte(toneFactor * (level - 128) + 128 + TONE_BRIGHTNESS);\n    }\n  }\n  const average = sum / ((x1 - x0) * (y1 - y0));\n  return clampByte((average - 128) * ditherFactor + 128);\n};\n\nexport const ditherFrame = (\n  frame: DitherFrame,\n  palette: DitherPalette,\n  { contrast, pixelSize }: DitherOptions\n): DitherFrame => {\n  const toneFactor = contrastFactor(TONE_CONTRAST);\n  const ditherFactor = contrastFactor(contrast);\n  const blocksWide = Math.ceil(frame.width / pixelSize);\n  const blocksHigh = Math.ceil(frame.height / pixelSize);\n  const lightBlocks = new Uint8Array(blocksWide * blocksHigh);\n  for (let blockY = 0; blockY < blocksHigh; blockY += 1) {\n    for (let blockX = 0; blockX < blocksWide; blockX += 1) {\n      const tone =\n        blockTone(frame, blockX, blockY, pixelSize, toneFactor, ditherFactor) /\n        255;\n      lightBlocks[blockY * blocksWide + blockX] =\n        tone > bayerThreshold(blockX, blockY) ? 1 : 0;\n    }\n  }\n  const data = new Uint8ClampedArray(frame.width * frame.height * 4);\n  for (let y = 0; y < frame.height; y += 1) {\n    const row = Math.floor(y / pixelSize) * blocksWide;\n    for (let x = 0; x < frame.width; x += 1) {\n      const color = lightBlocks[row + Math.floor(x / pixelSize)]\n        ? palette.light\n        : palette.dark;\n      data.set([...color, 255], (y * frame.width + x) * 4);\n    }\n  }\n  return { data, height: frame.height, width: frame.width };\n};\n",
+      "type": "registry:lib",
+      "target": "@lib/dither.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nconst reducedMotionQuery = \"(prefers-reduced-motion: reduce)\";\n\nconst subscribe = (onChange: () => void) => {\n  const mediaQuery = window.matchMedia(reducedMotionQuery);\n  mediaQuery.addEventListener(\"change\", onChange);\n  return () => mediaQuery.removeEventListener(\"change\", onChange);\n};\n\nconst getSnapshot = () => window.matchMedia(reducedMotionQuery).matches;\n\nconst getServerSnapshot = () => false;\n\nexport const usePrefersReducedMotion = () =>\n  useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-prefers-reduced-motion.ts"
+    }
+  ],
+  "meta": {
+    "docs": {
+      "props": [
+        {
+          "component": "DitherField",
+          "description": "Fills its positioned parent. Paints in currentColor.",
+          "props": [
+            {
+              "name": "seed",
+              "type": "string",
+              "default": "\"field\"",
+              "description": "Same seed, same grain."
+            },
+            {
+              "name": "anchor",
+              "type": "\"top-right\" | \"top\" | \"bottom\" | \"center\" | \"fill\"",
+              "default": "\"top-right\"",
+              "description": "Where the field is densest."
+            },
+            {
+              "name": "density",
+              "type": "number",
+              "default": "0.62",
+              "description": "Peak ink coverage, 0 to 1."
+            },
+            {
+              "name": "cellSize",
+              "type": "number",
+              "default": "4",
+              "description": "Cell size in CSS px, 2 to 32. Capped at 256 columns."
+            },
+            {
+              "name": "interactive",
+              "type": "boolean",
+              "default": "true",
+              "description": "Mouse over the parent swells a lens."
+            },
+            {
+              "name": "animated",
+              "type": "boolean",
+              "default": "true",
+              "description": "Ambient bloom. False paints one frame."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "default": "\"text-foreground opacity-20\"",
+              "description": "Set color and opacity here."
+            }
+          ]
+        }
+      ],
+      "variants": [
+        {
+          "name": "anchor",
+          "default": "top-right",
+          "options": [
+            "top-right",
+            "top",
+            "bottom",
+            "center",
+            "fill"
+          ],
+          "description": "Density envelope."
+        }
+      ],
+      "examples": [
+        {
+          "title": "Hero background",
+          "file": "registry/ivan/examples/dither-field/basic.tsx"
+        },
+        {
+          "title": "Anchors",
+          "file": "registry/ivan/examples/dither-field/anchors.tsx"
+        }
+      ],
+      "accessibility": [
+        "Decorative. aria-hidden and pointer-events none.",
+        "Listens for the pointer on its parent, so content above it stays clickable."
+      ],
+      "animation": [
+        {
+          "target": "Bloom",
+          "properties": "canvas pixels",
+          "timing": "30 fps, 2.4 s ramp in",
+          "trigger": "In view and tab visible",
+          "reducedMotion": "One static frame."
+        },
+        {
+          "target": "Lens",
+          "properties": "canvas pixels",
+          "timing": "Spring, stiffness 170, damping 22",
+          "trigger": "Mouse over the parent",
+          "reducedMotion": "Off."
+        },
+        {
+          "target": "Canvas",
+          "properties": "opacity",
+          "timing": "300 ms, ease-out",
+          "trigger": "First paint",
+          "reducedMotion": "Instant."
+        }
+      ]
+    }
+  },
+  "categories": [
+    "backgrounds",
+    "motion"
+  ],
+  "type": "registry:ui"
+}

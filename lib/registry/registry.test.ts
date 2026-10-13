@@ -20,6 +20,7 @@ import {
   registryItems,
   toCategoryLabel,
 } from "./registry";
+import { registryCssSchema } from "./schema";
 import type { RegistryFile, RegistryItem } from "./schema";
 
 const projectRoot = process.cwd();
@@ -290,11 +291,11 @@ describe("built registry", () => {
 
 describe("registry helpers", () => {
   test("build install commands for the URL and namespace forms", () => {
-    expect(getInstallCommand("bun", "technical-grid")).toBe(
-      `bunx --bun shadcn@latest add ${siteConfig.url}/r/technical-grid.json`
+    expect(getInstallCommand("bun", "dither-image")).toBe(
+      `bunx --bun shadcn@latest add ${siteConfig.url}/r/dither-image.json`
     );
-    expect(getNamespacedInstallCommand("npm", "technical-grid")).toBe(
-      "npx shadcn@latest add @ivan/technical-grid"
+    expect(getNamespacedInstallCommand("npm", "dither-image")).toBe(
+      "npx shadcn@latest add @ivan/dither-image"
     );
     expect(JSON.parse(getRegistriesSnippet())).toEqual({
       registries: { "@ivan": `${siteConfig.url}/r/{name}.json` },
@@ -319,10 +320,11 @@ describe("registry helpers", () => {
   });
 
   test("serialize css rules and variables", () => {
-    const item = registryItems.find((entry) => entry.css);
-    expect(item?.css).toBeDefined();
-    expect(serializeRegistryCss(item?.css ?? {})).toContain(
-      "@keyframes technical-grid-scan-y {"
+    const css = registryCssSchema.parse({
+      "@keyframes fade": { from: { opacity: "0" }, to: { opacity: "1" } },
+    });
+    expect(serializeRegistryCss(css)).toBe(
+      "@keyframes fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}"
     );
     expect(serializeRegistryCssVars({ dark: { clay: "red" } })).toBe(
       ".dark {\n  --clay: red;\n}"

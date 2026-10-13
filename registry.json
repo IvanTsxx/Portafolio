@@ -4,339 +4,6 @@
   "homepage": "https://bongi.dev",
   "items": [
     {
-      "name": "technical-grid",
-      "type": "registry:ui",
-      "title": "Animated Technical Grid",
-      "description": "Hairline blueprint grid with a scan line and pulsing nodes.",
-      "categories": ["backgrounds", "motion"],
-      "dependencies": ["class-variance-authority"],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/ivan/ui/technical-grid.tsx",
-          "type": "registry:ui",
-          "target": "@ui/technical-grid.tsx"
-        }
-      ],
-      "cssVars": {
-        "theme": {
-          "color-clay": "var(--clay)"
-        },
-        "light": {
-          "clay": "oklch(0.52 0.13 42)"
-        },
-        "dark": {
-          "clay": "oklch(0.7 0.14 45)"
-        }
-      },
-      "css": {
-        "@keyframes technical-grid-scan-y": {
-          "0%": {
-            "transform": "translateY(-100%)",
-            "opacity": "0"
-          },
-          "8%": {
-            "opacity": "1"
-          },
-          "92%": {
-            "opacity": "1"
-          },
-          "100%": {
-            "transform": "translateY(0)",
-            "opacity": "0"
-          }
-        },
-        "@keyframes technical-grid-scan-x": {
-          "0%": {
-            "transform": "translateX(-100%)",
-            "opacity": "0"
-          },
-          "8%": {
-            "opacity": "1"
-          },
-          "92%": {
-            "opacity": "1"
-          },
-          "100%": {
-            "transform": "translateX(0)",
-            "opacity": "0"
-          }
-        },
-        "@keyframes technical-grid-ping": {
-          "0%": {
-            "transform": "scale(1)",
-            "opacity": "0.7"
-          },
-          "70%": {
-            "transform": "scale(4)",
-            "opacity": "0"
-          },
-          "100%": {
-            "transform": "scale(4)",
-            "opacity": "0"
-          }
-        }
-      },
-      "meta": {
-        "docs": {
-          "props": [
-            {
-              "component": "TechnicalGrid",
-              "description": "Paints the grid behind its children.",
-              "props": [
-                {
-                  "name": "tone",
-                  "type": "\"muted\" | \"strong\" | \"clay\"",
-                  "default": "\"muted\"",
-                  "description": "Line intensity and ink."
-                },
-                {
-                  "name": "fade",
-                  "type": "\"none\" | \"edges\" | \"top\" | \"bottom\"",
-                  "default": "\"none\"",
-                  "description": "Fades the grid toward an edge."
-                },
-                {
-                  "name": "cellSize",
-                  "type": "number",
-                  "default": "32",
-                  "description": "Minor cell size in px, 8 to 160."
-                },
-                {
-                  "name": "majorEvery",
-                  "type": "number",
-                  "default": "4",
-                  "description": "Every Nth line is stronger."
-                },
-                {
-                  "name": "scan",
-                  "type": "\"none\" | \"horizontal\" | \"vertical\" | \"both\"",
-                  "default": "\"horizontal\"",
-                  "description": "Scan line direction."
-                },
-                {
-                  "name": "scanDuration",
-                  "type": "number",
-                  "default": "8",
-                  "description": "Seconds per sweep, 1 to 60."
-                },
-                {
-                  "name": "nodes",
-                  "type": "number",
-                  "default": "5",
-                  "description": "Pulsing nodes, up to 24."
-                },
-                {
-                  "name": "markers",
-                  "type": "boolean",
-                  "default": "true",
-                  "description": "Corner registration marks."
-                },
-                {
-                  "name": "label",
-                  "type": "string",
-                  "description": "Caption, top left."
-                },
-                {
-                  "name": "caption",
-                  "type": "string",
-                  "description": "Caption, bottom right."
-                },
-                {
-                  "name": "animated",
-                  "type": "boolean",
-                  "default": "true",
-                  "description": "Turns the scan and pulses off."
-                }
-              ]
-            }
-          ],
-          "variants": [
-            {
-              "name": "tone",
-              "default": "muted",
-              "options": ["muted", "strong", "clay"],
-              "description": "Line ink: muted, strong or clay."
-            },
-            {
-              "name": "fade",
-              "default": "none",
-              "options": ["none", "edges", "top", "bottom"],
-              "description": "Mask on the grid only."
-            }
-          ],
-          "examples": [
-            {
-              "title": "Grid as a framed field",
-              "file": "registry/ivan/examples/technical-grid/basic.tsx"
-            },
-            {
-              "title": "Grid as a section background",
-              "file": "registry/ivan/examples/technical-grid/background.tsx"
-            }
-          ],
-          "accessibility": [
-            "Decorative layers are aria-hidden and ignore pointer events.",
-            "Reduced motion hides the scan and pulses."
-          ],
-          "animation": [
-            {
-              "target": "Scan line",
-              "properties": "transform, opacity",
-              "timing": "scanDuration seconds, linear",
-              "trigger": "On mount",
-              "reducedMotion": "Hidden."
-            },
-            {
-              "target": "Node pulse ring",
-              "properties": "transform, opacity",
-              "timing": "3 to 5 seconds, ease-out",
-              "trigger": "On mount",
-              "reducedMotion": "Ring hidden."
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "agent-status-card",
-      "type": "registry:ui",
-      "title": "Agent Status Card",
-      "description": "Status card for an agent run.",
-      "categories": ["cards", "data"],
-      "dependencies": ["class-variance-authority"],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/ivan/ui/agent-status-card.tsx",
-          "type": "registry:ui",
-          "target": "@ui/agent-status-card.tsx"
-        }
-      ],
-      "cssVars": {
-        "theme": {
-          "color-clay": "var(--clay)",
-          "color-signal-moss": "var(--signal-moss)",
-          "color-signal-steel": "var(--signal-steel)"
-        },
-        "light": {
-          "clay": "oklch(0.52 0.13 42)",
-          "signal-moss": "oklch(0.5 0.09 150)",
-          "signal-steel": "oklch(0.5 0.07 240)"
-        },
-        "dark": {
-          "clay": "oklch(0.7 0.14 45)",
-          "signal-moss": "oklch(0.72 0.09 150)",
-          "signal-steel": "oklch(0.7 0.05 240)"
-        }
-      },
-      "meta": {
-        "docs": {
-          "props": [
-            {
-              "component": "AgentStatusCard",
-              "description": "Header, body, metadata and footer.",
-              "props": [
-                {
-                  "name": "agentId",
-                  "type": "string",
-                  "required": true,
-                  "description": "Designation, such as AG-03."
-                },
-                {
-                  "name": "name",
-                  "type": "string",
-                  "required": true,
-                  "description": "Agent name. Labels the article."
-                },
-                {
-                  "name": "task",
-                  "type": "string",
-                  "required": true,
-                  "description": "One line describing the work."
-                },
-                {
-                  "name": "status",
-                  "type": "\"idle\" | \"running\" | \"review\" | \"blocked\" | \"done\"",
-                  "default": "\"idle\"",
-                  "description": "Drives tone, dot and label."
-                },
-                {
-                  "name": "statusLabel",
-                  "type": "string",
-                  "description": "Overrides the status text."
-                },
-                {
-                  "name": "progress",
-                  "type": "number",
-                  "description": "0 to 100. Omit to hide."
-                },
-                {
-                  "name": "meta",
-                  "type": "{ label: string; value: string }[]",
-                  "description": "Mono key and value pairs."
-                },
-                {
-                  "name": "footer",
-                  "type": "ReactNode",
-                  "description": "Slot for actions."
-                },
-                {
-                  "name": "announce",
-                  "type": "boolean",
-                  "default": "false",
-                  "description": "Makes status a live region."
-                },
-                {
-                  "name": "children",
-                  "type": "ReactNode",
-                  "description": "Extra body content."
-                }
-              ]
-            }
-          ],
-          "variants": [
-            {
-              "name": "status",
-              "default": "idle",
-              "options": ["idle", "running", "review", "blocked", "done"],
-              "description": "Tone of the hairline, dot and progress."
-            }
-          ],
-          "examples": [
-            {
-              "title": "Running agent",
-              "file": "registry/ivan/examples/agent-status-card/basic.tsx"
-            },
-            {
-              "title": "Awaiting a human decision",
-              "file": "registry/ivan/examples/agent-status-card/review.tsx"
-            }
-          ],
-          "accessibility": [
-            "An article labelled by the name heading.",
-            "Status is always text. Dot and tone are redundant cues."
-          ],
-          "animation": [
-            {
-              "target": "Running status dot",
-              "properties": "transform, opacity",
-              "timing": "1 second, infinite",
-              "trigger": "While running",
-              "reducedMotion": "Ring removed."
-            },
-            {
-              "target": "Active progress segment",
-              "properties": "opacity",
-              "timing": "2 seconds, infinite",
-              "trigger": "While running",
-              "reducedMotion": "Steady."
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "magnetic-button",
       "type": "registry:ui",
       "title": "Industrial Magnetic Button",
@@ -463,259 +130,6 @@
               "reducedMotion": "Instant."
             }
           ]
-        }
-      }
-    },
-    {
-      "name": "text-scramble",
-      "type": "registry:ui",
-      "title": "Text Scramble Reveal",
-      "description": "Monospace text that resolves out of noise.",
-      "categories": ["text", "motion"],
-      "dependencies": ["class-variance-authority"],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/ivan/ui/text-scramble.tsx",
-          "type": "registry:ui",
-          "target": "@ui/text-scramble.tsx"
-        },
-        {
-          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
-          "type": "registry:hook",
-          "target": "@hooks/use-prefers-reduced-motion.ts"
-        }
-      ],
-      "cssVars": {
-        "theme": {
-          "color-clay": "var(--clay)"
-        },
-        "light": {
-          "clay": "oklch(0.52 0.13 42)"
-        },
-        "dark": {
-          "clay": "oklch(0.7 0.14 45)"
-        }
-      },
-      "meta": {
-        "docs": {
-          "props": [
-            {
-              "component": "TextScramble",
-              "description": "Animates its text. Extends span props.",
-              "props": [
-                {
-                  "name": "text",
-                  "type": "string",
-                  "required": true,
-                  "description": "The final text. Always in the DOM."
-                },
-                {
-                  "name": "trigger",
-                  "type": "\"mount\" | \"visible\" | \"hover\" | \"manual\"",
-                  "default": "\"visible\"",
-                  "description": "When it runs: visible or manual."
-                },
-                {
-                  "name": "duration",
-                  "type": "number",
-                  "default": "900",
-                  "description": "Milliseconds to resolve."
-                },
-                {
-                  "name": "charset",
-                  "type": "\"technical\" | \"alpha\" | \"binary\" | \"hex\" | \"blocks\"",
-                  "default": "\"technical\"",
-                  "description": "Preset noise alphabet."
-                },
-                {
-                  "name": "characters",
-                  "type": "string",
-                  "description": "Custom noise alphabet."
-                },
-                {
-                  "name": "once",
-                  "type": "boolean",
-                  "default": "true",
-                  "description": "Stop observing after the first reveal."
-                },
-                {
-                  "name": "replayKey",
-                  "type": "number | string",
-                  "description": "Change it to replay."
-                },
-                {
-                  "name": "as",
-                  "type": "\"span\" | \"p\" | \"div\" | \"h1\" | \"h2\" | \"h3\" | \"h4\"",
-                  "default": "\"span\"",
-                  "description": "Element to render."
-                },
-                {
-                  "name": "variant",
-                  "type": "\"label\" | \"heading\" | \"body\"",
-                  "default": "\"label\"",
-                  "description": "Type treatment."
-                },
-                {
-                  "name": "tone",
-                  "type": "\"default\" | \"muted\" | \"accent\"",
-                  "default": "\"default\"",
-                  "description": "Resolved text color."
-                }
-              ]
-            }
-          ],
-          "variants": [
-            {
-              "name": "variant",
-              "default": "label",
-              "options": ["label", "heading", "body"],
-              "description": "Label 12 px, heading 24 px, body 14 px."
-            },
-            {
-              "name": "tone",
-              "default": "default",
-              "options": ["default", "muted", "accent"],
-              "description": "Text color."
-            }
-          ],
-          "examples": [
-            {
-              "title": "Heading revealed on scroll",
-              "file": "registry/ivan/examples/text-scramble/basic.tsx"
-            },
-            {
-              "title": "Hover and manual replay",
-              "file": "registry/ivan/examples/text-scramble/interactive.tsx"
-            }
-          ],
-          "accessibility": [
-            "The final text is the real content. The animated copy is aria-hidden.",
-            "Reduced motion shows the final text immediately."
-          ],
-          "animation": [
-            {
-              "target": "Glyph resolve",
-              "properties": "Text per glyph",
-              "timing": "One rAF loop, noise every 45 ms",
-              "trigger": "Mount, visible, hover, focus or replayKey",
-              "reducedMotion": "Skipped."
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "blueprint-panel",
-      "type": "registry:ui",
-      "title": "Blueprint Panel",
-      "description": "Hairline panel with registration marks.",
-      "categories": ["layout", "cards"],
-      "dependencies": ["class-variance-authority"],
-      "registryDependencies": [],
-      "files": [
-        {
-          "path": "registry/ivan/ui/blueprint-panel.tsx",
-          "type": "registry:ui",
-          "target": "@ui/blueprint-panel.tsx"
-        }
-      ],
-      "cssVars": {
-        "theme": {
-          "color-clay": "var(--clay)"
-        },
-        "light": {
-          "clay": "oklch(0.52 0.13 42)"
-        },
-        "dark": {
-          "clay": "oklch(0.7 0.14 45)"
-        }
-      },
-      "meta": {
-        "docs": {
-          "props": [
-            {
-              "component": "BlueprintPanel",
-              "description": "The frame. Extends section props.",
-              "props": [
-                {
-                  "name": "tone",
-                  "type": "\"default\" | \"inset\" | \"clay\"",
-                  "default": "\"default\"",
-                  "description": "Surface and mark color."
-                },
-                {
-                  "name": "markers",
-                  "type": "boolean",
-                  "default": "true",
-                  "description": "Corner registration marks."
-                }
-              ]
-            },
-            {
-              "component": "BlueprintPanelHeader",
-              "description": "Mono header row.",
-              "props": [
-                {
-                  "name": "index",
-                  "type": "string",
-                  "description": "Muted index, such as SH-01."
-                },
-                {
-                  "name": "meta",
-                  "type": "ReactNode",
-                  "description": "Right-aligned content."
-                },
-                {
-                  "name": "headingLevel",
-                  "type": "\"h2\" | \"h3\" | \"h4\"",
-                  "default": "\"h3\"",
-                  "description": "Heading element."
-                }
-              ]
-            },
-            {
-              "component": "BlueprintPanelContent",
-              "description": "Padded body.",
-              "props": [
-                {
-                  "name": "className",
-                  "type": "string",
-                  "description": "Merged with the base padding."
-                }
-              ]
-            },
-            {
-              "component": "BlueprintPanelFooter",
-              "description": "Mono footer row.",
-              "props": [
-                {
-                  "name": "className",
-                  "type": "string",
-                  "description": "Merged with the base layout."
-                }
-              ]
-            }
-          ],
-          "variants": [
-            {
-              "name": "tone",
-              "default": "default",
-              "options": ["default", "inset", "clay"],
-              "description": "Surface and mark color."
-            }
-          ],
-          "examples": [
-            {
-              "title": "Spec sheet",
-              "file": "registry/ivan/examples/blueprint-panel/basic.tsx"
-            }
-          ],
-          "accessibility": [
-            "A section. Give it aria-label or aria-labelledby.",
-            "The header title is a real heading."
-          ],
-          "animation": []
         }
       }
     },
@@ -1231,6 +645,469 @@
               "timing": "0.38 second crossfade, 0.42 second hop",
               "trigger": "action changes or pointer enters",
               "reducedMotion": "Key pose. No hop."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "dither-image",
+      "type": "registry:ui",
+      "title": "Dither Image",
+      "description": "Any image as a 4×4 Bayer dither in two theme colors, with a row drift on hover.",
+      "categories": ["media", "motion"],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/dither-image.tsx",
+          "type": "registry:ui",
+          "target": "@ui/dither-image.tsx"
+        },
+        {
+          "path": "registry/ivan/lib/dither.ts",
+          "type": "registry:lib",
+          "target": "@lib/dither.ts"
+        },
+        {
+          "path": "registry/ivan/lib/dither-drift.ts",
+          "type": "registry:lib",
+          "target": "@lib/dither-drift.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "DitherImage",
+              "description": "A div with role img. Extends div props. Size it with className.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. Cross-origin images need CORS."
+                },
+                {
+                  "name": "alt",
+                  "type": "string",
+                  "required": true,
+                  "description": "Accessible name of the image."
+                },
+                {
+                  "name": "pixelSize",
+                  "type": "number",
+                  "default": "2",
+                  "description": "Dither cell in source pixels, 1 to 8."
+                },
+                {
+                  "name": "contrast",
+                  "type": "number",
+                  "default": "14",
+                  "description": "Tone contrast before dithering, 0 to 60."
+                },
+                {
+                  "name": "drift",
+                  "type": "number",
+                  "default": "11",
+                  "description": "Hover drift in source pixels. 0 turns it off."
+                },
+                {
+                  "name": "inkColor",
+                  "type": "string",
+                  "default": "\"--foreground\"",
+                  "description": "CSS color or custom property for one tone."
+                },
+                {
+                  "name": "paperColor",
+                  "type": "string",
+                  "default": "\"--background\"",
+                  "description": "CSS color or custom property for the other tone."
+                },
+                {
+                  "name": "crossOrigin",
+                  "type": "\"anonymous\" | \"use-credentials\" | null",
+                  "default": "\"anonymous\"",
+                  "description": "Passed to the image loader."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "Portrait",
+              "file": "registry/ivan/examples/dither-image/basic.tsx"
+            },
+            {
+              "title": "Fine and coarse",
+              "file": "registry/ivan/examples/dither-image/coarse.tsx"
+            }
+          ],
+          "accessibility": [
+            "A role img element named by alt. The canvases are hidden from assistive tech.",
+            "The darker color always takes the shadows, so the image reads right in light and dark themes."
+          ],
+          "animation": [
+            {
+              "target": "Image",
+              "properties": "opacity",
+              "timing": "500 ms, ease-out",
+              "trigger": "Image decoded",
+              "reducedMotion": "Instant."
+            },
+            {
+              "target": "Row drift",
+              "properties": "canvas pixels",
+              "timing": "rAF while hovered, eases out on leave",
+              "trigger": "Mouse move",
+              "reducedMotion": "No drift."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "dither-field",
+      "type": "registry:ui",
+      "title": "Dither Field",
+      "description": "Animated ordered-dither noise field for hero backgrounds, with a pointer lens.",
+      "categories": ["backgrounds", "motion"],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/dither-field.tsx",
+          "type": "registry:ui",
+          "target": "@ui/dither-field.tsx"
+        },
+        {
+          "path": "registry/ivan/lib/dither-field.ts",
+          "type": "registry:lib",
+          "target": "@lib/dither-field.ts"
+        },
+        {
+          "path": "registry/ivan/lib/dither.ts",
+          "type": "registry:lib",
+          "target": "@lib/dither.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "DitherField",
+              "description": "Fills its positioned parent. Paints in currentColor.",
+              "props": [
+                {
+                  "name": "seed",
+                  "type": "string",
+                  "default": "\"field\"",
+                  "description": "Same seed, same grain."
+                },
+                {
+                  "name": "anchor",
+                  "type": "\"top-right\" | \"top\" | \"bottom\" | \"center\" | \"fill\"",
+                  "default": "\"top-right\"",
+                  "description": "Where the field is densest."
+                },
+                {
+                  "name": "density",
+                  "type": "number",
+                  "default": "0.62",
+                  "description": "Peak ink coverage, 0 to 1."
+                },
+                {
+                  "name": "cellSize",
+                  "type": "number",
+                  "default": "4",
+                  "description": "Cell size in CSS px, 2 to 32. Capped at 256 columns."
+                },
+                {
+                  "name": "interactive",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Mouse over the parent swells a lens."
+                },
+                {
+                  "name": "animated",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Ambient bloom. False paints one frame."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"text-foreground opacity-20\"",
+                  "description": "Set color and opacity here."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "anchor",
+              "default": "top-right",
+              "options": ["top-right", "top", "bottom", "center", "fill"],
+              "description": "Density envelope."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Hero background",
+              "file": "registry/ivan/examples/dither-field/basic.tsx"
+            },
+            {
+              "title": "Anchors",
+              "file": "registry/ivan/examples/dither-field/anchors.tsx"
+            }
+          ],
+          "accessibility": [
+            "Decorative. aria-hidden and pointer-events none.",
+            "Listens for the pointer on its parent, so content above it stays clickable."
+          ],
+          "animation": [
+            {
+              "target": "Bloom",
+              "properties": "canvas pixels",
+              "timing": "30 fps, 2.4 s ramp in",
+              "trigger": "In view and tab visible",
+              "reducedMotion": "One static frame."
+            },
+            {
+              "target": "Lens",
+              "properties": "canvas pixels",
+              "timing": "Spring, stiffness 170, damping 22",
+              "trigger": "Mouse over the parent",
+              "reducedMotion": "Off."
+            },
+            {
+              "target": "Canvas",
+              "properties": "opacity",
+              "timing": "300 ms, ease-out",
+              "trigger": "First paint",
+              "reducedMotion": "Instant."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "copy-email",
+      "type": "registry:ui",
+      "title": "Copy Email",
+      "description": "An email address that copies itself on click, with a mailto fallback.",
+      "categories": ["buttons", "contact"],
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/copy-email.tsx",
+          "type": "registry:ui",
+          "target": "@ui/copy-email.tsx"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "ease-mechanical": "cubic-bezier(0.7, 0, 0.2, 1)"
+        }
+      },
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "CopyEmail",
+              "description": "A native button. Extends button props.",
+              "props": [
+                {
+                  "name": "email",
+                  "type": "string",
+                  "required": true,
+                  "description": "Address to copy."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "default": "email",
+                  "description": "Visible text."
+                },
+                {
+                  "name": "size",
+                  "type": "\"sm\" | \"md\" | \"lg\"",
+                  "default": "\"md\"",
+                  "description": "Type size."
+                },
+                {
+                  "name": "hint",
+                  "type": "string",
+                  "default": "\"Copy\"",
+                  "description": "Hint shown on hover and focus."
+                },
+                {
+                  "name": "copiedHint",
+                  "type": "string",
+                  "default": "\"Copied\"",
+                  "description": "Hint after a copy."
+                },
+                {
+                  "name": "resetAfter",
+                  "type": "number",
+                  "default": "1800",
+                  "description": "Milliseconds before the hint resets."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "default": "md",
+              "options": ["sm", "md", "lg"],
+              "description": "Type size."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Default",
+              "file": "registry/ivan/examples/copy-email/basic.tsx"
+            },
+            {
+              "title": "Sizes and label",
+              "file": "registry/ivan/examples/copy-email/sizes.tsx"
+            }
+          ],
+          "accessibility": [
+            "A native button at least 44 px tall.",
+            "A polite live region announces the copy.",
+            "Without clipboard access it opens a mailto link."
+          ],
+          "animation": [
+            {
+              "target": "Underline",
+              "properties": "transform",
+              "timing": "150 ms, ease-mechanical",
+              "trigger": "Hover, focus",
+              "reducedMotion": "Instant."
+            },
+            {
+              "target": "Hint",
+              "properties": "opacity",
+              "timing": "150 ms, ease-mechanical",
+              "trigger": "Hover, focus, copy",
+              "reducedMotion": "Instant."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "thumb-index",
+      "type": "registry:ui",
+      "title": "Thumb Index",
+      "description": "Scroll-spy notches on the page edge, placed where each section sits in the scroll.",
+      "categories": ["navigation", "motion"],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/ivan/ui/thumb-index.tsx",
+          "type": "registry:ui",
+          "target": "@ui/thumb-index.tsx"
+        },
+        {
+          "path": "registry/ivan/lib/thumb-index-layout.ts",
+          "type": "registry:lib",
+          "target": "@lib/thumb-index-layout.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "ThumbIndex",
+              "description": "A nav of in-page links. Extends nav props.",
+              "props": [
+                {
+                  "name": "sections",
+                  "type": "{ id: string; label: string }[]",
+                  "required": true,
+                  "description": "Element ids in page order."
+                },
+                {
+                  "name": "container",
+                  "type": "RefObject<HTMLElement | null>",
+                  "default": "window",
+                  "description": "Scroll container to track."
+                },
+                {
+                  "name": "landingOffset",
+                  "type": "number",
+                  "default": "80",
+                  "description": "Px above a section where it counts as reached."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"fixed top-24 right-4 bottom-16 z-20 w-12\"",
+                  "description": "Position the strip."
+                },
+                {
+                  "name": "aria-label",
+                  "type": "string",
+                  "default": "\"On this page\"",
+                  "description": "Name of the nav."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "Scroll container",
+              "file": "registry/ivan/examples/thumb-index/basic.tsx"
+            }
+          ],
+          "accessibility": [
+            "A nav of anchors. The current one has aria-current location.",
+            "Arrow up and down move between notches.",
+            "Notches keep at least 40 px apart."
+          ],
+          "animation": [
+            {
+              "target": "Edge fill",
+              "properties": "transform",
+              "timing": "Follows scroll",
+              "trigger": "Scroll",
+              "reducedMotion": "Follows scroll."
+            },
+            {
+              "target": "Notch label",
+              "properties": "opacity, translate",
+              "timing": "200 ms, ease-out",
+              "trigger": "Hover, focus",
+              "reducedMotion": "Instant."
+            },
+            {
+              "target": "Container jump",
+              "properties": "scroll",
+              "timing": "Smooth scroll",
+              "trigger": "Notch click",
+              "reducedMotion": "Instant jump."
             }
           ]
         }
