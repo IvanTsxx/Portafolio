@@ -31,7 +31,7 @@ const layoutOrigin = [0.2, -0.05, 0.045] as const;
 const browserOrigin = [0, -0.12, 0.045] as const;
 const flightSeconds = 1.5;
 const flightGap = 2.2;
-const flightArc = 1.1;
+const flightArc = 0.55;
 const textAt = 6.6;
 const resetAt = 7.55;
 

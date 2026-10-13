@@ -9,7 +9,6 @@ import type {
 } from "three";
 import {
   BoxGeometry,
-  MathUtils,
   MeshBasicMaterial,
   MeshStandardMaterial,
   Vector3,
@@ -22,16 +21,15 @@ import type { StageCue } from "../companion-stages";
 import { markStage } from "../companion-stages";
 import type { RigPose, StageSpec } from "./scene-values";
 import {
+  fitStageCamera,
   layoutRigs,
   mergeShadows,
   mergeStill,
   resetPoses,
   restPose,
+  stageFov,
   writeRigs,
 } from "./stage-mesh";
-
-const fov = 26;
-const elevation = 0.2;
 
 const stillMaterial = new MeshStandardMaterial({
   roughness: 0.78,
@@ -48,7 +46,6 @@ const shadowMaterial = new MeshBasicMaterial({
   transparent: true,
 });
 
-const viewDirection = new Vector3();
 const projected = new Vector3();
 
 const useStageClock = (loopSeconds: number, keyTime: number) => {
@@ -63,20 +60,6 @@ const useStageClock = (loopSeconds: number, keyTime: number) => {
     }
     return (elapsed - start.current) % loopSeconds;
   };
-};
-
-const fitCamera = (camera: PerspectiveCameraImpl, spec: StageSpec) => {
-  const halfFov = MathUtils.degToRad(fov / 2);
-  const distance = Math.max(
-    spec.camera.fitHeight / 2 / Math.tan(halfFov),
-    spec.camera.fitWidth / 2 / (Math.tan(halfFov) * camera.aspect)
-  );
-  viewDirection.set(0, Math.sin(elevation), Math.cos(elevation));
-  camera.position
-    .set(...spec.camera.target)
-    .addScaledVector(viewDirection, distance);
-  camera.lookAt(...spec.camera.target);
-  camera.updateMatrixWorld();
 };
 
 const markActor = (
@@ -125,7 +108,7 @@ export const StageProps = ({
     }
     if (Math.abs(view.aspect - fittedAspect.current) > 0.001) {
       fittedAspect.current = view.aspect;
-      fitCamera(view, spec);
+      fitStageCamera(view, spec);
     }
     const time = timeAt(state.clock.elapsedTime);
     resetPoses(poses);
@@ -147,7 +130,7 @@ export const StageProps = ({
 
   return (
     <>
-      <PerspectiveCamera fov={fov} makeDefault ref={camera} />
+      <PerspectiveCamera fov={stageFov} makeDefault ref={camera} />
       <mesh geometry={still} material={stillMaterial} />
       <instancedMesh
         args={[rigGeometry, rigMaterial, layout.count]}

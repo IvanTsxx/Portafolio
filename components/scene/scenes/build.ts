@@ -51,7 +51,7 @@ const moduleRigs = modules.map((module) =>
   })
 );
 
-const tick = framedRig(card, { at: [0.62, 1.15, 0.1], pieces: checkPieces() });
+const tick = framedRig(card, { at: [0.55, -0.66, 0.1], pieces: checkPieces() });
 const tickRig = modules.length;
 
 const actionAt = (time: number): AgentAction =>
@@ -59,7 +59,7 @@ const actionAt = (time: number): AgentAction =>
 
 export const buildStage: StageSpec = {
   actor: { at: [-1.5, 0, 0.55], height: 1.4, yaw: 0.4 },
-  camera: { fitHeight: 2.8, fitWidth: 5.2, target: [-0.1, 0.92, 0] },
+  camera: { fitHeight: 3.2, fitWidth: 5.2, target: [-0.1, 1.08, 0] },
   keyTime: 5.6,
   loopSeconds: 8,
   play: (time, poses) => {
@@ -78,7 +78,7 @@ export const buildStage: StageSpec = {
         )
       );
       const scale = easeOutBack(arrive) * (1 - collapse);
-      pose.y = (1 - easeOutBack(arrive)) * 0.6;
+      pose.y = (1 - easeOutBack(arrive)) * 0.3;
       pose.z = (1 - arrive) * 0.5;
       pose.sx = module.width * scale;
       pose.sy = module.height * scale;

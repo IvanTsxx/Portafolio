@@ -1,10 +1,11 @@
-import type { BufferGeometry } from "three";
+import type { BufferGeometry, PerspectiveCamera } from "three";
 import {
   BoxGeometry,
   CircleGeometry,
   Color,
   Euler,
   Float32BufferAttribute,
+  MathUtils,
   Matrix4,
   Quaternion,
   Vector3,
@@ -12,7 +13,7 @@ import {
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
-import type { Piece, Rig, RigPose, Shadow } from "./scene-values";
+import type { Piece, Rig, RigPose, Shadow, StageSpec } from "./scene-values";
 import { sceneColors } from "./scene-values";
 
 const unitBox = new BoxGeometry(1, 1, 1);
@@ -209,3 +210,21 @@ export const trianglesOf = (geometry: BufferGeometry | null) => {
 };
 
 export const boxTriangles = trianglesOf(unitBox);
+
+export const stageFov = 26;
+const stageElevation = 0.2;
+const viewDirection = new Vector3();
+
+export const fitStageCamera = (camera: PerspectiveCamera, spec: StageSpec) => {
+  const halfFov = MathUtils.degToRad(stageFov / 2);
+  const distance = Math.max(
+    spec.camera.fitHeight / 2 / Math.tan(halfFov),
+    spec.camera.fitWidth / 2 / (Math.tan(halfFov) * camera.aspect)
+  );
+  viewDirection.set(0, Math.sin(stageElevation), Math.cos(stageElevation));
+  camera.position
+    .set(...spec.camera.target)
+    .addScaledVector(viewDirection, distance);
+  camera.lookAt(...spec.camera.target);
+  camera.updateMatrixWorld();
+};
