@@ -85,7 +85,7 @@ export const LoomDrawing = ({
   return (
     <svg
       aria-hidden
-      className="iso-svg -mx-[6%] w-[112%]! sm:mx-0 sm:w-full!"
+      className="iso-svg"
       focusable="false"
       onClick={(event) => {
         const control = controlOf(event);

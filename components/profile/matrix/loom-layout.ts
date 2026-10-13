@@ -67,7 +67,7 @@ const spanOf = (weekCount: number) => {
 export const baseOf = (span: ReturnType<typeof spanOf>) => ({
   d: 116,
   r: 6,
-  w: span.console.x + span.console.w + 10 - (span.railLeft - 26),
+  w: span.console.x + span.console.w + 20 - (span.railLeft - 26),
   x: span.railLeft - 26,
   y: -60,
 });
@@ -88,7 +88,7 @@ export const loomLayoutOf = (
     [span.parkLeft + 5, 52, BEAM_TOP + bridgeRise + 2],
     [span.parkRight + 5, -52, BEAM_TOP + bridgeRise + 2],
     [span.railLeft - 14, -52, 14],
-    [span.console.x + span.console.w, span.console.y, CONSOLE_TOP + 4],
+    [span.console.x + span.console.w + 20, span.console.y, CONSOLE_TOP + 4],
   ];
   const projection = fitProjection(points, LOOM_WIDTH, LOOM_HEIGHT, {
     azimuth: AZIMUTH,

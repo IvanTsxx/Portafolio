@@ -1,7 +1,7 @@
 import type { ContributionCalendar } from "@/lib/github/model";
 
 export const DAYS = 7;
-export const PIN_RISE = 2.6;
+export const PIN_RISE = 3;
 
 export interface LoomDay {
   count: number;
@@ -208,7 +208,10 @@ export interface ReadoutText {
 }
 
 export const restText = (year: LoomYear): ReadoutText => ({
-  detail: `${year.caption} · ${year.year}`,
+  detail:
+    year.range === "last-year"
+      ? `${year.caption} · ${year.year}`
+      : year.caption,
   main: contributionsText(year.total),
 });
 

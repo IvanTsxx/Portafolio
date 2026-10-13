@@ -22,6 +22,7 @@ export const loomParts = (art: LoomArt) => {
     bridgeFront,
     console: panel,
     drive,
+    fittings,
     railBack,
     railFront,
   } = art;
@@ -48,6 +49,23 @@ export const loomParts = (art: LoomArt) => {
         <Line d={base.labelLine} tone="faint" />
         <Line d={base.labelRule} free tone="lo" />
         <Dots points={base.labelScrews} size={0.42} tone="mid" />
+        {fittings.duct.map((paths) => (
+          <Solid crease="faint" key={paths.outline} paths={paths} tone="lo" />
+        ))}
+        {fittings.ductClips.map((paths) => (
+          <Solid crease="faint" key={paths.outline} paths={paths} tone="mid" />
+        ))}
+        <Dots points={fittings.ductClipScrews} size={0.38} tone="mid" />
+        {fittings.handlePosts.map((paths) => (
+          <Solid crease="none" key={paths.outline} paths={paths} tone="mid" />
+        ))}
+        {fittings.handleBars.map((paths) => (
+          <Solid crease="faint" key={paths.outline} paths={paths} tone="mid" />
+        ))}
+        {fittings.clampsBack.map((paths) => (
+          <Solid crease="faint" key={paths.outline} paths={paths} tone="mid" />
+        ))}
+        <Dots points={fittings.clampScrewsBack} size={0.38} tone="mid" />
       </g>
     ),
     bed: (
@@ -68,6 +86,10 @@ export const loomParts = (art: LoomArt) => {
         <Solid crease="none" paths={bed.strip} tone="lo" />
         <Line d={bed.ticksMinor} tone="lo" />
         <Line d={bed.ticksMajor} tone="mid" />
+        {fittings.clampsFront.map((paths) => (
+          <Solid crease="faint" key={paths.outline} paths={paths} tone="mid" />
+        ))}
+        <Dots points={fittings.clampScrewsFront} size={0.38} tone="mid" />
       </g>
     ),
     bridgeBack: (

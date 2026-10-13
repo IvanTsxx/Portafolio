@@ -261,7 +261,7 @@ export const LoomLive = ({
           rest={restText(year)}
           title={STATION_TITLE}
         >
-          <div className="-my-1 touch-pan-y overflow-hidden select-none sm:px-2">
+          <div className="-my-1 touch-pan-y overflow-hidden px-1 select-none sm:px-2">
             <input
               aria-label={label}
               aria-valuetext={

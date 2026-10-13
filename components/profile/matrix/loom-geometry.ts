@@ -102,6 +102,74 @@ const baseArt = (L: LoomLayout) => {
   };
 };
 
+const clampOf = (x: number, side: -1 | 1): Plan => ({
+  d: 3.5,
+  r: 0.8,
+  w: 8,
+  x: x - 4,
+  y: side > 0 ? BED_HALF : -BED_HALF - 3.5,
+});
+
+const fittingsArt = (L: LoomLayout) => {
+  const P = L.projection;
+  const base = baseOf(L);
+  const z = BASE_TOP;
+  const driveX = L.railLeft - 10;
+  const branchX = L.console.x + 8;
+  const duct: Plan = {
+    d: 3,
+    r: 1,
+    w: branchX + 3 - driveX,
+    x: driveX - 1.5,
+    y: -57,
+  };
+  const branch: Plan = { d: 34, r: 1, w: 3, x: branchX, y: -57 };
+  const clipXs: number[] = [];
+  for (let x = driveX + 40; x < branchX - 12; x += 52) {
+    clipXs.push(x);
+  }
+  const handleXs = [base.x + 6, base.x + base.w - 6];
+  const span = L.weekX(L.weekCount - 1) - L.weekX(0);
+  const clampXs = [1 / 6, 1 / 2, 5 / 6].map(
+    (share) => L.weekX(0) + span * share
+  );
+  return {
+    clampScrewsBack: clampXs.map((x) => iso([x, -BED_HALF - 1.75, z + 3], P)),
+    clampScrewsFront: clampXs.map((x) => iso([x, BED_HALF + 1.75, z + 3], P)),
+    clampsBack: clampXs.map((x) => slabOf(clampOf(x, -1), z, 3, P, 2, 0.3)),
+    clampsFront: clampXs.map((x) => slabOf(clampOf(x, 1), z, 3, P, 2, 0.3)),
+    duct: [
+      slabOf(
+        { d: 4.5, r: 0.8, w: 3, x: driveX - 1.5, y: -57.5 },
+        z,
+        1.6,
+        P,
+        2,
+        0.3
+      ),
+      slabOf(duct, z, 1.6, P, 3, 0.3),
+      slabOf(branch, z, 1.6, P, 3, 0.3),
+    ],
+    ductClipScrews: clipXs.map((x) => iso([x, -55.5, z + 2.2], P)),
+    ductClips: clipXs.map((x) =>
+      slabOf({ d: 5, r: 0.6, w: 3, x: x - 1.5, y: -58 }, z, 2.2, P, 2, 0.3)
+    ),
+    handleBars: handleXs.map((x) =>
+      slabOf(
+        { d: 22.4, r: 1, w: 2.4, x: x - 1.2, y: -11.2 },
+        z + 5,
+        1.8,
+        P,
+        3,
+        0.3
+      )
+    ),
+    handlePosts: handleXs.flatMap((x) =>
+      [-10, 10].map((y) => cylinder(x, y, 1.1, z, 5, P, 14))
+    ),
+  };
+};
+
 const railPlan = (L: LoomLayout, side: -1 | 1): Plan => ({
   d: 6,
   r: 1,
@@ -420,6 +488,7 @@ export const loomArtOf = (L: LoomLayout, years: readonly number[]) => ({
   bridgeFront: bridgeFrontArt(L),
   console: consoleArt(L, years),
   drive: driveArt(L),
+  fittings: fittingsArt(L),
   railBack: railArt(L, -1),
   railFront: railArt(L, 1),
 });
