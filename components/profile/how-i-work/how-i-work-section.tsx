@@ -12,7 +12,6 @@ export const HowIWork = () => (
     aside={<PanelCount current={workSteps.length} total={workSteps.length} />}
     id="how-i-work"
     index="GH-06"
-    jp="仕事の流儀"
     label="How I work"
     script={sectionScripts.homeHowIWork}
   >

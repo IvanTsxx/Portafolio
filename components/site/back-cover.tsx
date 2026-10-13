@@ -11,9 +11,7 @@ export const BackCover = () => (
     <div className="border-ink bg-paper-deep stamp-press w-full origin-bottom-right border p-1 motion-reduce:animate-none md:w-auto">
       <div className="border-ink/60 grid gap-x-12 gap-y-6 border px-5 py-5 md:grid-cols-[auto_auto]">
         <div className="flex flex-col gap-3">
-          <p className="label text-mist tabular-nums">
-            [ END ] Colophon <span className="jp ml-1">奥付</span>
-          </p>
+          <p className="label text-mist tabular-nums">[ END ] Colophon</p>
           <p className="font-wordmark text-5xl leading-none italic">
             {siteConfig.nickname}
           </p>

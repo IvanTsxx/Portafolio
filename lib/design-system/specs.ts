@@ -21,14 +21,14 @@ export interface ColorSpec {
 }
 
 export const colorGroupLabels = {
-  agent: { jp: "代理", label: "Agents" },
-  chart: { jp: "図表", label: "Chart" },
-  ink: { jp: "墨", label: "Ink" },
-  rule: { jp: "罫線", label: "Rules" },
-  semantic: { jp: "意味", label: "Semantic aliases" },
-  signal: { jp: "信号", label: "Signals" },
-  surface: { jp: "紙", label: "Surface" },
-} as const satisfies Record<ColorGroup, { jp: string; label: string }>;
+  agent: { label: "Agents" },
+  chart: { label: "Chart" },
+  ink: { label: "Ink" },
+  rule: { label: "Rules" },
+  semantic: { label: "Semantic aliases" },
+  signal: { label: "Signals" },
+  surface: { label: "Surface" },
+} as const satisfies Record<ColorGroup, { label: string }>;
 
 export const colorSpecs: readonly ColorSpec[] = [
   {
@@ -372,7 +372,7 @@ export const fontFamilySpecs = [
     className: "font-jp",
     cssVar: "--font-jp",
     name: "Noto Sans JP",
-    role: "Japanese annotations",
+    role: "Route tab and page hero annotations",
     sample: "日本語の注釈",
     sourceVar: "--font-noto-jp",
     weights: "300 400 500",
@@ -611,14 +611,13 @@ export const documentGridSpec = {
 } as const;
 
 export interface AgentMotionSpec {
-  jp: string;
   label: string;
   value: string;
 }
 
 export const agentMotionSpecs = [
-  { jp: "遷移", label: "Clip crossfade", value: "0.38 s" },
-  { jp: "場面", label: "Scene loop", value: "8 s" },
-  { jp: "反応", label: "Hover reaction", value: "Shuffled deck of 8" },
-  { jp: "配慮", label: "Reduced motion", value: "Held key pose" },
+  { label: "Clip crossfade", value: "0.38 s" },
+  { label: "Scene loop", value: "8 s" },
+  { label: "Hover reaction", value: "Shuffled deck of 8" },
+  { label: "Reduced motion", value: "Held key pose" },
 ] as const satisfies readonly AgentMotionSpec[];

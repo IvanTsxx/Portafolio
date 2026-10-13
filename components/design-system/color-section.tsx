@@ -115,7 +115,6 @@ export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
       aside={`${padCount(colors.length)} tokens`}
       id={section.id}
       index={section.index}
-      jp={section.jp}
       label={section.label}
       script={sectionScripts.designColor}
     >
@@ -127,13 +126,13 @@ export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
       </p>
       {swatchGroups.map((group) => {
         const tokens = inGroup(group);
-        const { jp, label } = colorGroupLabels[group];
+        const { label } = colorGroupLabels[group];
         const offset = swatchGroups
           .slice(0, swatchGroups.indexOf(group))
           .reduce((total, previous) => total + inGroup(previous).length, 0);
         return (
           <div className="flex flex-col gap-3" key={group}>
-            <SubHeading aside={padCount(tokens.length)} jp={jp} label={label} />
+            <SubHeading aside={padCount(tokens.length)} label={label} />
             <SpecGrid className="grid-cols-2 @2xl:grid-cols-3 @4xl:grid-cols-4">
               {tokens.map((token, index) => (
                 <Swatch index={offset + index} key={token.name} token={token} />
@@ -145,7 +144,6 @@ export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
       <div className="flex flex-col gap-3">
         <SubHeading
           aside={padCount(inGroup("semantic").length)}
-          jp={colorGroupLabels.semantic.jp}
           label={colorGroupLabels.semantic.label}
         />
         <AliasList tokens={inGroup("semantic")} />
@@ -153,7 +151,6 @@ export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
       <div className="flex flex-col gap-3">
         <SubHeading
           aside={padCount(inGroup("chart").length)}
-          jp={colorGroupLabels.chart.jp}
           label={colorGroupLabels.chart.label}
         />
         <ChartStrip tokens={inGroup("chart")} />

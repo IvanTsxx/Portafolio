@@ -80,7 +80,6 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
       <DocumentHero
         back={{ href: "/notes", label: "Notes" }}
         code={code}
-        jp={kind.jp}
         meta={[
           { label: "Kind", value: kind.label },
           { label: "Stamp", value: stampOf(note).label },
@@ -129,7 +128,6 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
         <DocumentSection
           id="text"
           index={`${code}.1`}
-          jp="本文"
           label="Text"
           script={sectionScripts.noteText}
         >
@@ -151,7 +149,6 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
           aside={pad(related.length)}
           id="related"
           index={relatedIndex}
-          jp="関連"
           label="Related"
         >
           <ul className="border-rule border-t">

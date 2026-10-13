@@ -32,7 +32,6 @@ export const NoteArchive = ({
       aside={`${pad(visibleNotes.length)} / ${pad(notes.length)}`}
       id="archive"
       index="NT-03"
-      jp="記録"
       label="Archive"
       script={sectionScripts.notesArchive}
     >

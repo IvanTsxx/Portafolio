@@ -26,7 +26,6 @@ export const NoteFilters = ({
           label: noteKinds[kind].label,
           name: kind,
         }))}
-        jp="種別"
         label="Kind"
         onChange={setKind}
         total={total}
@@ -34,7 +33,6 @@ export const NoteFilters = ({
       <FilterBar
         active={filter.tag ?? ""}
         facets={facets.tags}
-        jp="札"
         label="Tag"
         onChange={setTag}
         total={total}
@@ -42,7 +40,6 @@ export const NoteFilters = ({
       <FilterBar
         active={filter.stack ?? ""}
         facets={facets.stack}
-        jp="技術"
         label="Stack"
         onChange={setStack}
         total={total}

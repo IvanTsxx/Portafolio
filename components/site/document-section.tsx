@@ -12,7 +12,6 @@ interface DocumentSectionProps {
   className?: string;
   id: string;
   index: string;
-  jp: string;
   label: string;
   script?: SectionScript;
 }
@@ -23,7 +22,6 @@ export const DocumentSection = ({
   className,
   id,
   index,
-  jp,
   label,
   script,
 }: DocumentSectionProps) => (
@@ -39,7 +37,6 @@ export const DocumentSection = ({
       aside={aside}
       id={`${id}-heading`}
       index={index}
-      jp={jp}
       label={label}
     />
     {script ? <CompanionLines lines={script.lines} /> : null}

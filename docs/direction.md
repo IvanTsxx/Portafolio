@@ -14,8 +14,8 @@ Ivo's portfolio (Ivan Bongiovanni; the surname appears once, in the dossier). Th
 
 - Paper `bg-paper` / `bg-background` (#ededeb), ink `text-ink` / `text-foreground` (#111), `text-graphite`, `text-mist`, `bg-paper-deep`, hairlines `border-rule`, strong rules `border-rule-strong`. Radius 0. Paper grain on body.
 - Orange `clay` is reserved for the agents. No other color except where the experiment uses vermilion sparingly.
-- Type: `font-sans` is Zen Kaku Gothic New (light for big names, `display` utility). `label` utility is Geist Mono micro uppercase tracked. `jp` utility (Noto Sans JP) for Japanese annotations next to section labels, as in the experiment (e.g. `CONTRIBUTION MATRIX 貢献行列`). `font-wordmark` (Instrument Serif italic) only for the site wordmark.
-- Vocabulary: `[ GH-03 ] LABEL 日本語 ........ 06 / 06` panel headings, crosshair corner marks, hatch and hazard-stripe fills, dither imagery, tabular numbers, dotted leader rows, barcodes, REDACTED blocks.
+- Type: `font-sans` is Zen Kaku Gothic New (light for big names, `display` utility). `label` utility is Geist Mono micro uppercase tracked. `jp` utility (Noto Sans JP) for Japanese annotations, a rare decoration only on route tabs and page heroes (plus the nickname kana in the home dossier); never on panel headings, filters, chips or labels. `font-wordmark` (Instrument Serif italic) only for the site wordmark.
+- Vocabulary: `[ GH-03 ] LABEL ........ 06 / 06` panel headings, crosshair corner marks, hatch and hazard-stripe fills, dither imagery, tabular numbers, dotted leader rows, barcodes, REDACTED blocks.
 
 ## 3D contract
 

@@ -13,12 +13,10 @@ export const LeaderList = ({
 export const LeaderRow = ({
   children,
   className,
-  jp,
   label,
 }: {
   children: ReactNode;
   className?: string;
-  jp?: string;
   label: string;
 }) => (
   <div
@@ -29,7 +27,6 @@ export const LeaderRow = ({
   >
     <dt className="text-mist after:border-rule-strong flex flex-auto items-baseline gap-x-2 after:mb-1 after:h-px after:min-w-4 after:flex-1 after:self-end after:border-b after:border-dotted">
       <span className="shrink-0">{label}</span>
-      {jp ? <span className="jp shrink-0">{jp}</span> : null}
     </dt>
     <dd className="text-ink ml-auto max-w-full text-right break-words normal-case">
       {children}

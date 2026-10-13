@@ -9,12 +9,9 @@ export type CaseStudy = Extract<Note, { kind: "case-study" }>;
 export type FieldNote = Extract<Note, { kind: "note" }>;
 
 export const noteKinds = {
-  "case-study": { jp: "事例", label: "Case study", plural: "Case studies" },
-  note: { jp: "手記", label: "Note", plural: "Notes" },
-} as const satisfies Record<
-  NoteKind,
-  { jp: string; label: string; plural: string }
->;
+  "case-study": { label: "Case study", plural: "Case studies" },
+  note: { label: "Note", plural: "Notes" },
+} as const satisfies Record<NoteKind, { label: string; plural: string }>;
 
 export const noteKindOrder: readonly NoteKind[] = ["case-study", "note"];
 

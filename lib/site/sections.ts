@@ -2,22 +2,7 @@ import { getExperiment } from "@/lib/lab/experiments";
 
 type Experiment = NonNullable<ReturnType<typeof getExperiment>>;
 
-export const registrySectionAnnotations = {
-  accessibility: "配慮",
-  animation: "動作",
-  dependencies: "依存",
-  installation: "導入",
-  preview: "見本",
-  props: "属性",
-  usage: "用法",
-} as const;
-
-export type RegistrySectionId = keyof typeof registrySectionAnnotations;
-
-export const registrySections: readonly {
-  id: RegistrySectionId;
-  label: string;
-}[] = [
+export const registrySections = [
   { id: "preview", label: "Preview" },
   { id: "installation", label: "Installation" },
   { id: "usage", label: "Usage" },
@@ -25,7 +10,9 @@ export const registrySections: readonly {
   { id: "accessibility", label: "Accessibility" },
   { id: "animation", label: "Animation" },
   { id: "dependencies", label: "Dependencies" },
-];
+] as const satisfies readonly { id: string; label: string }[];
+
+export type RegistrySectionId = (typeof registrySections)[number]["id"];
 
 export const relatedExperimentsOf = (experiment: Experiment) =>
   experiment.related

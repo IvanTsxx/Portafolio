@@ -38,7 +38,6 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
       <DocumentHero
         back={{ href: "/lab", label: "Lab" }}
         code={experiment.index}
-        jp="実験"
         lede={experiment.topics.join(" / ")}
         meta={[{ label: "Year", value: String(experiment.year) }]}
         size="title"
@@ -51,7 +50,6 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
       <DocumentSection
         id="preview"
         index={`${experiment.index}.1`}
-        jp="見本"
         label="Preview"
         script={sectionScripts.labPreview}
       >
@@ -62,7 +60,6 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
         aside={pad(experiment.implementation.length)}
         id="implementation"
         index={`${experiment.index}.2`}
-        jp="実装"
         label="Implementation"
       >
         <ol className="flex max-w-prose flex-col">
@@ -86,7 +83,6 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
         aside={pad(experiment.technicalNotes.length)}
         id="notes"
         index={`${experiment.index}.3`}
-        jp="注記"
         label="Notes"
       >
         <ul className="flex max-w-prose flex-col">
@@ -102,12 +98,7 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
         </ul>
       </DocumentSection>
 
-      <DocumentSection
-        id="stack"
-        index={`${experiment.index}.4`}
-        jp="技術"
-        label="Stack"
-      >
+      <DocumentSection id="stack" index={`${experiment.index}.4`} label="Stack">
         <ul className="flex flex-wrap gap-2">
           {experiment.technologies.map((technology) => (
             <li
@@ -125,7 +116,6 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
           aside={pad(related.length)}
           id="related"
           index={`${experiment.index}.5`}
-          jp="関連"
           label="Related"
         >
           <ul className="border-graphite/30 grid border-t border-l md:grid-cols-2">

@@ -19,7 +19,6 @@ export const FilterFold = ({
     >
       <span className="text-mist tabular-nums">[ {index} ]</span>
       <span className="text-ink">Filter</span>
-      <span className="jp">絞込</span>
       <span
         aria-hidden
         className="border-rule-strong mb-1 h-px min-w-4 flex-1 self-end border-b border-dotted"

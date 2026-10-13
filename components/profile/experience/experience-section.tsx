@@ -22,7 +22,6 @@ export const ExperienceSection = () => {
       aside={<PanelCount current={count} total={count} />}
       id="experience"
       index="GH-03"
-      jp="経歴"
       label="Experience"
       script={sectionScripts.homeExperience}
     >

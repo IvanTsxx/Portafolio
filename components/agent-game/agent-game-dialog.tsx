@@ -106,7 +106,6 @@ export const AgentGameDialog = ({
                 </h2>
               )}
             />
-            <span className="jp text-graphite shrink-0">対局</span>
             <span
               aria-hidden
               className="border-rule-strong mb-1 h-px min-w-4 flex-1 self-end border-b border-dotted"

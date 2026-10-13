@@ -100,7 +100,7 @@ export const WorkStages = () => {
       >
         <figcaption
           aria-hidden
-          className="label pointer-events-none absolute inset-x-0 top-0 z-40 flex items-baseline justify-between gap-3 p-3"
+          className="label pointer-events-none absolute inset-x-0 top-0 z-40 flex items-baseline gap-3 p-3"
         >
           <span className="flex items-baseline gap-2">
             <span className="text-mist tabular-nums">
@@ -108,7 +108,6 @@ export const WorkStages = () => {
             </span>
             <span className="text-ink">{active.title}</span>
           </span>
-          <span className="jp text-mist">{active.jp}</span>
         </figcaption>
       </StageScene>
       <Tabs.List
@@ -145,7 +144,14 @@ export const WorkStages = () => {
               >
                 {padIndex(index)}
               </span>
-              <span className="jp text-mist">{step.jp}</span>
+              <span
+                className={cn(
+                  "hidden w-full text-xs leading-tight text-pretty hyphens-auto sm:block",
+                  isActive ? "text-ink" : "text-graphite"
+                )}
+              >
+                {step.title}
+              </span>
               <span
                 aria-hidden
                 className="bg-rule absolute inset-x-0 bottom-0 h-px overflow-hidden"

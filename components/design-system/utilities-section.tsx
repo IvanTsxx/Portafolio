@@ -69,7 +69,6 @@ export const UtilitiesSection = ({
       aside={`${padCount(utilities.length)} utilities`}
       id={section.id}
       index={section.index}
-      jp={section.jp}
       label={section.label}
       script={sectionScripts.designUtilities}
     >

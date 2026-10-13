@@ -56,7 +56,6 @@ export const LabTopicFilter = ({
     <FilterBar
       active={selected ?? ""}
       facets={topics.map(({ count, topic }) => ({ count, name: topic }))}
-      jp="分野"
       label="Topic"
       onChange={selectTopic}
       total={total}
@@ -75,7 +74,6 @@ export const LabArchive = ({ items }: { items: readonly ArchiveItem[] }) => {
       aside={`${pad(visible.length)} / ${pad(items.length)}`}
       id="experiments"
       index="LAB-03"
-      jp="一覧"
       label="Index"
       script={sectionScripts.labExperiments}
     >

@@ -115,7 +115,7 @@ export const RegistryFilters = ({
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3">
         <label className="label text-mist" htmlFor={searchId}>
-          Search <span className="jp ml-1">検索</span>
+          Search
         </label>
         <div className="relative w-full">
           <MagnifyingGlassIcon
@@ -141,7 +141,6 @@ export const RegistryFilters = ({
           label,
           name: id,
         }))}
-        jp="分類"
         label="Category"
         onChange={setCategory}
         total={total}
@@ -172,7 +171,6 @@ export const RegistryGrid = ({
       aside={`${pad(visibleEntries.length)} / ${pad(entries.length)}`}
       id="components"
       index="REG-03"
-      jp="部品"
       label="Components"
       script={sectionScripts.registryComponents}
     >

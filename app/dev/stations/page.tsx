@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 };
 
 const benchSections = [
-  { id: "before", index: "DV-01", jp: "前", label: "Before" },
-  { id: "bench", index: "DV-02", jp: "台", label: "Station" },
-  { id: "after", index: "DV-03", jp: "後", label: "After" },
+  { id: "before", index: "DV-01", label: "Before" },
+  { id: "bench", index: "DV-02", label: "Station" },
+  { id: "after", index: "DV-03", label: "After" },
 ] as const;
 
 const scriptFor = (lines: readonly string[]) =>
@@ -38,7 +38,6 @@ const StationBenchPage = () => (
     <DocumentSection
       id="before"
       index="DV-01"
-      jp="前"
       label="Before"
       script={scriptFor(["Nothing to operate up here yet."])}
     >
@@ -48,7 +47,6 @@ const StationBenchPage = () => (
     <DocumentSection
       id="bench"
       index="DV-02"
-      jp="台"
       label="Station"
       script={scriptFor(["A machine. Let me get my hands on it."])}
     >
@@ -57,7 +55,6 @@ const StationBenchPage = () => (
     <DocumentSection
       id="after"
       index="DV-03"
-      jp="後"
       label="After"
       script={scriptFor(["Back on the rail."])}
     >

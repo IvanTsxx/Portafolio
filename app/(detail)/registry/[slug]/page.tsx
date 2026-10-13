@@ -33,10 +33,7 @@ import {
 } from "@/lib/registry/registry";
 import { buildItemCodeFiles } from "@/lib/registry/source";
 import { sectionScripts } from "@/lib/site/section-scripts";
-import {
-  registrySectionAnnotations,
-  registrySections,
-} from "@/lib/site/sections";
+import { registrySections } from "@/lib/site/sections";
 import type { RegistrySectionId } from "@/lib/site/sections";
 import { cn } from "@/lib/utils";
 
@@ -109,7 +106,6 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
     return {
       id,
       index: `${code}.${number}`,
-      jp: registrySectionAnnotations[id],
       label: section?.label ?? id,
     };
   };
@@ -120,7 +116,6 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
       <DocumentHero
         back={{ href: "/registry", label: "Registry" }}
         code={code}
-        jp="部品"
         lede={item.categories.map(toCategoryLabel).join(" / ")}
         meta={[{ label: "Type", value: item.type }]}
         size="title"

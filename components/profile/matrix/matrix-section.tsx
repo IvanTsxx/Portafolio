@@ -46,7 +46,6 @@ export const MatrixSection = ({
     <DocumentSection
       id="matrix"
       index="GH-05"
-      jp="貢献行列"
       label="Contribution matrix"
       script={sectionScripts.homeMatrix}
     >

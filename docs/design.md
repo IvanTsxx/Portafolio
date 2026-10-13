@@ -118,7 +118,7 @@ components:
 
 ## Overview
 
-A personal portfolio rendered as a technical document on paper: numbered panels, mono labels with Japanese annotations, hairline rules, hatch fills and dithered imagery. Ink and paper carry the interface. Small orange 3D agents are the only color and the only playful element.
+A personal portfolio rendered as a technical document on paper: numbered panels, mono labels, hairline rules, hatch fills and dithered imagery. Ink and paper carry the interface. Small orange 3D agents are the only color and the only playful element.
 
 - **Technical document on paper.** Paper ground, ink type, numbered sheets.
 - **80/20 minimalism.** Cut until 20 percent carries 80 percent.
@@ -155,11 +155,11 @@ High-contrast neutrals on warm paper. Clay orange is reserved for the 3D agents 
 
 ## Typography
 
-Zen Kaku Gothic New, light and tightly tracked, for names and titles. Geist Mono, 10px uppercase and tracked, for every label, number and button. Noto Sans JP for short Japanese annotations beside section labels. Instrument Serif italic only for the wordmark.
+Zen Kaku Gothic New, light and tightly tracked, for names and titles. Geist Mono, 10px uppercase and tracked, for every label, number and button. Noto Sans JP for Japanese annotations, a rare decoration used only on route tabs and page heroes. Instrument Serif italic only for the wordmark.
 
 ## Layout
 
-Every page is a dossier sheet: a hairline-framed paper sheet over two offset paper-deep backing sheets. Index pages share one sheet around a 44rem column; detail pages use a wider sheet. Routes are divider tabs on the sheet's left edge, a tab row on its top edge on phones, and the active tab sits flush with the sheet. Long pages carry a thumb index of notches cut into the sheet's right edge, the current one in ink; on phones it becomes a thin progress strip. The top line holds only the wordmark and search. The footer is the back cover: a stamped colophon on the backing sheet. Filters fold under the intro. The home intro carries the identity dossier: portrait, name, bio, GitHub readouts and links. A single hairline closes each page intro. Spacing follows a 4px scale. Sections are separated by 96px and open with a panel heading: `[ XX-NN ]  LABEL  日本語 ........ 06 / 06` over a strong rule. As a section scrolls in, its scaffold rules draw first and its content fills in while the companion agent builds it.
+Every page is a dossier sheet: a hairline-framed paper sheet over two offset paper-deep backing sheets. Index pages share one sheet around a 44rem column; detail pages use a wider sheet. Routes are divider tabs on the sheet's left edge, a tab row on its top edge on phones, and the active tab sits flush with the sheet. Long pages carry a thumb index of notches cut into the sheet's right edge, the current one in ink; on phones it becomes a thin progress strip. The top line holds only the wordmark and search. The footer is the back cover: a stamped colophon on the backing sheet. Filters fold under the intro. The home intro carries the identity dossier: portrait, name, bio, GitHub readouts and links. A single hairline closes each page intro. Spacing follows a 4px scale. Sections are separated by 96px and open with a panel heading: `[ XX-NN ]  LABEL ........ 06 / 06` over a strong rule. As a section scrolls in, its scaffold rules draw first and its content fills in while the companion agent builds it.
 
 ## Elevation & Depth
 
@@ -171,7 +171,7 @@ Square everything. Radius is 0 on cards, buttons, chips, inputs and images. Fram
 
 ## Components
 
-- **Panel heading:** index in brackets, mono label, Japanese annotation, dotted leader, count.
+- **Panel heading:** index in brackets, mono label, dotted leader, count.
 - **Specimen card:** hairline frame, corner marks, mono index top-left, square badge top-right, light title, one-line summary, mono footer row.
 - **Button:** 44px, square, mono uppercase label. Primary is ink on paper inverted; outline is a 1px ink frame. State flips in 100ms.
 - **Chip:** square hairline frame with a mono label; active chips invert to ink.
@@ -182,8 +182,8 @@ Square everything. Radius is 0 on cards, buttons, chips, inputs and images. Fram
 ## Do's and Don'ts
 
 - Do: Use bg-paper, text-ink, text-graphite, text-mist and border-rule tokens.
-- Do: Set every annotation in the label utility and pair section labels with a jp annotation.
-- Do: Number panels as [ XX-NN ] LABEL 日本語 with a dotted leader and a count.
+- Do: Set every annotation in the label utility. Japanese annotations are a rare decoration, only on route tabs and page heroes.
+- Do: Number panels as [ XX-NN ] LABEL with a dotted leader and a count.
 - Do: Flip states in 100ms with ease-mechanical. Reveal with out-quart or out-quint.
 - Do: Keep hit areas at 44px on touch and use focus-visible rings.
 - Do: Build one base component with cva variants and merge classes with cn.
