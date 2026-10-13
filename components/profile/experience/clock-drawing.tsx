@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, useRef } from "react";
 import type { MouseEvent, RefObject } from "react";
 
 import type { Projection } from "@/components/iso/iso-kit";
@@ -52,6 +52,7 @@ export const ClockDrawing = ({
   projection: Projection;
 }) => {
   const clipId = useId();
+  const pressed = useRef<number | null>(null);
   const lever = leverOf(LEVER_REST, projection);
   const hands = handsOf(REST_SECONDS, projection);
   const handPaths = [hands.hour, hands.minute, hands.second];
@@ -97,7 +98,8 @@ export const ClockDrawing = ({
       className="iso-svg"
       focusable="false"
       onClick={(event) => {
-        const job = jobAt(event);
+        const job = jobAt(event) ?? pressed.current;
+        pressed.current = null;
         if (job !== null) {
           onCard(job);
           return;
@@ -105,6 +107,9 @@ export const ClockDrawing = ({
         if (isConsole(event)) {
           onConsole();
         }
+      }}
+      onPointerDown={(event) => {
+        pressed.current = jobAt(event);
       }}
       onPointerLeave={() => onPeek(null)}
       onPointerOver={(event) => {
