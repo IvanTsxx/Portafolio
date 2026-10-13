@@ -164,7 +164,10 @@ const roundedFace = (
   for (const [cu, cv, start] of arcs) {
     for (let step = 0; step <= 6; step += 1) {
       const angle = ((start + step * 15) * Math.PI) / 180;
-      points.push([cu + radius * Math.cos(angle), cv + radius * Math.sin(angle)]);
+      points.push([
+        cu + radius * Math.cos(angle),
+        cv + radius * Math.sin(angle),
+      ]);
     }
   }
   return points;
@@ -222,10 +225,7 @@ const baseOf = (P: Projection) => {
   const rails = [-26, 20].map((y) => ({
     rail: slabOf({ d: 6, r: 1, w: 106, x: -46, y }, 0, 3, P, 3),
     stop: slabOf({ d: 9, r: 1, w: 3, x: 58, y: y - 1.5 }, 0, 6, P, 3),
-    stopScrews: [
-      iso([59.5, y + 1, 6], P),
-      iso([59.5, y + 5, 6], P),
-    ],
+    stopScrews: [iso([59.5, y + 1, 6], P), iso([59.5, y + 5, 6], P)],
   }));
   return {
     feet,
@@ -278,14 +278,17 @@ const trayOf = (P: Projection) => {
     follower: slabOf(follower, FLOOR_TOP, 24, P, 3, 0.6),
     followerKnob: cylinder(-40.5, 0, 3.4, 30, 3.6, P, 28),
     followerKnurl: knurl(-40.5, 0, 3.4, [30, 33.6], 26, P),
-    followerScrews: [
-      iso([-40.5, -26, 30], P),
-      iso([-40.5, 26, 30], P),
-    ],
+    followerScrews: [iso([-40.5, -26, 30], P), iso([-40.5, 26, 30], P)],
     holder: slabOf(holderPlan, holder.v0, holder.v1 - holder.v0, P, 2),
     holderCard: onFaceX(
       holderFace,
-      roundedFace(holder.u0 + 1.6, holder.v0 + 1.6, holder.u1 - 1.6, holder.v1 - 1.6, 0.4),
+      roundedFace(
+        holder.u0 + 1.6,
+        holder.v0 + 1.6,
+        holder.u1 - 1.6,
+        holder.v1 - 1.6,
+        0.4
+      ),
       P,
       true
     ),
@@ -301,7 +304,14 @@ const trayOf = (P: Projection) => {
     nearSeam: sideSeam({ d: 3, r: 0.5, w: 91, x: -44, y: 36 }, 14, P, 3),
     panel: slabOf(panel, 3, PANEL_TOP - 3, P, 3, 0.8),
     panelSeam: sideSeam(panel, 8, P, 3),
-    pullBar: slabOf({ d: 28, r: 1.2, w: 2.6, x: face + 3, y: -14 }, 6.4, 3, P, 4, 0.3),
+    pullBar: slabOf(
+      { d: 28, r: 1.2, w: 2.6, x: face + 3, y: -14 },
+      6.4,
+      3,
+      P,
+      4,
+      0.3
+    ),
     pullPosts: [-12, 9].map((y) =>
       slabOf({ d: 3, r: 0.6, w: 3.2, x: face, y }, 6.8, 2.2, P, 3)
     ),
@@ -432,7 +442,13 @@ const readerOf = (P: Projection) => {
   const body = READER;
   const slot: Plan = { d: 72, r: 1.4, w: 3, x: SLOT_X - 1.5, y: SLOT_Y - 36 };
   const lips = [slot.x - 1.8, slot.x + slot.w + 0.2].map((x) =>
-    slabOf({ d: slot.d + 2, r: 0.6, w: 1.6, x, y: slot.y - 1 }, READER_TOP, 1.2, P, 3)
+    slabOf(
+      { d: slot.d + 2, r: 0.6, w: 1.6, x, y: slot.y - 1 },
+      READER_TOP,
+      1.2,
+      P,
+      3
+    )
   );
   const front = body.x + body.w;
   const window = { u0: SLOT_Y - 8, u1: SLOT_Y + 8, v0: 11, v1: 21 };
@@ -442,9 +458,16 @@ const readerOf = (P: Projection) => {
   ];
   const ventFace = body.y + body.d;
   const vents = [8, 13, 18].map((z) =>
-    onFaceY(ventFace, roundedFace(body.x + 8, z - 1, body.x + 30, z + 1, 1), P, true)
+    onFaceY(
+      ventFace,
+      roundedFace(body.x + 8, z - 1, body.x + 30, z + 1, 1),
+      P,
+      true
+    )
   );
-  const topScrews = corners(body, 4.4).map(([x, y]) => iso([x, y, READER_TOP], P));
+  const topScrews = corners(body, 4.4).map(([x, y]) =>
+    iso([x, y, READER_TOP], P)
+  );
   const keyHousing: Plan = { d: 16, r: 2, w: 14, x: KEY[0] - 7, y: KEY[1] - 8 };
   return {
     body: slabOf(body, 3, READER_TOP - 3, P, 6, 1),
@@ -452,7 +475,13 @@ const readerOf = (P: Projection) => {
     counter: {
       bezel: onFaceX(
         front,
-        roundedFace(window.u0 - 1.6, window.v0 - 1.6, window.u1 + 1.6, window.v1 + 1.6, 1.6),
+        roundedFace(
+          window.u0 - 1.6,
+          window.v0 - 1.6,
+          window.u1 + 1.6,
+          window.v1 + 1.6,
+          1.6
+        ),
         P,
         true
       ),
@@ -469,7 +498,12 @@ const readerOf = (P: Projection) => {
       })(),
       origin: iso([front, 0, 0], P),
       split: segment([front, SLOT_Y, window.v0], [front, SLOT_Y, window.v1], P),
-      well: onFaceX(front, roundedFace(window.u0, window.v0, window.u1, window.v1, 0.8), P, true),
+      well: onFaceX(
+        front,
+        roundedFace(window.u0, window.v0, window.u1, window.v1, 0.8),
+        P,
+        true
+      ),
     },
     key: {
       cap: cylinder(KEY[0], KEY[1], 4.2, 37, 3.2, P, 32),
@@ -478,7 +512,14 @@ const readerOf = (P: Projection) => {
       guard: slabOf(keyHousing, READER_TOP, 3, P, 4, 0.5),
       guardScrews: [
         iso([keyHousing.x + 2, keyHousing.y + 2, READER_TOP + 3], P),
-        iso([keyHousing.x + keyHousing.w - 2, keyHousing.y + keyHousing.d - 2, READER_TOP + 3], P),
+        iso(
+          [
+            keyHousing.x + keyHousing.w - 2,
+            keyHousing.y + keyHousing.d - 2,
+            READER_TOP + 3,
+          ],
+          P
+        ),
       ],
       stem: cylinder(KEY[0], KEY[1], 2.6, READER_TOP + 3, 4, P, 24),
       stemSeam: sideArc(KEY[0], KEY[1], 2.6, READER_TOP + 5, P, 16),
@@ -502,29 +543,25 @@ export const catalogFigureOf = (catalog: Catalog) => {
   const axes = axesOf(P);
   const a = iso([SLOT_X, -400, READER_TOP], P);
   const b = iso([SLOT_X, 400, READER_TOP], P);
-  const clip = pathOf(
-    [a, b, [b[0], b[1] - 2000], [a[0], a[1] - 2000]],
-    true
-  );
+  const clip = pathOf([a, b, [b[0], b[1] - 2000], [a[0], a[1] - 2000]], true);
   const clearOfFrontCards =
     CARD_HALF * 2 - PITCH * Math.tan((AZIMUTH * Math.PI) / 180) + 2;
   const lastSlot = catalog.cards.length - 1;
-  const routes = catalog.cards.map(
-    (_, slot): CardRoute => ({
-      carry: CARRY_LIFT,
-      clearsFrom: slot === lastSlot ? 0 : clearOfFrontCards,
-      drop: SEAT_DROP,
-      hover: HOVER_LIFT,
-      shift: SLOT_X - cardX(slot),
-      slide: SLOT_Y,
-    })
-  );
+  const routes = catalog.cards.map((_, slot): CardRoute => ({
+    carry: CARRY_LIFT,
+    clearsFrom: slot === lastSlot ? 0 : clearOfFrontCards,
+    drop: SEAT_DROP,
+    hover: HOVER_LIFT,
+    shift: SLOT_X - cardX(slot),
+    slide: SLOT_Y,
+  }));
   const rig: CatalogRig = {
     assemblies: [
       { key: "tray", move: [0, 0, 46] },
-      ...catalog.cards.map(
-        (_, slot): Assembly => ({ key: `card-${slot}`, move: [0, 0, 74] })
-      ),
+      ...catalog.cards.map((_, slot): Assembly => ({
+        key: `card-${slot}`,
+        move: [0, 0, 74],
+      })),
       { key: "reader", move: [0, 70, 0] },
     ],
     axes,

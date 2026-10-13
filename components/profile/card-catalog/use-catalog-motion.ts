@@ -202,7 +202,6 @@ export const useCatalogMotion = ({
     return isMoving;
   });
 
-
   useLayoutEffect(() => {
     const node = root.current;
     if (isReduced) {
@@ -256,7 +255,8 @@ export const useCatalogMotion = ({
   return {
     canAnimate: canRun && !isReduced,
     isReading: () =>
-      reading.current !== null || (request !== null && taken.current !== request),
+      reading.current !== null ||
+      (request !== null && taken.current !== request),
     isReduced,
     isVisible,
     read: (slot: number, opens: boolean) => {

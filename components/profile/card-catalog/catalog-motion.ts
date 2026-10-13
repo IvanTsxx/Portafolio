@@ -26,9 +26,7 @@ const DAMPING = 15;
 
 const ease = (t: number) => {
   const clamped = Math.min(1, Math.max(0, t));
-  return clamped < 0.5
-    ? 4 * clamped ** 3
-    : 1 - (-2 * clamped + 2) ** 3 / 2;
+  return clamped < 0.5 ? 4 * clamped ** 3 : 1 - (-2 * clamped + 2) ** 3 / 2;
 };
 
 const mix = (from: number, to: number, share: number) =>
@@ -45,7 +43,9 @@ export const poseAt = (
   const shift = ease(u - 2);
   const drop = ease(u - 3);
   const dz =
-    u <= 1 ? mix(resting, route.carry, rise) : mix(route.carry, route.drop, drop);
+    u <= 1
+      ? mix(resting, route.carry, rise)
+      : mix(route.carry, route.drop, drop);
   return [route.shift * shift, route.slide * slide, dz];
 };
 
