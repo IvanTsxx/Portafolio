@@ -1,0 +1,131 @@
+.iso {
+  --iso-paper: var(--paper);
+  --iso-top: oklch(0.975 0.002 106);
+  --iso-shade-0: oklch(0.855 0.004 100);
+  --iso-shade-1: oklch(0.88 0.004 100);
+  --iso-shade-2: oklch(0.9 0.003 100);
+  --iso-shade-3: oklch(0.92 0.003 106);
+  --iso-lit-top: oklch(0.965 0.018 60);
+  --iso-lit-shade: oklch(0.9 0.03 52);
+  --iso-hi: var(--ink);
+  --iso-mid: oklch(0.42 0.004 100);
+  --iso-lo: oklch(0.58 0.004 100);
+  --iso-faint: oklch(0.74 0.003 100);
+  --iso-lit: var(--clay-deep);
+  --iso-halo: oklch(0.42 0.01 90);
+  --iso-dot: var(--ink);
+  --iso-weight: 0.6px;
+}
+
+.iso .iso-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.iso .iso-svg path,
+.iso .iso-svg circle {
+  vector-effect: non-scaling-stroke;
+}
+
+.iso .iso-fill {
+  fill: var(--iso-paper);
+  stroke: none;
+}
+
+.iso .iso-shade,
+.iso .iso-top {
+  stroke: none;
+}
+
+.iso .iso-shade[data-shade="0"] {
+  fill: var(--iso-shade-0);
+}
+
+.iso .iso-shade[data-shade="1"] {
+  fill: var(--iso-shade-1);
+}
+
+.iso .iso-shade[data-shade="2"] {
+  fill: var(--iso-shade-2);
+}
+
+.iso .iso-shade[data-shade="3"] {
+  fill: var(--iso-shade-3);
+}
+
+.iso .iso-top {
+  fill: var(--iso-top);
+}
+
+.iso .iso-ball {
+  fill: var(--iso-shade-2);
+}
+
+.iso .iso-ball-shine {
+  fill: var(--iso-top);
+  stroke: none;
+}
+
+.iso .iso-halo {
+  fill: var(--iso-halo);
+  stroke: none;
+  filter: blur(8px);
+  opacity: 0.3;
+  transform: translateY(3px);
+}
+
+.iso .iso-line {
+  fill: none;
+  stroke: var(--iso-lo);
+  stroke-width: var(--iso-weight);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.iso .iso-line[data-tone="hi"] {
+  stroke: var(--iso-hi);
+}
+
+.iso .iso-line[data-tone="mid"] {
+  stroke: var(--iso-mid);
+}
+
+.iso .iso-line[data-tone="faint"] {
+  stroke: var(--iso-faint);
+}
+
+.iso .iso-line[data-tone="lit"] {
+  stroke: var(--iso-lit);
+}
+
+.iso .iso-dots circle {
+  fill: var(--iso-dot);
+  stroke: none;
+  opacity: 0.45;
+}
+
+.iso .iso-dots[data-tone="hi"] circle {
+  opacity: 0.85;
+}
+
+.iso .iso-dots[data-tone="lo"] circle {
+  opacity: 0.25;
+}
+
+.iso [data-on] .iso-solid > .iso-top {
+  fill: var(--iso-lit-top);
+}
+
+.iso [data-on] .iso-solid > .iso-shade {
+  fill: var(--iso-lit-shade);
+}
+
+.iso [data-on] .iso-solid > .iso-edge {
+  stroke: var(--iso-lit);
+}
+
+.iso [data-on] .iso-solid > .iso-line[data-tone="lo"] {
+  stroke: var(--iso-lit);
+}
