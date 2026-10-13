@@ -1,5 +1,3 @@
-import type { Metadata } from "next";
-
 import { ColorSection } from "@/components/design-system/color-section";
 import { ExportActions } from "@/components/design-system/export-actions";
 import { MotionSection } from "@/components/design-system/motion-section";
@@ -8,18 +6,14 @@ import { SpacingSection } from "@/components/design-system/spacing-section";
 import { TypographySection } from "@/components/design-system/typography-section";
 import { UtilitiesSection } from "@/components/design-system/utilities-section";
 import { DocumentHero } from "@/components/site/document-hero";
+import { JsonLd } from "@/components/site/json-ld";
 import { padCount } from "@/lib/design-system/format";
 import { loadDesignMarkdown, loadDesignSystem } from "@/lib/design-system/load";
 import { documentCode, rawMarkdownPath } from "@/lib/design-system/sections";
+import { buildPageMetadata, pageSeo } from "@/lib/site/seo";
+import { designSystemJsonLd } from "@/lib/site/structured-data";
 
-const description =
-  "Paper-and-ink design system: principles, tokens, layout and motion. Copy it as a DESIGN.md for coding agents.";
-
-export const metadata: Metadata = {
-  alternates: { canonical: "/design-system" },
-  description,
-  title: "Design system",
-};
+export const metadata = buildPageMetadata(pageSeo.designSystem);
 
 const DesignSystemPage = async () => {
   const [system, markdown] = await Promise.all([
@@ -29,6 +23,7 @@ const DesignSystemPage = async () => {
 
   return (
     <>
+      <JsonLd data={designSystemJsonLd()} />
       <DocumentHero
         code={documentCode}
         jp="設計"

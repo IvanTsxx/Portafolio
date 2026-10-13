@@ -1,16 +1,31 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/lib/site/config";
+import { iconMarks } from "@/lib/site/icon-mark";
+import { printColors } from "@/lib/site/print-colors";
+import { pageSeo, siteTitle } from "@/lib/site/seo";
 
 const manifest = (): MetadataRoute.Manifest => ({
-  background_color: "#0b0a09",
-  description: siteConfig.description,
+  background_color: printColors.paper,
+  description: pageSeo.home.description,
   display: "standalone",
-  icons: [{ sizes: "any", src: "/favicon.ico", type: "image/x-icon" }],
-  name: `${siteConfig.nickname} · Agent Workshop`,
+  icons: [
+    {
+      sizes: `${iconMarks.tab.size}x${iconMarks.tab.size}`,
+      src: "/icon",
+      type: "image/png",
+    },
+    {
+      sizes: `${iconMarks.touch.size}x${iconMarks.touch.size}`,
+      src: "/apple-icon",
+      type: "image/png",
+    },
+  ],
+  lang: "en",
+  name: siteTitle,
   short_name: siteConfig.nickname,
   start_url: "/",
-  theme_color: "#121110",
+  theme_color: printColors.paper,
 });
 
 export default manifest;

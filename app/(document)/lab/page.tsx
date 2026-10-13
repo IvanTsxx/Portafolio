@@ -1,15 +1,13 @@
-import type { Metadata } from "next";
-
 import { ExperimentCard } from "@/components/lab/experiment-card";
 import { LabArchive, LabTopicFilter } from "@/components/lab/lab-archive";
 import { DocumentHero } from "@/components/site/document-hero";
 import { FilterFold } from "@/components/site/filter-fold";
+import { JsonLd } from "@/components/site/json-ld";
 import { activeTopics, experiments } from "@/lib/lab/experiments";
+import { buildPageMetadata, pageSeo } from "@/lib/site/seo";
+import { labIndexJsonLd } from "@/lib/site/structured-data";
 
-export const metadata: Metadata = {
-  description: "Experiments in shaders, motion, typography, CSS and 3D.",
-  title: "Lab",
-};
+export const metadata = buildPageMetadata(pageSeo.lab);
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
@@ -27,6 +25,7 @@ const items = experiments.map((experiment) => ({
 
 const LabPage = () => (
   <>
+    <JsonLd data={labIndexJsonLd(experiments)} />
     <DocumentHero
       code="LAB-01"
       jp="実験"

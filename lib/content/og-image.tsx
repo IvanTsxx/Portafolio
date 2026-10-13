@@ -5,16 +5,16 @@ import { ImageResponse } from "next/og";
 import type { CSSProperties } from "react";
 
 import { siteConfig } from "@/lib/site/config";
+import { inkAlpha, printColors } from "@/lib/site/print-colors";
 
-const ogSize = { height: 630, width: 1200 } as const;
+export const size = { height: 630, width: 1200 } as const;
+
+export const contentType = "image/png";
 
 const palette = {
-  graphite: "#3d3d3b",
-  grid: "rgba(18, 18, 18, 0.07)",
-  ink: "#121212",
-  mist: "#646361",
-  paper: "#ededeb",
-  ruleStrong: "rgba(18, 18, 18, 0.7)",
+  ...printColors,
+  grid: inkAlpha(0.07),
+  ruleStrong: inkAlpha(0.7),
 } as const;
 
 const cornerSize = 20;
@@ -175,7 +175,7 @@ export const renderOgImage = async ({
       </div>
     </div>,
     {
-      ...ogSize,
+      ...size,
       fonts: [
         { data: sansLight, name: "Geist", style: "normal", weight: 300 },
         { data: monoRegular, name: "Geist Mono", style: "normal", weight: 400 },

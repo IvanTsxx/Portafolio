@@ -4,9 +4,12 @@ import { notFound } from "next/navigation";
 import { ExperimentCard } from "@/components/lab/experiment-card";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
+import { JsonLd } from "@/components/site/json-ld";
 import { experiments, getExperiment } from "@/lib/lab/experiments";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { relatedExperimentsOf } from "@/lib/site/sections";
+import { buildPageMetadata, experimentSeo } from "@/lib/site/seo";
+import { experimentJsonLd } from "@/lib/site/structured-data";
 
 export const dynamicParams = false;
 
@@ -18,9 +21,7 @@ export const generateMetadata = async ({
 }: PageProps<"/lab/[slug]">): Promise<Metadata> => {
   const { slug } = await params;
   const experiment = getExperiment(slug);
-  return experiment
-    ? { description: experiment.summary, title: `${experiment.title} · Lab` }
-    : {};
+  return experiment ? buildPageMetadata(experimentSeo(experiment)) : {};
 };
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -35,6 +36,7 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
 
   return (
     <>
+      <JsonLd data={experimentJsonLd(experiment)} />
       <DocumentHero
         back={{ href: "/lab", label: "Lab" }}
         code={experiment.index}

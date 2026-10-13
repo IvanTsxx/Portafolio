@@ -7,13 +7,13 @@ import {
   CaseStudyLinks,
   CaseStudySections,
 } from "@/components/content/note-detail";
-import { NoteJsonLd } from "@/components/content/note-json-ld";
 import { NoteRow } from "@/components/content/note-row";
 import { SampleBadge } from "@/components/content/sample-badge";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
+import { JsonLd } from "@/components/site/json-ld";
 import { chipClassName } from "@/components/site/styles";
-import { buildNoteMetadata, isIndexable } from "@/lib/content/metadata";
+import { buildNoteMetadata } from "@/lib/content/metadata";
 import {
   formatNoteCode,
   leadSectionCount,
@@ -30,6 +30,7 @@ import {
   getRelatedNotes,
 } from "@/lib/content/notes";
 import { sectionScripts } from "@/lib/site/section-scripts";
+import { noteJsonLd } from "@/lib/site/structured-data";
 
 export const dynamicParams = false;
 
@@ -110,9 +111,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
           <CaseStudyLinks caseStudy={note} />
         ) : null}
       </DocumentHero>
-      {note.kind === "note" && isIndexable(note) ? (
-        <NoteJsonLd note={note} />
-      ) : null}
+      <JsonLd data={noteJsonLd(note)} />
       {note.kind === "case-study" ? (
         <CaseStudySections caseStudy={note} code={code} />
       ) : null}

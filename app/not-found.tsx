@@ -7,6 +7,8 @@ import { StageScene } from "@/components/scene/stage-scene";
 import { Dossier } from "@/components/site/dossier";
 
 export const metadata: Metadata = {
+  description: "This page does not exist. Head back to Ivo's home page.",
+  robots: { follow: true, index: false },
   title: "404 · Module not found",
 };
 

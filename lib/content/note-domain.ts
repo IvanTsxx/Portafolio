@@ -51,7 +51,7 @@ export interface RelatedNotesOptions {
   limit?: number;
 }
 
-export const notePath = (slug: string) => `/notes/${slug}`;
+export const notePath = (slug: string) => `/notes/${slug}` as const;
 
 export const noteSource = (slug: string) => `content/notes/${slug}.mdx`;
 

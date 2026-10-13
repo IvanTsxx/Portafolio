@@ -5,8 +5,7 @@ import { getNote, getNoteSlugs } from "@/lib/content/notes";
 import { renderOgImage } from "@/lib/content/og-image";
 
 export const alt = "Note";
-export const size = { height: 630, width: 1200 };
-export const contentType = "image/png";
+export { contentType, size } from "@/lib/content/og-image";
 
 export const generateStaticParams = async () => {
   const slugs = await getNoteSlugs();

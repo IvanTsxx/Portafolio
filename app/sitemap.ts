@@ -1,30 +1,14 @@
 import type { MetadataRoute } from "next";
 
-import { absoluteUrl, isIndexable } from "@/lib/content/metadata";
-import { notePath } from "@/lib/content/note-domain";
-import { getNotes } from "@/lib/content/notes";
-import { primaryRoutes } from "@/lib/site/config";
+import { getPublicRoutes, lastModifiedOf } from "@/lib/site/public-routes";
+import { absoluteUrl } from "@/lib/site/seo";
 
 const sitemap = async (): Promise<MetadataRoute.Sitemap> => {
-  const notes = await getNotes();
-
-  return [
-    ...primaryRoutes.map((route) => ({
-      priority: route.href === "/" ? 1 : 0.8,
-      url: absoluteUrl(route.href),
-    })),
-    ...notes.flatMap((note) =>
-      isIndexable(note)
-        ? [
-            {
-              lastModified: note.kind === "note" ? note.date : undefined,
-              priority: 0.6,
-              url: absoluteUrl(notePath(note.slug)),
-            },
-          ]
-        : []
-    ),
-  ];
+  const routes = await getPublicRoutes();
+  return routes.map((route) => ({
+    lastModified: lastModifiedOf(route.path),
+    url: absoluteUrl(route.path),
+  }));
 };
 
 export default sitemap;
