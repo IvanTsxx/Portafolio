@@ -3,9 +3,9 @@ import { describe, expect, test } from "bun:test";
 import type { Construction, ConstructionEvent } from "./section-construction";
 import {
   advanceConstruction,
-  blocksForBeat,
+  constructionSchedule,
   idleConstruction,
-  maxCompanionBeats,
+  scheduleSeconds,
 } from "./section-construction";
 
 const run = (events: readonly ConstructionEvent[]) => {
@@ -16,41 +16,18 @@ const run = (events: readonly ConstructionEvent[]) => {
   return state;
 };
 
-const beatsToBuild = (total: number) => {
-  const groups: number[] = [];
-  let placed = 0;
-  while (placed < total) {
-    const count = blocksForBeat(placed, total);
-    groups.push(count);
-    placed += count;
-  }
-  return groups;
-};
-
 describe("section construction", () => {
   test("a section moves idle, waiting, constructing, built", () => {
-    expect(run([{ total: 2, type: "arm" }])).toEqual({
-      phase: "waiting",
-      total: 2,
-    });
+    expect(run([{ type: "arm" }])).toEqual({ phase: "waiting" });
+    expect(
+      run([{ type: "arm" }, { total: 2, type: "begin" }, { type: "place" }])
+    ).toEqual({ phase: "constructing", placed: 1, total: 2 });
     expect(
       run([
-        { total: 2, type: "arm" },
-        { source: "companion", type: "begin" },
-        { count: 1, type: "place" },
-      ])
-    ).toEqual({
-      phase: "constructing",
-      placed: 1,
-      source: "companion",
-      total: 2,
-    });
-    expect(
-      run([
-        { total: 2, type: "arm" },
-        { source: "companion", type: "begin" },
-        { count: 1, type: "place" },
-        { count: 1, type: "place" },
+        { type: "arm" },
+        { total: 2, type: "begin" },
+        { type: "place" },
+        { type: "place" },
       ])
     ).toEqual({ phase: "built" });
   });
@@ -58,47 +35,68 @@ describe("section construction", () => {
   test("a built section never constructs again", () => {
     expect(
       run([
-        { total: 3, type: "arm" },
+        { type: "arm" },
         { type: "finish" },
-        { total: 3, type: "arm" },
-        { source: "self", type: "begin" },
+        { type: "arm" },
+        { total: 3, type: "begin" },
       ])
     ).toEqual({ phase: "built" });
   });
 
-  test("a section with no blocks is built as soon as it arms", () => {
-    expect(run([{ total: 0, type: "arm" }])).toEqual({ phase: "built" });
+  test("a section that finds no blocks is built as soon as it begins", () => {
+    expect(run([{ type: "arm" }, { total: 0, type: "begin" }])).toEqual({
+      phase: "built",
+    });
   });
 
   test("placing before the construction begins changes nothing", () => {
-    expect(
-      run([
-        { total: 2, type: "arm" },
-        { count: 2, type: "place" },
-      ])
-    ).toEqual({ phase: "waiting", total: 2 });
+    expect(run([{ type: "arm" }, { type: "place" }])).toEqual({
+      phase: "waiting",
+    });
   });
 
-  test("a stalled companion hands the remaining blocks to the section", () => {
-    expect(
-      run([
-        { total: 4, type: "arm" },
-        { source: "companion", type: "begin" },
-        { count: 1, type: "place" },
-        { type: "handoff" },
-      ])
-    ).toEqual({ phase: "constructing", placed: 1, source: "self", total: 4 });
+  test("beginning before arming changes nothing", () => {
+    expect(run([{ total: 2, type: "begin" }])).toEqual(idleConstruction);
   });
+});
 
-  test("the companion lays every block within a few strikes", () => {
-    expect(beatsToBuild(1)).toEqual([1]);
-    expect(beatsToBuild(2)).toEqual([1, 1]);
-    expect(beatsToBuild(3)).toEqual([1, 1, 1]);
-    expect(beatsToBuild(7)).toEqual([2, 2, 3]);
-    for (let total = 1; total <= 24; total += 1) {
-      const groups = beatsToBuild(total);
-      expect(groups.length).toBeLessThanOrEqual(maxCompanionBeats);
-      expect(groups.reduce((sum, count) => sum + count, 0)).toBe(total);
+describe("construction schedule", () => {
+  const typicalHeights = [480, 32, 32, 32, 32, 32, 120, 120, 64, 200, 44, 300];
+
+  test("a section of 4 to 12 blocks builds in 2 to 3.5 seconds", () => {
+    for (let count = 4; count <= 12; count += 1) {
+      const seconds = scheduleSeconds(
+        constructionSchedule(typicalHeights.slice(0, count))
+      );
+      expect(seconds).toBeGreaterThanOrEqual(2);
+      expect(seconds).toBeLessThanOrEqual(3.5);
     }
+  });
+
+  test("blocks start in order, one after another", () => {
+    const starts = constructionSchedule(typicalHeights).map(
+      (block) => block.start
+    );
+    expect(starts[0]).toBe(0);
+    for (const [index, start] of starts.entries()) {
+      expect(start).toBeGreaterThan(starts[index - 1] ?? -1);
+    }
+  });
+
+  test("taller blocks print longer and in more layers", () => {
+    const [short, tall] = constructionSchedule([32, 480]);
+    expect(tall?.print).toBeGreaterThan(short?.print ?? 0);
+    expect(tall?.layers).toBeGreaterThan(short?.layers ?? 0);
+  });
+
+  test("a lone block still draws its frame before it prints", () => {
+    const [only] = constructionSchedule([200]);
+    expect(only?.start).toBe(0);
+    expect(only?.frame).toBeGreaterThan(0);
+    expect(only?.print).toBeGreaterThan(0);
+  });
+
+  test("an empty section takes no time", () => {
+    expect(scheduleSeconds(constructionSchedule([]))).toBe(0);
   });
 });

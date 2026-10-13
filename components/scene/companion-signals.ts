@@ -49,32 +49,16 @@ const getServerLine = () => null;
 export const useCompanionLine = () =>
   useSyncExternalStore(subscribeLine, getLine, getServerLine);
 
-export interface CompanionBeat {
-  waypoint: HTMLElement;
-  x: number;
-  y: number;
-}
+let companionWorksite: HTMLElement | null = null;
 
-type BeatListener = (beat: CompanionBeat) => void;
-
-const beatListeners = new Set<BeatListener>();
-let companionStop: HTMLElement | null = null;
-
-export const subscribeCompanionBeat = (listener: BeatListener) => {
-  beatListeners.add(listener);
-  return () => {
-    beatListeners.delete(listener);
-  };
+export const setCompanionWorksite = (site: HTMLElement | null) => {
+  companionWorksite = site;
 };
 
-export const notifyCompanionBeat = (beat: CompanionBeat) => {
-  for (const listener of beatListeners) {
-    listener(beat);
+export const clearCompanionWorksite = (site: HTMLElement) => {
+  if (companionWorksite === site) {
+    companionWorksite = null;
   }
 };
 
-export const setCompanionStop = (stop: HTMLElement | null) => {
-  companionStop = stop;
-};
-
-export const getCompanionStop = () => companionStop;
+export const getCompanionWorksite = () => companionWorksite;

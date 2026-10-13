@@ -1,21 +1,13 @@
-export type ConstructionSource = "companion" | "self";
-
 export type Construction =
   | { phase: "idle" }
-  | { phase: "waiting"; total: number }
-  | {
-      phase: "constructing";
-      placed: number;
-      source: ConstructionSource;
-      total: number;
-    }
+  | { phase: "waiting" }
+  | { phase: "constructing"; placed: number; total: number }
   | { phase: "built" };
 
 export type ConstructionEvent =
-  | { type: "arm"; total: number }
-  | { type: "begin"; source: ConstructionSource }
-  | { type: "place"; count: number }
-  | { type: "handoff" }
+  | { type: "arm" }
+  | { type: "begin"; total: number }
+  | { type: "place" }
   | { type: "finish" };
 
 export type ConstructionPhase = Construction["phase"];
@@ -33,30 +25,21 @@ export const advanceConstruction = (
   }
   switch (state.phase) {
     case "idle": {
-      if (event.type !== "arm") {
-        return state;
-      }
-      return event.total > 0 ? { phase: "waiting", total: event.total } : built;
+      return event.type === "arm" ? { phase: "waiting" } : state;
     }
     case "waiting": {
       if (event.type !== "begin") {
         return state;
       }
-      return {
-        phase: "constructing",
-        placed: 0,
-        source: event.source,
-        total: state.total,
-      };
+      return event.total > 0
+        ? { phase: "constructing", placed: 0, total: event.total }
+        : built;
     }
     case "constructing": {
-      if (event.type === "handoff") {
-        return { ...state, source: "self" };
-      }
       if (event.type !== "place") {
         return state;
       }
-      const placed = state.placed + event.count;
+      const placed = state.placed + 1;
       return placed >= state.total ? built : { ...state, placed };
     }
     case "built": {
@@ -68,15 +51,52 @@ export const advanceConstruction = (
   }
 };
 
-export const maxCompanionBeats = 3;
+export interface BlockTiming {
+  frame: number;
+  layers: number;
+  print: number;
+  start: number;
+}
 
-export const blocksForBeat = (placed: number, total: number) => {
-  const beats = Math.min(total, maxCompanionBeats);
-  for (let beat = 1; beat <= beats; beat += 1) {
-    const end = Math.floor((beat * total) / beats);
-    if (end > placed) {
-      return end - placed;
-    }
-  }
-  return 0;
+const frameSeconds = 0.4;
+const targetSeconds = 3;
+const minStagger = 0.16;
+const maxStagger = 0.45;
+const minPrint = 0.5;
+const maxPrint = 1.1;
+const printPerPixel = 1 / 700;
+const layerPixels = 14;
+const minLayers = 4;
+const maxLayers = 28;
+
+const clamp = (low: number, high: number, value: number) =>
+  Math.min(high, Math.max(low, value));
+
+export const constructionSchedule = (
+  heights: readonly number[]
+): BlockTiming[] => {
+  const prints = heights.map((height) =>
+    clamp(minPrint, maxPrint, 0.4 + height * printPerPixel)
+  );
+  const longest = Math.max(minPrint, ...prints);
+  const stagger =
+    heights.length > 1
+      ? clamp(
+          minStagger,
+          maxStagger,
+          (targetSeconds - frameSeconds - longest) / (heights.length - 1)
+        )
+      : 0;
+  return heights.map((height, index) => ({
+    frame: frameSeconds,
+    layers: Math.round(clamp(minLayers, maxLayers, height / layerPixels)),
+    print: prints[index] ?? minPrint,
+    start: index * stagger,
+  }));
 };
+
+export const scheduleSeconds = (schedule: readonly BlockTiming[]) =>
+  Math.max(
+    0,
+    ...schedule.map((block) => block.start + block.frame + block.print)
+  );

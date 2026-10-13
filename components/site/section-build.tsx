@@ -3,62 +3,63 @@
 import { useRef } from "react";
 import type { ReactNode } from "react";
 
-import type { CompanionBeat } from "@/components/scene/companion-signals";
+import { holdBuild, releaseBuild } from "@/components/scene/build-hold";
 import {
-  getCompanionStop,
-  subscribeCompanionBeat,
+  clearCompanionWorksite,
+  setCompanionWorksite,
 } from "@/components/scene/companion-signals";
 import { motionKit } from "@/lib/motion/gsap";
 import type {
+  BlockTiming,
   Construction,
   ConstructionEvent,
 } from "@/lib/site/section-construction";
 import {
   advanceConstruction,
-  blocksForBeat,
+  constructionSchedule,
   idleConstruction,
 } from "@/lib/site/section-construction";
 
 const { gsap, useGSAP } = motionKit;
 
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface Box {
-  height: number;
-  left: number;
-  top: number;
-  width: number;
-}
-
-interface BuildSite {
+interface Scaffold {
   block: HTMLElement;
-  box: Box;
-  outline: HTMLElement;
+  cover: HTMLElement;
+  edges: readonly [HTMLElement, HTMLElement, HTMLElement, HTMLElement];
+  ordinal: string;
+  root: HTMLElement;
+  tag: HTMLElement | null;
+  ticks: readonly HTMLElement[];
 }
 
-const foldLine = 0.85;
 const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
-const companionGraceSeconds = 0.6;
-const companionArrivalSeconds = 2.4;
-const decisionPollSeconds = 0.2;
-const stallSeconds = 1.4;
-const selfBeatSeconds = 0.16;
-const groupStaggerSeconds = 0.06;
-const dropSeconds = 0.16;
-const dropPixels = 12;
-const brickHalf = 4;
-const dustReach = [6, 14, 22] as const;
-const dustRise = [10, 4, 14] as const;
+const loadLeadInSeconds = 0.6;
+const scrollLeadInSeconds = 0.12;
+const launchGapSeconds = 0.16;
+const labelMinWidth = 160;
+const labelMinHeight = 64;
 
-const outlineClass =
-  "border-rule-strong blueprint-dots absolute top-0 left-0 border border-dashed [--grid-size:12px]";
+const scaffoldClass =
+  "pointer-events-none absolute inset-0 z-20 select-none overflow-visible";
+const coverClass =
+  "bg-paper blueprint-dots pointer-events-auto absolute inset-0 [--grid-size:12px]";
+const edgeClasses = [
+  "bg-ink absolute inset-x-0 top-0 h-px origin-left",
+  "bg-ink absolute inset-y-0 right-0 w-px origin-top",
+  "bg-ink absolute inset-x-0 bottom-0 h-px origin-right",
+  "bg-ink absolute inset-y-0 left-0 w-px origin-bottom",
+] as const;
+const tickClasses = [
+  "bg-ink absolute -top-1 -left-1 size-2",
+  "bg-ink absolute -top-1 -right-1 size-2",
+  "bg-ink absolute -right-1 -bottom-1 size-2",
+  "bg-ink absolute -bottom-1 -left-1 size-2",
+] as const;
 const tagClass =
-  "label text-mist bg-paper absolute -top-2 left-2 px-1 tabular-nums";
-const brickClass = "bg-ink absolute top-0 left-0 size-2";
-const dustClass = "bg-ink absolute top-0 left-0 size-1";
+  "label bg-ink text-paper absolute top-0 left-0 z-10 px-1.5 py-0.5 whitespace-nowrap tabular-nums";
+const headClass = "absolute inset-0";
+const headLineClass = "bg-ink absolute inset-x-0 bottom-0 h-0.5";
+const nozzleClass = "bg-clay absolute bottom-0 left-0 size-3 translate-y-1/3";
 
 const builtSections = new Set<string>();
 
@@ -69,152 +70,177 @@ const spawn = (parent: HTMLElement, className: string) => {
   return element;
 };
 
+const isShown = (element: Element): element is HTMLElement =>
+  element instanceof HTMLElement &&
+  element.offsetWidth > 1 &&
+  element.offsetHeight > 1;
+
+const shownChildren = (element: Element) =>
+  [...element.children].filter(isShown);
+
 const findBlocks = (root: HTMLElement) => {
-  const marked = [...root.querySelectorAll<HTMLElement>("[data-build-block]")];
+  const marked = [
+    ...root.querySelectorAll<HTMLElement>("[data-build-block]"),
+  ].filter(
+    (element) =>
+      isShown(element) && !element.querySelector("[data-build-block]")
+  );
   if (marked.length > 0) {
     return marked;
   }
-  const direct = [...root.children];
-  const [only] = direct;
-  const level =
-    direct.length === 1 && only && only.children.length > 1
-      ? [...only.children]
-      : direct;
-  return level.filter(
-    (element): element is HTMLElement =>
-      element instanceof HTMLElement && element.getClientRects().length > 0
-  );
+  let level = shownChildren(root);
+  let [only] = level;
+  while (level.length === 1 && only && shownChildren(only).length > 1) {
+    level = shownChildren(only);
+    [only] = level;
+  }
+  return level;
 };
 
-const tagFor = (index: number, total: number) =>
-  `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
+const pad = (value: number) => String(value).padStart(2, "0");
 
-const arcPoint = (from: Point, apex: number, to: Point, progress: number) => {
-  const rest = 1 - progress;
-  return {
-    x: from.x + (to.x - from.x) * progress,
-    y: rest * rest * from.y + 2 * rest * progress * apex + progress ** 2 * to.y,
-  };
-};
+const ordinalFor = (index: number, total: number) =>
+  `${pad(index + 1)}/${pad(total)}`;
 
-const throwBrick = (
-  timeline: gsap.core.Timeline,
-  overlay: HTMLElement,
-  from: Point,
-  to: Point,
-  spin: number
-) => {
-  const brick = spawn(overlay, brickClass);
-  const distance = Math.hypot(to.x - from.x, to.y - from.y);
-  const flight = gsap.utils.clamp(0.22, 0.42, 0.2 + distance / 2400);
-  const apex =
-    Math.min(from.y, to.y) - gsap.utils.clamp(24, 96, distance * 0.18);
-  const path = { progress: 0 };
-  const draw = () => {
-    const point = arcPoint(from, apex, to, path.progress);
-    brick.style.transform = `translate3d(${point.x - brickHalf}px, ${point.y - brickHalf}px, 0) rotate(${path.progress * spin}deg)`;
-  };
-  draw();
-  timeline
-    .fromTo(brick, { opacity: 0 }, { duration: 0.06, opacity: 1 }, 0)
-    .to(
-      path,
-      { duration: flight, ease: "power1.in", onUpdate: draw, progress: 1 },
-      0
-    )
-    .call(() => brick.remove(), [], flight);
-  return flight;
-};
-
-const kickDust = (
-  timeline: gsap.core.Timeline,
-  overlay: HTMLElement,
-  box: Box,
-  at: number
-) => {
-  const floor = box.top + box.height;
-  for (const [corner, direction] of [
-    [box.left, -1],
-    [box.left + box.width, 1],
-  ] as const) {
-    for (const [index, reach] of dustReach.entries()) {
-      const dust = spawn(overlay, dustClass);
-      gsap.set(dust, { opacity: 0, x: corner - 2, y: floor - 2 });
-      timeline.set(dust, { opacity: 1 }, at).to(
-        dust,
-        {
-          duration: 0.42,
-          ease: "expo.out",
-          onComplete: () => dust.remove(),
-          opacity: 0,
-          rotation: direction * 90,
-          x: corner - 2 + direction * reach,
-          y: floor - 2 - (dustRise[index] ?? 0),
-        },
-        at
-      );
-    }
+const raise = (block: HTMLElement) => {
+  if (getComputedStyle(block).position === "static") {
+    block.style.position = "relative";
   }
 };
 
-const layBlock = (
-  overlay: HTMLElement,
-  site: BuildSite,
-  origin: Point | null,
-  delay: number,
-  spin: number,
-  onSettled: () => void
+const erect = (block: HTMLElement, index: number, total: number): Scaffold => {
+  raise(block);
+  const root = spawn(block, scaffoldClass);
+  root.setAttribute("aria-hidden", "true");
+  const cover = spawn(root, coverClass);
+  const edges = [
+    spawn(root, edgeClasses[0]),
+    spawn(root, edgeClasses[1]),
+    spawn(root, edgeClasses[2]),
+    spawn(root, edgeClasses[3]),
+  ] as const;
+  const [top, right, bottom, left] = edges;
+  const isLabelled =
+    block.offsetWidth >= labelMinWidth && block.offsetHeight >= labelMinHeight;
+  const ticks = isLabelled
+    ? tickClasses.map((className) => spawn(root, className))
+    : [];
+  const ordinal = ordinalFor(index, total);
+  const tag = isLabelled ? spawn(root, tagClass) : null;
+  if (tag) {
+    tag.textContent = `${ordinal} · ${block.offsetWidth} × ${block.offsetHeight}`;
+    gsap.set(tag, { opacity: 0, y: 4 });
+  }
+  gsap.set([top, bottom], { scaleX: 0 });
+  gsap.set([right, left], { scaleY: 0 });
+  gsap.set(ticks, { opacity: 0, scale: 0.4 });
+  return {
+    block,
+    cover,
+    edges,
+    ordinal,
+    root,
+    tag,
+    ticks,
+  };
+};
+
+const dismantle = (scaffold: Scaffold) => {
+  scaffold.root.remove();
+  scaffold.block.style.removeProperty("position");
+};
+
+const drawFrame = (
+  timeline: gsap.core.Timeline,
+  scaffold: Scaffold,
+  timing: BlockTiming
 ) => {
-  const { block, box, outline } = site;
-  const timeline = gsap.timeline({ delay, onComplete: onSettled });
-  const flight = origin
-    ? throwBrick(
-        timeline,
-        overlay,
-        origin,
-        { x: box.left + box.width / 2, y: box.top },
-        spin
-      )
-    : 0;
-  const impact = flight + dropSeconds;
-  const squash = 1 - Math.min(0.02, 6 / Math.max(box.height, 1));
+  const edge = timing.frame / 5;
+  const [top, right, bottom, left] = scaffold.edges;
   timeline
+    .to(top, { duration: edge, ease: "none", scaleX: 1 }, edge * 0.5)
+    .to(right, { duration: edge, ease: "none", scaleY: 1 }, ">")
+    .to(bottom, { duration: edge, ease: "none", scaleX: 1 }, ">")
+    .to(left, { duration: edge, ease: "power2.out", scaleY: 1 }, ">");
+  if (scaffold.tag) {
+    timeline
+      .to(
+        scaffold.ticks,
+        {
+          duration: edge,
+          ease: "back.out(2)",
+          opacity: 1,
+          scale: 1,
+          stagger: edge / 2,
+        },
+        0
+      )
+      .to(
+        scaffold.tag,
+        { duration: edge * 1.5, ease: "power3.out", opacity: 1, y: 0 },
+        edge
+      );
+  }
+};
+
+const printBlock = (
+  timeline: gsap.core.Timeline,
+  scaffold: Scaffold,
+  timing: BlockTiming
+) => {
+  const head = spawn(scaffold.root, headClass);
+  spawn(head, headLineClass);
+  const nozzle = spawn(head, nozzleClass);
+  const layer = timing.print / timing.layers;
+  const travel = Math.max(0, scaffold.block.offsetWidth - 12);
+  const stepped = `steps(${timing.layers})`;
+  gsap.set(head, { opacity: 0 });
+  timeline
+    .set(head, { opacity: 1 }, timing.frame)
     .fromTo(
-      block,
-      { opacity: 0, y: -dropPixels },
-      { duration: dropSeconds, ease: "power2.in", opacity: 1, y: 0 },
-      flight
-    )
-    .to(
-      block,
+      scaffold.cover,
+      { clipPath: "inset(0% 0% 0% 0%)" },
       {
-        duration: 0.06,
-        ease: "power1.out",
-        scaleX: 1 + (1 - squash) * 0.3,
-        scaleY: squash,
-        transformOrigin: "50% 100%",
+        clipPath: "inset(100% 0% 0% 0%)",
+        duration: timing.print,
+        ease: stepped,
+        pointerEvents: "none",
       },
-      impact
+      timing.frame
     )
-    .to(block, {
-      clearProps: "opacity,pointerEvents,transform,transformOrigin",
-      duration: 0.3,
-      ease: "expo.out",
-      scaleX: 1,
-      scaleY: 1,
-    })
-    .set(outline, { borderColor: "var(--ink)", borderStyle: "solid" }, impact)
-    .to(
-      outline,
+    .fromTo(
+      head,
+      { yPercent: -100 },
+      { duration: timing.print, ease: stepped, yPercent: 0 },
+      timing.frame
+    )
+    .fromTo(
+      nozzle,
+      { x: 0 },
       {
-        duration: 0.32,
-        ease: "power2.out",
-        onComplete: () => outline.remove(),
-        opacity: 0,
+        duration: layer,
+        ease: "sine.inOut",
+        repeat: timing.layers - 1,
+        x: travel,
+        yoyo: true,
       },
-      impact
-    );
-  kickDust(timeline, overlay, box, impact);
+      timing.frame
+    )
+    .to(head, { duration: 0.12, opacity: 0 }, ">");
+};
+
+const finishBlock = (timeline: gsap.core.Timeline, scaffold: Scaffold) => {
+  const { ordinal, tag } = scaffold;
+  if (tag) {
+    timeline.call(() => {
+      tag.textContent = `${ordinal} · built`;
+    });
+  }
+  timeline.to(
+    scaffold.root,
+    { duration: 0.28, ease: "power2.out", opacity: 0 },
+    "+=0.12"
+  );
 };
 
 export const SectionBuild = ({
@@ -226,199 +252,132 @@ export const SectionBuild = ({
 }) => {
   const site = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLDivElement>(null);
-  const scaffold = useRef<HTMLDivElement>(null);
 
   useGSAP(
     (_context, contextSafe) => {
       const root = site.current;
       const blocksRoot = content.current;
-      const overlay = scaffold.current;
-      if (!(root && blocksRoot && overlay && contextSafe)) {
+      if (!(root && blocksRoot && contextSafe)) {
         return;
       }
       const key = `${window.location.pathname}#${id}`;
       if (
         builtSections.has(key) ||
-        window.matchMedia(reducedMotionQuery).matches ||
-        root.getBoundingClientRect().top < window.innerHeight * foldLine
+        window.matchMedia(reducedMotionQuery).matches
       ) {
-        builtSections.add(key);
         return;
       }
-      const section = root.closest("section") ?? root;
-      const sites: BuildSite[] = findBlocks(blocksRoot).map(
-        (block, index, all) => {
-          const outline = spawn(overlay, outlineClass);
-          spawn(outline, tagClass).textContent = tagFor(index, all.length);
-          return {
-            block,
-            box: { height: 0, left: 0, top: 0, width: 0 },
-            outline,
-          };
-        }
-      );
       let state: Construction = idleConstruction;
-      let isInView = false;
-      let settled = 0;
-      let decision: gsap.core.Tween | null = null;
-      let stall: gsap.core.Tween | null = null;
-
-      const measure = () => {
-        if (!(state.phase === "waiting" || state.phase === "constructing")) {
-          return;
-        }
-        const origin = root.getBoundingClientRect();
-        const placed = state.phase === "constructing" ? state.placed : 0;
-        for (const entry of sites.slice(placed)) {
-          const rect = entry.block.getBoundingClientRect();
-          entry.box = {
-            height: rect.height,
-            left: rect.left - origin.left,
-            top: rect.top - origin.top,
-            width: rect.width,
-          };
-          gsap.set(entry.outline, {
-            height: entry.box.height,
-            width: entry.box.width,
-            x: entry.box.left,
-            y: entry.box.top,
-          });
-        }
-      };
-
-      const settle = () => {
-        settled += 1;
-        if (settled === sites.length) {
-          overlay.replaceChildren();
-        }
-      };
-
-      const enter = (next: Construction, previous: Construction) => {
-        root.dataset.construction = next.phase;
-        if (next.phase === "waiting") {
-          gsap.set(
-            sites.map((entry) => entry.block),
-            { opacity: 0, pointerEvents: "none" }
-          );
-          measure();
-          return;
-        }
-        if (next.phase === "built") {
-          decision?.kill();
-          stall?.kill();
-          builtSections.add(key);
-          return;
-        }
-        if (next.phase === "constructing" && previous.phase === "waiting") {
-          decision?.kill();
-          measure();
-        }
-      };
+      let scaffolds: Scaffold[] = [];
+      let sight: IntersectionObserver | null = null;
 
       const dispatch = (event: ConstructionEvent) => {
-        const next = advanceConstruction(state, event);
-        if (next === state) {
-          return;
+        state = advanceConstruction(state, event);
+        root.dataset.construction = state.phase;
+        if (state.phase === "built") {
+          builtSections.add(key);
         }
-        const previous = state;
-        state = next;
-        enter(next, previous);
       };
 
-      const lay = contextSafe((count: number, origin: Point | null) => {
-        if (state.phase !== "constructing") {
-          return;
-        }
-        const group = sites.slice(state.placed, state.placed + count);
-        for (const [offset, entry] of group.entries()) {
-          layBlock(
-            overlay,
-            entry,
-            origin,
-            offset * groupStaggerSeconds,
-            (state.placed + offset) % 2 === 0 ? 180 : -180,
-            settle
-          );
-        }
-        dispatch({ count: group.length, type: "place" });
+      const place = contextSafe((scaffold: Scaffold) => {
+        dismantle(scaffold);
+        releaseBuild(scaffold.block);
+        clearCompanionWorksite(scaffold.block);
+        dispatch({ type: "place" });
       });
 
-      const selfBeat = contextSafe(() => {
-        if (state.phase !== "constructing" || state.source !== "self") {
-          return;
-        }
-        lay(1, null);
-        gsap.delayedCall(selfBeatSeconds, selfBeat);
-      });
-
-      const buildAlone = contextSafe((event: ConstructionEvent) => {
-        stall?.kill();
-        dispatch(event);
-        selfBeat();
-      });
-
-      const decide = contextSafe((waited: number) => {
-        const stop = getCompanionStop();
-        const isComing = stop !== null && section.contains(stop);
-        const limit = isComing
-          ? companionArrivalSeconds
-          : companionGraceSeconds;
-        if (waited >= limit) {
-          buildAlone({ source: "self", type: "begin" });
-          return;
-        }
-        decision = gsap.delayedCall(decisionPollSeconds, () =>
-          decide(waited + decisionPollSeconds)
+      const begin = contextSafe(() => {
+        const blocks = findBlocks(blocksRoot);
+        scaffolds = blocks.map((block, index) =>
+          erect(block, index, blocks.length)
         );
-      });
-
-      const onBeat = contextSafe((beat: CompanionBeat) => {
-        if (!(isInView && section.contains(beat.waypoint))) {
-          return;
+        for (const block of blocks) {
+          holdBuild(block);
         }
-        dispatch({ source: "companion", type: "begin" });
-        if (state.phase !== "constructing" || state.source !== "companion") {
-          return;
-        }
-        const origin = root.getBoundingClientRect();
-        lay(blocksForBeat(state.placed, state.total), {
-          x: beat.x - origin.left,
-          y: beat.y - origin.top,
-        });
-        stall?.kill();
-        if (state.phase === "constructing") {
-          stall = gsap.delayedCall(stallSeconds, () =>
-            buildAlone({ type: "handoff" })
+        releaseBuild(blocksRoot);
+        gsap.set(blocksRoot, { clearProps: "opacity" });
+        dispatch({ total: blocks.length, type: "begin" });
+        const schedule = constructionSchedule(
+          blocks.map((block) => block.offsetHeight)
+        );
+        const beganAt = gsap.ticker.time;
+        let lastLaunch = Number.NEGATIVE_INFINITY;
+        const launch = contextSafe((index: number) => {
+          const scaffold = scaffolds[index];
+          const timing = schedule[index];
+          if (!(scaffold && timing)) {
+            return;
+          }
+          const now = gsap.ticker.time;
+          const at = Math.max(
+            now,
+            beganAt + timing.start,
+            lastLaunch + launchGapSeconds
           );
+          lastLaunch = at;
+          const timeline = gsap.timeline({
+            delay: at - now,
+            onComplete: () => place(scaffold),
+            onStart: () => setCompanionWorksite(scaffold.block),
+          });
+          drawFrame(timeline, scaffold, timing);
+          printBlock(timeline, scaffold, timing);
+          finishBlock(timeline, scaffold);
+        });
+        sight = new IntersectionObserver(
+          contextSafe((entries: IntersectionObserverEntry[]) => {
+            const seen: number[] = [];
+            for (const entry of entries) {
+              if (entry.isIntersecting && entry.target instanceof HTMLElement) {
+                seen.push(blocks.indexOf(entry.target));
+              }
+            }
+            seen.sort((first, second) => first - second);
+            for (const index of seen) {
+              const block = blocks[index];
+              if (block) {
+                sight?.unobserve(block);
+              }
+              launch(index);
+            }
+          }),
+          { rootMargin: "0px 0px -10% 0px" }
+        );
+        for (const block of blocks) {
+          sight.observe(block);
         }
       });
 
-      dispatch({ total: sites.length, type: "arm" });
-      if (state.phase === "built") {
-        return;
-      }
+      dispatch({ type: "arm" });
+      holdBuild(blocksRoot);
+      gsap.set(blocksRoot, { opacity: 0 });
 
-      const resize = new ResizeObserver(() => measure());
-      resize.observe(root);
+      let isFirstReport = true;
       const view = new IntersectionObserver(
-        ([entry]) => {
+        contextSafe(([entry]: IntersectionObserverEntry[]) => {
+          const leadIn = isFirstReport
+            ? loadLeadInSeconds
+            : scrollLeadInSeconds;
+          isFirstReport = false;
           if (!entry?.isIntersecting) {
             return;
           }
           view.disconnect();
-          isInView = true;
-          decide(0);
-        },
+          gsap.delayedCall(leadIn, begin);
+        }),
         { rootMargin: "0px 0px -15% 0px" }
       );
       view.observe(root);
-      const unsubscribe = subscribeCompanionBeat(onBeat);
 
       return () => {
-        unsubscribe();
         view.disconnect();
-        resize.disconnect();
-        overlay.replaceChildren();
+        sight?.disconnect();
+        for (const scaffold of scaffolds) {
+          dismantle(scaffold);
+          releaseBuild(scaffold.block);
+          clearCompanionWorksite(scaffold.block);
+        }
+        releaseBuild(blocksRoot);
         delete root.dataset.construction;
       };
     },
@@ -430,11 +389,6 @@ export const SectionBuild = ({
       <div className="flex flex-col gap-6" ref={content}>
         {children}
       </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-10 select-none"
-        ref={scaffold}
-      />
     </div>
   );
 };
