@@ -5,7 +5,7 @@ import { ContributionMatrix } from "@/components/profile/contribution-matrix";
 import { ExperienceSection } from "@/components/profile/experience/experience-section";
 import { HowIWork } from "@/components/profile/how-i-work";
 import { ProfileIntro } from "@/components/profile/profile-intro";
-import { PinnedSection } from "@/components/profile/repo-shelf/pinned-section";
+import { PinnedSection } from "@/components/profile/card-catalog/pinned-section";
 import { getGithubProfile } from "@/lib/site/github-profile";
 
 export const revalidate = 3600;
