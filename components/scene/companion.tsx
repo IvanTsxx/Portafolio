@@ -1,7 +1,13 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { lazy, useEffect, useEffectEvent, useRef } from "react";
+import {
+  lazy,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useSyncExternalStore,
+} from "react";
 import type { PointerEvent, RefObject } from "react";
 
 import type { AgentPointer } from "@/components/agents/use-agent-rig";
@@ -9,12 +15,19 @@ import { companionCastFor } from "@/lib/site/companion-roles";
 
 import type { ColumnBounds } from "./companion-placement";
 import { notifyCompanionActivate, useCompanionLine } from "./companion-signals";
+import { StationTracker } from "./station-tracker";
 import { requestSceneFrame, useViewSlot, viewPriority } from "./view-registry";
 import { useWebGLSupport } from "./webgl-support";
 
 const CompanionContent = lazy(() => import("./companion-content"));
 
 const companionSlotId = "agent-companion";
+const subscribeToLoad = (onChange: () => void) => {
+  window.addEventListener("load", onChange);
+  return () => window.removeEventListener("load", onChange);
+};
+const isClient = () => true;
+const isServer = () => false;
 const readingColumnSelector = "[data-reading-column]";
 
 const measureColumn = (element: HTMLElement): ColumnBounds => {
@@ -65,19 +78,21 @@ const SpeechBubble = ({
       className="group/speech pointer-events-none fixed top-0 left-0 z-30 size-0"
       data-agent-speech=""
       data-shown="false"
+      data-side="above"
+      data-tail="true"
       ref={bubble}
     >
       <p
         aria-atomic
         aria-live="polite"
-        className="border-ink bg-paper text-ink ease-out-quart before:bg-ink absolute bottom-0 left-0 m-0 w-max max-w-(--speech-width) translate-y-1 border px-3 py-2 font-mono text-xs leading-snug text-pretty opacity-0 transition-[opacity,translate] duration-200 select-none group-data-[shown=true]/speech:translate-y-0 group-data-[shown=true]/speech:opacity-100 before:absolute before:-bottom-2 before:left-(--speech-tail) before:h-2 before:w-px motion-reduce:transition-opacity"
+        className="border-ink bg-paper text-ink ease-out-quart before:bg-ink absolute bottom-0 left-0 m-0 w-max max-w-(--speech-width) translate-y-1 border px-3 py-2 font-mono text-xs leading-snug text-pretty opacity-0 transition-[opacity,translate] duration-200 select-none group-data-[shown=true]/speech:translate-y-0 group-data-[shown=true]/speech:opacity-100 group-data-[side=below]/speech:top-0 group-data-[side=below]/speech:bottom-auto before:absolute before:-bottom-2 before:left-(--speech-tail) before:h-2 before:w-px group-data-[side=below]/speech:before:-top-2 group-data-[side=below]/speech:before:bottom-auto group-data-[tail=false]/speech:before:hidden motion-reduce:transition-opacity"
       >
         {line ? (
           <>
             <span aria-hidden className="text-mist">
               ›{" "}
             </span>
-            {line}
+            {line.isQuiet ? <span aria-hidden>{line.text}</span> : line.text}
           </>
         ) : null}
       </p>
@@ -99,6 +114,7 @@ const CompanionStage = () => {
     y: 0,
   });
   const presses = useRef(0);
+  const isHydrated = useSyncExternalStore(subscribeToLoad, isClient, isServer);
 
   useViewSlot(
     companionSlotId,
@@ -136,6 +152,7 @@ const CompanionStage = () => {
           requestSceneFrame();
         }}
       />
+      {isHydrated ? <StationTracker /> : null}
       <SpeechBubble bubble={bubble} />
       <div
         aria-hidden
