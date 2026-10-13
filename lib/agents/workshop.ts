@@ -20,7 +20,7 @@ export interface WorkshopState {
   role: AgentRole;
 }
 
-export const defaultWorkshopRole = "builder" satisfies AgentRole;
+export const defaultWorkshopRole = "orchestrator" satisfies AgentRole;
 
 export const presetState = (role: AgentRole): WorkshopState => ({
   action: agentProfiles[role].signatureActions[0],

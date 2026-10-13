@@ -11,10 +11,11 @@ import {
 import type { PointerEvent, RefObject } from "react";
 
 import type { AgentPointer } from "@/components/agents/use-agent-rig";
-import { companionCastFor } from "@/lib/site/companion-roles";
+import { companionCastFor, showcasesTheRig } from "@/lib/site/companion-roles";
 
 import type { ColumnBounds } from "./companion-placement";
 import { notifyCompanionActivate, useCompanionLine } from "./companion-signals";
+import { useCompanionWardrobe } from "./companion-wardrobe";
 import { StationTracker } from "./station-tracker";
 import { requestSceneFrame, useViewSlot, viewPriority } from "./view-registry";
 import { useWebGLSupport } from "./webgl-support";
@@ -85,7 +86,7 @@ const SpeechBubble = ({
       <p
         aria-atomic
         aria-live="polite"
-        className="border-ink bg-paper text-ink ease-out-quart before:bg-ink absolute bottom-0 left-0 m-0 w-max max-w-(--speech-width) translate-y-1 border px-3 py-2 font-mono text-xs leading-snug text-pretty opacity-0 transition-[opacity,translate] duration-200 select-none group-data-[shown=true]/speech:translate-y-0 group-data-[shown=true]/speech:opacity-100 group-data-[side=below]/speech:top-0 group-data-[side=below]/speech:bottom-auto before:absolute before:-bottom-2 before:left-(--speech-tail) before:h-2 before:w-px group-data-[side=below]/speech:before:-top-2 group-data-[side=below]/speech:before:bottom-auto group-data-[tail=false]/speech:before:hidden motion-reduce:transition-opacity"
+        className="border-ink bg-paper text-ink ease-out-quart before:bg-ink absolute bottom-0 left-0 m-0 w-max max-w-(--speech-width) translate-y-1 border px-2.5 py-1.5 font-mono text-xs/snug text-pretty opacity-0 transition-[opacity,translate] duration-200 select-none group-data-[shown=true]/speech:translate-y-0 group-data-[shown=true]/speech:opacity-100 group-data-[side=below]/speech:top-0 group-data-[side=below]/speech:bottom-auto before:absolute before:-bottom-2 before:left-(--speech-tail) before:h-2 before:w-px group-data-[side=below]/speech:before:-top-2 group-data-[side=below]/speech:before:bottom-auto group-data-[tail=false]/speech:before:hidden motion-reduce:transition-opacity"
       >
         {line ? (
           <>
@@ -114,6 +115,7 @@ const CompanionStage = () => {
     y: 0,
   });
   const presses = useRef(0);
+  const wardrobe = useCompanionWardrobe();
   const isHydrated = useSyncExternalStore(subscribeToLoad, isClient, isServer);
 
   useViewSlot(
@@ -126,6 +128,7 @@ const CompanionStage = () => {
       hit={hit}
       pointer={pointer}
       presses={presses}
+      wardrobe={wardrobe}
     />,
     true,
     viewPriority.overlay
@@ -179,5 +182,6 @@ const CompanionStage = () => {
 
 export const Companion = () => {
   const hasWebGL = useWebGLSupport();
-  return hasWebGL ? <CompanionStage /> : null;
+  const isShowcase = showcasesTheRig(usePathname());
+  return hasWebGL && !isShowcase ? <CompanionStage /> : null;
 };

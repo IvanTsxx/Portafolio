@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { MissingRoute } from "@/components/not-found/missing-route";
-import { AgentScene } from "@/components/scene/agent-scene";
+import { StageScene } from "@/components/scene/stage-scene";
 import { Dossier } from "@/components/site/dossier";
 
 export const metadata: Metadata = {
@@ -60,9 +60,10 @@ const NotFound = () => (
           <span>Fig. 404 · Debugging</span>
           <span>AG-04</span>
         </p>
-        <AgentScene
-          label="The debugger agent inspects a code panel, finds the bug and resolves the broken line"
-          scene="debugging"
+        <StageScene
+          className="aspect-4/3"
+          label="The companion inspects a code panel, catches the bug and fixes the broken line"
+          stage="debug"
         />
       </div>
     </section>

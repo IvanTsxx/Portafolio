@@ -33,9 +33,9 @@ bun run build           # shadcn build (public/r) + next build
 - Global search palette (`⌘K`, `Ctrl+K`, `/`): the server builds the index in `lib/search/build-index.ts` from the content, lab, registry and config loaders, `lib/search/match.ts` matches and returns highlight ranges, and `components/command/**` renders it. A new route, section, note, experiment or registry item shows up without touching the palette, except a new home section, which is listed in `homeSections` in `lib/site/config.ts`.
 - Header stars chip: `lib/site/github-repo.ts` reads `stargazers_count` for `siteConfig.repository` hourly and hides the count when GitHub does not answer.
 - Design tokens and utilities (`label`, `display`, `blueprint-grid`, `grain`): `app/globals.css`. Direction notes: `docs/direction.md`.
-- Agent roles and scenes: `lib/agents/roles.ts`, `lib/agents/scenes.ts`.
+- Agent roles and stages: `lib/agents/roles.ts`, `lib/agents/stages.ts`.
 - Character rig, actions, materials, accessory kits: `components/agents/**`. Notes: `docs/characters.md`.
-- Shared canvas: `components/scene/scene-layer.tsx` is mounted once in the root layout and loads three.js only when a slot appears. The companion picks its role from the route and docks beside the reading column. Mark scenes with `<AgentScene scene label />` (`debugging`, `figma-to-code`, `feature`, `code-search`).
+- Shared canvas: `components/scene/scene-layer.tsx` is mounted once in the root layout and loads three.js only when a slot appears. The companion picks its role from the route and docks beside the reading column. Stage props with `<StageScene stage label />`; the companion walks in and acts.
 - GitHub data: `lib/github/profile.ts` reads `GITHUB_TOKEN` from `.env.local`, revalidates hourly, and falls back to `lib/github/snapshot.json` (refresh with `bun lib/github/write-snapshot.ts`). `lib/github/privacy.ts` strips anything matching basement before render.
 - How I work and stack copy: `lib/site/practice.ts`.
 

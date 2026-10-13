@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { companionCastFor } from "./companion-roles";
+import { companionCastFor, showcasesTheRig } from "./companion-roles";
 
 describe("companion cast per route", () => {
   test("each top-level section dresses the companion in one role", () => {
@@ -26,5 +26,16 @@ describe("companion cast per route", () => {
   test("unknown routes and lookalike prefixes fall back to the home cast", () => {
     expect(companionCastFor("/notebook")).toEqual(companionCastFor("/"));
     expect(companionCastFor("/dev/agents")).toEqual(companionCastFor("/"));
+  });
+
+  test("pages that show the rig itself keep the companion off, so one agent is ever on screen", () => {
+    expect(showcasesTheRig("/dev/agents")).toBe(true);
+    expect(showcasesTheRig("/registry/agent")).toBe(true);
+    expect(showcasesTheRig("/registry/agent-stage/")).toBe(true);
+    expect(showcasesTheRig("/lab/module-assembly")).toBe(true);
+    expect(showcasesTheRig("/registry")).toBe(false);
+    expect(showcasesTheRig("/registry/agent-status-card")).toBe(false);
+    expect(showcasesTheRig("/lab/dot-grid")).toBe(false);
+    expect(showcasesTheRig("/")).toBe(false);
   });
 });

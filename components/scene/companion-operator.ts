@@ -9,6 +9,12 @@ export interface Point {
   y: number;
 }
 
+export interface StageAct {
+  action: AgentAction;
+  scale: number;
+  yaw: number;
+}
+
 interface Press {
   isImpacted: boolean;
   startedAt: number;
@@ -16,8 +22,8 @@ interface Press {
 
 export type OperatorMode =
   | { kind: "rail" }
-  | { kind: "yielding" }
   | {
+      act: StageAct;
       duration: number;
       from: Point;
       kind: "travelling";
@@ -25,15 +31,23 @@ export type OperatorMode =
       stationId: string;
     }
   | {
+      act: StageAct;
       controlIndex: number;
       kind: "operating";
       nextPressAt: number;
       press: Press | null;
       stationId: string;
     }
-  | { duration: number; from: Point; kind: "returning"; startedAt: number };
+  | {
+      act: StageAct;
+      duration: number;
+      from: Point;
+      kind: "returning";
+      startedAt: number;
+    };
 
 export interface OperatorTarget {
+  act: StageAct;
   console: Point;
   controls: readonly FigureControl[];
   id: string;
@@ -43,7 +57,6 @@ export interface OperatorInput {
   canOperate: boolean;
   home: Point;
   isEngaged: boolean;
-  isYielding: boolean;
   position: Point;
   target: OperatorTarget | null;
   time: number;
@@ -70,7 +83,7 @@ export interface OperatorPose {
 export interface OperatorPlacement {
   goal: Point;
   pose: OperatorPose | null;
-  stationShare: number;
+  scale: number;
 }
 
 export const firstPressDelay = 1.6;
@@ -85,9 +98,15 @@ const travelArc = 28;
 const travelHops = 3;
 const travelHop = 6;
 const travelYaw = 1.1;
-const consoleYaw = -0.12;
+export const consoleYaw = -0.12;
 const enterPresence = 0.7;
 const leavePresence = 0.45;
+
+export const stationAct: StageAct = {
+  action: "inspect",
+  scale: 1,
+  yaw: consoleYaw,
+};
 
 export const railMode: OperatorMode = { kind: "rail" };
 
@@ -96,9 +115,12 @@ const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 export const easeInOutCubic = (value: number) =>
   value < 0.5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 3 / 2;
 
+const lerp = (from: number, to: number, share: number) =>
+  from + (to - from) * share;
+
 const lerpPoint = (from: Point, to: Point, share: number): Point => ({
-  x: from.x + (to.x - from.x) * share,
-  y: from.y + (to.y - from.y) * share,
+  x: lerp(from.x, to.x, share),
+  y: lerp(from.y, to.y, share),
 });
 
 export const travelDuration = (from: Point, to: Point) =>
@@ -112,6 +134,7 @@ const travelTo = (
   target: OperatorTarget,
   time: number
 ): OperatorMode => ({
+  act: target.act,
   duration: travelDuration(position, target.console),
   from: position,
   kind: "travelling",
@@ -119,7 +142,8 @@ const travelTo = (
   stationId: target.id,
 });
 
-const returnHome = (input: OperatorInput): OperatorMode => ({
+const returnHome = (input: OperatorInput, act: StageAct): OperatorMode => ({
+  act,
   duration: travelDuration(input.position, input.home),
   from: input.position,
   kind: "returning",
@@ -129,9 +153,11 @@ const returnHome = (input: OperatorInput): OperatorMode => ({
 const idle = (mode: OperatorMode): OperatorStep => ({ effect: null, mode });
 
 const stepOperating = (
-  mode: Extract<OperatorMode, { kind: "operating" }>,
+  current: Extract<OperatorMode, { kind: "operating" }>,
   { isEngaged, target, time }: OperatorInput & { target: OperatorTarget }
 ): OperatorStep => {
+  const mode =
+    current.act === target.act ? current : { ...current, act: target.act };
   const { press } = mode;
   if (!press) {
     if (isEngaged) {
@@ -172,51 +198,48 @@ export const stepOperator = (
   mode: OperatorMode,
   input: OperatorInput
 ): OperatorStep => {
-  if (input.isYielding) {
-    return idle(mode.kind === "yielding" ? mode : { kind: "yielding" });
-  }
-  const current = mode.kind === "yielding" ? railMode : mode;
   const target = input.canOperate ? input.target : null;
-  switch (current.kind) {
+  switch (mode.kind) {
     case "rail": {
-      return idle(
-        target ? travelTo(input.position, target, input.time) : current
-      );
+      return idle(target ? travelTo(input.position, target, input.time) : mode);
     }
     case "travelling": {
       if (!target) {
-        return idle(returnHome(input));
+        return idle(returnHome(input, mode.act));
       }
-      if (target.id !== current.stationId) {
+      if (target.id !== mode.stationId) {
         return idle(travelTo(input.position, target, input.time));
       }
-      if (input.time - current.startedAt < current.duration) {
-        return idle(current);
+      if (input.time - mode.startedAt < mode.duration) {
+        return idle(
+          mode.act === target.act ? mode : { ...mode, act: target.act }
+        );
       }
       return idle({
+        act: target.act,
         controlIndex: 0,
         kind: "operating",
         nextPressAt: input.time + firstPressDelay,
         press: null,
-        stationId: current.stationId,
+        stationId: mode.stationId,
       });
     }
     case "operating": {
-      if (!target || target.id !== current.stationId) {
-        return idle(returnHome(input));
+      if (!target || target.id !== mode.stationId) {
+        return idle(returnHome(input, mode.act));
       }
-      return stepOperating(current, { ...input, target });
+      return stepOperating(mode, { ...input, target });
     }
     case "returning": {
       if (target) {
         return idle(travelTo(input.position, target, input.time));
       }
       return idle(
-        input.time - current.startedAt < current.duration ? current : railMode
+        input.time - mode.startedAt < mode.duration ? mode : railMode
       );
     }
     default: {
-      return idle(current);
+      return idle(mode);
     }
   }
 };
@@ -235,7 +258,7 @@ const travelPose = (
   yaw: to.x < from.x ? -travelYaw : travelYaw,
 });
 
-export const pressPose = (progress: number): OperatorPose => {
+export const pressPose = (progress: number, yaw = consoleYaw): OperatorPose => {
   if (progress < pressImpact) {
     const windup = Math.sin((progress / pressImpact) * Math.PI * 0.5);
     return {
@@ -243,7 +266,7 @@ export const pressPose = (progress: number): OperatorPose => {
       lean: -0.06 * windup,
       lift: 6 * windup,
       squash: 1 + 0.06 * windup,
-      yaw: consoleYaw,
+      yaw,
     };
   }
   const release = (progress - pressImpact) / (1 - pressImpact);
@@ -253,17 +276,17 @@ export const pressPose = (progress: number): OperatorPose => {
     lean: 0.14 * settle,
     lift: -3 * settle,
     squash: 1 - 0.14 * settle,
-    yaw: consoleYaw,
+    yaw,
   };
 };
 
-const waitingPose: OperatorPose = {
-  action: "inspect",
+const actingPose = (act: StageAct): OperatorPose => ({
+  action: act.action,
   lean: 0,
   lift: 0,
   squash: 1,
-  yaw: consoleYaw,
-};
+  yaw: act.yaw,
+});
 
 export const operatorPlacement = (
   mode: OperatorMode,
@@ -277,7 +300,7 @@ export const operatorPlacement = (
       return {
         goal: lerpPoint(mode.from, destination, share),
         pose: travelPose(progress, mode.from, destination),
-        stationShare: share,
+        scale: lerp(1, mode.act.scale, share),
       };
     }
     case "operating": {
@@ -286,8 +309,11 @@ export const operatorPlacement = (
         : null;
       return {
         goal: console ?? home,
-        pose: press === null ? waitingPose : pressPose(press),
-        stationShare: 1,
+        pose:
+          press === null
+            ? actingPose(mode.act)
+            : pressPose(press, mode.act.yaw),
+        scale: mode.act.scale,
       };
     }
     case "returning": {
@@ -296,16 +322,17 @@ export const operatorPlacement = (
       return {
         goal: lerpPoint(mode.from, home, share),
         pose: travelPose(progress, mode.from, home),
-        stationShare: 1 - share,
+        scale: lerp(mode.act.scale, 1, share),
       };
     }
     default: {
-      return { goal: home, pose: null, stationShare: 0 };
+      return { goal: home, pose: null, scale: 1 };
     }
   }
 };
 
 export interface StationView {
+  clearance: number;
   console: ScreenRect;
   figure: ScreenRect;
   id: string;
@@ -314,14 +341,14 @@ export interface StationView {
 export const consoleClearance = 72;
 
 const consoleReachable = (
-  rect: ScreenRect,
+  { clearance, console }: StationView,
   viewport: Viewport,
   headerClearance: number
 ) =>
-  rect.top - consoleClearance >= headerClearance &&
-  rect.bottom <= viewport.height &&
-  rect.left >= 0 &&
-  rect.right <= viewport.width;
+  console.top - clearance >= headerClearance &&
+  console.bottom <= viewport.height &&
+  console.left >= 0 &&
+  console.right <= viewport.width;
 
 export const pickStation = (
   stations: readonly StationView[],
@@ -333,7 +360,7 @@ export const pickStation = (
   if (
     current &&
     castPresence(current.figure, viewport) >= leavePresence &&
-    consoleReachable(current.console, viewport, headerClearance)
+    consoleReachable(current, viewport, headerClearance)
   ) {
     return current.id;
   }
@@ -342,7 +369,7 @@ export const pickStation = (
     const presence = castPresence(station.figure, viewport);
     if (
       presence >= enterPresence &&
-      consoleReachable(station.console, viewport, headerClearance) &&
+      consoleReachable(station, viewport, headerClearance) &&
       presence > (best?.presence ?? 0)
     ) {
       best = { id: station.id, presence };

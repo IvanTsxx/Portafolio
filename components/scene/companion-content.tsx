@@ -12,6 +12,7 @@ import { Vector3 } from "three";
 
 import type { AgentPointer } from "@/components/agents/agent";
 import { Agent } from "@/components/agents/agent";
+import type { Outfit as AgentOutfit } from "@/components/agents/outfit";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 import type { CompanionCast } from "@/lib/site/companion-roles";
@@ -32,12 +33,15 @@ import type {
   StationView,
 } from "./companion-operator";
 import {
+  consoleClearance,
   operatorPlacement,
   pickStation,
   railMode,
+  stationAct,
   stepOperator,
 } from "./companion-operator";
 import type {
+  BubbleSlot,
   ColumnBounds,
   CompanionDock,
   DockGoal,
@@ -47,16 +51,15 @@ import {
   bubbleSide,
   companionDock,
   dockGoal,
+  headBubbleSlot,
   headerClearance,
-  shouldYield,
-  stationScale,
   watchYaw,
 } from "./companion-placement";
 import { getCompanionRail } from "./companion-rail";
 import { railShare } from "./companion-rail-math";
 import type { SpokenSection } from "./companion-signals";
 import { getSpokenSection, sayCompanionLine } from "./companion-signals";
-import type { TrackedStation } from "./station-tracking";
+import { getCompanionStages } from "./companion-stages";
 import {
   getFocusLine,
   getTrackedStations,
@@ -64,7 +67,6 @@ import {
   toScreen,
 } from "./station-tracking";
 import { ViewLights } from "./view-lights";
-import { getAgentCasts } from "./view-registry";
 
 export interface CompanionContentProps {
   bubble: RefObject<HTMLDivElement | null>;
@@ -73,6 +75,7 @@ export interface CompanionContentProps {
   hit: RefObject<HTMLDivElement | null>;
   pointer: RefObject<AgentPointer>;
   presses: RefObject<number>;
+  wardrobe: AgentOutfit | null;
 }
 
 interface Outfit {
@@ -91,12 +94,18 @@ interface Speech {
   text: string | null;
 }
 
+interface Candidate {
+  operate: ((controlId: string) => void) | null;
+  target: OperatorTarget;
+  view: StationView;
+}
+
 const modelHeight = 2.2;
 const baseTilt = 0.16;
 const depthClearPriority = 2.5;
-const speechSeconds = 7;
+const speechSeconds = 6;
 const operatorSpeechSeconds = 3.2;
-const speechGap = 12;
+const speechGap = 10;
 const tailInset = 8;
 const shownScale = 0.85;
 
@@ -104,9 +113,6 @@ const readViewport = (): Viewport => ({
   height: window.innerHeight,
   width: document.documentElement.clientWidth,
 });
-
-const castRects = () =>
-  Array.from(getAgentCasts(), (cast) => cast.getBoundingClientRect());
 
 const placeHitBox = (
   hit: HTMLDivElement | null,
@@ -130,17 +136,29 @@ const placeHitBox = (
   hit.style.pointerEvents = isInteractive ? "auto" : "none";
 };
 
-const placeBubble = (
-  bubble: HTMLDivElement | null,
-  state: CompanionMotion,
-  dock: CompanionDock | null,
-  lift: number,
-  isShown: boolean
-) => {
+const placeBubble = ({
+  bubble,
+  dock,
+  isAway,
+  isShown,
+  lift,
+  state,
+  viewport,
+}: {
+  bubble: HTMLDivElement | null;
+  dock: CompanionDock | null;
+  isAway: boolean;
+  isShown: boolean;
+  lift: number;
+  state: CompanionMotion;
+  viewport: Viewport;
+}) => {
   if (!bubble) {
     return;
   }
-  const slot = dock && dock.kind !== "corner" ? dock.bubble : null;
+  const docked = dock && dock.kind !== "corner" ? dock.bubble : null;
+  const slot: BubbleSlot | null =
+    isAway || !docked ? headBubbleSlot(viewport, state.x) : docked;
   if (!(dock && slot)) {
     bubble.dataset.shown = "false";
     return;
@@ -162,31 +180,60 @@ const placeBubble = (
 const lineFor = (section: SpokenSection, visit: number) =>
   section.lines[visit % section.lines.length] ?? null;
 
-const stationViews = (tracked: readonly TrackedStation[]): StationView[] =>
-  tracked.map((entry) => ({
-    console: toScreen(entry.console),
-    figure: toScreen(entry.figure),
-    id: entry.station.id,
-  }));
+const stationCandidates = (): Candidate[] =>
+  getTrackedStations().map((entry) => {
+    const console = toScreen(entry.console);
+    return {
+      operate: entry.station.operate,
+      target: {
+        act: stationAct,
+        console: { x: (console.left + console.right) / 2, y: console.top },
+        controls: entry.station.controls,
+        id: entry.station.id,
+      },
+      view: {
+        clearance: consoleClearance,
+        console,
+        figure: toScreen(entry.figure),
+        id: entry.station.id,
+      },
+    };
+  });
 
-const targetFor = (
-  views: readonly StationView[],
-  tracked: readonly TrackedStation[],
-  id: string | null
-): OperatorTarget | null => {
-  const view = views.find((candidate) => candidate.id === id);
-  const entry = tracked.find((candidate) => candidate.station.id === id);
-  if (!(view && entry)) {
-    return null;
+const stageCandidates = (dock: CompanionDock): Candidate[] => {
+  const candidates: Candidate[] = [];
+  for (const stage of getCompanionStages()) {
+    const spot = stage.spot();
+    if (!spot) {
+      continue;
+    }
+    const height = spot.height ?? dock.frame.agentHeight;
+    candidates.push({
+      operate: null,
+      target: {
+        act: {
+          action: spot.action,
+          scale: height / dock.frame.agentHeight,
+          yaw: spot.yaw,
+        },
+        console: { x: spot.x, y: spot.y },
+        controls: [],
+        id: stage.id,
+      },
+      view: {
+        clearance: 0,
+        console: {
+          bottom: spot.y,
+          left: spot.x - 1,
+          right: spot.x + 1,
+          top: spot.y - height,
+        },
+        figure: stage.figure.getBoundingClientRect(),
+        id: stage.id,
+      },
+    });
   }
-  return {
-    console: {
-      x: (view.console.left + view.console.right) / 2,
-      y: view.console.top,
-    },
-    controls: entry.station.controls,
-    id: entry.station.id,
-  };
+  return candidates;
 };
 
 const modeStationId = (mode: OperatorMode) =>
@@ -210,6 +257,7 @@ const CompanionContent = ({
   hit,
   pointer,
   presses,
+  wardrobe,
 }: CompanionContentProps) => {
   const isReduced = useReducedMotion();
   const camera = useRef<OrthographicCameraImpl>(null);
@@ -227,7 +275,6 @@ const CompanionContent = ({
   const operatorLine = useRef<{ at: number; text: string } | null>(null);
   const motion = useRef<CompanionMotion | null>(null);
   const operator = useRef<OperatorMode>(railMode);
-  const isYieldingRef = useRef(false);
   const [outfit, setOutfit] = useState<Outfit>({
     role: cast.role,
     toss: null,
@@ -300,55 +347,52 @@ const CompanionContent = ({
 
   const steer = ({
     dock,
-    isYielding,
     restGoal,
     state,
     time,
     viewport,
   }: {
     dock: CompanionDock;
-    isYielding: boolean;
     restGoal: DockGoal;
     state: CompanionMotion;
     time: number;
     viewport: Viewport;
   }): Steering => {
     const home: Point = { x: restGoal.x, y: restGoal.y };
-    const tracked = getTrackedStations();
-    const views = stationViews(tracked);
-    const canOperate = !isReduced && dock.kind !== "corner";
-    const targetId = canOperate
-      ? pickStation(
-          views,
-          viewport,
-          modeStationId(operator.current),
-          headerClearance
-        )
-      : null;
-    const target = targetFor(views, tracked, targetId);
+    const candidates = isReduced
+      ? []
+      : [
+          ...(dock.kind === "corner" ? [] : stationCandidates()),
+          ...stageCandidates(dock),
+        ];
+    const targetId = pickStation(
+      candidates.map((candidate) => candidate.view),
+      viewport,
+      modeStationId(operator.current),
+      headerClearance
+    );
+    const chosen =
+      candidates.find((candidate) => candidate.view.id === targetId) ?? null;
     const { effect, mode } = stepOperator(operator.current, {
-      canOperate,
+      canOperate: !isReduced,
       home,
       isEngaged: targetId ? isStationEngaged(targetId) : false,
-      isYielding,
       position: state.isPlaced ? { x: state.x, y: state.y } : home,
-      target,
+      target: chosen?.target ?? null,
       time,
     });
     operator.current = mode;
     if (effect) {
-      tracked
-        .find((entry) => entry.station.id === effect.stationId)
-        ?.station.operate(effect.control.id);
+      chosen?.operate?.(effect.control.id);
       operatorLine.current = { at: time, text: effect.control.label };
     }
     const placement = operatorPlacement(mode, {
-      console: target?.console ?? null,
+      console: chosen?.target.console ?? null,
       home,
       time,
     });
     if (!placement.pose) {
-      const isWatching = getFocusLine() !== null && !isYielding;
+      const isWatching = getFocusLine() !== null;
       return {
         goal: { ...restGoal, yaw: isWatching ? watchYaw : restGoal.yaw },
         pinned: null,
@@ -356,7 +400,7 @@ const CompanionContent = ({
     }
     return {
       goal: {
-        scale: 1 + (stationScale(dock) - 1) * placement.stationShare,
+        scale: placement.scale,
         x: placement.goal.x,
         y: placement.goal.y,
         yaw: placement.pose.yaw,
@@ -384,7 +428,15 @@ const CompanionContent = ({
     if (!dock) {
       spinner.visible = false;
       placeHitBox(hit.current, state, null, 0, false);
-      placeBubble(bubble.current, state, null, 0, false);
+      placeBubble({
+        bubble: bubble.current,
+        dock: null,
+        isAway: false,
+        isShown: false,
+        lift: 0,
+        state,
+        viewport,
+      });
       return;
     }
     const zoom = dock.frame.agentHeight / modelHeight;
@@ -394,22 +446,14 @@ const CompanionContent = ({
     }
 
     const section = listenToSection(time);
-    const isYielding = shouldYield(
-      castRects(),
-      viewport,
-      isYieldingRef.current
-    );
-    isYieldingRef.current = isYielding;
     const { scrollY } = window;
     const restGoal = dockGoal(dock, {
       isTucked: !isReduced && state.scrollVelocity > tuckSpeed,
-      isYielding,
       railShare:
         rail && dock.kind === "rail" ? railShare(scrollY, rail.anchors) : 0,
     });
     const { goal, pinned } = steer({
       dock,
-      isYielding,
       restGoal,
       state,
       time,
@@ -437,18 +481,19 @@ const CompanionContent = ({
       0
     );
     playCue(pose.cue, group.position);
-    const isPresent =
-      !isYielding && goal.scale > 0.5 && state.scale > shownScale * goal.scale;
+    const isPresent = goal.scale > 0.5 && state.scale > shownScale * goal.scale;
     placeHitBox(hit.current, state, dock, pose.lift, isPresent);
     const speech = chooseSpeech(time, section);
     sayCompanionLine(speech.text, speech.isQuiet);
-    placeBubble(
-      bubble.current,
-      state,
+    placeBubble({
+      bubble: bubble.current,
       dock,
-      pose.lift,
-      isPresent && speech.isShown && speech.text !== null
-    );
+      isAway: pinned !== null,
+      isShown: isPresent && speech.isShown && speech.text !== null,
+      lift: pose.lift,
+      state,
+      viewport,
+    });
   });
 
   return (
@@ -458,7 +503,13 @@ const CompanionContent = ({
       <ClearDepth />
       <group ref={mover}>
         <group ref={body}>
-          <Agent actionRef={actionRef} pointer={pointer} role={outfit.role} />
+          <Agent
+            actionRef={actionRef}
+            animateOutfit={wardrobe !== null}
+            outfit={wardrobe ?? undefined}
+            pointer={pointer}
+            role={outfit.role}
+          />
         </group>
       </group>
       <PaperPoof ref={poof} />

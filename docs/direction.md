@@ -20,8 +20,9 @@ Ivo's portfolio (Ivan Bongiovanni; the surname appears once, in the dossier). Th
 ## 3D contract
 
 - One shared Canvas for the whole site, mounted once in `app/layout.tsx`, rendering into DOM-tracked views (drei `View`). Never a second Canvas.
-- One companion agent per page, in the gutter beside the reading column. The route picks its role and action; a route change swaps the outfit with a spin, paper poof and hat toss. It follows the scroll calmly, steps aside while a section's own agents are in view, and speaks the lines of the section in the middle of the viewport.
-- `components/scene/agent-scene.tsx`: `<AgentScene scene label className />`, a box where a full scene plays while visible. The companion steps aside while a scene is at least half visible, so a view holds one agent cast. Scenes: `debugging`, used by the not-found page (`lib/agents/scenes.ts`). How I work is an isometric figure, not a scene: an indexing table in `components/profile/how-i-work/`.
+- One agent on screen: the companion, 48 to 56 px tall beside the dossier sheet (on the thumb index lane when it shows). The route picks its role and action; a route change swaps the outfit with a spin, paper poof and hat toss. It follows the scroll calmly and narrates one short first-person line per section. Pages that show the rig itself (`/dev`, `/registry/agent`, `/registry/agent-stage`, `/lab/module-assembly`) keep it off; `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.
+- The companion is the actor everywhere. Section builds, figure stations, the How I work stages, the 404 stage and the Workshop fitting room register a spot (`components/scene/companion-stages.ts`); it walks there, grows to the spot's size and performs the spot's action.
+- `components/scene/stage-scene.tsx`: `<StageScene stage label className />` renders props only (`components/scene/scenes/`, ids in `lib/agents/stages.ts`): one merged mesh, one instanced mesh and one shadow mesh per stage. Used by How I work (seven steps) and the not-found page (`debug`).
 - Every agent reacts to hover with a reaction from a pool (wave, jump, spin, look, salute, shuffle, surprised, peek), never the same one twice in a row.
 - Static, meaningful fallback when WebGL is off; reduced motion freezes poses and the companion stays put and swaps outfits without the spin.
 

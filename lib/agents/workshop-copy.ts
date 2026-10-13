@@ -1,6 +1,6 @@
 import type { OutfitPieceId, OutfitSlot } from "@/components/agents/outfit";
 
-import type { AgentAction, AgentRole } from "./roles";
+import type { AgentAction } from "./roles";
 
 export interface Annotated {
   label: string;
@@ -83,13 +83,3 @@ export const actionCopy = {
   walk: { jp: "歩行", label: "Walk" },
   wave: { jp: "挨拶", label: "Wave" },
 } as const satisfies Record<AgentAction, Annotated>;
-
-export const roleJp = {
-  analyst: "分析",
-  architect: "設計",
-  builder: "建築",
-  debugger: "探偵",
-  inspector: "検査",
-  orchestrator: "指揮",
-  researcher: "研究",
-} as const satisfies Record<AgentRole, string>;
