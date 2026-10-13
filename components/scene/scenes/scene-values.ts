@@ -49,8 +49,6 @@ export const clamp01 = (value: number) => MathUtils.clamp(value, 0, 1);
 export const progressBetween = (time: number, from: number, to: number) =>
   clamp01((time - from) / (to - from));
 
-export const easeOutCubic = (value: number) => 1 - (1 - value) ** 3;
-
 export const easeInOutCubic = (value: number) =>
   value < 0.5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 3 / 2;
 
@@ -63,5 +61,3 @@ export const easeOutBack = (value: number) => {
 export const popScale = (time: number, appearAt: number, vanishAt: number) =>
   easeOutBack(progressBetween(time, appearAt, appearAt + 0.35)) *
   (1 - easeInOutCubic(progressBetween(time, vanishAt, vanishAt + 0.3)));
-
-export const issueCardSize = [0.74, 0.38] as const;
