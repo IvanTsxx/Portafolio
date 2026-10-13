@@ -4,6 +4,7 @@ import { useRef } from "react";
 import type { ReactNode } from "react";
 
 import { holdBuild, releaseBuild } from "@/components/scene/build-hold";
+import { registerCompanionStage } from "@/components/scene/companion-stages";
 import { motionKit } from "@/lib/motion/gsap";
 import type {
   BlockTiming,
@@ -34,6 +35,7 @@ interface Scaffold {
   edges: readonly [HTMLElement, HTMLElement, HTMLElement, HTMLElement];
   height: number;
   rails: readonly HTMLElement[];
+  release: (() => void) | null;
   root: HTMLElement;
   tag: Tag | null;
   ticks: readonly HTMLElement[];
@@ -46,6 +48,8 @@ const scrollLeadInSeconds = 0.12;
 const compactMaxWidth = 200;
 const compactMaxHeight = 128;
 const carriageInset = 10;
+const builderInset = 28;
+const builderYaw = -0.6;
 
 const easeDraw = "power2.inOut";
 const easeStep = "power3.inOut";
@@ -90,7 +94,7 @@ const headClass = "absolute inset-0";
 const gantryClass = "bg-ink absolute -inset-x-1.5 bottom-0 h-px";
 const sweepClass = "bg-ink absolute inset-x-0 bottom-0 h-px";
 const depositClass =
-  "from-clay/25 absolute inset-x-0 bottom-0 h-3 bg-linear-to-t to-transparent";
+  "from-ink/10 absolute inset-x-0 bottom-0 h-3 bg-linear-to-t to-transparent";
 const bearingClasses = [
   "bg-paper border-ink absolute bottom-0 -left-2.5 size-2 translate-y-1/2 border",
   "bg-paper border-ink absolute -right-2.5 bottom-0 size-2 translate-y-1/2 border",
@@ -98,12 +102,13 @@ const bearingClasses = [
 const carriageClass = "absolute bottom-0 left-0";
 const carriageBodyClass =
   "bg-paper border-ink absolute bottom-0 left-0 flex h-2.5 w-5 -translate-x-1/2 translate-y-1/2 items-center justify-center border";
-const nozzleClass = "bg-clay size-1 rounded-full";
+const nozzleClass = "bg-ink size-1 rounded-full";
 const readoutClass =
   "label bg-paper text-ink absolute top-full right-0 mt-2 px-1 tabular-nums";
-const flashClass = "bg-clay absolute inset-x-0 top-0 h-0.5 origin-left";
+const flashClass = "bg-ink absolute inset-x-0 top-0 h-0.5 origin-left";
 
 const builtSections = new Set<string>();
+let buildSites = 0;
 
 const spawn = (parent: HTMLElement, className: string) => {
   const element = document.createElement("span");
@@ -239,6 +244,7 @@ const erect = (
     edges,
     height,
     rails,
+    release: null,
     root,
     tag,
     ticks,
@@ -246,7 +252,32 @@ const erect = (
   };
 };
 
+const callCompanion = (scaffold: Scaffold, head: HTMLElement) => {
+  buildSites += 1;
+  scaffold.release?.();
+  scaffold.release = registerCompanionStage({
+    figure: scaffold.block,
+    id: `build-site-${buildSites}`,
+    spot: () => {
+      const gantry = head.getBoundingClientRect();
+      return {
+        action: "build",
+        height: null,
+        x: Math.max(gantry.left + builderInset, gantry.right - builderInset),
+        y: gantry.bottom,
+        yaw: builderYaw,
+      };
+    },
+  });
+};
+
+const dismissCompanion = (scaffold: Scaffold) => {
+  scaffold.release?.();
+  scaffold.release = null;
+};
+
 const dismantle = (scaffold: Scaffold) => {
+  dismissCompanion(scaffold);
   scaffold.root.remove();
   scaffold.block.style.removeProperty("position");
 };
@@ -333,11 +364,9 @@ const printBlock = (
   if (readout) {
     readout.textContent = readoutFor(1, 0);
   }
-  timeline.to(
-    head,
-    { duration: 0.25, ease: easeEnter, opacity: 1 },
-    begin - 0.25
-  );
+  timeline
+    .call(() => callCompanion(scaffold, head), undefined, begin - 0.25)
+    .to(head, { duration: 0.25, ease: easeEnter, opacity: 1 }, begin - 0.25);
   for (let index = 0; index < timing.layers; index += 1) {
     const at = begin + index * layer;
     const share = (index + 1) / timing.layers;
@@ -377,6 +406,7 @@ const printBlock = (
   timeline
     .set(scaffold.cover, { pointerEvents: "none" }, begin + timing.print)
     .call(() => releaseBuild(scaffold.block), undefined, begin + timing.print)
+    .call(() => dismissCompanion(scaffold), undefined, begin + timing.print)
     .to(
       head,
       { duration: 0.22, ease: easeLeave, opacity: 0 },

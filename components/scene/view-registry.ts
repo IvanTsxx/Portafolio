@@ -19,7 +19,6 @@ interface SlotRecord extends ViewSlot {
 }
 
 const slots = new Map<string, SlotRecord>();
-const agentCasts = new Set<HTMLElement>();
 const listeners = new Set<() => void>();
 let nearSnapshot: readonly ViewSlot[] = [];
 let observer: IntersectionObserver | null = null;
@@ -125,26 +124,6 @@ const getNearSnapshot = () => nearSnapshot;
 const getServerNearSnapshot = (): readonly ViewSlot[] => [];
 const getHasSlots = () => slots.size > 0;
 const getServerHasSlots = () => false;
-export const getAgentCasts = () => agentCasts;
-
-export const useAgentCast = (
-  track: RefObject<HTMLElement | null>,
-  enabled: boolean
-) => {
-  const isHeld = useBuildHeld(track);
-  const isCast = enabled && !isHeld;
-  useLayoutEffect(() => {
-    const element = track.current;
-    if (!(element && isCast)) {
-      return;
-    }
-    agentCasts.add(element);
-    return () => {
-      agentCasts.delete(element);
-    };
-  }, [isCast, track]);
-};
-
 export const useNearViewSlots = () =>
   useSyncExternalStore(subscribe, getNearSnapshot, getServerNearSnapshot);
 

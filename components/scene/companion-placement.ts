@@ -39,7 +39,6 @@ export type CompanionDock =
       kind: "gutter";
       restY: number;
       x: number;
-      yieldY: number;
     }
   | {
       bubble: BubbleSlot | null;
@@ -47,7 +46,6 @@ export type CompanionDock =
       kind: "rail";
       track: RailTrack;
       x: number;
-      yieldY: number;
     }
   | {
       frame: CompanionFrame;
@@ -65,23 +63,21 @@ export interface DockGoal {
 }
 
 const gutterFrames: readonly CompanionFrame[] = [
-  { agentHeight: 96, agentWidth: 84 },
-  { agentHeight: 80, agentWidth: 70 },
-  { agentHeight: 64, agentWidth: 56 },
+  { agentHeight: 56, agentWidth: 48 },
+  { agentHeight: 48, agentWidth: 42 },
 ];
-const cornerFrame: CompanionFrame = { agentHeight: 56, agentWidth: 48 };
-const stationFrameHeight = 64;
+const cornerFrame: CompanionFrame = { agentHeight: 48, agentWidth: 42 };
+export const sheetShadow = 12;
 const laneInset = 8;
 const columnGap = 24;
 const edgeInset = 12;
 const restShare = 0.72;
 export const headerClearance = 56;
-const bubbleRoom = 96;
+const bubbleRoom = 80;
 const bubbleGap = 8;
 const bubbleMinWidth = 132;
-const bubbleMaxWidth = 256;
+export const bubbleMaxWidth = 224;
 const cornerHiddenShare = 0.3;
-const yieldScale = 0.6;
 const restYaw = -0.32;
 export const watchYaw = -0.75;
 
@@ -93,9 +89,25 @@ const bubbleSlotFor = (
   column: ColumnBounds,
   x: number
 ): BubbleSlot | null => {
-  const left = column.right + bubbleGap;
+  const left = column.right + sheetShadow + bubbleGap;
   const maxWidth = Math.min(bubbleMaxWidth, viewport.width - edgeInset - left);
   return maxWidth >= bubbleMinWidth ? { left, maxWidth, tail: x - left } : null;
+};
+
+export const headBubbleSlot = (
+  viewport: Viewport,
+  x: number
+): BubbleSlot | null => {
+  const maxWidth = Math.min(bubbleMaxWidth, viewport.width - edgeInset * 2);
+  if (maxWidth < bubbleMinWidth) {
+    return null;
+  }
+  const left = clamp(
+    x - bubbleGap * 3,
+    edgeInset,
+    viewport.width - edgeInset - maxWidth
+  );
+  return { left, maxWidth, tail: x - left };
 };
 
 const railDock = (
@@ -103,21 +115,20 @@ const railDock = (
   column: ColumnBounds,
   track: RailTrack
 ): CompanionDock | null => {
-  const lane = track.left - column.right;
+  const lane = track.left - column.right - sheetShadow;
   const frame = gutterFrames.find(
     (candidate) => candidate.agentWidth + laneInset * 2 <= lane
   );
   if (!frame || track.bottom <= track.top) {
     return null;
   }
-  const x = column.right + lane / 2;
+  const x = column.right + sheetShadow + lane / 2;
   return {
     bubble: bubbleSlotFor(viewport, column, x),
     frame,
     kind: "rail",
     track,
     x,
-    yieldY: viewport.height - edgeInset,
   };
 };
 
@@ -155,7 +166,6 @@ export const companionDock = (
       floor
     ),
     x,
-    yieldY: floor,
   };
 };
 
@@ -169,28 +179,17 @@ export type BubbleSide = "above" | "below";
 export const bubbleSide = (headY: number): BubbleSide =>
   headY - bubbleRoom >= headerClearance ? "above" : "below";
 
-export const stationScale = (dock: CompanionDock) =>
-  Math.min(1, stationFrameHeight / dock.frame.agentHeight);
-
 export const dockGoal = (
   dock: CompanionDock,
-  {
-    isTucked,
-    isYielding,
-    railShare = 0,
-  }: { isTucked: boolean; isYielding: boolean; railShare?: number }
+  { isTucked, railShare = 0 }: { isTucked: boolean; railShare?: number }
 ): DockGoal => {
   if (dock.kind === "corner") {
-    const isAway = isTucked || isYielding;
     return {
-      scale: isAway ? 0 : 1,
+      scale: isTucked ? 0 : 1,
       x: dock.x,
-      y: isAway ? dock.tuckY : dock.restY,
+      y: isTucked ? dock.tuckY : dock.restY,
       yaw: restYaw,
     };
-  }
-  if (isYielding) {
-    return { scale: yieldScale, x: dock.x, y: dock.yieldY, yaw: watchYaw };
   }
   return {
     scale: 1,
@@ -199,26 +198,6 @@ export const dockGoal = (
     yaw: restYaw,
   };
 };
-
-export const ownVisibleShare = (rect: ScreenRect, viewport: Viewport) => {
-  const width = rect.right - rect.left;
-  const height = rect.bottom - rect.top;
-  if (width <= 0 || height <= 0) {
-    return 0;
-  }
-  const visibleWidth = Math.max(
-    0,
-    Math.min(rect.right, viewport.width) - Math.max(rect.left, 0)
-  );
-  const visibleHeight = Math.max(
-    0,
-    Math.min(rect.bottom, viewport.height) - Math.max(rect.top, 0)
-  );
-  return (visibleWidth * visibleHeight) / (width * height);
-};
-
-const yieldEnterPresence = 0.6;
-const yieldLeavePresence = 0.4;
 
 export const castPresence = (rect: ScreenRect, viewport: Viewport) => {
   const height = rect.bottom - rect.top;
@@ -230,18 +209,4 @@ export const castPresence = (rect: ScreenRect, viewport: Viewport) => {
     Math.min(rect.bottom, viewport.height) - Math.max(rect.top, 0)
   );
   return visibleHeight / Math.min(height, viewport.height);
-};
-
-export const shouldYield = (
-  casts: Iterable<ScreenRect>,
-  viewport: Viewport,
-  isYielding: boolean
-) => {
-  const threshold = isYielding ? yieldLeavePresence : yieldEnterPresence;
-  for (const rect of casts) {
-    if (castPresence(rect, viewport) >= threshold) {
-      return true;
-    }
-  }
-  return false;
 };

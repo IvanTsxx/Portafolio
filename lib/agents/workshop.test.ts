@@ -10,6 +10,7 @@ import { agentRoles } from "./roles";
 import type { WorkshopState } from "./workshop";
 import {
   defaultWorkshopState,
+  freeHands,
   matchingPreset,
   parseWorkshopParams,
   presetState,
@@ -64,7 +65,7 @@ describe("workshop params", () => {
     );
     expect(state).toEqual({
       ...defaultWorkshopState,
-      outfit: { ...defaultWorkshopState.outfit, held: "book" },
+      outfit: freeHands({ ...defaultWorkshopState.outfit, held: "book" }),
     });
   });
 });

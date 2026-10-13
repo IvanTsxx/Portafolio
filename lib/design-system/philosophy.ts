@@ -71,7 +71,7 @@ export const guidance = {
     "Keep hit areas at 44px on touch and use focus-visible rings.",
     "Build one base component with cva variants and merge classes with cn.",
     "Use Server Components by default and add use client only for interactivity.",
-    "Give a section companion lines through its script. Show a scene with AgentScene.",
+    "Give a section companion lines through its script. Stage props with StageScene; the companion is the only agent.",
     "Show a static meaningful fallback when WebGL is off.",
   ],
   dont: [

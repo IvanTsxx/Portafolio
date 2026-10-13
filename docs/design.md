@@ -187,7 +187,7 @@ Square everything. Radius is 0 on cards, buttons, chips, inputs and images. Fram
 - Do: Keep hit areas at 44px on touch and use focus-visible rings.
 - Do: Build one base component with cva variants and merge classes with cn.
 - Do: Use Server Components by default and add use client only for interactivity.
-- Do: Give a section companion lines through its script. Show a scene with AgentScene.
+- Do: Give a section companion lines through its script. Stage props with StageScene; the companion is the only agent.
 - Do: Show a static meaningful fallback when WebGL is off.
 - Don't: Add a second Canvas or a per-component WebGL context.
 - Don't: Use clay orange for UI chrome, links or buttons.

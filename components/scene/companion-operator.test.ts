@@ -8,12 +8,14 @@ import type {
   StationView,
 } from "./companion-operator";
 import {
+  consoleClearance,
   engagedHold,
   firstPressDelay,
   operatorPlacement,
   pickStation,
   pressCadence,
   railMode,
+  stationAct,
   stepOperator,
   travelDuration,
 } from "./companion-operator";
@@ -21,6 +23,7 @@ import {
 const frame = 1 / 60;
 const home = { x: 1100, y: 400 };
 const station: OperatorTarget = {
+  act: stationAct,
   console: { x: 700, y: 520 },
   controls: [
     { id: "next", label: "Next year" },
@@ -32,7 +35,6 @@ const station: OperatorTarget = {
 interface Script {
   canOperate?: boolean;
   isEngaged?: (time: number) => boolean;
-  isYielding?: (time: number) => boolean;
   target?: (time: number) => OperatorTarget | null;
 }
 
@@ -49,7 +51,6 @@ const run = (
       canOperate: script.canOperate ?? true,
       home,
       isEngaged: script.isEngaged?.(time) ?? false,
-      isYielding: script.isYielding?.(time) ?? false,
       position: operatorPlacement(mode, {
         console: station.console,
         home,
@@ -119,22 +120,38 @@ describe("companion operator", () => {
     expect(effects).toEqual([]);
   });
 
-  test("an agent cast takes the stage from any phase and the companion comes back to the rail afterwards", () => {
-    const { effects, modes } = run(12, {
-      isYielding: (time) => time > 4 && time < 6,
-      target: (time) => (time < 5 ? station : null),
+  test("on a stage the companion performs the stage's action at the stage's size, and shrinks back on the way home", () => {
+    const stage: OperatorTarget = {
+      act: { action: "type", scale: 2.5, yaw: 0.5 },
+      console: { x: 500, y: 600 },
+      controls: [],
+      id: "build",
+    };
+    const { effects, mode } = run(6, { target: () => stage });
+    expect(effects).toEqual([]);
+    expect(mode.kind).toBe("operating");
+    const acting = operatorPlacement(mode, {
+      console: stage.console,
+      home,
+      time: 6,
     });
-    expect(modes.map((entry) => entry.kind)).toEqual([
-      "travelling",
-      "operating",
-      "yielding",
-      "rail",
-    ]);
-    expect(effects.every((effect) => effect.time < 4)).toBe(true);
+    expect(acting.pose).toMatchObject({ action: "type", yaw: 0.5 });
+    expect(acting.scale).toBe(2.5);
+    const back: OperatorMode = {
+      act: stage.act,
+      duration: 1,
+      from: stage.console,
+      kind: "returning",
+      startedAt: 0,
+    };
+    const context = { console: null, home, time: 0 };
+    expect(operatorPlacement(back, context).scale).toBe(2.5);
+    expect(operatorPlacement(back, { ...context, time: 1 }).scale).toBe(1);
   });
 
   test("travel starts where the companion stood and ends exactly on the console", () => {
     const mode: OperatorMode = {
+      act: stationAct,
       duration: 1,
       from: home,
       kind: "travelling",
@@ -153,6 +170,7 @@ describe("companion operator", () => {
 });
 
 const viewOf = (top: number): StationView => ({
+  clearance: consoleClearance,
   console: { bottom: top + 340, left: 600, right: 720, top: top + 280 },
   figure: { bottom: top + 400, left: 368, right: 1072, top },
   id: "stub",

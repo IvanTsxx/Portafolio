@@ -1,8 +1,5 @@
-import { agentRoles } from "@/lib/agents/roles";
-
 import { siteConfig } from "./config";
-import { experience, formatMonth } from "./experience";
-import { workSteps } from "./practice";
+import { experience } from "./experience";
 
 export type SectionReveal = "build" | "static";
 
@@ -11,28 +8,25 @@ export interface SectionScript {
   reveal: SectionReveal;
 }
 
-const jobsOldestFirst = experience.toSorted((first, second) =>
-  first.start.localeCompare(second.start)
-);
+const countWords = [
+  "no",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+] as const;
 
-const currentJobLines = experience.flatMap((job) =>
-  job.end === null
-    ? [`${job.role} at ${job.company} since ${formatMonth(job.start)}.`]
-    : []
-);
+const spelled = (count: number) => countWords[count] ?? String(count);
 
-const pastJobLines = jobsOldestFirst
-  .filter((job) => job.end !== null && job.stack.length > 0)
-  .toReversed()
-  .map((job) => `${job.company}: ${job.stack.join(" · ")}.`);
-
-const firstYear = jobsOldestFirst[0]?.start.slice(0, 4) ?? "";
-
-const spokenSteps = new Set<string>(["orchestrate", "build"]);
-
-const workStepLines = workSteps.flatMap((step) =>
-  spokenSteps.has(step.id) ? [step.summary] : []
-);
+const firstYear = experience
+  .map((job) => job.start.slice(0, 4))
+  .toSorted()
+  .at(0);
 
 const builds = (lines: readonly string[] = []): SectionScript => ({
   lines,
@@ -51,25 +45,30 @@ export const sectionScripts = {
   designSpacing: builds(),
   designTypography: builds(),
   designUtilities: builds(),
-  homeContact: speaks([`Say hi at ${siteConfig.email}.`]),
+  homeContact: speaks(["Last page. This is how to reach Ivo."]),
   homeExperience: builds([
-    `${experience.length} roles since ${firstYear}.`,
-    ...pastJobLines,
+    `Laying out ${spelled(experience.length)} roles since ${firstYear}.`,
   ]),
-  homeExperiments: builds(["Shaders, dithers and dot grids I build to learn."]),
-  homeHowIWork: builds(workStepLines),
-  homeIntro: speaks([`From ${siteConfig.location}.`, ...currentJobLines]),
-  homeMatrix: builds([
-    `A year of commits from @${siteConfig.handle} on GitHub.`,
+  homeExperiments: builds(["Unpacking what Ivo builds to learn."]),
+  homeHowIWork: builds(["I play every step here. Ivo calls the shots."]),
+  homeIntro: speaks([
+    "Opening Ivo's file.",
+    "I build each section as you reach it.",
   ]),
-  homePinned: builds([`Pinned on github.com/${siteConfig.github}.`]),
-  homeWorkshop: builds([`${agentRoles.length} agents, one per role.`]),
-  labExperiments: builds(),
+  homeMatrix: builds(["Weaving a year of commits."]),
+  homePinned: builds(["Pinning the repos Ivo is proud of."]),
+  homeWorkshop: builds([
+    "My fitting room. Dress me up.",
+    "The link keeps the look.",
+  ]),
+  labExperiments: builds(["Shelving Ivo's experiments."]),
   labPreview: speaks(),
   noteResponsibilities: speaks(),
   noteText: speaks(),
-  notesArchive: builds(),
-  registryComponents: builds(),
-  registryInstall: builds([`Install from ${siteConfig.registryNamespace}.`]),
+  notesArchive: builds(["Filing the notes."]),
+  registryComponents: builds(["Stocking the shelf."]),
+  registryInstall: builds([
+    `Every piece installs from ${siteConfig.registryNamespace}.`,
+  ]),
   registryPreview: speaks(),
 } as const satisfies Record<string, SectionScript>;

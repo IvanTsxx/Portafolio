@@ -23,3 +23,19 @@ export const companionCastFor = (pathname: string): CompanionCast => {
   const match = routeCasts.find((cast) => cast.section === section);
   return match ? { action: match.action, role: match.role } : homeCast;
 };
+
+const rigShowcases: readonly (readonly string[])[] = [
+  ["dev"],
+  ["lab", "module-assembly"],
+  ["registry", "agent"],
+  ["registry", "agent-stage"],
+];
+
+export const showcasesTheRig = (pathname: string) => {
+  const segments = pathname.split("/").filter(Boolean);
+  return rigShowcases.some(
+    (showcase) =>
+      showcase.length <= segments.length &&
+      showcase.every((segment, index) => segments[index] === segment)
+  );
+};
