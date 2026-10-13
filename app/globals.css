@@ -170,6 +170,14 @@
   background-size: var(--grid-size, 24px) var(--grid-size, 24px);
 }
 
+@utility rail-ties {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--rule-strong) 0 1px,
+    transparent 1px 12px
+  );
+}
+
 @utility grain {
   background-image: var(--grain);
 }

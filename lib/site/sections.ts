@@ -1,5 +1,3 @@
-import type { Heading } from "@/lib/content/text";
-import { sectionSpecs as designSystemSectionSpecs } from "@/lib/design-system/sections";
 import { getExperiment } from "@/lib/lab/experiments";
 
 type Experiment = NonNullable<ReturnType<typeof getExperiment>>;
@@ -29,18 +27,7 @@ export const registrySections: readonly {
   { id: "dependencies", label: "Dependencies" },
 ];
 
-export const toHeadings = (
-  sections: readonly { id: string; label: string }[]
-): Heading[] =>
-  sections.map((section) => ({
-    depth: 2,
-    id: section.id,
-    text: section.label,
-  }));
-
 export const relatedExperimentsOf = (experiment: Experiment) =>
   experiment.related
     .map((relatedSlug) => getExperiment(relatedSlug))
     .filter((entry) => entry !== undefined);
-
-export const designSystemHeadings = toHeadings(designSystemSectionSpecs);

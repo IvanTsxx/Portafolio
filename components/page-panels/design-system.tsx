@@ -1,10 +1,13 @@
-import { TableOfContents } from "@/components/content/table-of-contents";
 import { LeaderList, LeaderRow } from "@/components/site/leader-list";
 import { AsidePanel, PageAside } from "@/components/site/page-aside";
+import { SectionRail } from "@/components/site/section-rail";
 import { linkClassName } from "@/components/site/styles";
 import { loadDesignMarkdown } from "@/lib/design-system/load";
-import { documentCode, rawMarkdownPath } from "@/lib/design-system/sections";
-import { designSystemHeadings } from "@/lib/site/sections";
+import {
+  documentCode,
+  rawMarkdownPath,
+  sectionSpecs,
+} from "@/lib/design-system/sections";
 
 const bytesPerKilobyte = 1024;
 
@@ -15,22 +18,22 @@ export const DesignSystemPanels = async () => {
   ).toFixed(1);
 
   return (
-    <PageAside code={documentCode} label="Design system index">
-      <AsidePanel collapsible jp="目次" label="On this page">
-        <TableOfContents headings={designSystemHeadings} />
-      </AsidePanel>
-      <AsidePanel jp="出力" label="Export">
-        <LeaderList>
-          <LeaderRow jp="容量" label="Size">
-            {kilobytes} KB
-          </LeaderRow>
-          <LeaderRow jp="原文" label="Raw">
-            <a className={linkClassName} href={rawMarkdownPath}>
-              {rawMarkdownPath}
-            </a>
-          </LeaderRow>
-        </LeaderList>
-      </AsidePanel>
-    </PageAside>
+    <>
+      <SectionRail sections={sectionSpecs} />
+      <PageAside code={documentCode} label="Design system index">
+        <AsidePanel jp="出力" label="Export">
+          <LeaderList>
+            <LeaderRow jp="容量" label="Size">
+              {kilobytes} KB
+            </LeaderRow>
+            <LeaderRow jp="原文" label="Raw">
+              <a className={linkClassName} href={rawMarkdownPath}>
+                {rawMarkdownPath}
+              </a>
+            </LeaderRow>
+          </LeaderList>
+        </AsidePanel>
+      </PageAside>
+    </>
   );
 };
