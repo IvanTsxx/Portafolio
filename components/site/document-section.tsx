@@ -43,7 +43,7 @@ export const DocumentSection = ({
       waypoint={script}
     />
     {script?.reveal === "build" ? (
-      <SectionBuild code={index}>{children}</SectionBuild>
+      <SectionBuild id={id}>{children}</SectionBuild>
     ) : (
       children
     )}
