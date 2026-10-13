@@ -54,6 +54,8 @@ export const checkStroke = (time: number) => {
 
 const buildCycle = 0.9;
 
+export const buildBeat = (time: number) => Math.floor(time / buildCycle);
+
 export const buildStrike = (time: number) => {
   const phase = (time % buildCycle) / buildCycle;
   if (phase < 0.6) {

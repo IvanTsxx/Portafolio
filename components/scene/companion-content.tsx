@@ -2,7 +2,7 @@
 
 import { OrthographicCamera } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type {
   Group,
@@ -10,6 +10,7 @@ import type {
 } from "three";
 import { Vector3 } from "three";
 
+import { buildBeat } from "@/components/agents/actions";
 import type { AgentPointer } from "@/components/agents/agent";
 import { Agent } from "@/components/agents/agent";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
@@ -17,7 +18,11 @@ import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 
 import type { BurstHandle, HatToss, TossHandle } from "./companion-effects";
 import { FlyingHat, PaperPoof } from "./companion-effects";
-import type { CompanionCue, CompanionMotion } from "./companion-motion";
+import type {
+  CompanionCue,
+  CompanionMotion,
+  CompanionPose,
+} from "./companion-motion";
 import {
   createCompanionMotion,
   isSwapActive,
@@ -39,7 +44,11 @@ import {
   perchPoint,
   pickWaypoint,
 } from "./companion-path";
-import { sayCompanionLine } from "./companion-signals";
+import {
+  notifyCompanionBeat,
+  sayCompanionLine,
+  setCompanionStop,
+} from "./companion-signals";
 import { ViewLights } from "./view-lights";
 import type { Waypoint, WaypointSide } from "./view-registry";
 import { getAgentCasts, getWaypoints } from "./view-registry";
@@ -187,6 +196,59 @@ const pickFreePerch = (
 
 const swapOrigin = new Vector3();
 
+const hammerReach = 0.32;
+const hammerHeight = 0.3;
+
+const hammerPoint = (
+  point: ScreenPoint,
+  frame: CompanionFrame,
+  lift: number,
+  viewport: Viewport
+) => {
+  const facing = point.x > viewport.width / 2 ? -1 : 1;
+  return {
+    x: point.x + facing * frame.agentWidth * hammerReach,
+    y: point.y - frame.agentHeight * hammerHeight - lift,
+  };
+};
+
+interface BuildBeatInput {
+  frame: CompanionFrame;
+  isBeat: boolean;
+  isVisible: boolean;
+  pose: CompanionPose;
+  state: CompanionMotion;
+  stop: Waypoint;
+  time: number;
+  viewport: Viewport;
+}
+
+const reportBuildBeat = ({
+  frame,
+  isBeat,
+  isVisible,
+  pose,
+  state,
+  stop,
+  time,
+  viewport,
+}: BuildBeatInput) => {
+  setCompanionStop(isVisible ? stop.element : null);
+  const isHammering =
+    isBeat &&
+    isVisible &&
+    pose.action === "build" &&
+    state.leap === null &&
+    !state.travel.isTraveling &&
+    !isSwapActive(state, time);
+  if (isHammering) {
+    notifyCompanionBeat({
+      waypoint: stop.element,
+      ...hammerPoint(state.travel, frame, pose.lift, viewport),
+    });
+  }
+};
+
 const ClearDepth = () => {
   useFrame(({ gl }) => {
     gl.clearDepth();
@@ -213,11 +275,14 @@ const CompanionContent = ({
   const tossCount = useRef(0);
   const visits = useRef(new WeakMap<HTMLElement, number>());
   const spokenAt = useRef(Number.NEGATIVE_INFINITY);
+  const lastBeat = useRef(0);
   const [outfit, setOutfit] = useState<Outfit>(() => ({
     role: findActiveWaypoint(readViewport(), null)?.role ?? "orchestrator",
     toss: null,
   }));
   const motion = useRef<CompanionMotion | null>(null);
+
+  useEffect(() => () => setCompanionStop(null), []);
 
   const playCue = (cue: CompanionCue, side: WaypointSide, feet: Vector3) => {
     if (cue.kind === "none") {
@@ -268,7 +333,11 @@ const CompanionContent = ({
     activeStop.current = stop;
     const state = motion.current ?? createCompanionMotion(outfit.role);
     motion.current = state;
+    const beat = buildBeat(time);
+    const isNewBeat = beat !== lastBeat.current;
+    lastBeat.current = beat;
     if (!stop) {
+      setCompanionStop(null);
       spinner.visible = false;
       placeHitBox(hit.current, state.travel, frame, 0, false);
       placeBubble(bubble.current, state.travel, frame, 0, viewport, false);
@@ -335,6 +404,16 @@ const CompanionContent = ({
         !state.travel.isTraveling &&
         time - spokenAt.current < speechSeconds
     );
+    reportBuildBeat({
+      frame,
+      isBeat: isNewBeat && !isReduced,
+      isVisible,
+      pose,
+      state,
+      stop,
+      time,
+      viewport,
+    });
   });
 
   return (

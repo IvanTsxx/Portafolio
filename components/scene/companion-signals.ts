@@ -48,3 +48,33 @@ const getServerLine = () => null;
 
 export const useCompanionLine = () =>
   useSyncExternalStore(subscribeLine, getLine, getServerLine);
+
+export interface CompanionBeat {
+  waypoint: HTMLElement;
+  x: number;
+  y: number;
+}
+
+type BeatListener = (beat: CompanionBeat) => void;
+
+const beatListeners = new Set<BeatListener>();
+let companionStop: HTMLElement | null = null;
+
+export const subscribeCompanionBeat = (listener: BeatListener) => {
+  beatListeners.add(listener);
+  return () => {
+    beatListeners.delete(listener);
+  };
+};
+
+export const notifyCompanionBeat = (beat: CompanionBeat) => {
+  for (const listener of beatListeners) {
+    listener(beat);
+  }
+};
+
+export const setCompanionStop = (stop: HTMLElement | null) => {
+  companionStop = stop;
+};
+
+export const getCompanionStop = () => companionStop;
