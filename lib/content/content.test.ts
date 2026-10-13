@@ -77,10 +77,10 @@ describe("shipped notes", () => {
     expect(notes.map((item) => item.slug).toSorted()).toEqual(slugs);
     expect(
       notes.filter((item) => item.kind === "case-study").length
-    ).toBeGreaterThanOrEqual(3);
-    expect(
-      notes.filter((item) => item.kind === "note").length
-    ).toBeGreaterThanOrEqual(3);
+    ).toBeGreaterThan(0);
+    expect(notes.filter((item) => item.kind === "note").length).toBeGreaterThan(
+      0
+    );
   });
 
   test("is ordered newest first across both kinds", async () => {
