@@ -110,7 +110,6 @@ export const CaseStudySections = ({
       aside={pad(caseStudy.responsibilities.length)}
       id="responsibilities"
       index={`${code}.1`}
-      jp="担当"
       label="Responsibilities"
       script={sectionScripts.noteResponsibilities}
     >
@@ -127,12 +126,7 @@ export const CaseStudySections = ({
       </ul>
     </DocumentSection>
     {hasPreviewSection(caseStudy) ? (
-      <DocumentSection
-        id="preview"
-        index={`${code}.2`}
-        jp="見本"
-        label="Preview"
-      >
+      <DocumentSection id="preview" index={`${code}.2`} label="Preview">
         <Previews caseStudy={caseStudy} />
       </DocumentSection>
     ) : null}

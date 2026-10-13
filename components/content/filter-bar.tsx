@@ -38,14 +38,12 @@ const FilterOption = ({
 export const FilterBar = ({
   active,
   facets,
-  jp,
   label,
   onChange,
   total,
 }: {
   active: string;
   facets: readonly FilterFacet[];
-  jp?: string;
   label: string;
   onChange: (facet: string) => void;
   total: number;
@@ -56,7 +54,6 @@ export const FilterBar = ({
     <div className="flex flex-col gap-2">
       <p className="label text-mist" id={labelId}>
         {label}
-        {jp ? <span className="jp ml-1">{jp}</span> : null}
       </p>
       <fieldset
         aria-labelledby={labelId}

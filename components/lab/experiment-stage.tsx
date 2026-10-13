@@ -70,7 +70,6 @@ export const ExperimentStage = ({
           <h2 className="label border-rule-strong flex items-baseline gap-3 border-b px-5 py-3">
             <span className="text-mist tabular-nums">[ CTL ]</span>
             <span className="text-ink font-normal">Controls</span>
-            <span className="jp text-graphite">操作</span>
           </h2>
           <div className="divide-rule flex flex-col divide-y">{controls}</div>
         </section>

@@ -10,7 +10,6 @@ export const PanelHeading = ({
   className,
   id,
   index,
-  jp,
   label,
 }: {
   aside?: ReactNode;
@@ -18,7 +17,6 @@ export const PanelHeading = ({
   className?: string;
   id?: string;
   index: string;
-  jp?: string;
   label: string;
 }) => (
   <div
@@ -31,7 +29,6 @@ export const PanelHeading = ({
     <Tag className="text-ink m-0 shrink-0 font-normal" id={id}>
       {label}
     </Tag>
-    {jp ? <span className="jp text-graphite shrink-0">{jp}</span> : null}
     <span
       aria-hidden
       className="border-rule-strong mb-1 h-px min-w-4 flex-1 self-end border-b border-dotted"

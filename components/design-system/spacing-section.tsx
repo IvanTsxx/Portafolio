@@ -120,24 +120,15 @@ export const SpacingSection = ({
       aside="4px base"
       id={section.id}
       index={section.index}
-      jp={section.jp}
       label={section.label}
       script={sectionScripts.designSpacing}
     >
       <div className="flex flex-col gap-3">
-        <SubHeading
-          aside={padCount(spacingSpecs.length)}
-          jp="間隔"
-          label="Spacing"
-        />
+        <SubHeading aside={padCount(spacingSpecs.length)} label="Spacing" />
         <SpacingScale />
       </div>
       <div className="flex flex-col gap-3">
-        <SubHeading
-          aside={`${radius.baseVar} ${radius.base}`}
-          jp="角丸"
-          label="Radius"
-        />
+        <SubHeading aside={`${radius.baseVar} ${radius.base}`} label="Radius" />
         <RadiusScale steps={radius.steps} />
       </div>
       <div className="flex flex-col gap-3">
@@ -145,7 +136,6 @@ export const SpacingSection = ({
           aside={
             <ClassTag>{documentGridSpec.containerClasses.join(" ")}</ClassTag>
           }
-          jp="格子"
           label="Document column"
         />
         <GridDiagram />
@@ -153,7 +143,6 @@ export const SpacingSection = ({
       <div className="flex flex-col gap-3">
         <SubHeading
           aside={`${breakpointSpecs.length} steps`}
-          jp="分岐点"
           label="Breakpoints"
         />
         <BreakpointRuler />

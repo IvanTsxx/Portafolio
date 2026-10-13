@@ -277,7 +277,6 @@ export const AgentWorkshop = ({
       }
       id="workshop"
       index={index}
-      jp="工房"
       label="Workshop"
       script={sectionScripts.homeWorkshop}
     >
@@ -285,7 +284,6 @@ export const AgentWorkshop = ({
         <div className="border-rule bg-paper sticky top-13 z-40 flex items-center justify-between gap-3 border-b pl-3 lg:top-12">
           <span className="label flex items-baseline gap-2">
             <span className="text-ink">{title}</span>
-            <span className="jp text-mist">試着室</span>
           </span>
           <span className="flex items-center">
             <button

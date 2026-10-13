@@ -88,14 +88,13 @@ export const PhilosophySection = () => {
       aside={`${padCount(principles.length)} rules`}
       id={section.id}
       index={section.index}
-      jp={section.jp}
       label={section.label}
       script={sectionScripts.designPhilosophy}
     >
       <ol className="border-rule border-t">
         {principles.map((principle, index) => (
           <li
-            className="border-rule grid grid-cols-[6rem_1fr] items-center gap-x-4 gap-y-2 border-b py-4 md:grid-cols-[8rem_1fr_auto] md:gap-x-6"
+            className="border-rule grid grid-cols-[6rem_1fr] items-center gap-x-4 gap-y-2 border-b py-4 md:grid-cols-[8rem_1fr] md:gap-x-6"
             key={principle.id}
           >
             <div
@@ -115,12 +114,6 @@ export const PhilosophySection = () => {
                 {principle.rule}
               </p>
             </div>
-            <span
-              aria-hidden
-              className="jp text-graphite/25 hidden text-6xl leading-none font-light select-none md:block"
-            >
-              {principle.jp}
-            </span>
           </li>
         ))}
       </ol>

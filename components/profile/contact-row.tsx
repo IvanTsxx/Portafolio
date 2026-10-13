@@ -8,7 +8,6 @@ export const ContactRow = () => (
   <DocumentSection
     id="contact"
     index="GH-09"
-    jp="連絡"
     label="Contact"
     script={sectionScripts.homeContact}
   >

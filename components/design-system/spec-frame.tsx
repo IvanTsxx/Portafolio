@@ -24,7 +24,6 @@ export const SpecCell = ({
   className,
   code,
   footer,
-  jp,
   name,
   surface,
 }: {
@@ -32,7 +31,6 @@ export const SpecCell = ({
   className?: string;
   code: string;
   footer?: ReactNode;
-  jp?: string;
   name: string;
   surface?: VariantProps<typeof specimenVariants>["surface"];
 }) => (
@@ -43,7 +41,6 @@ export const SpecCell = ({
         <span className="text-mist tabular-nums">{code}</span>
         <span className="text-ink">{name}</span>
       </span>
-      {jp ? <span className="jp text-mist shrink-0">{jp}</span> : null}
     </p>
     {children}
     {footer ? (
@@ -56,16 +53,13 @@ export const SpecCell = ({
 
 export const SubHeading = ({
   aside,
-  jp,
   label,
 }: {
   aside?: ReactNode;
-  jp: string;
   label: string;
 }) => (
   <h3 className="label text-mist flex items-baseline gap-2 font-normal">
     <span>{label}</span>
-    <span className="jp">{jp}</span>
     {aside ? (
       <span className="text-graphite ml-auto tabular-nums">{aside}</span>
     ) : null}

@@ -194,19 +194,13 @@ export const PortraitPlate = ({
         )}
       >
         <span className="sr-only">{label}</span>
-        <span>
-          PL-01 Portrait <span className="jp">肖像</span>
-        </span>
+        <span>PL-01 Portrait</span>
         {scanned ? (
-          <span>
-            Source <span className="jp">原画</span>
-          </span>
+          <span>Source</span>
         ) : (
           <>
             <span className="group-hover:hidden">Dither 4×4 · Click</span>
-            <span className="hidden group-hover:inline">
-              Drift <span className="jp">歪み</span>
-            </span>
+            <span className="hidden group-hover:inline">Drift</span>
           </>
         )}
       </figcaption>

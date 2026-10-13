@@ -58,7 +58,7 @@ export const NoteRow = ({
             {note.stamp.label}
           </time>
           <span className={kindBadgeVariants({ kind: note.kind })}>
-            {kind.label} <span className="jp">{kind.jp}</span>
+            {kind.label}
           </span>
         </div>
         <div className="flex flex-col items-start gap-3 lg:col-span-9">

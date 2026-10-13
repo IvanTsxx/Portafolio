@@ -18,7 +18,6 @@ const GlobalError = ({
         aside={error.digest}
         as="p"
         index="ERR"
-        jp="障害"
         label="System fault"
       />
       <span aria-hidden className="hazard-stripe text-ink block h-3 w-full" />

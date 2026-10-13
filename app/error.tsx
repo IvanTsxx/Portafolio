@@ -21,7 +21,6 @@ const RouteError = ({
       aside={error.digest}
       as="p"
       index="ERR"
-      jp="障害"
       label="Runtime fault"
     />
     <span aria-hidden className="hazard-stripe text-ink block h-3 w-full" />

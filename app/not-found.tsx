@@ -19,9 +19,7 @@ const NotFound = () => (
       <div className="flex flex-col gap-8 lg:col-span-5">
         <p className="label text-graphite flex items-center gap-3">
           <span className="text-ink">[ ER-404 ]</span>
-          <span>
-            Route trace <span className="jp">経路追跡</span>
-          </span>
+          <span>Route trace</span>
           <span
             aria-hidden
             className="border-rule-strong min-w-8 flex-1 border-b border-dotted"

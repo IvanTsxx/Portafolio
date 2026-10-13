@@ -29,12 +29,11 @@ export const TypographySection = ({
       aside={`${padCount(fonts.length)} families`}
       id={section.id}
       index={section.index}
-      jp={section.jp}
       label={section.label}
       script={sectionScripts.designTypography}
     >
       <div className="flex flex-col gap-3">
-        <SubHeading jp="書体族" label="Families" />
+        <SubHeading label="Families" />
         <SpecGrid className="grid-cols-1 @2xl:grid-cols-2">
           {fonts.map((font, index) => (
             <SpecCell
@@ -61,7 +60,7 @@ export const TypographySection = ({
         </SpecGrid>
       </div>
       <div className="flex flex-col gap-3">
-        <SubHeading jp="尺度" label="Scale" aside="px" />
+        <SubHeading label="Scale" aside="px" />
         <ol className="border-rule border-t">
           {typeScaleSpecs.map((step) => (
             <li

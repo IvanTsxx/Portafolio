@@ -24,7 +24,6 @@ const titleVariants = cva("display text-ink text-balance", {
 });
 
 interface DocumentHeroProps extends VariantProps<typeof titleVariants> {
-  annotation?: string;
   back?: { href: string; label: string };
   children?: ReactNode;
   code: string;
@@ -35,7 +34,6 @@ interface DocumentHeroProps extends VariantProps<typeof titleVariants> {
 }
 
 export const DocumentHero = ({
-  annotation,
   back,
   children,
   code,
@@ -68,8 +66,10 @@ export const DocumentHero = ({
           </span>
         ))}
       </span>
-      {annotation ? (
-        <span className="jp text-graphite">{annotation}</span>
+      {jp ? (
+        <span aria-hidden className="jp text-mist">
+          {jp}
+        </span>
       ) : null}
     </div>
 
@@ -78,23 +78,10 @@ export const DocumentHero = ({
         <h1 className={titleVariants({ size })}>{title}</h1>
         {children}
       </div>
-      {jp || lede ? (
-        <div className="flex flex-col gap-4 @3xl:col-span-4">
-          {jp ? (
-            <p
-              aria-hidden
-              className="jp text-graphite text-5xl leading-none font-light tracking-widest select-none @3xl:text-6xl"
-            >
-              {jp}
-            </p>
-          ) : null}
-          <span
-            aria-hidden
-            className="hazard-stripe text-ink block h-1.5 w-24"
-          />
-          {lede ? <p className="label text-graphite">{lede}</p> : null}
-        </div>
-      ) : null}
+      <div className="flex flex-col gap-4 @3xl:col-span-4">
+        <span aria-hidden className="hazard-stripe text-ink block h-1.5 w-24" />
+        {lede ? <p className="label text-graphite">{lede}</p> : null}
+      </div>
     </div>
   </header>
 );

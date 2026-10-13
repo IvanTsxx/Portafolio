@@ -56,7 +56,7 @@ describe("home section entries", () => {
 
   test("name the page a section lives on", () => {
     const [first] = sectionEntries("Design system", "/design-system", [
-      { id: "color", index: "DS-02", jp: "色彩", label: "Color tokens" },
+      { id: "color", index: "DS-02", label: "Color tokens" },
     ]);
 
     expect(first).toMatchObject({

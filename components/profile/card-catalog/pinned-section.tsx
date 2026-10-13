@@ -25,7 +25,6 @@ export const PinnedSection = ({
       aside={<PanelCount current={count} total={count} />}
       id="pinned"
       index="GH-04"
-      jp="固定標本"
       label="Pinned"
       script={sectionScripts.homePinned}
     >

@@ -52,7 +52,6 @@ export const ExperimentsSection = () => (
     }
     id="experiments"
     index="GH-08"
-    jp="実験"
     label="Experiments"
     script={sectionScripts.homeExperiments}
   >

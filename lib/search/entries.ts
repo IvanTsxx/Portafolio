@@ -15,7 +15,6 @@ import type { SearchEntry } from "./types";
 interface SectionSource {
   id: string;
   index: string;
-  jp: string;
   label: string;
 }
 
@@ -65,7 +64,7 @@ export const sectionEntries = (
     detail: pageLabel,
     group: "sections",
     id: `section:${pageHref}#${section.id}`,
-    keywords: [section.jp],
+    keywords: [],
     title: section.label,
   }));
 
@@ -81,7 +80,7 @@ export const noteEntry = (note: Note, position: number): SearchEntry => ({
   ),
   group: "notes",
   id: `note:${note.slug}`,
-  keywords: [note.summary, noteKinds[note.kind].jp],
+  keywords: [note.summary],
   title: note.title,
 });
 

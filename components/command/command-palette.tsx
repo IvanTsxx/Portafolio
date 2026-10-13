@@ -63,7 +63,6 @@ const GroupHeading = ({
 }) => (
   <span className="label text-mist flex items-baseline gap-3">
     <span className="text-ink">{searchGroups[group].label}</span>
-    <span className="jp text-graphite">{searchGroups[group].jp}</span>
     <span
       aria-hidden
       className="border-rule-strong mb-1 h-px min-w-4 flex-1 border-b border-dotted"
@@ -209,13 +208,7 @@ export const CommandPalette = ({
         value={selectedId}
       >
         <div className="px-3 pt-3 pb-2">
-          <PanelHeading
-            aside="Esc"
-            as="p"
-            index="SRCH"
-            jp="検索"
-            label="Search"
-          />
+          <PanelHeading aside="Esc" as="p" index="SRCH" label="Search" />
         </div>
         <CommandInput
           className="text-base md:text-sm"
@@ -246,9 +239,7 @@ export const CommandPalette = ({
             </CommandGroup>
           ))}
           <CommandEmpty className="flex flex-col items-center gap-2 px-6 py-10">
-            <span className="label text-mist">
-              No match <span className="jp">該当なし</span>
-            </span>
+            <span className="label text-mist">No match</span>
             <span className="text-graphite max-w-full text-sm text-pretty break-words">
               Nothing for “{query.trim()}”. Try a note title, a section or a
               tag.

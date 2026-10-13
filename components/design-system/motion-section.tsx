@@ -22,25 +22,24 @@ export const MotionSection = async ({ system }: { system: DesignSystem }) => {
       aside={`${padCount(system.easings.length)} easings`}
       id={section.id}
       index={section.index}
-      jp={section.jp}
       label={section.label}
       script={sectionScripts.designMotion}
     >
       <div className="flex flex-col gap-3">
-        <SubHeading jp="緩急と時間" label="Easings and durations" />
+        <SubHeading label="Easings and durations" />
         <MotionLab durations={system.durations} easings={system.easings} />
       </div>
       <div className="flex flex-col gap-3">
-        <SubHeading jp="配慮" label="Reduced motion" aside="globals.css" />
+        <SubHeading label="Reduced motion" aside="globals.css" />
         <div className="border-rule-strong bg-popover border">
           <CodeBlock lines={reducedMotionLines} />
         </div>
       </div>
       <div className="flex flex-col gap-3">
-        <SubHeading jp="代理の動き" label="Agent motion" />
+        <SubHeading label="Agent motion" />
         <LeaderList>
           {agentMotionSpecs.map((spec) => (
-            <LeaderRow jp={spec.jp} key={spec.label} label={spec.label}>
+            <LeaderRow key={spec.label} label={spec.label}>
               {spec.value}
             </LeaderRow>
           ))}
