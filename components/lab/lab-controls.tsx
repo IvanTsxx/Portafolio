@@ -7,6 +7,7 @@ import {
   chipClassName,
   technicalButtonVariants,
 } from "@/components/site/styles";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -81,6 +82,45 @@ export const SliderControl = ({
           onChange(Array.isArray(next) ? (next[0] ?? min) : next)
         }
         step={step}
+        value={value}
+      />
+    </ControlRow>
+  );
+};
+
+interface TextControlProps {
+  label: string;
+  value: string;
+  maxLength: number;
+  hint?: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+}
+
+export const TextControl = ({
+  label,
+  value,
+  maxLength,
+  hint,
+  disabled = false,
+  onChange,
+}: TextControlProps) => {
+  const labelId = useId();
+  return (
+    <ControlRow
+      hint={hint}
+      label={label}
+      labelId={labelId}
+      readout={`${value.length}/${maxLength}`}
+    >
+      <Input
+        aria-labelledby={labelId}
+        autoComplete="off"
+        className="font-mono"
+        disabled={disabled}
+        maxLength={maxLength}
+        onChange={(event) => onChange(event.target.value)}
+        spellCheck={false}
         value={value}
       />
     </ControlRow>

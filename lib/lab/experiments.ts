@@ -1,11 +1,15 @@
 import type { ComponentType } from "react";
 
+import { AsciiLive } from "@/components/lab/experiments/ascii/live";
+import { AsciiPoster } from "@/components/lab/experiments/ascii/poster";
 import { DitherFieldLive } from "@/components/lab/experiments/dither-field/live";
 import { DitherFieldPoster } from "@/components/lab/experiments/dither-field/poster";
 import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
 import { DotGridPoster } from "@/components/lab/experiments/dot-grid/poster";
 import { ErrorDiffusionLive } from "@/components/lab/experiments/error-diffusion/live";
 import { ErrorDiffusionPoster } from "@/components/lab/experiments/error-diffusion/poster";
+import { HalftoneLive } from "@/components/lab/experiments/halftone/live";
+import { HalftonePoster } from "@/components/lab/experiments/halftone/poster";
 import { MatrixRainLive } from "@/components/lab/experiments/matrix-rain/live";
 import { MatrixRainPoster } from "@/components/lab/experiments/matrix-rain/poster";
 import { SignalTypeLive } from "@/components/lab/experiments/signal-type/live";
@@ -18,7 +22,9 @@ export type ExperimentSlug =
   | "dot-grid"
   | "signal-type"
   | "matrix-rain"
-  | "error-diffusion";
+  | "error-diffusion"
+  | "halftone"
+  | "ascii";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -38,6 +44,29 @@ export interface Experiment {
 }
 
 const experimentsBySlug = {
+  ascii: {
+    Poster: AsciiPoster,
+    Preview: AsciiLive,
+    hasControls: true,
+    implementation: [
+      "Glyphs are drawn once in Geist Mono to a texture atlas and sorted by measured ink.",
+      "A fragment shader picks each cell's glyph from the source tone and samples it from the atlas.",
+      "Inside the scanner the grid halves its cell size or prints in negative.",
+    ],
+    index: "LAB-07",
+    related: ["halftone", "signal-type"],
+    slug: "ascii",
+    summary: "A lit form typed in mono glyphs, read through a pointer scanner.",
+    technicalNotes: [
+      "The whole grid is one draw call. A new glyph set rebuilds only the atlas.",
+      "Custom sets accept twelve characters. A space is always the lightest step.",
+      "The render loop stops offscreen. Reduced motion renders a single frame.",
+    ],
+    technologies: ["React Three Fiber", "GLSL", "Canvas 2D", "Geist Mono"],
+    title: "ASCII scanner",
+    topics: ["Shader", "Typography", "WebGL"],
+    year: 2026,
+  },
   "dither-field": {
     Poster: DitherFieldPoster,
     Preview: DitherFieldLive,
@@ -67,7 +96,7 @@ const experimentsBySlug = {
       "One full-viewport plane with a ShaderMaterial. Each pixel tests the dots of its own cell and the eight around it.",
       "Value noise sets each dot's radius. The lens springs toward the pointer in useFrame and pushes dots outward.",
     ],
-    index: "LAB-05",
+    index: "LAB-03",
     related: ["dither-field", "signal-type"],
     slug: "dot-grid",
     summary: "A halftone dot grid that swells and parts around the pointer.",
@@ -89,7 +118,7 @@ const experimentsBySlug = {
       "Each kernel is a table of offsets and weights. One loop spreads the error forward, mirrored on odd rows when serpentine.",
       "Both results paint into stacked canvases. The split is a clip-path, so dragging it never re-dithers.",
     ],
-    index: "LAB-07",
+    index: "LAB-05",
     related: ["dither-field", "dot-grid"],
     slug: "error-diffusion",
     summary: "Error diffusion against ordered Bayer, split down the middle.",
@@ -102,6 +131,29 @@ const experimentsBySlug = {
     topics: ["Image"],
     year: 2026,
   },
+  halftone: {
+    Poster: HalftonePoster,
+    Preview: HalftoneLive,
+    hasControls: true,
+    implementation: [
+      "One full-viewport plane. The fragment shader rotates each pixel into screen space and tests the four nearest cells.",
+      "Each cell reads the source tone at its center and sizes its mark so the inked area matches that tone.",
+      "The source is a shaded sphere or the portrait relit from its own luminance slope. The pointer is the light.",
+    ],
+    index: "LAB-06",
+    related: ["ascii", "dot-grid"],
+    slug: "halftone",
+    summary: "An amplitude-modulated print screen, relit by the pointer.",
+    technicalNotes: [
+      "Round, line and square marks share one loop. Only the coverage-to-size curve changes.",
+      "The portrait is sampled at a mip level matched to the cell, so each mark averages its own area.",
+      "The render loop stops offscreen. Reduced motion renders a single frame.",
+    ],
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
+    title: "Halftone",
+    topics: ["Shader", "WebGL"],
+    year: 2026,
+  },
   "matrix-rain": {
     Poster: MatrixRainPoster,
     Preview: MatrixRainLive,
@@ -111,7 +163,7 @@ const experimentsBySlug = {
       "Glyphs are box-filtered into a 6×8 texel atlas, one texel per dot. A Bayer threshold thins the trails.",
       "The pointer pushes columns sideways with a Gaussian falloff, so the rain parts around it.",
     ],
-    index: "LAB-06",
+    index: "LAB-04",
     related: ["dot-grid", "dither-field"],
     slug: "matrix-rain",
     summary:
