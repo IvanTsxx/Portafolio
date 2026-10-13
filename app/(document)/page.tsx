@@ -1,9 +1,9 @@
 import { HomePanels } from "@/components/page-panels/home";
 import { AgentWorkshop } from "@/components/profile/agent-workshop";
 import { ContactRow } from "@/components/profile/contact-row";
-import { ContributionMatrix } from "@/components/profile/contribution-matrix";
 import { ExperienceSection } from "@/components/profile/experience/experience-section";
 import { HowIWork } from "@/components/profile/how-i-work/how-i-work-section";
+import { MatrixSection } from "@/components/profile/matrix/matrix-section";
 import { ProfileIntro } from "@/components/profile/profile-intro";
 import { PinnedSection } from "@/components/profile/card-catalog/pinned-section";
 import { getGithubProfile } from "@/lib/site/github-profile";
@@ -19,7 +19,7 @@ const HomePage = async () => {
       <HomePanels />
       <ExperienceSection />
       <PinnedSection repositories={profile.pinned} />
-      <ContributionMatrix calendars={profile.calendars} />
+      <MatrixSection calendars={profile.calendars} />
       <HowIWork />
       <AgentWorkshop />
       <ContactRow />
