@@ -60,40 +60,112 @@ describe("section construction", () => {
   });
 });
 
-describe("construction schedule", () => {
-  const typicalHeights = [480, 32, 32, 32, 32, 32, 120, 120, 64, 200, 44, 300];
+const panel = (height: number, parent = 0) => ({
+  compact: false,
+  height,
+  parent,
+});
 
-  test("a section of 4 to 12 blocks builds in 2 to 3.5 seconds", () => {
+const chip = (parent: number) => ({ compact: true, height: 32, parent });
+
+describe("construction schedule", () => {
+  const typicalBlocks = [
+    panel(480),
+    chip(1),
+    chip(1),
+    chip(1),
+    chip(1),
+    chip(1),
+    panel(120),
+    panel(120),
+    chip(2),
+    panel(200),
+    chip(3),
+    panel(300),
+  ];
+
+  test("a section of 4 to 12 blocks builds in 3.5 to 6 seconds", () => {
     for (let count = 4; count <= 12; count += 1) {
       const seconds = scheduleSeconds(
-        constructionSchedule(typicalHeights.slice(0, count))
+        constructionSchedule(typicalBlocks.slice(0, count))
       );
-      expect(seconds).toBeGreaterThanOrEqual(2);
-      expect(seconds).toBeLessThanOrEqual(3.5);
+      expect(seconds).toBeGreaterThanOrEqual(3.5);
+      expect(seconds).toBeLessThanOrEqual(6);
     }
   });
 
-  test("blocks start in order, one after another", () => {
-    const starts = constructionSchedule(typicalHeights).map(
-      (block) => block.start
+  test("a large block draws its frame, pauses, then prints for 1.2 to 2 seconds", () => {
+    for (const height of [64, 200, 480, 1200]) {
+      const [only] = constructionSchedule([panel(height)]);
+      expect(only?.tool).toBe("gantry");
+      expect(only?.frame).toBeCloseTo(0.5);
+      expect(only?.pause).toBeGreaterThan(0);
+      expect(only?.print).toBeGreaterThanOrEqual(1.2);
+      expect(only?.print).toBeLessThanOrEqual(2);
+    }
+  });
+
+  test("printing steps through a few legible layers", () => {
+    for (const height of [64, 200, 480, 1200]) {
+      const [only] = constructionSchedule([panel(height)]);
+      const layers = only?.layers ?? 0;
+      expect(layers).toBeGreaterThanOrEqual(4);
+      expect(layers).toBeLessThanOrEqual(9);
+      expect((only?.print ?? 0) / layers).toBeGreaterThanOrEqual(0.2);
+    }
+  });
+
+  test("compact siblings share one quick pass in order", () => {
+    const schedule = constructionSchedule(typicalBlocks);
+    const chips = schedule.slice(1, 6);
+    expect(new Set(chips.map((block) => block.pass)).size).toBe(1);
+    expect(chips.every((block) => block.tool === "sweep")).toBe(true);
+    for (const [index, block] of chips.entries()) {
+      expect(block.start).toBeGreaterThan(chips[index - 1]?.start ?? -1);
+    }
+    expect(chips.at(-1)?.start ?? 0).toBeLessThan(
+      (chips[0]?.start ?? 0) + 0.5
     );
+  });
+
+  test("compact blocks under different parents start separate passes", () => {
+    const [first, second] = constructionSchedule([chip(1), chip(2)]);
+    expect(second?.pass).toBe((first?.pass ?? 0) + 1);
+  });
+
+  test("passes start in order, one after another", () => {
+    const schedule = constructionSchedule(typicalBlocks);
+    const passStarts = new Map<number, number>();
+    for (const block of schedule) {
+      passStarts.set(
+        block.pass,
+        Math.min(passStarts.get(block.pass) ?? block.start, block.start)
+      );
+    }
+    const starts = [...passStarts.entries()]
+      .toSorted(([first], [second]) => first - second)
+      .map(([, start]) => start);
     expect(starts[0]).toBe(0);
     for (const [index, start] of starts.entries()) {
       expect(start).toBeGreaterThan(starts[index - 1] ?? -1);
     }
   });
 
-  test("taller blocks print longer and in more layers", () => {
-    const [short, tall] = constructionSchedule([32, 480]);
-    expect(tall?.print).toBeGreaterThan(short?.print ?? 0);
-    expect(tall?.layers).toBeGreaterThan(short?.layers ?? 0);
+  test("compact siblings split by a panel in reading order stay one pass", () => {
+    const [first, panelBlock, second] = constructionSchedule([
+      chip(1),
+      panel(300),
+      chip(1),
+    ]);
+    expect(second?.pass).toBe(first?.pass);
+    expect(panelBlock?.pass).not.toBe(first?.pass);
+    expect(second?.start).toBeGreaterThan(first?.start ?? 0);
   });
 
-  test("a lone block still draws its frame before it prints", () => {
-    const [only] = constructionSchedule([200]);
-    expect(only?.start).toBe(0);
-    expect(only?.frame).toBeGreaterThan(0);
-    expect(only?.print).toBeGreaterThan(0);
+  test("taller blocks print longer and in more layers", () => {
+    const [short, tall] = constructionSchedule([panel(120), panel(480, 1)]);
+    expect(tall?.print).toBeGreaterThan(short?.print ?? 0);
+    expect(tall?.layers).toBeGreaterThan(short?.layers ?? 0);
   });
 
   test("an empty section takes no time", () => {
