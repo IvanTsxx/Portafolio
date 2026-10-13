@@ -268,9 +268,7 @@ export const LineLive = ({ caption, drawing, label }: LineLiveProps) => {
             {drawing}
           </div>
           <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 px-4 pb-3">
-            <span className="label text-mist">
-              Point at a station · click to send the part
-            </span>
+            <span className="label text-mist">Pick a station · ← →</span>
             <span
               className="ml-auto flex max-w-sm flex-col items-end gap-0.5 text-right"
               data-readout
