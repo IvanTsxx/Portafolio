@@ -356,7 +356,7 @@ export const CatalogLive = ({
                 <g data-part={`card-${slot}`} key={card.id}>
                   <a
                     aria-label={spokenCard(card)}
-                    className="cursor-pointer outline-none"
+                    className="focus-visible:outline-ink cursor-pointer outline-none focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-solid"
                     data-card={slot}
                     href={card.url}
                     onClick={(event) => onCardClick(event, slot)}
