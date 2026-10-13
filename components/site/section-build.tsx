@@ -127,14 +127,12 @@ const printableChildren = (element: Element) =>
   [...element.children].filter(isPrintable);
 
 const findBlocks = (root: HTMLElement) => {
-  const marked = [
-    ...root.querySelectorAll<HTMLElement>("[data-build-block]"),
-  ].filter(
-    (element) =>
-      isPrintable(element) && !element.querySelector("[data-build-block]")
-  );
+  const marked = [...root.querySelectorAll<HTMLElement>("[data-build-block]")];
   if (marked.length > 0) {
-    return marked;
+    return marked.filter(
+      (element) =>
+        isPrintable(element) && !element.querySelector("[data-build-block]")
+    );
   }
   let level = printableChildren(root);
   let [only] = level;
@@ -155,7 +153,7 @@ const inReadingOrder = (blocks: readonly HTMLElement[]) =>
     )
     .map(({ block }) => block);
 
-const toBuildBlocks =(blocks: readonly HTMLElement[]): BuildBlock[] => {
+const toBuildBlocks = (blocks: readonly HTMLElement[]): BuildBlock[] => {
   const parents = new Map<Element, number>();
   return blocks.map((block) => {
     const parent = block.parentElement ?? block;
@@ -276,7 +274,11 @@ const drawFrame = (
   }
   if (firstTick) {
     timeline
-      .to(firstTick, { duration: 0.2, ease: easeEnter, opacity: 1, scale: 1 }, 0)
+      .to(
+        firstTick,
+        { duration: 0.2, ease: easeEnter, opacity: 1, scale: 1 },
+        0
+      )
       .to(
         restTicks,
         { duration: 0.2, ease: easeEnter, opacity: 1, scale: 1, stagger: 0.06 },
@@ -331,7 +333,11 @@ const printBlock = (
   if (readout) {
     readout.textContent = readoutFor(1, 0);
   }
-  timeline.to(head, { duration: 0.25, ease: easeEnter, opacity: 1 }, begin - 0.25);
+  timeline.to(
+    head,
+    { duration: 0.25, ease: easeEnter, opacity: 1 },
+    begin - 0.25
+  );
   for (let index = 0; index < timing.layers; index += 1) {
     const at = begin + index * layer;
     const share = (index + 1) / timing.layers;
@@ -371,7 +377,11 @@ const printBlock = (
   timeline
     .set(scaffold.cover, { pointerEvents: "none" }, begin + timing.print)
     .call(() => releaseBuild(scaffold.block), undefined, begin + timing.print)
-    .to(head, { duration: 0.22, ease: easeLeave, opacity: 0 }, begin + timing.print);
+    .to(
+      head,
+      { duration: 0.22, ease: easeLeave, opacity: 0 },
+      begin + timing.print
+    );
 };
 
 const settleBlock = (
@@ -396,14 +406,26 @@ const settleBlock = (
         { duration: 0.25, ease: easeEnter, opacity: 1, y: 0 },
         at + 0.08
       )
-      .to(tag.root, { duration: 0.25, ease: easeLeave, opacity: 0 }, retractAt + retract * 0.4);
+      .to(
+        tag.root,
+        { duration: 0.25, ease: easeLeave, opacity: 0 },
+        retractAt + retract * 0.4
+      );
   }
   for (const [index, edge] of edges.entries()) {
     timeline.set(edge, { transformOrigin: retractOrigins[index] }, retractAt);
   }
   timeline
-    .to([top, bottom], { duration: retract, ease: easeStep, scaleX: 0 }, retractAt)
-    .to([right, left], { duration: retract, ease: easeStep, scaleY: 0 }, retractAt);
+    .to(
+      [top, bottom],
+      { duration: retract, ease: easeStep, scaleX: 0 },
+      retractAt
+    )
+    .to(
+      [right, left],
+      { duration: retract, ease: easeStep, scaleY: 0 },
+      retractAt
+    );
   if (rails.length > 0) {
     timeline
       .set(rails, { transformOrigin: "center bottom" }, retractAt)
