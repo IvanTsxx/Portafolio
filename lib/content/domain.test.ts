@@ -18,6 +18,7 @@ const caseStudy = (
 ): CaseStudy => ({
   aiWorkflowNotes: [],
   context: "Context",
+  date: "2026-06-01",
   featured: false,
   kind: "case-study",
   links: [],
@@ -32,7 +33,6 @@ const caseStudy = (
   summary: "Summary",
   title: overrides.slug,
   wordCount: 10,
-  year: 2026,
   ...overrides,
 });
 
@@ -56,10 +56,10 @@ const slugsOf = (notes: readonly Note[]) => notes.map((note) => note.slug);
 describe("ordering", () => {
   test("interleaves both kinds newest first and breaks ties by title", () => {
     const sorted = [
-      caseStudy({ slug: "old-build", year: 2024 }),
+      caseStudy({ date: "2024-06-01", slug: "old-build" }),
       fieldNote({ date: "2026-10-09", slug: "fresh-note" }),
-      caseStudy({ slug: "b-build", title: "Bravo", year: 2026 }),
-      caseStudy({ slug: "a-build", title: "Alpha", year: 2026 }),
+      caseStudy({ date: "2026-06-01", slug: "b-build", title: "Bravo" }),
+      caseStudy({ date: "2026-06-01", slug: "a-build", title: "Alpha" }),
       fieldNote({ date: "2025-03-01", slug: "last-year-note" }),
     ].toSorted(compareNotes);
 

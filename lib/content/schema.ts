@@ -69,6 +69,7 @@ export const caseStudyMetaSchema = z.strictObject({
   aiWorkflowNotes: textList.default([]),
   client: text.optional(),
   context: text,
+  date: z.iso.date(),
   featured: z.boolean().default(false),
   kind: z.literal("case-study"),
   links: z.array(linkSchema).default([]),
@@ -77,7 +78,6 @@ export const caseStudyMetaSchema = z.strictObject({
   responsibilities: requiredTextList,
   role: text,
   stack: requiredTextList,
-  year: z.number().int().min(2000).max(2100),
 });
 
 export const fieldNoteMetaSchema = z.strictObject({

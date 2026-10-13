@@ -199,7 +199,7 @@ export const noteJsonLd = (note: Note) => {
       : {
           ...shared,
           "@type": "Article",
-          datePublished: String(note.year),
+          datePublished: note.date,
           keywords: note.stack.join(", "),
         };
   return toGraph(

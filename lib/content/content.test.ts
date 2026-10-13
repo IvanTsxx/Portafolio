@@ -67,9 +67,7 @@ describe("shipped notes", () => {
 
   test("is ordered newest first across both kinds", async () => {
     const notes = await getNotes();
-    const keys = notes.map((item) =>
-      item.kind === "note" ? item.date : String(item.year)
-    );
+    const keys = notes.map((item) => item.date);
 
     expect(keys).toEqual(keys.toSorted().toReversed());
   });

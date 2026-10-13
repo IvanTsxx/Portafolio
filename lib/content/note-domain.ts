@@ -62,13 +62,12 @@ export const tagsOf = (note: Note) => (note.kind === "note" ? note.tags : []);
 
 const topicsOf = (note: Note) => [...tagsOf(note), ...stackOf(note)];
 
-const sortKeyOf = (note: Note) =>
-  note.kind === "note" ? note.date : String(note.year);
+const sortKeyOf = (note: Note) => note.date;
 
-export const stampOf = (note: Note): NoteStamp =>
-  note.kind === "note"
-    ? { dateTime: note.date, label: formatPostDate(note.date) }
-    : { dateTime: String(note.year), label: String(note.year) };
+export const stampOf = (note: Note): NoteStamp => ({
+  dateTime: note.date,
+  label: formatPostDate(note.date),
+});
 
 export const toNoteIndexItem = (note: Note): NoteIndexItem => ({
   kind: note.kind,

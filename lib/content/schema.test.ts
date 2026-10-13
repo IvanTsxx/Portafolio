@@ -4,13 +4,13 @@ import { caseStudyMetaSchema, noteMetaSchema, slugPattern } from "./schema";
 
 const validWork = {
   context: "Sample entry",
+  date: "2026-06-01",
   kind: "case-study",
   responsibilities: ["Motion tokens"],
   role: "Frontend engineer",
   stack: ["Next.js"],
   summary: "A summary",
   title: "Project",
-  year: 2026,
 };
 
 const validPost = {
@@ -36,7 +36,7 @@ describe("note kinds", () => {
       noteMetaSchema.safeParse({ ...validPost, stack: ["GSAP"] }).success
     ).toBe(false);
     expect(
-      noteMetaSchema.safeParse({ ...validWork, date: "2026-10-09" }).success
+      noteMetaSchema.safeParse({ ...validWork, tags: ["Workflow"] }).success
     ).toBe(false);
   });
 });
@@ -73,10 +73,10 @@ describe("case study meta", () => {
     ).toBe(false);
   });
 
-  test("rejects a year outside a sane range", () => {
-    expect(noteMetaSchema.safeParse({ ...validWork, year: 1850 }).success).toBe(
-      false
-    );
+  test("rejects a date that is not an ISO day", () => {
+    expect(
+      noteMetaSchema.safeParse({ ...validWork, date: "October 2026" }).success
+    ).toBe(false);
   });
 
   test("rejects a summary longer than 280 characters", () => {

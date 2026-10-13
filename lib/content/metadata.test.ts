@@ -22,6 +22,7 @@ const note: FieldNote = {
 const caseStudy: CaseStudy = {
   aiWorkflowNotes: [],
   context: "Context",
+  date: "2026-06-01",
   featured: false,
   kind: "case-study",
   links: [],
@@ -37,7 +38,6 @@ const caseStudy: CaseStudy = {
   summary: "Summary of the case study",
   title: "Editorial motion system",
   wordCount: 300,
-  year: 2026,
 };
 
 describe("note metadata", () => {
