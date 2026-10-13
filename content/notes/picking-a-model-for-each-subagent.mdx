@@ -1,0 +1,48 @@
+export const meta = {
+  kind: "note",
+  title: "How I pick the model for each subagent",
+  date: "2026-10-05",
+  summary:
+    "Sonnet at high effort for scoped work, Opus at medium effort for hard work, and a reason every time.",
+  tags: ["Subagents", "Claude Code", "AI agents", "Workflow"],
+  related: ["my-global-claude-md-rule-by-rule", "worktrees-as-lanes"],
+};
+
+My global Claude Code rules say that before an agent launches a subagent, it names the model and gives a one-line reason. Picking the model is a decision, so I want to see it.
+
+## Two tiers cover almost everything
+
+| Work | Model and effort |
+| --- | --- |
+| Search, mechanical edits, repetitive changes, running checks | Sonnet, high or xhigh |
+| Animation, new features and components, design and architecture choices | Opus, medium |
+| A bug with an unknown cause | Opus, medium |
+
+The first row is work with a clear finish line. The agent knows when it is done, and the output is easy to check. Sonnet at high effort handles that well.
+
+The second and third rows need judgment. There is no single right answer, or the cause is not known yet. Those go to Opus.
+
+## Effort is part of the choice
+
+I pick the effort level with the model. A fast model at high effort is a different worker from the same model at low effort. In Claude Code I set the level through the agent type, and pass the model on the call.
+
+## The rules around the launch
+
+The model choice is one line. The rules around it matter as much:
+
+<Steps>
+  <Step title="Run independent work in parallel">
+    Agents with separate scopes launch in the same message.
+  </Step>
+  <Step title="Never wait idle">
+    While subagents run, the lead keeps working on the core task.
+  </Step>
+  <Step title="Read and verify the output">
+    A subagent report is a claim. The lead reads the diff, integrates it and
+    runs the checks before it reports done.
+  </Step>
+</Steps>
+
+## What the redesign used
+
+In the redesign of this site, every agent ran Opus at medium effort. The work was design, 3D and motion, so the second row applied every time. No launch needed an exception to the table.

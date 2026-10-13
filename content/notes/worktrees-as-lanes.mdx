@@ -1,144 +1,49 @@
 export const meta = {
   kind: "note",
-  title: "Worktrees as lanes: how I run parallel agents in Conductor",
-  date: "2026-10-09",
-  summary: "A git worktree gives each agent its own lane.",
-  tags: ["Conductor", "Git worktrees", "AI agents", "Workflow"],
-  sample: true,
+  title: "Worktrees as lanes",
+  date: "2026-10-03",
+  summary:
+    "Every task gets its own git worktree and branch. Disjoint file scopes keep the merges small.",
+  tags: ["Git worktrees", "Conductor", "AI agents", "Workflow"],
+  related: [
+    "redesigning-this-portfolio-with-parallel-agents",
+    "picking-a-model-for-each-subagent",
+  ],
 };
 
-Two agents in one checkout will edit the same file or fight over the branch and the dev server port. A git worktree gives each agent its own directory. I call each one a lane.
+Two agents in one checkout edit the same files and fight over the branch. So every task or issue I hand out gets its own git worktree and its own branch. I call each one a lane.
 
-<Callout tone="sample" title="Sample draft">
-  Editable placeholder. No measured results.
-</Callout>
+## One task, one worktree, one branch
 
-## What a lane is
+A worktree is a second working directory backed by the same repository. Conductor creates one for every workspace. When Claude Code spawns subagents in this repo, each one runs in `.claude/worktrees/agent-*`.
 
-One branch, one agent and one diff to review.
-
-<Diagram
-  caption="Every lane has its own files and branch. The repository underneath is shared."
-  label="One shared git repository with three lanes attached: main, lane hero and lane nav. Each lane has an agent."
->
-  <svg
-    className="h-auto w-full max-w-xl"
-    fill="none"
-    viewBox="0 0 560 220"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <rect
-      className="stroke-rule-strong"
-      height="44"
-      width="240"
-      x="160"
-      y="8"
-    />
-    <text
-      className="fill-graphite font-mono text-xs"
-      textAnchor="middle"
-      x="280"
-      y="35"
-    >
-      {"shared .git"}
-    </text>
-    <path
-      className="stroke-rule-strong"
-      d="M280 52 V84 M80 84 H480 M80 84 V116 M280 84 V116 M480 84 V116"
-    />
-    <rect
-      className="stroke-rule-strong"
-      height="96"
-      width="160"
-      x="0"
-      y="116"
-    />
-    <rect
-      className="stroke-rule-strong"
-      height="96"
-      width="160"
-      x="200"
-      y="116"
-    />
-    <rect
-      className="stroke-rule-strong"
-      height="96"
-      width="160"
-      x="400"
-      y="116"
-    />
-    <text
-      className="fill-ink font-mono text-xs"
-      textAnchor="middle"
-      x="80"
-      y="144"
-    >
-      {"main"}
-    </text>
-    <text
-      className="fill-ink font-mono text-xs"
-      textAnchor="middle"
-      x="280"
-      y="144"
-    >
-      {"lane/hero"}
-    </text>
-    <text
-      className="fill-ink font-mono text-xs"
-      textAnchor="middle"
-      x="480"
-      y="144"
-    >
-      {"lane/nav"}
-    </text>
-    <text
-      className="fill-graphite font-mono text-xs"
-      textAnchor="middle"
-      x="80"
-      y="176"
-    >
-      {"me"}
-    </text>
-    <text
-      className="fill-graphite font-mono text-xs"
-      textAnchor="middle"
-      x="280"
-      y="176"
-    >
-      {"agent"}
-    </text>
-    <text
-      className="fill-graphite font-mono text-xs"
-      textAnchor="middle"
-      x="480"
-      y="176"
-    >
-      {"agent"}
-    </text>
-  </svg>
-</Diagram>
-
-## Isolated and shared
-
-| Thing                           | Scope    |
-| ------------------------------- | -------- |
-| Working files and branch        | Per lane |
-| `node_modules` and build output | Per lane |
-| Git objects and remotes         | Shared   |
-| Stash stack                     | Shared   |
-
-<Callout tone="warning" title="The stash is shared">
-  A bare `git stash pop` can apply another lane's work. Commit a
-  work-in-progress instead.
-</Callout>
-
-## Setting up a lane
-
-```bash title="new-lane.sh"
-git worktree add ../lane-hero -b lane/hero origin/main
-cd ../lane-hero
-bun install
-bun dev --port 3105
+```bash
+git worktree add .claude/worktrees/agent-hero -b agent/hero main
+cd .claude/worktrees/agent-hero
+bun install --frozen-lockfile
 ```
 
-Cut lanes along files, not features. Shared files get one owner.
+The lane owns its files, its branch and its build output. The git objects and the remotes stay shared.
+
+## Disjoint scopes keep merges small
+
+A lead agent merges each lane back. The conflicts stay small because I cut lanes along files: every agent gets a scope it owns. In the portfolio redesign the only conflicts were of two kinds:
+
+- A route-dates JSON file that gets regenerated after the merge anyway.
+- An experiments registry where two agents appended entries to the same list.
+
+Both took one edit to resolve. When two lanes need the same file, one of them owns it and the other asks.
+
+## Two gotchas
+
+<Callout tone="warning" title="A new worktree may have no node_modules">
+  Run `bun install --frozen-lockfile` before the first typecheck or test.
+</Callout>
+
+Some files derive from git history. In this repo `lib/site/route-dates.json` holds the last commit date of every route. A lane cannot know the date of a merge that has not happened yet, so the lead regenerates that file after the merge commit:
+
+```bash
+bun run seo:dates
+```
+
+Then it commits the dates on their own.

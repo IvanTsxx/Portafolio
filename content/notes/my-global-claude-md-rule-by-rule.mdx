@@ -1,0 +1,55 @@
+export const meta = {
+  kind: "note",
+  title: "My global CLAUDE.md, rule by rule",
+  date: "2026-10-07",
+  summary:
+    "The rules every agent reads before it touches one of my projects, grouped by what they control.",
+  tags: ["Claude Code", "CLAUDE.md", "AI agents", "Workflow"],
+  related: ["skills-vs-mcps", "picking-a-model-for-each-subagent"],
+};
+
+My global `CLAUDE.md` applies to every project I open with Claude Code. Project files add context. They never relax these rules. Here they are, grouped by what they control.
+
+## Find the right tool before the code
+
+- Check the installed skills first, load every one that matches the task and follow it.
+- Navigate code with `jg` (jevgrep) and CodeGraph before grep.
+- Check `package.json` first. Use a well-maintained library instead of writing the same thing by hand.
+
+## Figma is the source of truth
+
+- Match the hierarchy, type, color, spacing and states in the Figma file.
+- Map every value to an existing token.
+- Round to the Tailwind scale, in steps of 4px. No arbitrary values unless the value is a deliberate brand token.
+
+## Styling stays in the markup
+
+- Hover, focus and active states are CSS. JavaScript only when CSS cannot express the effect.
+- No ad-hoc `.class` rules. Tailwind utilities, a reusable `@utility`, or a cva variant.
+- One component base with variants, the shadcn way, with cva and `cn`.
+
+```tsx
+const buttonVariants = cva("inline-flex items-center", {
+  variants: { size: { sm: "h-8 px-3", md: "h-10 px-4" } },
+});
+```
+
+## Page builders use a registry
+
+Each block is one self-contained module that registers itself in a single registry. The renderer looks blocks up by type. No switch statements over block types, so adding a block never edits existing code.
+
+## The code carries no extras
+
+- Never add code comments. Names explain the code.
+- Never add AI attribution to commits or pull requests.
+- Server Components by default. `"use client"` only where interaction needs it.
+
+## Done means seen
+
+- Verify with typecheck, lint, build and tests before reporting.
+- Report the real output. Never claim a success you have not seen.
+- Never use Playwright. `agent-browser` is a last resort, and only after asking me.
+
+## Language
+
+The agent replies in the language I write in, so Spanish when I write in Spanish. Code, commits and identifiers stay in English.

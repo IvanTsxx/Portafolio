@@ -74,10 +74,10 @@ describe("shipped notes", () => {
     expect(keys).toEqual(keys.toSorted().toReversed());
   });
 
-  test("labels every non-real entry as sample content", async () => {
+  test("ships only real entries, so every note is indexable", async () => {
     const notes = await getNotes();
 
-    expect(notes.every((item) => item.sample)).toBe(true);
+    expect(notes.filter((item) => item.sample)).toEqual([]);
   });
 
   test("reading time comes from the prose and not from the meta block", async () => {

@@ -1,0 +1,60 @@
+export const meta = {
+  kind: "note",
+  title: "One WebGL canvas for a whole site",
+  date: "2026-10-09",
+  summary:
+    "Every 3D scene here renders through one fixed canvas into DOM-tracked views, with one exception.",
+  tags: ["WebGL", "React Three Fiber", "Performance", "3D"],
+  related: [
+    "dithering-from-bayer-to-error-diffusion",
+    "redesigning-this-portfolio-with-parallel-agents",
+  ],
+};
+
+This site has 3D in several places: the small orange companion on the rail and the stages in How I work. All of it renders through one `<Canvas>`.
+
+## One canvas, many views
+
+The root layout mounts `components/scene/shared-canvas.tsx` once. The canvas is fixed, covers the viewport and sits at z-30. A component that wants 3D does not create a canvas. It registers a slot with `useViewSlot`, passing a ref to a DOM element and the scene to draw there:
+
+```tsx
+useViewSlot("stage", stageRef, <Stage />);
+```
+
+The canvas renders each registered slot as a drei `View`. A `View` reads the position of its DOM element and draws its scene inside that rectangle:
+
+```tsx
+return slots.map((slot) => (
+  <View index={slot.priority} key={slot.id} track={slot.track}>
+    <Suspense fallback={null}>{slot.node}</Suspense>
+  </View>
+));
+```
+
+This repo never adds a second `Canvas`. A test also checks that only one agent renders on screen.
+
+## Each stage draws in three calls
+
+A How I work stage costs three draw calls:
+
+- Static parts, merged into one mesh.
+- Moving parts, as one instanced mesh.
+- Shadows, merged into one mesh.
+
+The tests measure 468 to 2,760 triangles per stage.
+
+## It only runs when it has work
+
+- A view mounts only when its element is near the viewport.
+- With no views near the viewport, the canvas renders on demand.
+- Reduced motion freezes the poses.
+- Without WebGL, a static fallback takes the place of the view.
+
+## When I did not use it
+
+The dither field behind each page title is a DOM Canvas2D, not a view. There were two reasons:
+
+1. The shared canvas is fixed at z-30, so a view would paint over the title.
+2. The scissor rectangle of a view follows the DOM one frame late while scrolling.
+
+The Canvas2D layer draws 192 by 72 cells in about 0.1 ms per frame in a Bun benchmark. One shared canvas is the default, and a fixed overlay is the wrong place for a background.
