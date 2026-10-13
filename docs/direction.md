@@ -14,13 +14,14 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 
 - `components/site/dossier.tsx` wraps every page in a sheet over two backing sheets. Index pages (`app/(document)`) use the 44rem column. Detail pages (`app/(detail)`) use the wide sheet.
 - Route tabs use English labels with a tiny vertical kana on desktop. Japanese appears only there, in index page heroes and in the nickname kana.
-- The thumb index (`thumb-index.tsx`) shows one notch per section from `lib/site/page-sections.ts`.
+- The thumb index (`thumb-index.tsx`) shows one notch per section from `lib/site/page-sections.ts`. Notch numbers come from the section heading codes, and section components read their code from the same list.
+- `components/scene/active-section.ts` decides the active section for the notches, the companion's rail position and its line.
 - The top line holds the wordmark, back to top, ⌘K search and the GitHub star count. The back cover is the colophon.
 
 ## 3D contract
 
 - One shared Canvas, mounted once in `app/layout.tsx`, renders into DOM-tracked views. Never add a second Canvas.
-- One agent on screen, the companion, 48×56 on the rail. The route picks its role. It narrates one first-person line per section and builds sections as they scroll in.
+- One agent on screen, the companion, 48×56 on the rail. The route picks its role. It narrates one first-person line per section while that section is active, stays quiet during fast scrolls, and builds sections as they scroll in.
 - Section builds, figure stations, the How I work stages, the 404 stage and the Workshop register a spot in `components/scene/companion-stages.ts`. The companion walks there and performs the spot's action.
 - `<StageScene>` renders props only, never an agent.
 - Rig showcase routes (`/dev/agents`, `/registry/agent`, `/registry/agent-stage`) send the companion away. `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.

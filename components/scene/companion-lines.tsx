@@ -2,17 +2,18 @@
 
 import { useLayoutEffect, useRef } from "react";
 
-import { registerSpokenSection } from "./companion-signals";
+import { registerSpokenSection } from "./active-section";
 
 export const CompanionLines = ({ lines }: { lines: readonly string[] }) => {
   const marker = useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
     const element = marker.current;
-    if (!element || lines.length === 0) {
+    const section = element?.parentElement;
+    if (!(element && section)) {
       return;
     }
-    return registerSpokenSection(element, lines);
+    return registerSpokenSection({ element, id: section.id, lines });
   }, [lines]);
 
   return (

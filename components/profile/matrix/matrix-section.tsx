@@ -1,6 +1,7 @@
 import "@/components/iso/iso.css";
 import { DocumentSection } from "@/components/site/document-section";
 import type { ContributionCalendar } from "@/lib/github/model";
+import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { loomParts } from "./loom-art";
@@ -41,12 +42,13 @@ export const MatrixSection = ({
     layout,
     sources.map((source) => source.year)
   );
+  const section = homeSectionById("matrix");
 
   return (
     <DocumentSection
-      id="matrix"
-      index="GH-05"
-      label="Contribution matrix"
+      id={section.id}
+      index={section.index}
+      label={section.label}
       script={sectionScripts.homeMatrix}
     >
       <LoomLive

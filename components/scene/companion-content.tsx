@@ -17,6 +17,7 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 import type { CompanionCast } from "@/lib/site/companion-roles";
 
+import { activeSpokenSection } from "./active-section";
 import type { BurstHandle, HatToss, TossHandle } from "./companion-effects";
 import { FlyingHat, PaperPoof } from "./companion-effects";
 import type { CompanionCue, CompanionMotion } from "./companion-motion";
@@ -25,6 +26,8 @@ import {
   stepCompanion,
   tuckSpeed,
 } from "./companion-motion";
+import type { Narration, NarrationStep } from "./companion-narration";
+import { isFastScroll, narrate, silence } from "./companion-narration";
 import type {
   OperatorMode,
   OperatorPose,
@@ -55,10 +58,8 @@ import {
   headerClearance,
   watchYaw,
 } from "./companion-placement";
-import { getCompanionRail } from "./companion-rail";
-import { railShare } from "./companion-rail-math";
-import type { SpokenSection } from "./companion-signals";
-import { getSpokenSection, sayCompanionLine } from "./companion-signals";
+import { getCompanionRail, railMarkFor } from "./companion-rail";
+import { sayCompanionLine } from "./companion-signals";
 import { getCompanionStages } from "./companion-stages";
 import {
   getFocusLine,
@@ -103,7 +104,6 @@ interface Candidate {
 const modelHeight = 2.2;
 const baseTilt = 0.16;
 const depthClearPriority = 2.5;
-const speechSeconds = 6;
 const operatorSpeechSeconds = 3.2;
 const speechGap = 10;
 const tailInset = 8;
@@ -177,9 +177,6 @@ const placeBubble = ({
   bubble.dataset.shown = String(isShown);
 };
 
-const lineFor = (section: SpokenSection, visit: number) =>
-  section.lines[visit % section.lines.length] ?? null;
-
 const stationCandidates = (): Candidate[] =>
   getTrackedStations().map((entry) => {
     const console = toScreen(entry.console);
@@ -242,6 +239,7 @@ const modeStationId = (mode: OperatorMode) =>
     : null;
 
 const swapOrigin = new Vector3();
+const quietNarration: Narration<Element> = silence();
 
 const ClearDepth = () => {
   useFrame(({ gl }) => {
@@ -266,12 +264,9 @@ const CompanionContent = ({
   const poof = useRef<BurstHandle>(null);
   const hat = useRef<TossHandle>(null);
   const actionRef = useRef<AgentAction>(cast.action);
-  const heardSection = useRef<Element | null>(null);
-  const sectionLine = useRef<string | null>(null);
   const handledPresses = useRef(0);
   const tossCount = useRef(0);
-  const visits = useRef(new WeakMap<Element, number>());
-  const spokenAt = useRef(Number.NEGATIVE_INFINITY);
+  const narration = useRef(quietNarration);
   const operatorLine = useRef<{ at: number; text: string } | null>(null);
   const motion = useRef<CompanionMotion | null>(null);
   const operator = useRef<OperatorMode>(railMode);
@@ -300,36 +295,7 @@ const CompanionContent = ({
     hat.current?.launch(feet, -1, 1);
   };
 
-  const listenToSection = (time: number) => {
-    const section = getSpokenSection();
-    const speak = () => {
-      if (!section) {
-        return;
-      }
-      const visit = visits.current.get(section.element) ?? 0;
-      visits.current.set(section.element, visit + 1);
-      sectionLine.current = lineFor(section, visit);
-      spokenAt.current = time;
-    };
-    if ((section?.element ?? null) !== heardSection.current) {
-      if (section) {
-        speak();
-      } else {
-        sectionLine.current = null;
-      }
-    }
-    heardSection.current = section?.element ?? null;
-    if (presses.current !== handledPresses.current) {
-      handledPresses.current = presses.current;
-      speak();
-    }
-    return section;
-  };
-
-  const chooseSpeech = (
-    time: number,
-    section: SpokenSection | null
-  ): Speech => {
+  const chooseSpeech = (time: number, told: NarrationStep<Element>): Speech => {
     const focused = getFocusLine();
     if (focused) {
       return { isQuiet: false, isShown: true, text: focused };
@@ -340,8 +306,8 @@ const CompanionContent = ({
     }
     return {
       isQuiet: false,
-      isShown: section !== null && time - spokenAt.current < speechSeconds,
-      text: sectionLine.current,
+      isShown: told.isShown,
+      text: told.narration.line,
     };
   };
 
@@ -445,12 +411,14 @@ const CompanionContent = ({
       view.updateProjectionMatrix();
     }
 
-    const section = listenToSection(time);
     const { scrollY } = window;
+    const section = activeSpokenSection(scrollY, viewport.height);
     const restGoal = dockGoal(dock, {
       isTucked: !isReduced && state.scrollVelocity > tuckSpeed,
       railShare:
-        rail && dock.kind === "rail" ? railShare(scrollY, rail.anchors) : 0,
+        rail && dock.kind === "rail"
+          ? railMarkFor(rail, section?.id ?? null)
+          : 0,
     });
     const { goal, pinned } = steer({
       dock,
@@ -483,7 +451,15 @@ const CompanionContent = ({
     playCue(pose.cue, group.position);
     const isPresent = goal.scale > 0.5 && state.scale > shownScale * goal.scale;
     placeHitBox(hit.current, state, dock, pose.lift, isPresent);
-    const speech = chooseSpeech(time, section);
+    const isPressed = presses.current !== handledPresses.current;
+    handledPresses.current = presses.current;
+    const told = narrate(narration.current, {
+      isFast: isFastScroll(state.scrollVelocity),
+      isPressed,
+      section: section && { key: section.element, lines: section.lines },
+    });
+    narration.current = told.narration;
+    const speech = chooseSpeech(time, told);
     sayCompanionLine(speech.text, speech.isQuiet);
     placeBubble({
       bubble: bubble.current,

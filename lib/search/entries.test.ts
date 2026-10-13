@@ -40,9 +40,12 @@ const note: FieldNote = {
 
 describe("home section entries", () => {
   test("every home anchor exists in the profile components", () => {
-    for (const section of homeSections) {
-      expect(profileSources).toContain(`id="${section.id}"`);
-    }
+    const missing = homeSections.filter(
+      (section) =>
+        !profileSources.includes(`id="${section.id}"`) &&
+        !profileSources.includes(`homeSectionById("${section.id}")`)
+    );
+    expect(missing).toEqual([]);
   });
 
   test("link to the matching anchor on the home page", () => {
