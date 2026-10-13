@@ -61,7 +61,8 @@ export const homeSections = [
   },
   { id: "how-i-work", index: "GH-06", jp: "仕事の流儀", label: "How I work" },
   { id: "workshop", index: "GH-07", jp: "工房", label: "Workshop" },
-  { id: "contact", index: "GH-08", jp: "連絡", label: "Contact" },
+  { id: "experiments", index: "GH-08", jp: "実験", label: "Experiments" },
+  { id: "contact", index: "GH-09", jp: "連絡", label: "Contact" },
 ] as const;
 
 export type Social = (typeof siteConfig.socials)[number];

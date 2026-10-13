@@ -106,6 +106,3 @@ export const languageText = (catalog: Catalog) =>
 
 export const spokenCard = (card: CatalogCard) =>
   `${card.name}. ${cardDetail(card)}.${card.description ? ` ${card.description}` : ""}`;
-
-export const focusLine = (card: CatalogCard) =>
-  `${card.name} · ${cardDetail(card)}`;

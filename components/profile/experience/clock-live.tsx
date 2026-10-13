@@ -2,16 +2,13 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import {
-  setFigureFocus,
-  useFigureStation,
-} from "@/components/iso/figure-stations";
+import { useFigureStation } from "@/components/iso/figure-stations";
 import type { FigureControl } from "@/components/iso/figure-stations";
 import type { Projection } from "@/components/iso/iso-kit";
-import { CornerMarks } from "@/components/site/corner-marks";
+import { FigurePlate } from "@/components/profile/figure-plate";
 
 import type { Tenure } from "./career";
-import { glanceText, spanText } from "./career";
+import { spanText } from "./career";
 import type { ClockParts } from "./clock-art";
 import { ClockDrawing } from "./clock-drawing";
 import type { Pocket } from "./clock-layout";
@@ -147,29 +144,19 @@ export const ClockLive = ({
 
   const motion = useClockMotion({ homes, nodes, onPhase, projection, root });
 
-  const show = (job: number | null) => {
-    setPeek(job);
-    motion.preview(job);
-  };
-
   const touch = useClockTour({
     count,
     current: currentJob,
     feed: motion.feed,
     isActive: motion.isVisible && !motion.isReduced && !isEngaged,
-    preview: show,
+    preview: setPeek,
     release: motion.release,
     root,
   });
 
   const peekByUser = (job: number | null) => {
     touch();
-    show(job);
-    const tenure = job === null ? undefined : tenures[job];
-    setFigureFocus(
-      STATION_ID,
-      tenure ? `${tenure.company}: ${glanceText(tenure)}` : null
-    );
+    setPeek(job);
   };
 
   const heldJob = desk.phase === "held" ? desk.job : null;
@@ -240,18 +227,16 @@ export const ClockLive = ({
         setIsEngaged(false);
       }}
     >
-      <figure
-        className="iso m-0 flex flex-col gap-2"
-        data-build-block
-        data-build-self
-        ref={root}
-      >
-        <div className="border-rule-strong bg-paper has-[button:focus-visible]:outline-ink relative flex flex-col border outline-offset-4 has-[button:focus-visible]:outline-1">
-          <CornerMarks />
-          <div className="label text-graphite flex items-start justify-between gap-4 px-4 pt-3">
-            <span className="tabular-nums">Fig 03</span>
-            <span className="text-ink">Time clock</span>
-          </div>
+      <figure className="iso m-0" data-build-block data-build-self ref={root}>
+        <FigurePlate
+          readout={
+            <ClockReadout
+              current={tenures[currentJob]}
+              shown={shownOf(peek, desk)}
+              tenures={tenures}
+            />
+          }
+        >
           <CardButtons
             heldJob={heldJob}
             onEscape={putBack}
@@ -259,38 +244,24 @@ export const ClockLive = ({
             onToggle={toggle}
             tenures={tenures}
           />
-          <div className="-my-1 touch-pan-y overflow-hidden px-1 select-none sm:px-4">
-            <ClockDrawing
-              consoleRef={consoleRef}
-              ids={ids}
-              mask={mask}
-              bind={bind}
-              onCard={toggle}
-              onConsole={() => step(1)}
-              onPeek={peekByUser}
-              parts={parts}
-              peek={peek}
-              pockets={pockets}
-              projection={projection}
-            />
-          </div>
-          <div className="flex flex-col gap-x-4 gap-y-2 px-4 pb-3 sm:flex-row sm:items-end sm:justify-between">
-            <span className="label text-mist shrink-0">
-              Hover a card · click to punch it
-            </span>
-            <ClockReadout
-              current={tenures[currentJob]}
-              shown={shownOf(peek, desk)}
-              tenures={tenures}
-            />
-          </div>
+          <ClockDrawing
+            consoleRef={consoleRef}
+            ids={ids}
+            mask={mask}
+            bind={bind}
+            onCard={toggle}
+            onConsole={() => step(1)}
+            onPeek={peekByUser}
+            parts={parts}
+            peek={peek}
+            pockets={pockets}
+            projection={projection}
+          />
           <p aria-live="polite" className="sr-only">
             {spoken}
           </p>
-        </div>
-        <figcaption className="text-graphite text-sm leading-relaxed text-pretty">
-          {caption}
-        </figcaption>
+        </FigurePlate>
+        <figcaption className="sr-only">{caption}</figcaption>
       </figure>
     </div>
   );

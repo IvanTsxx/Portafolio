@@ -9,8 +9,6 @@ import { loomLayoutOf } from "./loom-layout";
 import { LoomLive } from "./loom-live";
 import {
   contributionsText,
-  DAYS,
-  formatShortDay,
   loomSourcesOf,
   loomYearOf,
   weekCountOf,
@@ -18,14 +16,10 @@ import {
 import type { LoomYear } from "./loom-model";
 
 const captionOf = (weekCount: number, latest: LoomYear | undefined) => {
-  const machine = `A pin loom with one steel pin for each of the ${weekCount * DAYS} days in ${weekCount} weeks, Sunday at the back. The reading bridge sweeps the year from left to right and raises each pin by the square root of that day's contributions.`;
-  if (!latest) {
-    return machine;
-  }
-  const busiest = latest.busiest
-    ? `; the tallest pin is ${formatShortDay(latest.busiest.date)} with ${latest.busiest.count}`
-    : "";
-  return `${machine} ${contributionsText(latest.total)} ${latest.caption}${busiest}.`;
+  const machine = `A pin loom with one pin per day across ${weekCount} weeks, each raised by that day's contributions.`;
+  return latest
+    ? `${machine} ${contributionsText(latest.total)} ${latest.caption}.`
+    : machine;
 };
 
 export const MatrixSection = ({

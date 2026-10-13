@@ -2,8 +2,6 @@ import {
   cellOf,
   DAYS,
   dayText,
-  focusLineOfDay,
-  focusLineOfWeek,
   restText,
   sweepText,
   weekText,
@@ -61,24 +59,7 @@ export const readoutOf = (
   return restText(year);
 };
 
-export const focusLineOf = (
-  year: LoomYear,
-  cell: number | null,
-  pinned: number | null
-) => {
-  const day = dayOf(year, cell);
-  if (day) {
-    return focusLineOfDay(day);
-  }
-  const week = weekOf(year, pinned);
-  return week ? focusLineOfWeek(week) : null;
-};
-
-export const litCellsOf = (
-  year: LoomYear,
-  cell: number | null,
-  pinned: number | null
-) => {
+export const litCellsOf = (year: LoomYear, pinned: number | null) => {
   const lit = new Set<number>();
   if (pinned !== null) {
     for (let day = 0; day < DAYS; day += 1) {
@@ -86,9 +67,6 @@ export const litCellsOf = (
         lit.add(cellOf(pinned, day));
       }
     }
-  }
-  if (cell !== null) {
-    lit.add(cell);
   }
   return lit;
 };
@@ -135,21 +113,22 @@ export const writeReadout = (
   }
 };
 
-export const lightCells = (
+export const markCells = (
   svg: SVGSVGElement | null,
+  mark: "cursor" | "on",
   next: ReadonlySet<number>,
   previous: ReadonlySet<number>
 ) => {
   for (const cell of previous) {
     const pin = svg?.querySelector<SVGGElement>(`[data-cell="${cell}"]`);
     if (pin && !next.has(cell)) {
-      delete pin.dataset.on;
+      pin.removeAttribute(`data-${mark}`);
     }
   }
   for (const cell of next) {
     const pin = svg?.querySelector<SVGGElement>(`[data-cell="${cell}"]`);
     if (pin) {
-      pin.dataset.on = "";
+      pin.setAttribute(`data-${mark}`, "");
     }
   }
 };

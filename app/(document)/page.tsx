@@ -2,6 +2,7 @@ import { AgentWorkshop } from "@/components/profile/agent-workshop";
 import { PinnedSection } from "@/components/profile/card-catalog/pinned-section";
 import { ContactRow } from "@/components/profile/contact-row";
 import { ExperienceSection } from "@/components/profile/experience/experience-section";
+import { ExperimentsSection } from "@/components/profile/experiments-section";
 import { HowIWork } from "@/components/profile/how-i-work/how-i-work-section";
 import { MatrixSection } from "@/components/profile/matrix/matrix-section";
 import { ProfileIntro } from "@/components/profile/profile-intro";
@@ -20,6 +21,7 @@ const HomePage = async () => {
       <MatrixSection calendars={profile.calendars} />
       <HowIWork />
       <AgentWorkshop />
+      <ExperimentsSection />
       <ContactRow />
     </>
   );

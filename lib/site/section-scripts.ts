@@ -49,6 +49,7 @@ export const sectionScripts = {
   homeExperience: builds([
     `Laying out ${spelled(experience.length)} roles since ${firstYear}.`,
   ]),
+  homeExperiments: builds(["Unpacking what Ivo builds to learn."]),
   homeHowIWork: builds(["I play every step here. Ivo calls the shots."]),
   homeIntro: speaks([
     "Opening Ivo's file.",

@@ -3,7 +3,6 @@ import {
   CARD_Y,
   CLOCK_X,
   HELD_BOTTOM,
-  HOVER_LIFT,
   LEVER_PULLED,
   LEVER_REST,
   LIP_TOP,
@@ -38,8 +37,6 @@ export interface Flight {
 
 export interface Desk {
   flight: Flight | null;
-  hover: Axis[];
-  hovered: number | null;
   homes: readonly number[];
   pending: number | null;
 }
@@ -63,13 +60,11 @@ const outbound = new Set<FlightPhase>([
 
 export const isOutbound = (phase: FlightPhase) => outbound.has(phase);
 
-const still = (at = 0): Axis => ({ at, rate: 0 });
+const still = (): Axis => ({ at: 0, rate: 0 });
 
 export const deskOf = (homes: readonly number[]): Desk => ({
   flight: null,
   homes,
-  hover: homes.map(() => still()),
-  hovered: null,
   pending: null,
 });
 
@@ -134,7 +129,7 @@ export const feed = (desk: Desk, job: number) => {
       age: 0,
       dx: still(),
       dy: still(),
-      dz: still(desk.hover[job]?.at ?? 0),
+      dz: still(),
       job,
       phase: "rise",
     };
@@ -236,22 +231,11 @@ const isHome = (flight: Flight) =>
   flight.dy.at === 0;
 
 export const stepDesk = (desk: Desk, dt: number, calm: boolean) => {
-  let isMoving = false;
-  for (const [job, axis] of desk.hover.entries()) {
-    const isLifted = desk.hovered === job && desk.flight?.job !== job;
-    springTo(axis, isLifted ? HOVER_LIFT : 0, dt, calm);
-    if (axis.rate !== 0 || axis.at !== (isLifted ? HOVER_LIFT : 0)) {
-      isMoving = true;
-    }
-  }
   for (let pass = 0; pass < 8 && desk.flight; pass += 1) {
     const flight: Flight = desk.flight;
     const before = flight.phase;
     flight.phase = steps[before](flight, desk, dt, calm);
     if (isHome(flight)) {
-      if (desk.hover[flight.job]) {
-        desk.hover[flight.job] = still();
-      }
       desk.flight = null;
       const next = desk.pending;
       if (next !== null) {
@@ -264,10 +248,7 @@ export const stepDesk = (desk: Desk, dt: number, calm: boolean) => {
       break;
     }
   }
-  if (desk.flight && desk.flight.phase !== "held") {
-    isMoving = true;
-  }
-  return isMoving;
+  return desk.flight !== null && desk.flight.phase !== "held";
 };
 
 export const isAirborne = (flight: Flight | null) =>

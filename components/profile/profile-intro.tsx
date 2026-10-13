@@ -20,7 +20,7 @@ export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
   return (
     <header
       aria-labelledby="intro-heading"
-      className="border-rule relative flex flex-col gap-10 border-b pb-16"
+      className="border-rule relative flex flex-col gap-8 border-b pb-16"
       id="intro"
     >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
@@ -51,16 +51,9 @@ export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <p className="text-ink text-xl leading-snug font-light text-pretty sm:text-2xl">
-          {siteConfig.role} in {siteConfig.location}.
-        </p>
-        {identity.bio ? (
-          <p className="text-graphite max-w-prose text-base leading-relaxed text-pretty">
-            {identity.bio}
-          </p>
-        ) : null}
-      </div>
+      <p className="text-ink text-xl leading-snug font-light text-pretty sm:text-2xl">
+        {siteConfig.role} in {siteConfig.location}.
+      </p>
 
       <SocialLinks />
       <CompanionLines lines={homeIntro.lines} />
