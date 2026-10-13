@@ -4,6 +4,8 @@ import { BlueprintIntersectionsPoster } from "@/components/lab/experiments/bluep
 import { BlueprintIntersections } from "@/components/lab/experiments/blueprint-intersections/preview";
 import { DitherFieldLive } from "@/components/lab/experiments/dither-field/live";
 import { DitherFieldPoster } from "@/components/lab/experiments/dither-field/poster";
+import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
+import { DotGridPoster } from "@/components/lab/experiments/dot-grid/poster";
 import { ModuleAssemblyLive } from "@/components/lab/experiments/module-assembly/live";
 import { ModuleAssemblyPoster } from "@/components/lab/experiments/module-assembly/poster";
 import { SignalTypeLive } from "@/components/lab/experiments/signal-type/live";
@@ -13,6 +15,7 @@ import type { LabTopic } from "@/lib/lab/topics";
 
 export type ExperimentSlug =
   | "dither-field"
+  | "dot-grid"
   | "signal-type"
   | "blueprint-intersections"
   | "module-assembly";
@@ -80,6 +83,27 @@ const experimentsBySlug = {
     technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
     title: "Dither field",
     topics: ["Shader", "WebGL"],
+    year: 2026,
+  },
+  "dot-grid": {
+    Poster: DotGridPoster,
+    Preview: DotGridLive,
+    hasControls: true,
+    implementation: [
+      "One full-viewport plane with a ShaderMaterial. Each pixel tests the dots of its own cell and the eight around it.",
+      "Value noise sets each dot's radius. The lens springs toward the pointer in useFrame and pushes dots outward.",
+    ],
+    index: "LAB-05",
+    related: ["dither-field", "module-assembly"],
+    slug: "dot-grid",
+    summary: "A halftone dot grid that swells and parts around the pointer.",
+    technicalNotes: [
+      "It shares the site canvas, so the grid costs one draw call and no second WebGL context.",
+      "The render loop stops offscreen. Reduced motion renders a single frame.",
+    ],
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
+    title: "Dot grid",
+    topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
   "module-assembly": {

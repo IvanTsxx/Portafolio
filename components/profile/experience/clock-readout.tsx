@@ -64,7 +64,7 @@ export const ClockReadout = ({
   const line: ReactNode = lineOf(shown, tenure, current);
   return (
     <span
-      className="flex min-h-28 w-full sm:min-h-16 max-w-md flex-col items-start gap-0.5 sm:ml-auto sm:items-end sm:text-right"
+      className="flex min-h-28 w-full max-w-md flex-col items-start gap-0.5 sm:ml-auto sm:min-h-16 sm:items-end sm:text-right"
       data-readout
     >
       <span className="text-ink text-sm leading-tight font-medium tracking-tight">

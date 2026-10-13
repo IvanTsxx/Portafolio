@@ -110,11 +110,7 @@ export const catalogParts = (art: CatalogArt) => {
         <Dots points={reader.topScrews} size={0.45} tone="mid" />
         <Line d={reader.vents} tone="lo" />
         <Line d={reader.counter.bezel} tone="lo" />
-        <path
-          className="iso-shade"
-          d={reader.counter.well}
-          data-shade={0}
-        />
+        <path className="iso-shade" d={reader.counter.well} data-shade={0} />
         <Line d={reader.counter.well} tone="mid" />
         <Line d={reader.counter.split} tone="lo" />
         <Dots points={reader.counter.bezelScrews} size={0.4} tone="mid" />

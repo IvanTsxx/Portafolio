@@ -67,20 +67,18 @@ export const catalogOf = (
   const tabOf = new Map(
     languages.map((entry, index) => [entry.language, index])
   );
-  const cards = repositories.map(
-    (repository): CatalogCard => ({
-      description: repository.description,
-      descriptionRules: descriptionRules(repository.description),
-      id: repository.nameWithOwner,
-      isTemplate: repository.visibility === "public-template",
-      language: languageOf(repository),
-      name: repository.name,
-      nameRule: Math.min(1, repository.name.length / LONGEST_NAME),
-      stars: repository.stars,
-      tab: tabOf.get(languageOf(repository)) ?? 0,
-      url: `https://github.com/${repository.nameWithOwner}`,
-    })
-  );
+  const cards = repositories.map((repository): CatalogCard => ({
+    description: repository.description,
+    descriptionRules: descriptionRules(repository.description),
+    id: repository.nameWithOwner,
+    isTemplate: repository.visibility === "public-template",
+    language: languageOf(repository),
+    name: repository.name,
+    nameRule: Math.min(1, repository.name.length / LONGEST_NAME),
+    stars: repository.stars,
+    tab: tabOf.get(languageOf(repository)) ?? 0,
+    url: `https://github.com/${repository.nameWithOwner}`,
+  }));
   const mostStars = Math.max(0, ...cards.map((card) => card.stars));
   return {
     cards,

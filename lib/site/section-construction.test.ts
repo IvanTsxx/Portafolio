@@ -123,9 +123,7 @@ describe("construction schedule", () => {
     for (const [index, block] of chips.entries()) {
       expect(block.start).toBeGreaterThan(chips[index - 1]?.start ?? -1);
     }
-    expect(chips.at(-1)?.start ?? 0).toBeLessThan(
-      (chips[0]?.start ?? 0) + 0.5
-    );
+    expect(chips.at(-1)?.start ?? 0).toBeLessThan((chips[0]?.start ?? 0) + 0.5);
   });
 
   test("compact blocks under different parents start separate passes", () => {

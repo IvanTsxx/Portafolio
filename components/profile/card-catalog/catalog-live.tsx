@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
-import type {
-  KeyboardEvent,
-  MouseEvent,
-  PointerEvent,
-  ReactNode,
-} from "react";
+import type { KeyboardEvent, MouseEvent, PointerEvent, ReactNode } from "react";
 
-import { setFigureFocus, useFigureStation } from "@/components/iso/figure-stations";
+import {
+  setFigureFocus,
+  useFigureStation,
+} from "@/components/iso/figure-stations";
 import { CornerMarks } from "@/components/site/corner-marks";
 
 import type { Catalog, CatalogCard } from "./catalog";
@@ -108,8 +106,12 @@ const CatalogCardFrame = ({
     {children}
     <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1 px-4">
       <span className="label text-mist">
-        <span className="pointer-coarse:hidden">Hover a card, click to read it</span>
-        <span className="hidden pointer-coarse:inline">Tap a card to read it</span>
+        <span className="pointer-coarse:hidden">
+          Hover a card, click to read it
+        </span>
+        <span className="hidden pointer-coarse:inline">
+          Tap a card to read it
+        </span>
       </span>
       <Readout card={card} catalog={catalog} />
     </div>
@@ -209,7 +211,9 @@ export const CatalogLive = ({
 
   const step = (by: number) => {
     setHovered(null);
-    setToured((current) => ((current ?? (by > 0 ? -1 : 0)) + by + count) % count);
+    setToured(
+      (current) => ((current ?? (by > 0 ? -1 : 0)) + by + count) % count
+    );
   };
 
   useFigureStation({
@@ -236,7 +240,9 @@ export const CatalogLive = ({
   );
   const tourStep = useEffectEvent((slot: number, reads: boolean) => {
     setToured(slot);
-    return reads ? window.setTimeout(() => feed(slot, false), TOUR_READ_AFTER_MS) : 0;
+    return reads
+      ? window.setTimeout(() => feed(slot, false), TOUR_READ_AFTER_MS)
+      : 0;
   });
 
   useEffect(() => {
@@ -258,7 +264,10 @@ export const CatalogLive = ({
           return;
         }
         steps += 1;
-        readTimer = tourStep((steps - 1) % count, steps % TOUR_READ_EVERY === 0);
+        readTimer = tourStep(
+          (steps - 1) % count,
+          steps % TOUR_READ_EVERY === 0
+        );
         later(TOUR_EVERY_MS);
       }, delay);
     };
@@ -291,9 +300,7 @@ export const CatalogLive = ({
       return;
     }
     event.preventDefault();
-    root.current
-      ?.querySelector<SVGAElement>(`a[data-card="${next}"]`)
-      ?.focus();
+    root.current?.querySelector<SVGAElement>(`a[data-card="${next}"]`)?.focus();
   };
 
   const bindCard = (slot: number) => (node: SVGGElement | null) => {

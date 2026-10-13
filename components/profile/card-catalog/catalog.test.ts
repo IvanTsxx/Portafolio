@@ -65,7 +65,10 @@ describe("card catalog", () => {
 
   test("links every card to its repository and marks templates", () => {
     const [card] = catalogOf([
-      { ...repository("starter", "TypeScript", 4), visibility: "public-template" },
+      {
+        ...repository("starter", "TypeScript", 4),
+        visibility: "public-template",
+      },
     ]).cards;
     expect(card?.url).toBe("https://github.com/IvanTsxx/starter");
     expect(card?.isTemplate).toBe(true);
