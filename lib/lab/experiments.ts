@@ -6,6 +6,10 @@ import { DitherFieldLive } from "@/components/lab/experiments/dither-field/live"
 import { DitherFieldPoster } from "@/components/lab/experiments/dither-field/poster";
 import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
 import { DotGridPoster } from "@/components/lab/experiments/dot-grid/poster";
+import { ErrorDiffusionLive } from "@/components/lab/experiments/error-diffusion/live";
+import { ErrorDiffusionPoster } from "@/components/lab/experiments/error-diffusion/poster";
+import { MatrixRainLive } from "@/components/lab/experiments/matrix-rain/live";
+import { MatrixRainPoster } from "@/components/lab/experiments/matrix-rain/poster";
 import { ModuleAssemblyLive } from "@/components/lab/experiments/module-assembly/live";
 import { ModuleAssemblyPoster } from "@/components/lab/experiments/module-assembly/poster";
 import { SignalTypeLive } from "@/components/lab/experiments/signal-type/live";
@@ -18,7 +22,9 @@ export type ExperimentSlug =
   | "dot-grid"
   | "signal-type"
   | "blueprint-intersections"
-  | "module-assembly";
+  | "module-assembly"
+  | "matrix-rain"
+  | "error-diffusion";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -103,6 +109,51 @@ const experimentsBySlug = {
     ],
     technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
     title: "Dot grid",
+    topics: ["Shader", "WebGL", "Motion"],
+    year: 2026,
+  },
+  "error-diffusion": {
+    Poster: ErrorDiffusionPoster,
+    Preview: ErrorDiffusionLive,
+    hasControls: true,
+    implementation: [
+      "The source is downsampled to luminance on a 2D canvas. Contrast and threshold reshape it once per change.",
+      "Each kernel is a table of offsets and weights. One loop spreads the error forward, mirrored on odd rows when serpentine.",
+      "Both results paint into stacked canvases. The split is a clip-path, so dragging it never re-dithers.",
+    ],
+    index: "LAB-07",
+    related: ["dither-field", "dot-grid"],
+    slug: "error-diffusion",
+    summary: "Error diffusion against ordered Bayer, split down the middle.",
+    technicalNotes: [
+      "Diffusion is sequential, so it runs on the CPU at a capped 160k pixels. The stage shows its time.",
+      "It only reruns on a control change or resize, and not while offscreen. Nothing animates.",
+    ],
+    technologies: ["Canvas 2D", "TypedArrays", "Floyd–Steinberg", "Atkinson"],
+    title: "Error diffusion",
+    topics: ["Image"],
+    year: 2026,
+  },
+  "matrix-rain": {
+    Poster: MatrixRainPoster,
+    Preview: MatrixRainLive,
+    hasControls: true,
+    implementation: [
+      "One full-viewport plane with a ShaderMaterial. Each pixel finds its dot, then the glyph cell and column above it.",
+      "Glyphs are box-filtered into a 6×8 texel atlas, one texel per dot. A Bayer threshold thins the trails.",
+      "The pointer pushes columns sideways with a Gaussian falloff, so the rain parts around it.",
+    ],
+    index: "LAB-06",
+    related: ["dot-grid", "dither-field"],
+    slug: "matrix-rain",
+    summary:
+      "Digital rain printed as dot-matrix glyphs that part around the pointer.",
+    technicalNotes: [
+      "It shares the site canvas: one draw call, one texture lookup per pixel, no second WebGL context.",
+      "The render loop stops offscreen. Reduced motion renders a single frame.",
+    ],
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "DataTexture"],
+    title: "Matrix rain",
     topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
