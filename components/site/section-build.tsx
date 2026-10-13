@@ -83,7 +83,9 @@ const findBlocks = (root: HTMLElement) => {
     ...root.querySelectorAll<HTMLElement>("[data-build-block]"),
   ].filter(
     (element) =>
-      isShown(element) && !element.querySelector("[data-build-block]")
+      isShown(element) &&
+      !Object.hasOwn(element.dataset, "buildSelf") &&
+      !element.querySelector("[data-build-block]")
   );
   if (marked.length > 0) {
     return marked;
