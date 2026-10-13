@@ -4,7 +4,6 @@ import type { ReactNode, RefObject } from "react";
 import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
 
 import { useBuildHeld } from "./build-hold";
-import { ownVisibleShare } from "./companion-placement";
 
 export const viewPriority = { overlay: 3, scene: 2 } as const;
 
@@ -127,25 +126,6 @@ const getServerNearSnapshot = (): readonly ViewSlot[] => [];
 const getHasSlots = () => slots.size > 0;
 const getServerHasSlots = () => false;
 export const getAgentCasts = () => agentCasts;
-
-const castLeadShare = 0.5;
-
-export const isLeadAgentCast = (element: HTMLElement | null) => {
-  if (!element) {
-    return false;
-  }
-  const viewport = { height: window.innerHeight, width: window.innerWidth };
-  let lead: HTMLElement | null = null;
-  let leadShare = castLeadShare;
-  for (const cast of agentCasts) {
-    const share = ownVisibleShare(cast.getBoundingClientRect(), viewport);
-    if (share >= leadShare) {
-      lead = cast;
-      leadShare = share;
-    }
-  }
-  return lead === element;
-};
 
 export const useAgentCast = (
   track: RefObject<HTMLElement | null>,
