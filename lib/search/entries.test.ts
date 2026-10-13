@@ -80,7 +80,7 @@ describe("content entries", () => {
     expect(noteEntry(note, 0).keywords).toContain("One worktree per issue.");
   });
 
-  test("an experiment links to its lab page and searches its technologies", () => {
+  test("an experiment links to its experiment page and searches its technologies", () => {
     const entry = experimentEntry({
       index: "LAB-01",
       slug: "dither-field",
@@ -92,10 +92,10 @@ describe("content entries", () => {
     });
 
     expect(entry).toMatchObject({
-      action: { href: "/lab/dither-field", type: "route" },
+      action: { href: "/experiments/dither-field", type: "route" },
       code: "LAB-01",
       detail: "Shader, WebGL",
-      group: "lab",
+      group: "experiments",
     });
     expect(entry.keywords).toEqual(["Bayer dithering.", "GLSL", "2026"]);
   });

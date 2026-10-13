@@ -68,16 +68,16 @@ export const pageSeo = {
     path: "/design-system",
     title: "Design system",
   },
+  experiments: {
+    description:
+      "Interactive experiments by Ivo in shaders, dithering, motion and variable type. Each one has a live preview and implementation notes.",
+    path: "/experiments",
+    title: "Experiments",
+  },
   home: {
     description: siteConfig.description,
     path: "/",
     title: siteTitle,
-  },
-  lab: {
-    description:
-      "Interactive experiments by Ivo in shaders, motion, variable type, CSS and real-time 3D. Each one has a live preview and implementation notes.",
-    path: "/lab",
-    title: "Lab",
   },
   notes: {
     description:
@@ -92,7 +92,7 @@ export const pageSeo = {
   },
 } as const satisfies Record<string, PageSeo>;
 
-export const experimentPath = (slug: string) => `/lab/${slug}` as const;
+export const experimentPath = (slug: string) => `/experiments/${slug}` as const;
 
 export const registryItemPath = (name: string) => `/registry/${name}` as const;
 
@@ -100,7 +100,7 @@ export const experimentSeo = (experiment: Experiment): PageSeo => ({
   description: `${experiment.summary} An interactive ${experiment.topics.join(", ")} experiment with a live preview and implementation notes.`,
   keywords: [...experiment.topics, ...experiment.technologies],
   path: experimentPath(experiment.slug),
-  title: `${experiment.title} · Lab`,
+  title: `${experiment.title} · Experiments`,
 });
 
 export const registryItemSeo = (item: RegistryItem): PageSeo => ({

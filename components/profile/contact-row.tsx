@@ -7,7 +7,7 @@ import { sectionScripts } from "@/lib/site/section-scripts";
 export const ContactRow = () => (
   <DocumentSection
     id="contact"
-    index="GH-09"
+    index="GH-10"
     label="Contact"
     script={sectionScripts.homeContact}
   >

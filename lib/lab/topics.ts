@@ -1,12 +1,9 @@
 export const labTopics = [
-  "3D",
   "Motion",
   "WebGL",
   "GSAP",
-  "CSS",
   "Shader",
   "Typography",
-  "UI",
   "AI",
 ] as const;
 

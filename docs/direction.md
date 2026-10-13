@@ -23,7 +23,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - One agent on screen, the companion, 48×56 on the rail. The route picks its role. It narrates one first-person line per section and builds sections as they scroll in.
 - Section builds, figure stations, the How I work stages, the 404 stage and the Workshop register a spot in `components/scene/companion-stages.ts`. The companion walks there and performs the spot's action.
 - `<StageScene>` renders props only, never an agent.
-- Rig showcase routes (`/dev/agents`, `/registry/agent`, `/registry/agent-stage`, `/lab/module-assembly`) send the companion away. `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.
+- Rig showcase routes (`/dev/agents`, `/registry/agent`, `/registry/agent-stage`) send the companion away. `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.
 - With WebGL off, show a static fallback. With reduced motion, the companion holds a key pose and swaps outfits without the spin.
 
 ## Engineering rules

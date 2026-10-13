@@ -5,9 +5,9 @@ import { FilterFold } from "@/components/site/filter-fold";
 import { JsonLd } from "@/components/site/json-ld";
 import { activeTopics, experiments } from "@/lib/lab/experiments";
 import { buildPageMetadata, pageSeo } from "@/lib/site/seo";
-import { labIndexJsonLd } from "@/lib/site/structured-data";
+import { experimentsIndexJsonLd } from "@/lib/site/structured-data";
 
-export const metadata = buildPageMetadata(pageSeo.lab);
+export const metadata = buildPageMetadata(pageSeo.experiments);
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
@@ -23,18 +23,18 @@ const items = experiments.map((experiment) => ({
   topics: experiment.topics,
 }));
 
-const LabPage = () => (
+const ExperimentsPage = () => (
   <>
-    <JsonLd data={labIndexJsonLd(experiments)} />
+    <JsonLd data={experimentsIndexJsonLd(experiments)} />
     <DocumentHero
       code="LAB-01"
       jp="実験"
       lede="Techniques tested live"
       meta={[
-        { label: "Experiments", value: pad(experiments.length) },
+        { label: "Entries", value: pad(experiments.length) },
         { label: "Topics", value: pad(activeTopics.length) },
       ]}
-      title="Lab"
+      title="Experiments"
     />
     <FilterFold index="LAB-02">
       <LabTopicFilter topics={topicCounts} total={experiments.length} />
@@ -43,4 +43,4 @@ const LabPage = () => (
   </>
 );
 
-export default LabPage;
+export default ExperimentsPage;

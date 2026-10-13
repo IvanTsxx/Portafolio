@@ -18,7 +18,7 @@ export const generateStaticParams = () =>
 
 export const generateMetadata = async ({
   params,
-}: PageProps<"/lab/[slug]">): Promise<Metadata> => {
+}: PageProps<"/experiments/[slug]">): Promise<Metadata> => {
   const { slug } = await params;
   const experiment = getExperiment(slug);
   return experiment ? buildPageMetadata(experimentSeo(experiment)) : {};
@@ -26,7 +26,7 @@ export const generateMetadata = async ({
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
-const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
+const ExperimentPage = async ({ params }: PageProps<"/experiments/[slug]">) => {
   const { slug } = await params;
   const experiment = getExperiment(slug);
   if (!experiment) {
@@ -38,7 +38,7 @@ const ExperimentPage = async ({ params }: PageProps<"/lab/[slug]">) => {
     <>
       <JsonLd data={experimentJsonLd(experiment)} />
       <DocumentHero
-        back={{ href: "/lab", label: "Lab" }}
+        back={{ href: "/experiments", label: "Experiments" }}
         code={experiment.index}
         lede={experiment.topics.join(" / ")}
         meta={[{ label: "Year", value: String(experiment.year) }]}

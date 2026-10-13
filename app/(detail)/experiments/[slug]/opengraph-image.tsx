@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { renderOgImage } from "@/lib/content/og-image";
 import { experiments, getExperiment } from "@/lib/lab/experiments";
 
-export const alt = "Lab experiment";
+export const alt = "Experiment";
 export { contentType, size } from "@/lib/content/og-image";
 
 export const generateStaticParams = () =>
@@ -20,7 +20,7 @@ const ExperimentOpenGraphImage = async ({
     notFound();
   }
   return renderOgImage({
-    eyebrow: `Lab · ${experiment.index} · ${experiment.topics.join(" / ")}`,
+    eyebrow: `Experiments · ${experiment.index} · ${experiment.topics.join(" / ")}`,
     title: experiment.title,
   });
 };

@@ -24,7 +24,7 @@ const ExperimentCell = ({ experiment }: { experiment: Experiment }) => {
   const { Poster } = experiment;
   return (
     <li className="border-rule min-w-0 border-r border-b" data-build-block>
-      <Link className={cellClassName} href={`/lab/${experiment.slug}`}>
+      <Link className={cellClassName} href={`/experiments/${experiment.slug}`}>
         <CornerMarks reveal="hover" />
         <div className="bg-popover border-rule aspect-video overflow-hidden border-b">
           <Poster />
@@ -65,7 +65,7 @@ export const ExperimentsSection = () => (
             cellClassName,
             "label text-ink h-full min-h-32 justify-end p-3"
           )}
-          href="/lab"
+          href="/experiments"
         >
           <CornerMarks reveal="hover" />
           <span>

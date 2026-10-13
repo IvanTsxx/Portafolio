@@ -13,7 +13,7 @@ const homeCast: CompanionCast = { action: "wave", role: "orchestrator" };
 
 const routeCasts: readonly RouteCast[] = [
   { action: "read", role: "researcher", section: "notes" },
-  { action: "type", role: "builder", section: "lab" },
+  { action: "type", role: "builder", section: "experiments" },
   { action: "inspect", role: "inspector", section: "registry" },
   { action: "measure", role: "architect", section: "design-system" },
 ];
@@ -26,7 +26,6 @@ export const companionCastFor = (pathname: string): CompanionCast => {
 
 const rigShowcases: readonly (readonly string[])[] = [
   ["dev"],
-  ["lab", "module-assembly"],
   ["registry", "agent"],
   ["registry", "agent-stage"],
 ];

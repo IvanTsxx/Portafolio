@@ -32,13 +32,13 @@ export const workSteps = [
     title: "Review",
   },
   {
-    href: "/lab",
+    href: "/experiments",
     id: "explore",
     summary: "Shaders, dithers and dot grids, built to learn.",
     title: "Explore",
   },
 ] as const satisfies readonly {
-  href?: "/lab";
+  href?: "/experiments";
   id: StageId;
   summary: string;
   title: string;

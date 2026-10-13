@@ -12,6 +12,17 @@ const nextConfig: NextConfig = {
       { destination: "/notes/:slug", permanent: true, source: "/work/:slug" },
       { destination: "/notes", permanent: true, source: "/blog" },
       { destination: "/notes/:slug", permanent: true, source: "/blog/:slug" },
+      {
+        destination: "/experiments",
+        permanent: true,
+        source: "/lab/:slug(blueprint-intersections|module-assembly)",
+      },
+      { destination: "/experiments", permanent: true, source: "/lab" },
+      {
+        destination: "/experiments/:slug",
+        permanent: true,
+        source: "/lab/:slug",
+      },
     ]),
 };
 

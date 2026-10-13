@@ -63,7 +63,7 @@ describe("site naming", () => {
 
   test("keeps every detail route outside the document group", () => {
     expect(routePages("detail")).toEqual([
-      "lab/[slug]",
+      "experiments/[slug]",
       "notes/[slug]",
       "registry/[slug]",
     ]);

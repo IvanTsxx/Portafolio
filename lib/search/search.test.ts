@@ -33,7 +33,7 @@ const entries: SearchEntry[] = [
   }),
   entry({
     detail: "Shader, WebGL",
-    group: "lab",
+    group: "experiments",
     id: "dither",
     title: "Dither field",
   }),
@@ -59,7 +59,7 @@ describe("searchEntries without a query", () => {
       "pages",
       "sections",
       "notes",
-      "lab",
+      "experiments",
       "registry",
     ]);
     expect(countHits(sections)).toBe(entries.length);

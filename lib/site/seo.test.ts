@@ -4,11 +4,11 @@ import path from "node:path";
 
 import type { Metadata } from "next";
 
-import * as labItemPage from "@/app/(detail)/lab/[slug]/page";
+import * as experimentItemPage from "@/app/(detail)/experiments/[slug]/page";
 import * as noteItemPage from "@/app/(detail)/notes/[slug]/page";
 import * as registryItemPage from "@/app/(detail)/registry/[slug]/page";
 import * as designSystemPage from "@/app/(document)/design-system/page";
-import * as labPage from "@/app/(document)/lab/page";
+import * as experimentsPage from "@/app/(document)/experiments/page";
 import * as notesPage from "@/app/(document)/notes/page";
 import * as homePage from "@/app/(document)/page";
 import * as registryPage from "@/app/(document)/registry/page";
@@ -29,7 +29,7 @@ interface RouteCase {
 
 interface GeneratedPage {
   generateMetadata: (
-    props: PageProps<"/lab/[slug]"> &
+    props: PageProps<"/experiments/[slug]"> &
       PageProps<"/notes/[slug]"> &
       PageProps<"/registry/[slug]">
   ) => Promise<Metadata>;
@@ -41,7 +41,11 @@ interface GeneratedPage {
 const staticCases: RouteCase[] = [
   { dir: "app/(document)", metadata: homePage.metadata, path: "/" },
   { dir: "app/(document)/notes", metadata: notesPage.metadata, path: "/notes" },
-  { dir: "app/(document)/lab", metadata: labPage.metadata, path: "/lab" },
+  {
+    dir: "app/(document)/experiments",
+    metadata: experimentsPage.metadata,
+    path: "/experiments",
+  },
   {
     dir: "app/(document)/registry",
     metadata: registryPage.metadata,
@@ -56,7 +60,11 @@ const staticCases: RouteCase[] = [
 
 const generatedPages: { base: string; dir: string; page: GeneratedPage }[] = [
   { base: "/notes", dir: "app/(detail)/notes/[slug]", page: noteItemPage },
-  { base: "/lab", dir: "app/(detail)/lab/[slug]", page: labItemPage },
+  {
+    base: "/experiments",
+    dir: "app/(detail)/experiments/[slug]",
+    page: experimentItemPage,
+  },
   {
     base: "/registry",
     dir: "app/(detail)/registry/[slug]",

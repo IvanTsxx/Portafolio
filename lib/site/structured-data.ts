@@ -135,10 +135,10 @@ export const notesIndexJsonLd = (notes: readonly Note[]) =>
     )
   );
 
-export const labIndexJsonLd = (experiments: readonly Experiment[]) =>
+export const experimentsIndexJsonLd = (experiments: readonly Experiment[]) =>
   toGraph(
     collectionPage(
-      pageSeo.lab,
+      pageSeo.experiments,
       experiments.map((experiment) => ({
         name: experiment.title,
         path: experimentPath(experiment.slug),
@@ -224,7 +224,7 @@ export const experimentJsonLd = (experiment: Experiment) => {
       url: absoluteUrl(path),
     },
     breadcrumbNode([
-      { name: pageSeo.lab.title, path: pageSeo.lab.path },
+      { name: pageSeo.experiments.title, path: pageSeo.experiments.path },
       { name: experiment.title, path },
     ])
   );

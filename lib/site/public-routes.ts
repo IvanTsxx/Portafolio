@@ -27,7 +27,7 @@ const primarySources: Record<PrimaryRoute["href"], readonly string[]> = {
     "components/design-system",
     "lib/design-system",
   ],
-  "/lab": ["app/(document)/lab", "components/lab", "lib/lab"],
+  "/experiments": ["app/(document)/experiments", "components/lab", "lib/lab"],
   "/notes": ["app/(document)/notes", "components/content", "content/notes"],
   "/registry": [
     "app/(document)/registry",
