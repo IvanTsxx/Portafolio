@@ -37,6 +37,9 @@ const boardOf = ({ board }: ClockArt) => (
     ))}
     <Solid crease="faint" paths={board.slab} tone="lo" />
     <Dots points={board.screws} size={0.45} tone="mid" />
+    <Solid crease="faint" paths={board.cap} tone="mid" />
+    <Solid crease="none" paths={board.batten} tone="mid" />
+    <Dots points={board.battenScrews} size={0.42} tone="mid" />
   </g>
 );
 
@@ -68,23 +71,23 @@ const rackOf = (rack: RackArt, key: string) => ({
         paths={rack.lip}
         tone="mid"
       />
-      {rack.holders.map((holder) => (
-        <Solid
-          crease="none"
-          inner={
-            <>
-              <Line d={holder.window} tone="faint" />
-              <Line d={holder.rule} free tone="lo" />
-            </>
-          }
-          key={holder.holder.outline}
-          paths={holder.holder}
-          tone="lo"
-        />
-      ))}
       <Dots points={rack.rivets} size={0.42} tone="mid" />
     </g>
   ),
+  holders: rack.holders.map((holder) => (
+    <Solid
+      crease="none"
+      inner={
+        <>
+          <Line d={holder.window} tone="faint" />
+          <Line d={holder.rule} free tone="lo" />
+        </>
+      }
+      key={holder.holder.outline}
+      paths={holder.holder}
+      tone="lo"
+    />
+  )),
   under: (
     <g key={`${key}-under`}>
       {rack.feet.map((paths) => (
@@ -163,6 +166,7 @@ const clockOf = ({ clock }: ClockArt) => {
             <Line d={dial.ticksMinor} tone="lo" />
             <Line d={dial.ticksMajor} tone="mid" />
             <Line d={dial.zero} tone="hi" />
+            <Line d={dial.maker} free tone="lo" />
           </>
         }
         paths={dial.drum}

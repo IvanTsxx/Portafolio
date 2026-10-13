@@ -51,7 +51,7 @@ export const HELD_BOTTOM = 66;
 export const TRAVEL_BOTTOM = 91;
 export const HOVER_LIFT = 8;
 
-export const HUB: Point3 = [SIDE_X + 6, 8, 38];
+export const HUB: Point3 = [SIDE_X + 6, 6, 66];
 export const HUB_R = 5;
 export const ARM_X = HUB[0] + 3;
 export const ARM_LENGTH = 26;

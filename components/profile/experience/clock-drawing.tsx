@@ -78,6 +78,15 @@ export const ClockDrawing = ({
         ))}
         {pieces.cheekRight}
         {pieces.front}
+        {pockets.map((pocket, index) => (
+          <g
+            className={pocket.rack === which ? "cursor-pointer" : undefined}
+            data-job={pocket.rack === which ? index : undefined}
+            key={ids[index] ?? index}
+          >
+            {pieces.holders[index]}
+          </g>
+        ))}
       </g>
     );
   };
@@ -124,6 +133,7 @@ export const ClockDrawing = ({
           <path
             className="iso-line"
             d={d}
+            data-free=""
             data-tone={HAND_TONES[index]}
             key={HAND_TONES[index] + String(HAND_WEIGHTS[index])}
             ref={bind("hands", index)}

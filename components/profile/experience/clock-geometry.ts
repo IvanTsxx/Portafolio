@@ -54,6 +54,7 @@ import {
   POCKET_PITCH,
   pocketOf,
   RACK_BACK,
+  RACK_GAP,
   rackLeft,
   rackWidth,
   SHELF_LOW,
@@ -96,7 +97,7 @@ const byDepth = (points: readonly Plane[], P: Projection) =>
 const baseArt = (count: number, P: Projection) => {
   const base = baseOf(count);
   const low = -BASE_H;
-  const label: Plan = { d: 6, r: 1, w: 46, x: base.x + 22, y: 18 };
+  const label: Plan = { d: 9, r: 1.2, w: 34, x: base.x + 24, y: 15 };
   return {
     feet: byDepth(corners(base, 18), P).map(([x, y]) => [
       cylinder(x, y, 7, low - FOOT_H, 1.6, P, 28),
@@ -107,11 +108,11 @@ const baseArt = (count: number, P: Projection) => {
     label: slabOf(label, 0, 0.8, P, 4),
     labelLine: planOutline(insetPlan(label, 1.4), 0.8, P),
     labelRules: join(
-      [26, 18, 22].map((length, row) =>
+      [20, 13, 16].map((length, row) =>
         linePath(
           [
-            [label.x + 4, label.y + 1.8 + row * 1.2, 0.8],
-            [label.x + 4 + length, label.y + 1.8 + row * 1.2, 0.8],
+            [label.x + 4, label.y + 2.6 + row * 2, 0.8],
+            [label.x + 4 + length, label.y + 2.6 + row * 2, 0.8],
           ],
           P
         )
@@ -143,13 +144,27 @@ const boardArt = (count: number, P: Projection) => {
   const brackets = [board.x + 14, right - 20].map((x) =>
     slabOf({ d: 6, r: 1, w: 6, x, y: front - 0.5 }, 0, 4, P, 3, 0.4)
   );
+  const batten = rackLeft(1, count) - RACK_GAP / 2 - 2;
   return {
+    batten: slabOf(
+      { d: 1.4, r: 0.4, w: 4, x: batten, y: front },
+      0,
+      BOARD_TOP,
+      P,
+      2,
+      0.4
+    ),
+    battenScrews: flat(
+      [20, 46, 70].map((z): Point3 => [batten + 2, front + 1.4, z]),
+      P
+    ),
     brackets,
+    cap: slabOf(insetPlan(board, -1.2), BOARD_TOP, 3, P, 3, 0.8),
     halo: slabOf(insetPlan(board, -2), 0, 0.1, P).fill,
     screws: flat(
       [
-        [board.x + 4, front, BOARD_TOP - 5],
-        [right - 4, front, BOARD_TOP - 5],
+        [board.x + 4, front, BOARD_TOP - 4],
+        [right - 4, front, BOARD_TOP - 4],
         [board.x + 4, front, 3],
         [right - 4, front, 3],
       ],
@@ -159,24 +174,27 @@ const boardArt = (count: number, P: Projection) => {
   };
 };
 
-const holderArt = (cx: number, P: Projection) => {
+const holderArt = (cx: number, isFilled: boolean, P: Projection) => {
   const frame = facing(LIP_FRONT, 0.5);
   const outer = rectRing(cx - 6.5, 20, cx + 6.5, 27, 0.8);
   const face = facing(LIP_FRONT + 0.5, 0);
   return {
     holder: prismOf(outer, frame, P),
-    rule: linePath(
-      [
-        [cx - 4.2, LIP_FRONT + 0.5, 23.6],
-        [cx + 2.4, LIP_FRONT + 0.5, 23.6],
-      ],
-      P
-    ),
+    rule: isFilled
+      ? linePath(
+          [
+            [cx - 4.2, LIP_FRONT + 0.5, 23.6],
+            [cx + 2.4, LIP_FRONT + 0.5, 23.6],
+          ],
+          P
+        )
+      : "",
     window: ringIn(face, rectRing(cx - 5.2, 21.2, cx + 5.2, 25.8, 0.5), P),
   };
 };
 
-const rackArt = (rack: 0 | 1, count: number, P: Projection) => {
+const rackArt = (rack: 0 | 1, filled: readonly boolean[], P: Projection) => {
+  const count = filled.length;
   const left = rackLeft(rack, count);
   const width = rackWidth(count);
   const cheek = (x: number) =>
@@ -258,13 +276,15 @@ const rackArt = (rack: 0 | 1, count: number, P: Projection) => {
       ],
       P
     ),
-    holders: centers.map((cx) => holderArt(cx, P)),
+    holders: centers.map((cx, index) =>
+      holderArt(cx, filled[index] ?? false, P)
+    ),
     lip: slabOf(lip, SHELF_TOP, LIP_TOP - SHELF_TOP, P, 2, 0.3),
     lipSeam: sideSeam(lip, SHELF_TOP + 4, P, 2),
     rivets: flat(
       centers.flatMap((cx): Point3[] => [
-        [cx - 9, LIP_FRONT, LIP_TOP - 2.4],
-        [cx + 9, LIP_FRONT, LIP_TOP - 2.4],
+        [cx - 9, LIP_FRONT, SHELF_TOP + 2],
+        [cx + 9, LIP_FRONT, SHELF_TOP + 2],
       ]),
       P
     ),
@@ -409,13 +429,34 @@ const dialArt = (P: Projection) => {
     w: [0, 0.6, 0],
   };
   return {
-    bezel: ringIn(
-      { ...drum, origin: [CLOCK_X, faceY, DIAL_Z] },
-      circleOf(root, 64),
-      P
-    ),
+    bezel: join([
+      ringIn(
+        { ...drum, origin: [CLOCK_X, faceY, DIAL_Z] },
+        circleOf(root, 64),
+        P
+      ),
+      ringIn(
+        { ...drum, origin: [CLOCK_X, faceY, DIAL_Z] },
+        circleOf(DIAL_R - 0.8, 64),
+        P
+      ),
+    ]),
     drum: prismOf(circleOf(DIAL_R, 56), drum, P),
     hub: prismOf(circleOf(1.5, 16), hub, P),
+    maker: join(
+      [
+        [3.6, 6.4],
+        [2.2, 8.2],
+      ].map(([half = 0, drop = 0]) =>
+        linePath(
+          [
+            [CLOCK_X - half, faceY, DIAL_Z - drop],
+            [CLOCK_X + half, faceY, DIAL_Z - drop],
+          ],
+          P
+        )
+      )
+    ),
     ticksMajor: tickPaths((index) => index % 5 === 0 && index !== 0, 2.6),
     ticksMinor: tickPaths((index) => index % 5 !== 0, 1.2),
     zero: tickPaths((index) => index === 0, 3.2),
@@ -427,19 +468,23 @@ const clockSide = (P: Projection) => {
   const vents = join(
     Array.from({ length: 6 }, (_, index) => {
       const y = CASE.y + 7 + index * 4;
-      return ringIn(side, rectRing(y, 60, y + 1.6, 76, 0.8), P);
+      return ringIn(side, rectRing(y, 16, y + 1.6, 34, 0.8), P);
     })
   );
   const [face] = HUB;
   const housingFrame = siding(SIDE_X, face - SIDE_X);
   return {
-    housing: prismOf(rectRing(1, 28, 15, 48, 1.2), housingFrame, P),
+    housing: prismOf(
+      rectRing(HUB[1] - 7, HUB[2] - 10, HUB[1] + 7, HUB[2] + 10, 1.2),
+      housingFrame,
+      P
+    ),
     housingScrews: flat(
       [
-        [face, 3, 30],
-        [face, 13, 30],
-        [face, 3, 46],
-        [face, 13, 46],
+        [face, HUB[1] - 5, HUB[2] - 8],
+        [face, HUB[1] + 5, HUB[2] - 8],
+        [face, HUB[1] - 5, HUB[2] + 8],
+        [face, HUB[1] + 5, HUB[2] + 8],
       ],
       P
     ),
@@ -514,7 +559,18 @@ export const clockOf = (career: Career) => {
         cardArt(tenure.id, pockets[index]?.x ?? 0, tenure.isCurrent, P)
       ),
       clock: clockArt(P),
-      racks: [rackArt(0, count, P), rackArt(1, count, P)] as const,
+      racks: [
+        rackArt(
+          0,
+          pockets.map((pocket) => pocket.rack === 0),
+          P
+        ),
+        rackArt(
+          1,
+          pockets.map((pocket) => pocket.rack === 1),
+          P
+        ),
+      ] as const,
     },
     mask: slotMask(P, CLOCK_WIDTH, CLOCK_HEIGHT),
     pockets,

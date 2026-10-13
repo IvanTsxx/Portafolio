@@ -18,7 +18,7 @@ import {
   STAGGER,
   stepDesk,
 } from "./clock-motion";
-import type { Axis, Desk, Flight } from "./clock-motion";
+import type { Axis, Desk } from "./clock-motion";
 import { handsOf, leverOf } from "./clock-parts";
 import { shiftOf } from "./prism";
 
@@ -186,12 +186,8 @@ const placeCards = (nodes: ClockNodes, desk: Desk, P: Projection) => {
   }
 };
 
-const placeLever = (
-  nodes: ClockNodes,
-  flight: Flight | null,
-  P: Projection
-) => {
-  const lever = leverOf(leverAngle(flight), P);
+const placeLever = (nodes: ClockNodes, angle: number, P: Projection) => {
+  const lever = leverOf(angle, P);
   const [arm = null, cap = null, knob = null] = nodes.lever;
   writeSolid(arm, lever.arm);
   writeSolid(cap, lever.cap);
@@ -241,6 +237,8 @@ const engineOf = ({
   let last = 0;
   let assembling: { clock: number; shares: Axis[] } | null = null;
   let reported: Report = { job: null, phase: "home" };
+  let isDirty = true;
+  let drawnAngle = Number.NaN;
 
   const report = () => {
     const phase = phaseOf(desk);
@@ -255,10 +253,17 @@ const engineOf = ({
     }
   };
 
-  const draw = () => {
+  const draw = (isMoving: boolean) => {
     const P = latest.current.projection;
-    placeCards(nodes.current, desk, P);
-    placeLever(nodes.current, desk.flight, P);
+    if (isMoving || isDirty) {
+      placeCards(nodes.current, desk, P);
+    }
+    isDirty = isMoving;
+    const angle = leverAngle(desk.flight);
+    if (angle !== drawnAngle) {
+      drawnAngle = angle;
+      placeLever(nodes.current, angle, P);
+    }
     placeHands(nodes.current, P);
     report();
   };
@@ -285,7 +290,7 @@ const engineOf = ({
     const calm = latest.current.isReduced;
     const isAssembling = assemble(dt, calm);
     const isMoving = stepDesk(desk, dt, calm);
-    draw();
+    draw(isMoving);
     return isAssembling || isMoving || !calm;
   };
 
@@ -304,6 +309,7 @@ const engineOf = ({
   };
 
   const kick = () => {
+    isDirty = true;
     if (frame) {
       return;
     }
@@ -312,7 +318,7 @@ const engineOf = ({
       return;
     }
     stepDesk(desk, 1, true);
-    draw();
+    draw(true);
   };
 
   return {
