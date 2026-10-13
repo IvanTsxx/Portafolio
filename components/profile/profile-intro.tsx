@@ -35,7 +35,7 @@ export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
           />
         </div>
         <div className="flex min-w-0 flex-col gap-3">
-          <p className="label text-mist tabular-nums">[ GH-02 ] Dossier</p>
+          <p className="label text-mist tabular-nums">[ GH-01 ] Dossier</p>
           <h1
             className="display text-ink text-6xl sm:text-7xl"
             id="intro-heading"

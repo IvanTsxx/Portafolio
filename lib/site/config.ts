@@ -51,18 +51,18 @@ export const primaryRoutes = [
 ] as const;
 
 export const homeSections = [
-  { id: "experience", index: "GH-03", label: "Experience" },
-  { id: "pinned", index: "GH-04", label: "Pinned" },
+  { id: "experience", index: "GH-02", label: "Experience" },
+  { id: "pinned", index: "GH-03", label: "Pinned" },
   {
     id: "matrix",
-    index: "GH-05",
+    index: "GH-04",
     label: "Contribution matrix",
   },
-  { id: "how-i-work", index: "GH-06", label: "How I work" },
-  { id: "workshop", index: "GH-07", label: "Workshop" },
-  { id: "experiments", index: "GH-08", label: "Experiments" },
-  { id: "registry", index: "GH-09", label: "Registry" },
-  { id: "contact", index: "GH-10", label: "Contact" },
+  { id: "how-i-work", index: "GH-05", label: "How I work" },
+  { id: "workshop", index: "GH-06", label: "Workshop" },
+  { id: "experiments", index: "GH-07", label: "Experiments" },
+  { id: "registry", index: "GH-08", label: "Registry" },
+  { id: "contact", index: "GH-09", label: "Contact" },
 ] as const;
 
 export type Social = (typeof siteConfig.socials)[number];
