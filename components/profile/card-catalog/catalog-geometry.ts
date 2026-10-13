@@ -42,7 +42,7 @@ const TAB_W = 16;
 const TAB_H = 6;
 const WALL_TOP = 22;
 const PANEL_TOP = 28;
-const CLIP_Y = 27;
+const CLIP_Y = 4;
 const NOTCH_R = 1.1;
 const NOTCH_INSET = 2.7;
 const NOTCH_FIRST = 6;
@@ -315,7 +315,20 @@ const cardFace = (
   P: Projection
 ) => {
   const fx = x + CARD_T / 2;
+  const bx = x - CARD_T / 2;
   const edge = CARD_HALF;
+  const aroundEdge = (points: readonly Plane[]) => {
+    const [first] = points;
+    const last = points.at(-1);
+    if (!(first && last)) {
+      return "";
+    }
+    return pathOf([
+      iso([bx, first[0], first[1]], P),
+      ...points.map(([y, z]) => iso([fx, y, z], P)),
+      iso([bx, last[0], last[1]], P),
+    ]);
+  };
   const holeY = edge - NOTCH_INSET;
   const notched: string[] = [];
   const holes: string[] = [];
@@ -323,17 +336,13 @@ const cardFace = (
     const z = CARD_TOP - NOTCH_FIRST - index * NOTCH_PITCH;
     if (index < card.stars) {
       notched.push(
-        onFaceX(
-          fx,
-          [
-            [edge, z + NOTCH_R],
-            [holeY, z + NOTCH_R],
-            ...arcPoints(holeY, z, NOTCH_R, 90, 270, 8).slice(1, -1),
-            [holeY, z - NOTCH_R],
-            [edge, z - NOTCH_R],
-          ],
-          P
-        )
+        aroundEdge([
+          [edge, z + NOTCH_R],
+          [holeY, z + NOTCH_R],
+          ...arcPoints(holeY, z, NOTCH_R, 90, 270, 8).slice(1, -1),
+          [holeY, z - NOTCH_R],
+          [edge, z - NOTCH_R],
+        ])
       );
     } else {
       holes.push(
@@ -363,14 +372,11 @@ const cardFace = (
     ),
     nameRule: typed(CARD_TOP - 9.6, card.nameRule),
     notched: join(notched),
-    rule: onFaceX(
-      fx,
-      [
-        [edge, CARD_TOP - 3.6],
-        [-edge, CARD_TOP - 3.6],
-      ],
-      P
-    ),
+    rule: pathOf([
+      iso([bx, edge, CARD_TOP - 3.6], P),
+      iso([fx, edge, CARD_TOP - 3.6], P),
+      iso([fx, -edge, CARD_TOP - 3.6], P),
+    ]),
     typedRules: join(
       card.descriptionRules.map((share, index) =>
         typed(CARD_TOP - 14.2 - index * 3.8, share)
@@ -390,9 +396,9 @@ const cardOf = (
   return {
     clip: card.isTemplate
       ? slabOf(
-          { d: 3.4, r: 0.6, w: 2.6, x: x - 1.3, y: -CLIP_Y },
-          CARD_TOP - 7,
-          8,
+          { d: 4, r: 0.5, w: 2.4, x: x - 1.2, y: -CLIP_Y },
+          CARD_TOP - 2.6,
+          4.2,
           P,
           3
         )
