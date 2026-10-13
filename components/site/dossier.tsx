@@ -3,6 +3,7 @@ import type { VariantProps } from "class-variance-authority";
 import type { ReactNode } from "react";
 
 import { BackCover } from "@/components/site/back-cover";
+import { DossierEdgeReview } from "@/components/site/dossier-edge-review";
 import { RouteTabs } from "@/components/site/route-tabs";
 import { RouteThumbIndex } from "@/components/site/thumb-index";
 
@@ -40,6 +41,7 @@ export const Dossier = ({
     <div className={frameVariants({ size })}>
       <RouteTabs />
       <div className="relative">
+        <DossierEdgeReview size={size} />
         <span
           aria-hidden
           className={`${backingSheetClassName} hatch translate-x-2 translate-y-2 md:translate-x-3 md:translate-y-3`}
