@@ -25,13 +25,44 @@ import {
   tuckSpeed,
 } from "./companion-motion";
 import type {
+  OperatorMode,
+  OperatorPose,
+  OperatorTarget,
+  Point,
+  StationView,
+} from "./companion-operator";
+import {
+  operatorPlacement,
+  pickStation,
+  railMode,
+  stepOperator,
+} from "./companion-operator";
+import type {
   ColumnBounds,
   CompanionDock,
+  DockGoal,
   Viewport,
 } from "./companion-placement";
-import { companionDock, dockGoal, shouldYield } from "./companion-placement";
+import {
+  bubbleSide,
+  companionDock,
+  dockGoal,
+  headerClearance,
+  shouldYield,
+  stationScale,
+  watchYaw,
+} from "./companion-placement";
+import { getCompanionRail } from "./companion-rail";
+import { railShare } from "./companion-rail-math";
 import type { SpokenSection } from "./companion-signals";
 import { getSpokenSection, sayCompanionLine } from "./companion-signals";
+import type { TrackedStation } from "./station-tracking";
+import {
+  getFocusLine,
+  getTrackedStations,
+  isStationEngaged,
+  toScreen,
+} from "./station-tracking";
 import { ViewLights } from "./view-lights";
 import { getAgentCasts } from "./view-registry";
 
@@ -49,11 +80,24 @@ interface Outfit {
   toss: HatToss | null;
 }
 
+interface Steering {
+  goal: DockGoal;
+  pinned: OperatorPose | null;
+}
+
+interface Speech {
+  isQuiet: boolean;
+  isShown: boolean;
+  text: string | null;
+}
+
 const modelHeight = 2.2;
 const baseTilt = 0.16;
 const depthClearPriority = 2.5;
 const speechSeconds = 7;
+const operatorSpeechSeconds = 3.2;
 const speechGap = 12;
+const tailInset = 8;
 const shownScale = 0.85;
 
 const readViewport = (): Viewport => ({
@@ -68,7 +112,8 @@ const placeHitBox = (
   hit: HTMLDivElement | null,
   state: CompanionMotion,
   dock: CompanionDock | null,
-  lift: number
+  lift: number,
+  isInteractive: boolean
 ) => {
   if (!hit) {
     return;
@@ -82,7 +127,7 @@ const placeHitBox = (
   hit.style.transform = `translate3d(${state.x - width / 2}px, ${state.y - height - lift}px, 0)`;
   hit.style.width = `${width}px`;
   hit.style.height = `${height}px`;
-  hit.style.pointerEvents = state.scale > shownScale ? "auto" : "none";
+  hit.style.pointerEvents = isInteractive ? "auto" : "none";
 };
 
 const placeBubble = (
@@ -95,20 +140,59 @@ const placeBubble = (
   if (!bubble) {
     return;
   }
-  const slot = dock?.kind === "gutter" ? dock.bubble : null;
+  const slot = dock && dock.kind !== "corner" ? dock.bubble : null;
   if (!(dock && slot)) {
     bubble.dataset.shown = "false";
     return;
   }
-  const top = state.y - dock.frame.agentHeight * state.scale - lift - speechGap;
+  const head = state.y - dock.frame.agentHeight * state.scale - lift;
+  const side = bubbleSide(head);
+  const top = side === "above" ? head - speechGap : state.y + speechGap;
+  const tail = state.x - slot.left;
   bubble.style.transform = `translate3d(${slot.left}px, ${top}px, 0)`;
   bubble.style.setProperty("--speech-width", `${slot.maxWidth}px`);
-  bubble.style.setProperty("--speech-tail", `${state.x - slot.left}px`);
+  bubble.style.setProperty("--speech-tail", `${tail}px`);
+  bubble.dataset.side = side;
+  bubble.dataset.tail = String(
+    tail >= tailInset && tail <= slot.maxWidth - tailInset
+  );
   bubble.dataset.shown = String(isShown);
 };
 
 const lineFor = (section: SpokenSection, visit: number) =>
   section.lines[visit % section.lines.length] ?? null;
+
+const stationViews = (tracked: readonly TrackedStation[]): StationView[] =>
+  tracked.map((entry) => ({
+    console: toScreen(entry.console),
+    figure: toScreen(entry.figure),
+    id: entry.station.id,
+  }));
+
+const targetFor = (
+  views: readonly StationView[],
+  tracked: readonly TrackedStation[],
+  id: string | null
+): OperatorTarget | null => {
+  const view = views.find((candidate) => candidate.id === id);
+  const entry = tracked.find((candidate) => candidate.station.id === id);
+  if (!(view && entry)) {
+    return null;
+  }
+  return {
+    console: {
+      x: (view.console.left + view.console.right) / 2,
+      y: view.console.top,
+    },
+    controls: entry.station.controls,
+    id: entry.station.id,
+  };
+};
+
+const modeStationId = (mode: OperatorMode) =>
+  mode.kind === "travelling" || mode.kind === "operating"
+    ? mode.stationId
+    : null;
 
 const swapOrigin = new Vector3();
 
@@ -135,11 +219,14 @@ const CompanionContent = ({
   const hat = useRef<TossHandle>(null);
   const actionRef = useRef<AgentAction>(cast.action);
   const heardSection = useRef<Element | null>(null);
+  const sectionLine = useRef<string | null>(null);
   const handledPresses = useRef(0);
   const tossCount = useRef(0);
   const visits = useRef(new WeakMap<Element, number>());
   const spokenAt = useRef(Number.NEGATIVE_INFINITY);
+  const operatorLine = useRef<{ at: number; text: string } | null>(null);
   const motion = useRef<CompanionMotion | null>(null);
+  const operator = useRef<OperatorMode>(railMode);
   const isYieldingRef = useRef(false);
   const [outfit, setOutfit] = useState<Outfit>({
     role: cast.role,
@@ -166,6 +253,118 @@ const CompanionContent = ({
     hat.current?.launch(feet, -1, 1);
   };
 
+  const listenToSection = (time: number) => {
+    const section = getSpokenSection();
+    const speak = () => {
+      if (!section) {
+        return;
+      }
+      const visit = visits.current.get(section.element) ?? 0;
+      visits.current.set(section.element, visit + 1);
+      sectionLine.current = lineFor(section, visit);
+      spokenAt.current = time;
+    };
+    if ((section?.element ?? null) !== heardSection.current) {
+      if (section) {
+        speak();
+      } else {
+        sectionLine.current = null;
+      }
+    }
+    heardSection.current = section?.element ?? null;
+    if (presses.current !== handledPresses.current) {
+      handledPresses.current = presses.current;
+      speak();
+    }
+    return section;
+  };
+
+  const chooseSpeech = (
+    time: number,
+    section: SpokenSection | null
+  ): Speech => {
+    const focused = getFocusLine();
+    if (focused) {
+      return { isQuiet: false, isShown: true, text: focused };
+    }
+    const operated = operatorLine.current;
+    if (operated && time - operated.at < operatorSpeechSeconds) {
+      return { isQuiet: true, isShown: true, text: operated.text };
+    }
+    return {
+      isQuiet: false,
+      isShown: section !== null && time - spokenAt.current < speechSeconds,
+      text: sectionLine.current,
+    };
+  };
+
+  const steer = ({
+    dock,
+    isYielding,
+    restGoal,
+    state,
+    time,
+    viewport,
+  }: {
+    dock: CompanionDock;
+    isYielding: boolean;
+    restGoal: DockGoal;
+    state: CompanionMotion;
+    time: number;
+    viewport: Viewport;
+  }): Steering => {
+    const home: Point = { x: restGoal.x, y: restGoal.y };
+    const tracked = getTrackedStations();
+    const views = stationViews(tracked);
+    const canOperate = !isReduced && dock.kind !== "corner";
+    const targetId = canOperate
+      ? pickStation(
+          views,
+          viewport,
+          modeStationId(operator.current),
+          headerClearance
+        )
+      : null;
+    const target = targetFor(views, tracked, targetId);
+    const { effect, mode } = stepOperator(operator.current, {
+      canOperate,
+      home,
+      isEngaged: targetId ? isStationEngaged(targetId) : false,
+      isYielding,
+      position: state.isPlaced ? { x: state.x, y: state.y } : home,
+      target,
+      time,
+    });
+    operator.current = mode;
+    if (effect) {
+      tracked
+        .find((entry) => entry.station.id === effect.stationId)
+        ?.station.operate(effect.control.id);
+      operatorLine.current = { at: time, text: effect.control.label };
+    }
+    const placement = operatorPlacement(mode, {
+      console: target?.console ?? null,
+      home,
+      time,
+    });
+    if (!placement.pose) {
+      const isWatching = getFocusLine() !== null && !isYielding;
+      return {
+        goal: { ...restGoal, yaw: isWatching ? watchYaw : restGoal.yaw },
+        pinned: null,
+      };
+    }
+    return {
+      goal: {
+        scale: 1 + (stationScale(dock) - 1) * placement.stationShare,
+        x: placement.goal.x,
+        y: placement.goal.y,
+        yaw: placement.pose.yaw,
+      },
+      pinned: placement.pose,
+    };
+  };
+
   useFrame((frameState, delta) => {
     const view = camera.current;
     const group = mover.current;
@@ -173,15 +372,18 @@ const CompanionContent = ({
     if (!(view && group && spinner)) {
       return;
     }
-    const time = frameState.clock.elapsedTime;
+    const { elapsedTime: time } = frameState.clock;
     const viewport = readViewport();
     const bounds = column.current;
-    const dock = bounds ? companionDock(viewport, bounds) : null;
+    const rail = getCompanionRail();
+    const dock = bounds
+      ? companionDock(viewport, bounds, rail?.track ?? null)
+      : null;
     const state = motion.current ?? createCompanionMotion(cast.role);
     motion.current = state;
     if (!dock) {
       spinner.visible = false;
-      placeHitBox(hit.current, state, null, 0);
+      placeHitBox(hit.current, state, null, 0, false);
       placeBubble(bubble.current, state, null, 0, false);
       return;
     }
@@ -191,45 +393,35 @@ const CompanionContent = ({
       view.updateProjectionMatrix();
     }
 
-    const section = getSpokenSection();
-    const speak = () => {
-      if (!section) {
-        return;
-      }
-      const visit = visits.current.get(section.element) ?? 0;
-      visits.current.set(section.element, visit + 1);
-      sayCompanionLine(lineFor(section, visit));
-      spokenAt.current = time;
-    };
-    if ((section?.element ?? null) !== heardSection.current) {
-      if (section) {
-        speak();
-      } else {
-        sayCompanionLine(null);
-      }
-    }
-    heardSection.current = section?.element ?? null;
-    if (presses.current !== handledPresses.current) {
-      handledPresses.current = presses.current;
-      speak();
-    }
-
+    const section = listenToSection(time);
     const isYielding = shouldYield(
       castRects(),
       viewport,
       isYieldingRef.current
     );
     isYieldingRef.current = isYielding;
-    const goal = dockGoal(dock, {
+    const { scrollY } = window;
+    const restGoal = dockGoal(dock, {
       isTucked: !isReduced && state.scrollVelocity > tuckSpeed,
       isYielding,
+      railShare:
+        rail && dock.kind === "rail" ? railShare(scrollY, rail.anchors) : 0,
+    });
+    const { goal, pinned } = steer({
+      dock,
+      isYielding,
+      restGoal,
+      state,
+      time,
+      viewport,
     });
     const pose = stepCompanion(state, {
       goal,
       isReduced,
+      pinned,
       restAction: cast.action,
       role: cast.role,
-      scrollY: window.scrollY,
+      scrollY,
       step: Math.min(delta, 0.1),
       time,
     });
@@ -245,16 +437,17 @@ const CompanionContent = ({
       0
     );
     playCue(pose.cue, group.position);
-    placeHitBox(hit.current, state, dock, pose.lift);
+    const isPresent =
+      !isYielding && goal.scale > 0.5 && state.scale > shownScale * goal.scale;
+    placeHitBox(hit.current, state, dock, pose.lift, isPresent);
+    const speech = chooseSpeech(time, section);
+    sayCompanionLine(speech.text, speech.isQuiet);
     placeBubble(
       bubble.current,
       state,
       dock,
       pose.lift,
-      !isYielding &&
-        state.scale > shownScale &&
-        section !== null &&
-        time - spokenAt.current < speechSeconds
+      isPresent && speech.isShown && speech.text !== null
     );
   });
 

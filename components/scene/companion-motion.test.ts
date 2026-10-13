@@ -13,6 +13,7 @@ const rest = { scale: 1, x: 1200, y: 640, yaw: -0.32 };
 const input = (overrides: Partial<CompanionInput>): CompanionInput => ({
   goal: rest,
   isReduced: false,
+  pinned: null,
   restAction: "wave",
   role: "builder",
   scrollY: 0,
@@ -135,5 +136,37 @@ describe("stepCompanion", () => {
     expect(poses.some((pose) => pose.cue.kind === "swap")).toBe(false);
     expect(poses[0]?.cue).toEqual({ kind: "wear", role: "analyst" });
     expect(state.scale).toBeLessThan(0.05);
+  });
+
+  test("while operating a station the companion stays glued to the console through a fast scroll and plays the press pose", () => {
+    const state = createCompanionMotion("builder");
+    run(30, 0, (time) => input({ time }), state);
+    const console = { scale: 0.67, x: 700, y: 520, yaw: -0.12 };
+    const press = {
+      action: "point",
+      lean: 0.14,
+      lift: -3,
+      squash: 0.86,
+      yaw: -0.12,
+    } as const;
+    const poses = run(
+      20,
+      0.5,
+      (time, frame) =>
+        input({
+          goal: { ...console, y: console.y - frame * 30 },
+          pinned: press,
+          scrollY: frame * 30,
+          time,
+        }),
+      state
+    );
+    expect(state.x).toBe(700);
+    expect(state.y).toBe(520 - 19 * 30);
+    expect(poses.at(-1)).toMatchObject({
+      action: "point",
+      lift: -3,
+      squash: 0.86,
+    });
   });
 });

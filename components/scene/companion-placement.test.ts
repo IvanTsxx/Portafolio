@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import type { ColumnBounds, Viewport } from "./companion-placement";
 import {
+  bubbleSide,
   castPresence,
   companionDock,
   dockGoal,
@@ -144,5 +145,64 @@ describe("yield to section casts", () => {
 
   test("no casts, no yield", () => {
     expect(shouldYield([], viewport, true)).toBe(false);
+  });
+});
+
+const trackFor = (column: ColumnBounds, offset: number) => ({
+  bottom: 852,
+  left: column.right + offset,
+  top: 128,
+});
+
+describe("rail dock", () => {
+  test("on the rail the companion rides in the lane between the column and the rail, never over either", () => {
+    for (const [width, offset] of [
+      [1024, 88],
+      [1280, 120],
+      [1440, 120],
+      [1920, 120],
+    ] as const) {
+      const column = centeredColumn(width);
+      const track = trackFor(column, offset);
+      const dock = companionDock(viewportOf(width, 900), column, track);
+      expect(dock.kind).toBe("rail");
+      if (dock.kind !== "rail") {
+        continue;
+      }
+      expect(dock.x - dock.frame.agentWidth / 2).toBeGreaterThan(column.right);
+      expect(dock.x + dock.frame.agentWidth / 2).toBeLessThan(track.left);
+      expect(dock.bubble?.left).toBeGreaterThan(column.right);
+    }
+  });
+
+  test("the rail position runs from the top of the track to the bottom and centres the companion on it", () => {
+    const column = centeredColumn(1440);
+    const dock = companionDock(
+      viewportOf(1440, 900),
+      column,
+      trackFor(column, 120)
+    );
+    if (dock.kind !== "rail") {
+      throw new Error("expected a rail dock");
+    }
+    const half = dock.frame.agentHeight / 2;
+    const flags = { isTucked: false, isYielding: false };
+    expect(dockGoal(dock, { ...flags, railShare: 0 }).y - half).toBe(128);
+    expect(dockGoal(dock, { ...flags, railShare: 1 }).y - half).toBe(852);
+  });
+
+  test("a lane too narrow for the smallest companion falls back to the plain gutter dock", () => {
+    const column = centeredColumn(1440);
+    const dock = companionDock(
+      viewportOf(1440, 900),
+      column,
+      trackFor(column, 40)
+    );
+    expect(dock.kind).toBe("gutter");
+  });
+
+  test("near the top of the screen the speech bubble drops below the companion instead of hiding under the header", () => {
+    expect(bubbleSide(400)).toBe("above");
+    expect(bubbleSide(100)).toBe("below");
   });
 });

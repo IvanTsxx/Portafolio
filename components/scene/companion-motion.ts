@@ -1,5 +1,6 @@
 import type { AgentAction, AgentRole } from "@/lib/agents/roles";
 
+import type { OperatorPose } from "./companion-operator";
 import type { DockGoal } from "./companion-placement";
 
 export interface CompanionMotion {
@@ -34,6 +35,7 @@ export interface CompanionPose {
 export interface CompanionInput {
   goal: DockGoal;
   isReduced: boolean;
+  pinned: OperatorPose | null;
   restAction: AgentAction;
   role: AgentRole;
   scrollY: number;
@@ -151,6 +153,25 @@ const stepFollow = (
   };
 };
 
+const stepPinned = (
+  state: CompanionMotion,
+  input: CompanionInput,
+  pinned: OperatorPose
+): CompanionPose => {
+  state.x = input.goal.x;
+  state.y = input.goal.y;
+  state.yaw = damp(state.yaw, pinned.yaw, yawRate * 2, input.step);
+  state.stride = 0;
+  return {
+    action: pinned.action,
+    cue: noCue,
+    lean: pinned.lean,
+    lift: pinned.lift,
+    spin: 0,
+    squash: pinned.squash,
+  };
+};
+
 const stepSwap = (
   state: CompanionMotion,
   input: CompanionInput,
@@ -187,8 +208,12 @@ export const stepCompanion = (
   }
   trackScroll(state, input);
   stepScale(state, input.goal.scale, input.step);
-  const follow = stepFollow(state, input);
-  const lean = clamp(-state.scrollVelocity * leanPerSpeed, leanLimit);
+  const follow = input.pinned
+    ? stepPinned(state, input, input.pinned)
+    : stepFollow(state, input);
+  const lean = input.pinned
+    ? input.pinned.lean
+    : clamp(-state.scrollVelocity * leanPerSpeed, leanLimit);
 
   const progress = (input.time - state.swapStart) / swapSeconds;
   const isSwapping = progress >= 0 && progress < 1;

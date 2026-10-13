@@ -512,6 +512,11 @@ export const utilitySpecs = [
     variable: "--grid-size",
   },
   {
+    name: "rail-ties",
+    summary: "Track ties every 12px down the section rail.",
+    usage: '<span className="rail-ties block h-24 w-2" />',
+  },
+  {
     name: "grain",
     summary: "Paper noise tile.",
     usage: '<div className="grain bg-paper-deep" />',

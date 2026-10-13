@@ -6,7 +6,12 @@ type Listener = () => void;
 
 const activateListeners = new Set<Listener>();
 const lineListeners = new Set<Listener>();
-let spokenLine: string | null = null;
+export interface CompanionLine {
+  isQuiet: boolean;
+  text: string;
+}
+
+let spokenLine: CompanionLine | null = null;
 
 export const subscribeCompanionActivate = (listener: Listener) => {
   activateListeners.add(listener);
@@ -26,11 +31,14 @@ export const useCompanionActivate = (onActivate: () => void) => {
   useEffect(() => subscribeCompanionActivate(() => handleActivate()), []);
 };
 
-export const sayCompanionLine = (line: string | null) => {
-  if (line === spokenLine) {
+export const sayCompanionLine = (text: string | null, isQuiet = false) => {
+  if (
+    (spokenLine?.text ?? null) === text &&
+    (spokenLine?.isQuiet ?? isQuiet) === isQuiet
+  ) {
     return;
   }
-  spokenLine = line;
+  spokenLine = text === null ? null : { isQuiet, text };
   for (const listener of lineListeners) {
     listener();
   }
