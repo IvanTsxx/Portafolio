@@ -1,5 +1,3 @@
-import type { Metadata } from "next";
-
 import { CommandLine } from "@/components/registry-docs/command-line";
 import { ItemStyles } from "@/components/registry-docs/item-styles";
 import { loadDemoModule } from "@/components/registry-docs/load-demo";
@@ -9,10 +7,8 @@ import {
 } from "@/components/registry-docs/registry-browser";
 import { DocumentHero } from "@/components/site/document-hero";
 import { FilterFold } from "@/components/site/filter-fold";
-import {
-  getRegistryItemUrl,
-  registryUrlTemplate,
-} from "@/lib/registry/install";
+import { JsonLd } from "@/components/site/json-ld";
+import { getRegistryItemUrl } from "@/lib/registry/install";
 import {
   formatRegistryIndex,
   getRegistryCategories,
@@ -20,11 +16,10 @@ import {
   toCategoryLabel,
 } from "@/lib/registry/registry";
 import { siteConfig } from "@/lib/site/config";
+import { buildPageMetadata, pageSeo } from "@/lib/site/seo";
+import { registryIndexJsonLd } from "@/lib/site/structured-data";
 
-export const metadata: Metadata = {
-  description: `Installable shadcn components. Add any item from ${registryUrlTemplate}.`,
-  title: "Registry",
-};
+export const metadata = buildPageMetadata(pageSeo.registry);
 
 const RegistryPage = async () => {
   const categories = getRegistryCategories();
@@ -47,6 +42,7 @@ const RegistryPage = async () => {
 
   return (
     <>
+      <JsonLd data={registryIndexJsonLd(registryItems)} />
       <ItemStyles items={registryItems} />
       <DocumentHero
         code="REG-01"

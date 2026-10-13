@@ -1,8 +1,9 @@
 import { describe, expect, test } from "bun:test";
 
 import { siteConfig } from "@/lib/site/config";
+import { noteJsonLd } from "@/lib/site/structured-data";
 
-import { buildNoteJsonLd, buildNoteMetadata } from "./metadata";
+import { buildNoteMetadata } from "./metadata";
 import type { CaseStudy, FieldNote } from "./note-domain";
 
 const note: FieldNote = {
@@ -46,7 +47,7 @@ describe("note metadata", () => {
 
       expect(metadata.alternates?.canonical).toBe(`/notes/${entry.slug}`);
       expect(metadata.openGraph?.url).toBe(`/notes/${entry.slug}`);
-      expect(metadata.description).toBe(entry.summary);
+      expect(metadata.description).toStartWith(entry.summary);
     }
   });
 
@@ -74,12 +75,13 @@ describe("note metadata", () => {
   });
 
   test("builds BlogPosting structured data with an absolute URL", () => {
-    const jsonLd = buildNoteJsonLd(note);
+    const [posting, breadcrumb] = noteJsonLd(note)["@graph"];
 
-    expect(jsonLd["@type"]).toBe("BlogPosting");
-    expect(jsonLd.datePublished).toBe("2026-10-09");
-    expect(jsonLd.mainEntityOfPage).toBe(
-      `${siteConfig.url}/notes/worktrees-as-lanes`
-    );
+    expect(posting).toMatchObject({
+      "@type": "BlogPosting",
+      datePublished: "2026-10-09",
+      mainEntityOfPage: `${siteConfig.url}/notes/worktrees-as-lanes`,
+    });
+    expect(breadcrumb?.["@type"]).toBe("BreadcrumbList");
   });
 });

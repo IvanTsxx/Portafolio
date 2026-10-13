@@ -7,19 +7,17 @@ import { SceneLayer } from "@/components/scene/scene-layer";
 import { SiteHeader } from "@/components/site/site-header";
 import { fontClassNames } from "@/lib/fonts";
 import { siteConfig } from "@/lib/site/config";
+import { printColors } from "@/lib/site/print-colors";
+import { pageSeo, siteTitle } from "@/lib/site/seo";
 
 export const metadata: Metadata = {
-  description: siteConfig.description,
+  applicationName: siteConfig.nickname,
+  authors: [{ name: siteConfig.nickname, url: siteConfig.url }],
+  creator: siteConfig.nickname,
+  description: pageSeo.home.description,
   metadataBase: new URL(siteConfig.url),
-  openGraph: {
-    description: siteConfig.description,
-    siteName: siteConfig.nickname,
-    title: `${siteConfig.nickname} · Agent Workshop`,
-    type: "website",
-    url: siteConfig.url,
-  },
   title: {
-    default: `${siteConfig.nickname} · Agent Workshop`,
+    default: siteTitle,
     template: `%s · ${siteConfig.nickname}`,
   },
   twitter: { card: "summary_large_image", creator: `@${siteConfig.handle}` },
@@ -27,7 +25,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: "light",
-  themeColor: "#ebebe9",
+  themeColor: printColors.paper,
 };
 
 const RootLayout = ({ children }: LayoutProps<"/">) => (

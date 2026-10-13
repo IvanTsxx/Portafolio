@@ -16,6 +16,7 @@ import { PreviewCodeTabs } from "@/components/registry-docs/preview-code-tabs";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
+import { JsonLd } from "@/components/site/json-ld";
 import { focusRingClassName } from "@/components/site/styles";
 import { highlightCode } from "@/lib/registry/highlight";
 import {
@@ -35,6 +36,8 @@ import { buildItemCodeFiles } from "@/lib/registry/source";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { registrySections } from "@/lib/site/sections";
 import type { RegistrySectionId } from "@/lib/site/sections";
+import { buildPageMetadata, registryItemSeo } from "@/lib/site/seo";
+import { registryItemJsonLd } from "@/lib/site/structured-data";
 import { cn } from "@/lib/utils";
 
 export const dynamicParams = false;
@@ -50,7 +53,7 @@ export const generateMetadata = async ({
   if (!item) {
     return {};
   }
-  return { description: item.description, title: item.title };
+  return buildPageMetadata(registryItemSeo(item));
 };
 
 const NeighborLink = ({
@@ -112,6 +115,7 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
 
   return (
     <>
+      <JsonLd data={registryItemJsonLd(item)} />
       <ItemStyles items={[item]} />
       <DocumentHero
         back={{ href: "/registry", label: "Registry" }}

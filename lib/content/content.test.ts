@@ -2,32 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { compile } from "@mdx-js/mdx";
-import { plugin } from "bun";
 import { createElement } from "react";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import rehypeSlug from "rehype-slug";
-import remarkGfm from "remark-gfm";
 
 import type { ContentDocument } from "./collection";
 import { noteSource } from "./note-domain";
 import { getNote, getNotes, getNoteSlugs } from "./notes";
 import { removeMetaExport } from "./text";
-
-plugin({
-  name: "mdx",
-  setup(build) {
-    build.onLoad({ filter: /\.mdx$/u }, async ({ path: filePath }) => {
-      const source = await readFile(filePath, "utf-8");
-      const compiled = await compile(source, {
-        rehypePlugins: [rehypeSlug],
-        remarkPlugins: [remarkGfm],
-      });
-      return { contents: String(compiled), loader: "js" };
-    });
-  },
-});
 
 const passthrough = ({ children }: { children?: ReactNode }) =>
   createElement("div", null, children);
