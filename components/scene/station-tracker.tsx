@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import {
   useFigureFocus,
@@ -17,10 +17,44 @@ import {
 export const StationTracker = () => {
   const stations = useFigureStations();
   const focus = useFigureFocus();
+  const [visibleIds, setVisibleIds] = useState<ReadonlySet<string>>(
+    () => new Set()
+  );
 
   useEffect(() => {
-    setFocusLine(focus?.line ?? null);
-  }, [focus]);
+    const isVisible = focus ? visibleIds.has(focus.stationId) : false;
+    setFocusLine(isVisible && focus ? focus.line : null);
+  }, [focus, visibleIds]);
+
+  useEffect(() => {
+    const idOf = new Map<Element, string>(
+      stations.map((station) => [station.figure, station.id])
+    );
+    const observer = new IntersectionObserver((entries) => {
+      setVisibleIds((previous) => {
+        const next = new Set(previous);
+        for (const entry of entries) {
+          const id = idOf.get(entry.target);
+          if (!id) {
+            continue;
+          }
+          if (entry.isIntersecting) {
+            next.add(id);
+          } else {
+            next.delete(id);
+          }
+        }
+        return next;
+      });
+    });
+    for (const station of stations) {
+      observer.observe(station.figure);
+    }
+    return () => {
+      observer.disconnect();
+      setVisibleIds(new Set());
+    };
+  }, [stations]);
 
   useEffect(() => {
     const measure = () => measureStations(stations);
