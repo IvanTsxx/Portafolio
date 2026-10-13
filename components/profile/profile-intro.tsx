@@ -1,4 +1,5 @@
 import { CompanionLines } from "@/components/scene/companion-lines";
+import { HeroField } from "@/components/site/hero-field";
 import { SocialLinks } from "@/components/site/social-links";
 import type { GithubIdentity } from "@/lib/github/model";
 import { siteConfig } from "@/lib/site/config";
@@ -20,9 +21,10 @@ export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
   return (
     <header
       aria-labelledby="intro-heading"
-      className="border-rule relative flex flex-col gap-8 border-b pb-16"
+      className="border-rule relative isolate flex flex-col gap-8 border-b pb-16"
       id="intro"
     >
+      <HeroField seed="GH-02" />
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
         <div className="w-32 shrink-0 sm:w-40">
           <PortraitPlate
