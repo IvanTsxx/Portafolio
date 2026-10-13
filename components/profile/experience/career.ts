@@ -9,9 +9,12 @@ export interface Tenure {
   isCurrent: boolean;
   months: number;
   role: string;
+  stack: readonly string[];
   startMonth: number;
   step: number;
+  summary: string | null;
   type: Experience["type"];
+  website: string | null;
   year: string;
 }
 
@@ -53,9 +56,12 @@ export const careerOf = (
       isCurrent: job.end === null,
       months: endMonth - startMonth,
       role: job.role,
+      stack: job.stack,
       startMonth,
       step,
+      summary: job.summary,
       type: job.type,
+      website: job.website,
       year: job.start.slice(0, 4),
     };
   });
@@ -78,5 +84,11 @@ export const detailText = (tenure: Tenure) =>
 
 export const spokenText = (tenure: Tenure) =>
   `${tenure.company}, ${tenure.role}, ${tenure.dates.replace("→", "to")}, ${spanText(tenure)}, ${tenure.type}`;
+
+export const glanceText = (tenure: Tenure) =>
+  tenure.summary ?? (tenure.isCurrent ? `${tenure.role}, now` : tenure.role);
+
+export const hostOf = (website: string) =>
+  website.replace(/^https?:\/\/(?:www\.)?/u, "").replace(/\/$/u, "");
 
 export const currentMonthStamp = () => monthStampOf(new Date());
