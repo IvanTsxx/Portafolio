@@ -31,7 +31,7 @@ export const releaseStagePointer = (pointer: StagePointer) => {
   requestSceneFrame();
 };
 
-const restingLight = { x: 0.24, y: 0.78 } as const;
+export const restingLight = { x: 0.24, y: 0.78 } as const;
 const followRate = 9;
 
 export const useDampedPointer = (
