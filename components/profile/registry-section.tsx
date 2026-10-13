@@ -10,6 +10,7 @@ import {
 } from "@/components/site/document-section";
 import { focusRingClassName } from "@/components/site/styles";
 import { formatRegistryIndex, registryItems } from "@/lib/registry/registry";
+import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { registryItemPath } from "@/lib/site/seo";
 import { cn } from "@/lib/utils";
@@ -68,12 +69,13 @@ export const RegistrySection = async () => {
     })
   );
 
+  const section = homeSectionById("registry");
   return (
     <DocumentSection
       aside={<PanelCount current={entries.length} total={entries.length} />}
-      id="registry"
-      index="GH-09"
-      label="Registry"
+      id={section.id}
+      index={section.index}
+      label={section.label}
       script={sectionScripts.homeRegistry}
     >
       <ItemStyles items={registryItems} />
