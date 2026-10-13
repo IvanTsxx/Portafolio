@@ -41,7 +41,6 @@ export const Dossier = ({
     <div className={frameVariants({ size })}>
       <RouteTabs />
       <div className="relative">
-        <DossierEdgeReview size={size} />
         <span
           aria-hidden
           className={`${backingSheetClassName} hatch translate-x-2 translate-y-2 md:translate-x-3 md:translate-y-3`}
@@ -60,6 +59,7 @@ export const Dossier = ({
               <div className={contentVariants({ size })}>{children}</div>
             </div>
           </main>
+          <DossierEdgeReview size={size} />
         </div>
         <BackCover />
       </div>

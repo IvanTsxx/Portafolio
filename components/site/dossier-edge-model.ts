@@ -1,4 +1,10 @@
-export const dossierEdges = ["binding", "dither", "none"] as const;
+export const dossierEdges = [
+  "binding",
+  "stitch",
+  "dither",
+  "ruler",
+  "none",
+] as const;
 
 export type DossierEdgeVariant = (typeof dossierEdges)[number];
 
