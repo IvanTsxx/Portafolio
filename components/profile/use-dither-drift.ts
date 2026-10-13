@@ -1,16 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import type { PointerEvent } from "react";
 
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 import type { DitherFrame } from "./dither";
 
-const BAND_RATIO = 0.16;
-const AMPLITUDE = 16;
-const CELL = 2;
-const EASING = 0.12;
 const SETTLED = 0.01;
 
 interface DriftPointer {
@@ -19,9 +14,19 @@ interface DriftPointer {
   inside: boolean;
 }
 
-interface CoverAnchor {
-  x: number;
-  y: number;
+export interface DriftConfig {
+  anchor: { x: number; y: number };
+  amplitude: number;
+  band: number;
+  cell: number;
+  easing: number;
+  edge: "wrap" | "clear";
+}
+
+interface DriftPointerEvent {
+  clientX: number;
+  clientY: number;
+  pointerType: string;
 }
 
 const shiftRows = (
@@ -29,24 +34,39 @@ const shiftRows = (
   target: Uint8ClampedArray,
   pointer: DriftPointer,
   intensity: number,
-  time: number
+  time: number,
+  config: DriftConfig
 ) => {
   const { width, height, data } = source;
+  const { amplitude, cell } = config;
   const rowBytes = width * 4;
-  const band = height * BAND_RATIO;
-  const lean = ((pointer.x - width / 2) / width) * AMPLITUDE;
+  const band = height * config.band;
+  const lean = ((pointer.x - width / 2) / width) * amplitude;
   for (let y = 0; y < height; y += 1) {
-    const row = Math.floor(y / CELL);
+    const row = Math.floor(y / cell);
     const distance = (y - pointer.y) / band;
     const falloff = Math.exp(-distance * distance);
     const wave =
       Math.sin(time * 0.008 + row * 0.9) +
       0.5 * Math.sin(time * 0.013 - row * 0.37);
     const shift =
-      Math.round((intensity * falloff * (AMPLITUDE * wave + lean)) / CELL) *
-      CELL;
-    const offset = ((shift % width) + width) % width;
+      Math.round((intensity * falloff * (amplitude * wave + lean)) / cell) *
+      cell;
     const start = y * rowBytes;
+    if (config.edge === "clear") {
+      const reach = Math.min(width, Math.abs(shift)) * 4;
+      target.fill(0, start, start + rowBytes);
+      if (shift >= 0) {
+        target.set(
+          data.subarray(start, start + rowBytes - reach),
+          start + reach
+        );
+      } else {
+        target.set(data.subarray(start + reach, start + rowBytes), start);
+      }
+      continue;
+    }
+    const offset = ((shift % width) + width) % width;
     target.set(
       data.subarray(start + (width - offset) * 4, start + rowBytes),
       start
@@ -58,7 +78,7 @@ const shiftRows = (
   }
 };
 
-export const useDitherDrift = (anchor: CoverAnchor) => {
+export const useDitherDrift = (config: DriftConfig) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef<DitherFrame | null>(null);
   const imageRef = useRef<ImageData | null>(null);
@@ -81,7 +101,7 @@ export const useDitherDrift = (anchor: CoverAnchor) => {
       }
       const pointer = pointerRef.current;
       intensityRef.current +=
-        ((pointer.inside ? 1 : 0) - intensityRef.current) * EASING;
+        ((pointer.inside ? 1 : 0) - intensityRef.current) * config.easing;
       if (!pointer.inside && intensityRef.current < SETTLED) {
         intensityRef.current = 0;
         canvas.dataset.active = "false";
@@ -104,14 +124,15 @@ export const useDitherDrift = (anchor: CoverAnchor) => {
         imageRef.current.data,
         pointer,
         intensityRef.current,
-        time
+        time,
+        config
       );
       context.putImageData(imageRef.current, 0, 0);
       canvas.dataset.active = "true";
       requestRef.current = requestAnimationFrame(step);
     };
     requestRef.current = requestAnimationFrame(step);
-  }, []);
+  }, [config]);
 
   useEffect(
     () => () => {
@@ -126,30 +147,34 @@ export const useDitherDrift = (anchor: CoverAnchor) => {
     frameRef.current = frame;
   }, []);
 
-  const onPointerMove = (event: PointerEvent<HTMLElement>) => {
-    const frame = frameRef.current;
-    if (event.pointerType !== "mouse" || reducedMotion || !frame) {
-      return;
-    }
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const scale = Math.max(
-      bounds.width / frame.width,
-      bounds.height / frame.height
-    );
-    const offsetX = (bounds.width - frame.width * scale) * anchor.x;
-    const offsetY = (bounds.height - frame.height * scale) * anchor.y;
-    pointerRef.current = {
-      inside: true,
-      x: (event.clientX - bounds.left - offsetX) / scale,
-      y: (event.clientY - bounds.top - offsetY) / scale,
-    };
-    run();
-  };
+  const onPointerMove = useCallback(
+    (event: DriftPointerEvent) => {
+      const frame = frameRef.current;
+      const canvas = canvasRef.current;
+      if (event.pointerType !== "mouse" || reducedMotion || !frame || !canvas) {
+        return;
+      }
+      const bounds = canvas.getBoundingClientRect();
+      const scale = Math.max(
+        bounds.width / frame.width,
+        bounds.height / frame.height
+      );
+      const offsetX = (bounds.width - frame.width * scale) * config.anchor.x;
+      const offsetY = (bounds.height - frame.height * scale) * config.anchor.y;
+      pointerRef.current = {
+        inside: true,
+        x: (event.clientX - bounds.left - offsetX) / scale,
+        y: (event.clientY - bounds.top - offsetY) / scale,
+      };
+      run();
+    },
+    [config, reducedMotion, run]
+  );
 
-  const onPointerLeave = () => {
+  const onPointerLeave = useCallback(() => {
     pointerRef.current = { ...pointerRef.current, inside: false };
     run();
-  };
+  }, [run]);
 
   return { canvasRef, onPointerLeave, onPointerMove, onRender };
 };

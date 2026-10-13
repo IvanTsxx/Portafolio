@@ -5,11 +5,19 @@ import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-import { ditherFrame } from "./dither";
-import type { DitherFrame, Rgb } from "./dither";
+import { ditherFrame, tokenRgb } from "./dither";
+import type { DitherFrame } from "./dither";
 import { useDitherDrift } from "./use-dither-drift";
+import type { DriftConfig } from "./use-dither-drift";
 
-const portraitAnchor = { x: 0.5, y: 0.35 } as const;
+const portraitDrift: DriftConfig = {
+  amplitude: 11,
+  anchor: { x: 0.5, y: 0.35 },
+  band: 0.16,
+  cell: 2,
+  easing: 0.09,
+  edge: "wrap",
+};
 
 const MAX_SIZE = 480;
 
@@ -21,16 +29,6 @@ const registrationCorners = [
 ] as const;
 
 const pixelated = { imageRendering: "pixelated" } as const;
-
-const tokenRgb = (context: CanvasRenderingContext2D, token: string): Rgb => {
-  context.clearRect(0, 0, 1, 1);
-  context.fillStyle = getComputedStyle(document.documentElement)
-    .getPropertyValue(token)
-    .trim();
-  context.fillRect(0, 0, 1, 1);
-  const [red = 0, green = 0, blue = 0] = context.getImageData(0, 0, 1, 1).data;
-  return [red, green, blue];
-};
 
 const loadFrame = async (src: string) => {
   const image = new window.Image();
@@ -85,7 +83,7 @@ export const PortraitPlate = ({
   const [ready, setReady] = useState(false);
   const ditherRef = useRef<HTMLCanvasElement>(null);
   const { canvasRef, onRender, onPointerMove, onPointerLeave } =
-    useDitherDrift(portraitAnchor);
+    useDitherDrift(portraitDrift);
 
   useEffect(() => {
     let cancelled = false;

@@ -4,6 +4,7 @@ import type { VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { HeroField } from "@/components/site/hero-field";
 import { focusRingClassName } from "@/components/site/styles";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +45,8 @@ export const DocumentHero = ({
   size,
   title,
 }: DocumentHeroProps) => (
-  <header className="border-rule @container relative w-full border-b pb-16">
+  <header className="border-rule @container relative isolate w-full border-b pb-16">
+    <HeroField seed={code} />
     <div className="label flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
       <span className="flex flex-wrap items-center gap-x-6 gap-y-1">
         {back ? (
