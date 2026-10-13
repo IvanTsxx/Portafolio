@@ -197,7 +197,7 @@ const layBlock = (
       impact
     )
     .to(block, {
-      clearProps: "opacity,transform,transformOrigin",
+      clearProps: "opacity,pointerEvents,transform,transformOrigin",
       duration: 0.3,
       ease: "expo.out",
       scaleX: 1,
@@ -298,7 +298,7 @@ export const SectionBuild = ({
         if (next.phase === "waiting") {
           gsap.set(
             sites.map((entry) => entry.block),
-            { opacity: 0 }
+            { opacity: 0, pointerEvents: "none" }
           );
           measure();
           return;
