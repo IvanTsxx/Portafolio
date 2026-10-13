@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
 
 import type { AgentAction, AgentRole, WaypointSide } from "@/lib/agents/roles";
 
+import { useBuildHeld } from "./build-hold";
 import { ownVisibleShare } from "./companion-path";
 
 export const viewPriority = { overlay: 3, scene: 2 } as const;
@@ -185,16 +186,18 @@ export const useAgentCast = (
   track: RefObject<HTMLElement | null>,
   enabled: boolean
 ) => {
+  const isHeld = useBuildHeld(track);
+  const isCast = enabled && !isHeld;
   useLayoutEffect(() => {
     const element = track.current;
-    if (!(element && enabled)) {
+    if (!(element && isCast)) {
       return;
     }
     agentCasts.add(element);
     return () => {
       agentCasts.delete(element);
     };
-  }, [enabled, track]);
+  }, [isCast, track]);
 };
 
 export const useNearViewSlots = () =>
@@ -210,13 +213,15 @@ export const useViewSlot = (
   enabled = true,
   priority: number = viewPriority.scene
 ) => {
+  const isHeld = useBuildHeld(track);
+  const isShown = enabled && !isHeld;
   useLayoutEffect(() => {
     const element = track.current;
-    if (!(element && enabled)) {
+    if (!(element && isShown)) {
       return;
     }
     return registerSlot(id, element, null, priority);
-  }, [enabled, id, priority, track]);
+  }, [isShown, id, priority, track]);
 
   useEffect(() => {
     updateSlot(id, node);
