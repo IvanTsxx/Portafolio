@@ -18,12 +18,10 @@ const inkCells = [
 ] as const;
 
 const glyphs = {
-  canvas: (
-    <div className="border-ink relative size-full border">
+  companion: (
+    <div className="border-ink relative flex size-full items-end justify-center border pb-2">
       <CornerMarks />
-      <span className="border-rule-strong absolute top-3 left-3 h-6 w-10 border border-dashed" />
-      <span className="border-rule-strong absolute right-3 bottom-3 h-8 w-12 border border-dashed" />
-      <span className="border-rule-strong absolute top-4 right-6 size-4 border border-dashed" />
+      <span className="bg-clay h-4 w-3" />
     </div>
   ),
   hairlines: (
@@ -55,7 +53,7 @@ const glyphs = {
     </div>
   ),
   paper: (
-    <div className="grain bg-paper border-rule-strong relative size-full border">
+    <div className="bg-paper border-rule-strong relative size-full border">
       <span className="label text-mist absolute top-2 left-2">[ 01 ]</span>
       <span className="bg-rule-strong absolute inset-x-3 bottom-3 h-px" />
       <span className="bg-rule absolute inset-x-3 bottom-6 h-px" />
@@ -71,12 +69,6 @@ const glyphs = {
         <span>80</span>
         <span>20</span>
       </p>
-    </div>
-  ),
-  visuals: (
-    <div className="flex w-full items-end gap-2">
-      <span className="hatch border-rule-strong h-10 flex-1 border" />
-      <span className="bg-ink mb-1 h-px w-6" />
     </div>
   ),
 } as const satisfies Record<PrincipleId, ReactNode>;

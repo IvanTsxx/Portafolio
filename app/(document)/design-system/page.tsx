@@ -13,7 +13,7 @@ import { loadDesignMarkdown, loadDesignSystem } from "@/lib/design-system/load";
 import { documentCode, rawMarkdownPath } from "@/lib/design-system/sections";
 
 const description =
-  "Paper-and-ink design system: tokens, type, components and motion. Copy it as a DESIGN.md for coding agents.";
+  "Paper-and-ink design system: principles, tokens, layout and motion. Copy it as a DESIGN.md for coding agents.";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/design-system" },
@@ -44,10 +44,10 @@ const DesignSystemPage = async () => {
       </DocumentHero>
       <PhilosophySection />
       <ColorSection colors={system.colors} />
-      <TypographySection fonts={system.fonts} textLabel={system.textLabel} />
+      <TypographySection fonts={system.fonts} />
       <SpacingSection radius={system.radius} />
-      <UtilitiesSection utilities={system.utilities} />
       <MotionSection system={system} />
+      <UtilitiesSection utilities={system.utilities} />
     </>
   );
 };

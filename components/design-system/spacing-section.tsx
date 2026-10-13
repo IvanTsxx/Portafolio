@@ -2,31 +2,16 @@ import { DocumentSection } from "@/components/site/document-section";
 import { padCount } from "@/lib/design-system/format";
 import type { DesignSystem } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
-import {
-  breakpointSpecs,
-  documentGridSpec,
-  spacingSpecs,
-} from "@/lib/design-system/specs";
-import type { RadiusStepName } from "@/lib/design-system/specs";
+import { documentGridSpec, spacingSpecs } from "@/lib/design-system/specs";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { ClassTag, SubHeading } from "./spec-frame";
-
-const radiusClassNames = {
-  "2xl": "rounded-2xl",
-  lg: "rounded-lg",
-  md: "rounded-md",
-  sm: "rounded-sm",
-  xl: "rounded-xl",
-} as const satisfies Record<RadiusStepName, string>;
-
-const maxBreakpoint = Math.max(...breakpointSpecs.map(({ px }) => px));
 
 const SpacingScale = () => (
   <ol className="border-rule border-t">
     {spacingSpecs.map((step) => (
       <li
-        className="label border-rule grid grid-cols-[2rem_3.5rem_1fr] items-center gap-x-3 gap-y-1 border-b py-2 md:grid-cols-[2rem_3.5rem_8rem_1fr]"
+        className="label border-rule grid grid-cols-[2rem_3.5rem_1fr] items-center gap-x-3 gap-y-1 border-b py-2 md:grid-cols-[2rem_3.5rem_6rem_1fr]"
         key={step.step}
       >
         <span className="text-mist tabular-nums">{step.step}</span>
@@ -44,69 +29,39 @@ const SpacingScale = () => (
   </ol>
 );
 
-const RadiusScale = ({ steps }: { steps: DesignSystem["radius"]["steps"] }) => (
-  <ul className="flex flex-wrap gap-6">
-    {steps.map((step) => (
-      <li className="flex flex-col gap-2" key={step.name}>
-        <span
-          aria-hidden
-          className={`border-ink bg-paper-deep block size-12 border ${radiusClassNames[step.name]}`}
-        />
-        <span className="label text-ink">{step.name}</span>
-        <span className="label text-mist normal-case tabular-nums">
-          {step.px}px
-        </span>
-      </li>
-    ))}
-  </ul>
-);
-
-const GridDiagram = () => (
-  <div className="border-rule relative flex flex-col gap-3 border p-3 md:p-4">
-    <div className="grid grid-cols-[1fr_6fr_1fr] gap-x-1.5 md:gap-x-3">
-      <span className="hatch border-rule-strong label text-ink flex h-24 items-center justify-center border border-dashed text-center [writing-mode:vertical-rl]">
+const DossierDiagram = () => (
+  <div className="border-rule flex flex-col gap-2 border p-3 md:p-4">
+    <span className="border-rule-strong label text-mist flex h-6 items-center border-b">
+      Top line 48
+    </span>
+    <div className="grid grid-cols-[1.5rem_1fr_1.5rem] gap-x-1.5 md:gap-x-3">
+      <span className="border-rule-strong/50 bg-paper-deep label text-graphite flex h-28 items-center justify-center border [writing-mode:vertical-rl]">
         Tabs
       </span>
-      <span className="border-ink label text-ink flex h-24 items-center justify-center border text-center">
-        Sheet · column {documentGridSpec.columnWidth}
-      </span>
-      <span className="border-rule label text-mist flex h-24 items-center justify-center border border-dashed text-center [writing-mode:vertical-rl]">
-        Thumb
-      </span>
-    </div>
-    <p className="label text-mist flex flex-wrap justify-between gap-x-4 gap-y-1 normal-case">
-      <span>
-        Sheet inset {documentGridSpec.sheetInset} · {documentGridSpec.gutter}
-      </span>
-      <span>Sections {documentGridSpec.sectionGap}</span>
-    </p>
-  </div>
-);
-
-const BreakpointRuler = () => (
-  <ol className="border-rule border-t">
-    {breakpointSpecs.map((breakpoint) => (
-      <li
-        className="label border-rule grid grid-cols-[2rem_3rem_1fr] items-center gap-x-3 gap-y-1 border-b py-2"
-        key={breakpoint.name}
-      >
-        <span className="text-ink">{breakpoint.name}</span>
-        <span className="text-mist tabular-nums">{breakpoint.px}</span>
+      <div className="relative">
         <span
           aria-hidden
-          className="border-rule-strong relative block h-2 border"
-        >
-          <span
-            className="hatch absolute inset-y-0 left-0 block"
-            style={{ width: `${(breakpoint.px / maxBreakpoint) * 100}%` }}
-          />
+          className="bg-paper-deep border-rule-strong/40 hatch absolute inset-0 translate-x-1.5 translate-y-1.5 border"
+        />
+        <span
+          aria-hidden
+          className="bg-paper-deep border-rule-strong/40 absolute inset-0 translate-x-0.5 translate-y-0.5 border"
+        />
+        <span className="border-rule-strong/50 bg-paper label text-ink relative flex h-28 items-center justify-center border text-center">
+          Sheet · {documentGridSpec.columnWidth}
         </span>
-        <span className="text-graphite col-span-3 normal-case">
-          {breakpoint.changes}
-        </span>
-      </li>
-    ))}
-  </ol>
+      </div>
+      <span className="border-rule label text-mist flex h-28 items-center justify-center border border-dashed [writing-mode:vertical-rl]">
+        Notches
+      </span>
+    </div>
+    <p className="label text-mist flex flex-wrap justify-between gap-x-4 gap-y-1 pt-2 normal-case">
+      <span>Back cover</span>
+      <span>
+        {documentGridSpec.sheetInset} · {documentGridSpec.sectionGap}
+      </span>
+    </p>
+  </div>
 );
 
 export const SpacingSection = ({
@@ -128,25 +83,15 @@ export const SpacingSection = ({
         <SpacingScale />
       </div>
       <div className="flex flex-col gap-3">
-        <SubHeading aside={`${radius.baseVar} ${radius.base}`} label="Radius" />
-        <RadiusScale steps={radius.steps} />
-      </div>
-      <div className="flex flex-col gap-3">
         <SubHeading
           aside={
             <ClassTag>{documentGridSpec.containerClasses.join(" ")}</ClassTag>
           }
-          label="Document column"
+          label="Dossier"
         />
-        <GridDiagram />
+        <DossierDiagram />
       </div>
-      <div className="flex flex-col gap-3">
-        <SubHeading
-          aside={`${breakpointSpecs.length} steps`}
-          label="Breakpoints"
-        />
-        <BreakpointRuler />
-      </div>
+      <SubHeading aside={`${radius.baseVar}: ${radius.base}`} label="Radius" />
     </DocumentSection>
   );
 };

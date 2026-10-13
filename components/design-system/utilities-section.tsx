@@ -17,16 +17,6 @@ const previews = {
     <div className="blueprint-grid absolute inset-0 [--grid-size:16px]" />
   ),
   display: <p className="display text-ink text-6xl">Ivo</p>,
-  grain: <div className="grain bg-paper-deep absolute inset-0" />,
-  "h-below-header": (
-    <div className="border-rule-strong absolute inset-3 flex flex-col border">
-      <span className="label text-mist border-rule-strong border-b px-2 py-1">
-        Header 48
-      </span>
-      <span className="hatch flex-1" />
-    </div>
-  ),
-  hairline: <div className="hairline absolute inset-3 border" />,
   hatch: (
     <div className="hatch border-rule-strong absolute inset-3 border border-dashed" />
   ),
@@ -38,14 +28,6 @@ const previews = {
   ),
   jp: <p className="jp text-graphite text-2xl font-light">日本語の注釈</p>,
   label: <p className="label text-ink">Label 0123</p>,
-  "min-h-below-header": (
-    <div className="border-rule-strong absolute inset-3 flex flex-col border">
-      <span className="label text-mist border-rule-strong border-b px-2 py-1">
-        Header 48
-      </span>
-      <span className="hatch flex-1" />
-    </div>
-  ),
   "scroll-reveal": (
     <div className="scroll-reveal border-ink absolute inset-x-3 bottom-3 grid size-8 place-items-center border">
       <span className="bg-ink h-3 w-px" />

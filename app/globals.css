@@ -22,7 +22,6 @@
   --color-ink: var(--ink);
   --color-mist: var(--mist);
   --ease-mechanical: cubic-bezier(0.7, 0, 0.2, 1);
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -39,11 +38,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --color-graphite: var(--graphite);
   --color-rule: var(--rule);
   --color-rule-strong: var(--rule-strong);
@@ -58,13 +52,9 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.5);
   --radius-2xl: calc(var(--radius) * 2);
-  --text-label: 0.6875rem;
-  --text-label--line-height: 1rem;
-  --text-label--letter-spacing: 0.08em;
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --container-column: 44rem;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 :root {
@@ -91,11 +81,6 @@
   --border: oklch(0.18 0 0 / 14%);
   --input: oklch(0.18 0 0 / 22%);
   --ring: var(--ink);
-  --chart-1: var(--ink);
-  --chart-2: oklch(0.36 0.003 106);
-  --chart-3: oklch(0.5 0.004 100);
-  --chart-4: oklch(0.66 0.004 100);
-  --chart-5: oklch(0.8 0.003 100);
   --radius: 0;
   --rule: oklch(0.18 0 0 / 14%);
   --rule-strong: oklch(0.18 0 0 / 70%);
@@ -105,7 +90,6 @@
   --signal-steel: oklch(0.45 0.06 240);
   --signal-moss: oklch(0.48 0.09 150);
   --signal-rust: oklch(0.52 0.15 35);
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0 0.07 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   color-scheme: light;
 }
 
@@ -196,14 +180,6 @@
   animation-range: 40vh 60vh;
 }
 
-@utility grain {
-  background-image: var(--grain);
-}
-
-@utility hairline {
-  border-color: var(--rule);
-}
-
 @utility ink-underline {
   position: relative;
   &::after {
@@ -259,12 +235,4 @@
       scroll-behavior: auto !important;
     }
   }
-}
-
-@utility min-h-below-header {
-  min-height: calc(100svh - --spacing(12));
-}
-
-@utility h-below-header {
-  height: calc(100svh - --spacing(12));
 }

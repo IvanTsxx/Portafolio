@@ -5,7 +5,6 @@ export const colorGroups = [
   "agent",
   "signal",
   "semantic",
-  "chart",
 ] as const;
 
 export type ColorGroup = (typeof colorGroups)[number];
@@ -21,239 +20,123 @@ export interface ColorSpec {
 }
 
 export const colorGroupLabels = {
-  agent: { label: "Agents" },
-  chart: { label: "Chart" },
+  agent: { label: "Agent" },
   ink: { label: "Ink" },
   rule: { label: "Rules" },
-  semantic: { label: "Semantic aliases" },
+  semantic: { label: "shadcn aliases" },
   signal: { label: "Signals" },
   surface: { label: "Surface" },
 } as const satisfies Record<ColorGroup, { label: string }>;
 
 export const colorSpecs: readonly ColorSpec[] = [
-  {
-    group: "surface",
-    name: "paper",
-    prefix: "bg",
-    role: "Page and card ground",
-  },
+  { group: "surface", name: "paper", prefix: "bg", role: "Sheet ground" },
   {
     group: "surface",
     name: "paper-deep",
     prefix: "bg",
-    role: "Recessed fill and hover rows",
+    role: "Backing sheets, idle tabs, hover rows",
   },
-  {
-    group: "ink",
-    name: "ink",
-    prefix: "text",
-    role: "Primary text and fills",
-  },
-  {
-    group: "ink",
-    name: "graphite",
-    prefix: "text",
-    role: "Secondary text",
-  },
-  {
-    group: "ink",
-    name: "mist",
-    prefix: "text",
-    role: "Indices and captions",
-  },
-  {
-    group: "ink",
-    name: "faint",
-    prefix: "text",
-    role: "Alias of mist",
-  },
-  {
-    group: "rule",
-    name: "rule",
-    prefix: "border",
-    role: "Hairlines",
-  },
+  { group: "ink", name: "ink", prefix: "text", role: "Text and fills" },
+  { group: "ink", name: "graphite", prefix: "text", role: "Secondary text" },
+  { group: "ink", name: "mist", prefix: "text", role: "Indices, captions" },
+  { group: "ink", name: "faint", prefix: "text", role: "Alias of mist" },
+  { group: "rule", name: "rule", prefix: "border", role: "Hairlines" },
   {
     group: "rule",
     name: "rule-strong",
     prefix: "border",
-    role: "Heading rules and leaders",
+    role: "Heading rules, sheet frame, leaders",
   },
-  {
-    group: "agent",
-    name: "clay",
-    prefix: "bg",
-    role: "3D agents only",
-  },
-  {
-    group: "agent",
-    name: "clay-deep",
-    prefix: "bg",
-    role: "Agent shade",
-  },
+  { group: "agent", name: "clay", prefix: "bg", role: "Companion only" },
+  { group: "agent", name: "clay-deep", prefix: "bg", role: "Companion shade" },
   {
     group: "signal",
     name: "signal-steel",
     prefix: "text",
-    role: "In review",
+    role: "Status review",
   },
   {
     group: "signal",
     name: "signal-moss",
     prefix: "text",
-    role: "Done",
+    role: "Status done",
   },
   {
     group: "signal",
     name: "signal-rust",
     prefix: "text",
-    role: "Vermilion accent, sparingly",
+    role: "Accent",
   },
   {
     group: "signal",
     name: "destructive",
     prefix: "text",
-    role: "Blocked and invalid",
+    role: "Errors",
   },
-  {
-    group: "semantic",
-    name: "background",
-    prefix: "bg",
-    role: "App background (paper)",
-  },
+  { group: "semantic", name: "background", prefix: "bg", role: "paper" },
   {
     group: "semantic",
     name: "foreground",
     on: "background",
     prefix: "text",
-    role: "Default text (ink)",
+    role: "ink",
   },
-  {
-    group: "semantic",
-    name: "card",
-    prefix: "bg",
-    role: "Card surface",
-  },
+  { group: "semantic", name: "card", prefix: "bg", role: "paper" },
   {
     group: "semantic",
     name: "card-foreground",
     on: "card",
     prefix: "text",
-    role: "Text on cards",
+    role: "ink",
   },
   {
     group: "semantic",
     name: "popover",
     prefix: "bg",
-    role: "Raised surface",
+    role: "Raised surface, code blocks",
   },
   {
     group: "semantic",
     name: "popover-foreground",
     on: "popover",
     prefix: "text",
-    role: "Text on popovers",
+    role: "ink",
   },
-  {
-    group: "semantic",
-    name: "primary",
-    prefix: "bg",
-    role: "Primary fill",
-  },
+  { group: "semantic", name: "primary", prefix: "bg", role: "ink" },
   {
     group: "semantic",
     name: "primary-foreground",
     on: "primary",
     prefix: "text",
-    role: "Text on primary",
+    role: "paper",
   },
-  {
-    group: "semantic",
-    name: "secondary",
-    prefix: "bg",
-    role: "Secondary fill",
-  },
+  { group: "semantic", name: "secondary", prefix: "bg", role: "paper-deep" },
   {
     group: "semantic",
     name: "secondary-foreground",
     on: "secondary",
     prefix: "text",
-    role: "Text on secondary",
+    role: "ink",
   },
-  {
-    group: "semantic",
-    name: "muted",
-    prefix: "bg",
-    role: "Muted fill",
-  },
+  { group: "semantic", name: "muted", prefix: "bg", role: "paper-deep" },
   {
     group: "semantic",
     name: "muted-foreground",
     on: "muted",
     prefix: "text",
-    role: "Muted text",
+    role: "graphite",
   },
-  {
-    group: "semantic",
-    name: "accent",
-    prefix: "bg",
-    role: "Hover and active fill",
-  },
+  { group: "semantic", name: "accent", prefix: "bg", role: "paper-deep" },
   {
     group: "semantic",
     name: "accent-foreground",
     on: "accent",
     prefix: "text",
-    role: "Text on accent",
+    role: "ink",
   },
-  {
-    group: "semantic",
-    name: "border",
-    prefix: "border",
-    role: "Default border",
-  },
-  {
-    group: "semantic",
-    name: "input",
-    prefix: "border",
-    role: "Input border",
-  },
-  {
-    group: "semantic",
-    name: "ring",
-    prefix: "border",
-    role: "Focus ring",
-  },
-  {
-    group: "chart",
-    name: "chart-1",
-    prefix: "bg",
-    role: "Series 1",
-  },
-  {
-    group: "chart",
-    name: "chart-2",
-    prefix: "bg",
-    role: "Series 2",
-  },
-  {
-    group: "chart",
-    name: "chart-3",
-    prefix: "bg",
-    role: "Series 3",
-  },
-  {
-    group: "chart",
-    name: "chart-4",
-    prefix: "bg",
-    role: "Series 4",
-  },
-  {
-    group: "chart",
-    name: "chart-5",
-    prefix: "bg",
-    role: "Series 5",
-  },
+  { group: "semantic", name: "border", prefix: "border", role: "Hairline" },
+  { group: "semantic", name: "input", prefix: "border", role: "Input border" },
+  { group: "semantic", name: "ring", prefix: "border", role: "ink" },
 ];
 
 export interface EasingSpec {
@@ -262,26 +145,9 @@ export interface EasingSpec {
 }
 
 export const easingSpecs = [
-  {
-    name: "mechanical",
-    use: "State flips. Pairs with 100ms.",
-  },
-  {
-    name: "out-quart",
-    use: "Fades and nudges. 150 to 500ms.",
-  },
-  {
-    name: "out-quint",
-    use: "Reveals. Pairs with 300ms.",
-  },
-  {
-    name: "out-expo",
-    use: "Scale settles. Pairs with 500ms.",
-  },
-  {
-    name: "in-out-quart",
-    use: "On-screen moves.",
-  },
+  { name: "mechanical", use: "State flips" },
+  { name: "out-quart", use: "Fades, folds, nudges" },
+  { name: "out-expo", use: "Image scale settles" },
 ] as const satisfies readonly EasingSpec[];
 
 export type EasingName = (typeof easingSpecs)[number]["name"];
@@ -314,14 +180,14 @@ export const durationSpecs = [
     ease: "out-quart",
     ms: 200,
     name: "short",
-    use: "Icon nudges",
+    use: "Tabs, tooltips",
   },
   {
     className: "duration-300",
-    ease: "out-quint",
+    ease: "out-quart",
     ms: 300,
     name: "base",
-    use: "Reveals",
+    use: "Folds, notches",
   },
   {
     className: "duration-500",
@@ -372,7 +238,7 @@ export const fontFamilySpecs = [
     className: "font-jp",
     cssVar: "--font-jp",
     name: "Noto Sans JP",
-    role: "Route tab and page hero annotations",
+    role: "Route tabs, page heroes, nickname kana",
     sample: "日本語の注釈",
     sourceVar: "--font-noto-jp",
     weights: "300 400 500",
@@ -381,7 +247,7 @@ export const fontFamilySpecs = [
     className: "font-wordmark",
     cssVar: "--font-wordmark",
     name: "Instrument Serif",
-    role: "Site wordmark only",
+    role: "Wordmark only",
     sample: "Ivo",
     sourceVar: "--font-instrument-serif",
     weights: "400 italic",
@@ -399,33 +265,15 @@ export interface TypeStepSpec {
 
 export const typeScaleSpecs = [
   {
-    className: "display text-9xl",
-    sample: "Ivo",
-    size: "128",
-    use: "Hero, xl",
-  },
-  {
     className: "display text-8xl",
     sample: "Ivo",
-    size: "96",
-    use: "Hero, md",
-  },
-  {
-    className: "display text-7xl",
-    sample: "Ivo",
-    size: "72",
-    use: "Hero, sm",
-  },
-  {
-    className: "display text-6xl",
-    sample: "Ivo",
-    size: "60",
-    use: "Hero, base",
+    size: "60-128",
+    use: "Page hero",
   },
   {
     className: "display text-5xl",
     sample: "Ivo",
-    size: "48",
+    size: "48-72",
     use: "Detail title",
   },
   {
@@ -433,12 +281,6 @@ export const typeScaleSpecs = [
     sample: "0128",
     size: "30",
     use: "Readout numerals",
-  },
-  {
-    className: "text-3xl leading-tight font-light tracking-tight",
-    sample: "Name plate",
-    size: "30",
-    use: "Name plate",
   },
   {
     className: "text-xl leading-tight font-light tracking-tight",
@@ -450,7 +292,7 @@ export const typeScaleSpecs = [
     className: "text-base",
     sample: "Body copy in Zen Kaku.",
     size: "16",
-    use: "Body, prose",
+    use: "Body",
   },
   {
     className: "text-graphite text-sm leading-relaxed",
@@ -462,92 +304,33 @@ export const typeScaleSpecs = [
     className: "label",
     sample: "Label 10px tracked",
     size: "10",
-    use: "Annotations and buttons",
+    use: "Labels, buttons",
   },
 ] as const satisfies readonly TypeStepSpec[];
 
 export interface UtilitySpec {
   name: string;
   summary: string;
-  usage: string;
   variable?: string;
 }
 
 export const utilitySpecs = [
-  {
-    name: "label",
-    summary: "Geist Mono, 10px, tracked caps.",
-    usage: '<span className="label text-mist">Doc</span>',
-  },
-  {
-    name: "display",
-    summary: "Zen Kaku light, 0.88 leading.",
-    usage: '<h1 className="display text-ink text-8xl">Title</h1>',
-  },
-  {
-    name: "jp",
-    summary: "Noto Sans JP, normal tracking.",
-    usage: '<span className="jp text-graphite">哲学</span>',
-  },
-  {
-    name: "hatch",
-    summary: "Diagonal hairline fill.",
-    usage: '<div className="hatch border border-dashed" />',
-  },
-  {
-    name: "hazard-stripe",
-    summary: "Diagonal stripes.",
-    usage: '<span className="hazard-stripe text-ink block h-1.5 w-24" />',
-  },
+  { name: "label", summary: "Geist Mono, 10px, tracked caps." },
+  { name: "display", summary: "Zen Kaku light, 0.88 leading." },
+  { name: "jp", summary: "Noto Sans JP, normal tracking." },
+  { name: "hatch", summary: "Diagonal hairline fill." },
+  { name: "hazard-stripe", summary: "Diagonal stripes in currentColor." },
   {
     name: "blueprint-grid",
     summary: "Square hairline grid.",
-    usage: '<div className="blueprint-grid [--grid-size:24px]" />',
     variable: "--grid-size",
   },
-  {
-    name: "blueprint-dots",
-    summary: "Dot grid.",
-    usage: '<div className="blueprint-dots [--grid-size:16px]" />',
-    variable: "--grid-size",
-  },
-  {
-    name: "stamp-press",
-    summary: "Presses a stamp into place as it scrolls in.",
-    usage:
-      '<div className="stamp-press motion-reduce:animate-none border p-1" />',
-  },
-  {
-    name: "scroll-reveal",
-    summary:
-      "Fades a control in once the page has scrolled past its first screen.",
-    usage: '<a className="scroll-reveal" href="#top" />',
-  },
-  {
-    name: "grain",
-    summary: "Paper noise tile.",
-    usage: '<div className="grain bg-paper-deep" />',
-  },
-  {
-    name: "hairline",
-    summary: "Border in the rule color.",
-    usage: '<div className="hairline border" />',
-  },
+  { name: "blueprint-dots", summary: "Dot grid.", variable: "--grid-size" },
+  { name: "stamp-press", summary: "Stamps in as it scrolls into view." },
+  { name: "scroll-reveal", summary: "Fades in past the first screen." },
   {
     name: "ink-underline",
-    summary: "Hairline that draws in on hover or focus, 160ms.",
-    usage:
-      '<a className="group/ink" href="#top"><span className="ink-underline">Link</span></a>',
-  },
-  {
-    name: "min-h-below-header",
-    summary: "Viewport minus the 48px header, minimum.",
-    usage: '<section className="min-h-below-header" />',
-  },
-  {
-    name: "h-below-header",
-    summary: "Viewport minus the 48px header.",
-    usage: '<section className="h-below-header" />',
+    summary: "Underline draws in on hover or focus, 160ms.",
   },
 ] as const satisfies readonly UtilitySpec[];
 
@@ -562,45 +345,19 @@ export interface SpacingStepSpec {
 export const spacingSpecs = [
   { px: 4, step: "1", use: "Hairline gaps" },
   { px: 8, step: "2", use: "Chip gaps" },
-  { px: 12, step: "3", use: "Inner stacks" },
-  { px: 16, step: "4", use: "Cell padding" },
-  { px: 20, step: "5", use: "Cell padding, md" },
-  { px: 24, step: "6", use: "Panel stack" },
+  { px: 12, step: "3", use: "Inner stacks, phone gutter" },
+  { px: 16, step: "4", use: "Cell padding, phone sheet inset" },
+  { px: 24, step: "6", use: "Section stack" },
   { px: 32, step: "8", use: "Page gutter, md" },
   { px: 44, step: "11", use: "Touch target" },
-  { px: 64, step: "16", use: "Between sections" },
-  { px: 96, step: "24", use: "Page bottom" },
+  { px: 48, step: "12", use: "Sheet inset, md" },
+  { px: 64, step: "16", use: "Detail section gap" },
+  { px: 96, step: "24", use: "Index section gap" },
 ] as const satisfies readonly SpacingStepSpec[];
 
 export const radiusStepNames = ["sm", "md", "lg", "xl", "2xl"] as const;
 
 export type RadiusStepName = (typeof radiusStepNames)[number];
-
-export interface BreakpointSpec {
-  changes: string;
-  name: string;
-  px: number;
-}
-
-export const breakpointSpecs = [
-  {
-    changes: "Section stacks go side by side",
-    name: "sm",
-    px: 640,
-  },
-  {
-    changes: "Gutter 16 to 32",
-    name: "md",
-    px: 768,
-  },
-  {
-    changes: "Route tabs move to the sheet edge",
-    name: "lg",
-    px: 1024,
-  },
-  { changes: "Companion lane widens", name: "xl", px: 1280 },
-  { changes: "Container stops at 1536", name: "2xl", px: 1536 },
-] as const satisfies readonly BreakpointSpec[];
 
 export const documentGridSpec = {
   columnWidth: "44rem",
@@ -617,7 +374,7 @@ export interface AgentMotionSpec {
 
 export const agentMotionSpecs = [
   { label: "Clip crossfade", value: "0.38 s" },
-  { label: "Scene loop", value: "8 s" },
+  { label: "Stage loop", value: "8 s" },
   { label: "Hover reaction", value: "Shuffled deck of 8" },
   { label: "Reduced motion", value: "Held key pose" },
 ] as const satisfies readonly AgentMotionSpec[];

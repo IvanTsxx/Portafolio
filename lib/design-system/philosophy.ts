@@ -2,10 +2,9 @@ export const principleIds = [
   "paper",
   "restraint",
   "ink",
-  "canvas",
-  "motion",
-  "visuals",
   "hairlines",
+  "companion",
+  "motion",
 ] as const;
 
 export type PrincipleId = (typeof principleIds)[number];
@@ -19,62 +18,51 @@ export interface Principle {
 export const principles = [
   {
     id: "paper",
-    rule: "Paper ground, ink type, numbered sheets.",
-    title: "Technical document on paper",
+    rule: "A paper sheet with ink type and numbered panels.",
+    title: "A dossier on paper",
   },
   {
     id: "restraint",
-    rule: "Cut until 20 percent carries 80 percent.",
+    rule: "Labels and short lines. Figures carry the story.",
     title: "80/20 minimalism",
   },
   {
     id: "ink",
-    rule: "Ink and paper. Clay belongs to the 3D agents.",
-    title: "Ink only, clay for agents",
+    rule: "Ink on paper. Clay belongs to the companion.",
+    title: "Ink only",
   },
   {
-    id: "canvas",
-    rule: "One WebGL canvas for the whole site.",
-    title: "One shared canvas",
+    id: "hairlines",
+    rule: "Radius 0. Rules, hatch and backing sheets, no shadows.",
+    title: "Hairlines, not shadows",
+  },
+  {
+    id: "companion",
+    rule: "One WebGL canvas, one agent. It narrates and builds.",
+    title: "One companion",
   },
   {
     id: "motion",
     rule: "Every animation has a reduced-motion twin.",
-    title: "Motion with purpose",
-  },
-  {
-    id: "visuals",
-    rule: "Labels and short lines. Visuals carry the story.",
-    title: "Less text, more visuals",
-  },
-  {
-    id: "hairlines",
-    rule: "Radius 0. Rules and hatch, no soft shadows.",
-    title: "Hairlines, not shadows",
+    title: "Motion with a twin",
   },
 ] as const satisfies readonly Principle[];
 
 export const guidance = {
   do: [
-    "Use bg-paper, text-ink, text-graphite, text-mist and border-rule tokens.",
-    "Set every annotation in the label utility. Japanese annotations are a rare decoration, only on route tabs and page heroes.",
-    "Number panels as [ XX-NN ] LABEL with a dotted leader and a count.",
-    "Flip states in 100ms with ease-mechanical. Reveal with out-quart or out-quint.",
-    "Keep hit areas at 44px on touch and use focus-visible rings.",
-    "Build one base component with cva variants and merge classes with cn.",
-    "Use Server Components by default and add use client only for interactivity.",
-    "Give a section companion lines through its script. Stage props with StageScene; the companion is the only agent.",
-    "Show a static meaningful fallback when WebGL is off.",
+    "Use token classes: `bg-paper`, `text-ink`, `text-graphite`, `text-mist`, `border-rule`.",
+    "Open each section with `DocumentSection` and give it a script in `lib/site/section-scripts.ts`.",
+    "Keep touch targets at 44px and show `focus-visible` rings.",
+    "Build one `cva` base with variants and merge classes with `cn`.",
+    "Ship a static fallback when WebGL is off.",
   ],
   dont: [
-    "Add a second Canvas or a per-component WebGL context.",
-    "Use clay orange for UI chrome, links or buttons.",
-    "Round corners. Radius is 0 everywhere.",
-    "Hard-code hex or oklch values. Use the token class.",
-    "Invent clients, metrics or achievements. Label placeholders as sample content.",
-    "Write paragraphs where a label, a number or a specimen would do.",
-    "Animate layout properties or ship motion without a reduced-motion twin.",
-    "Write ad-hoc CSS classes. Style in markup with Tailwind utilities and cva variants.",
-    "Add comments to code.",
+    "Render `<Agent>` outside the companion or add a second `Canvas`.",
+    "Use clay for UI chrome, links or buttons.",
+    "Round corners, add shadows or hard-code hex and oklch values.",
+    "Use Japanese outside route tabs, index page heroes and the nickname kana.",
+    "Write a paragraph where a label or a figure would do.",
+    "Animate layout properties.",
+    "Invent clients, metrics or achievements.",
   ],
 } as const;

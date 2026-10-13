@@ -79,13 +79,6 @@ export interface UtilityDoc extends Omit<UtilitySpec, "name"> {
   name: UtilityName;
 }
 
-export interface TextLabelToken {
-  className: string;
-  letterSpacing: string;
-  lineHeight: string;
-  size: string;
-}
-
 export interface DesignSystem {
   colors: readonly ColorToken[];
   durations: readonly DurationSpec[];
@@ -97,12 +90,10 @@ export interface DesignSystem {
     steps: readonly RadiusToken[];
   };
   reducedMotionCss: string;
-  textLabel: TextLabelToken;
   utilities: readonly UtilityDoc[];
 }
 
 const reducedMotionHeader = "@media (prefers-reduced-motion: reduce)";
-const textLabelVar = "--text-label";
 const radiusBaseVar = "--radius";
 
 export const tokenReferences = (): TokenReference[] => [
@@ -123,9 +114,6 @@ export const tokenReferences = (): TokenReference[] => [
     name: `--radius-${name}`,
     source: "theme" as const,
   })),
-  { name: textLabelVar, source: "theme" },
-  { name: `${textLabelVar}--line-height`, source: "theme" },
-  { name: `${textLabelVar}--letter-spacing`, source: "theme" },
   ...utilitySpecs.map(({ name }) => ({
     name,
     source: "utility" as const,
@@ -320,13 +308,6 @@ const buildReducedMotionCss = (globals: GlobalsCss) => {
   return rule ? ruleToCss(rule) : "";
 };
 
-const buildTextLabel = (globals: GlobalsCss): TextLabelToken => ({
-  className: "text-label",
-  letterSpacing: globals.theme.get(`${textLabelVar}--letter-spacing`) ?? "",
-  lineHeight: globals.theme.get(`${textLabelVar}--line-height`) ?? "",
-  size: globals.theme.get(textLabelVar) ?? "",
-});
-
 export const buildDesignSystem = (globals: GlobalsCss): DesignSystem => {
   const missing = findMissingTokens(globals, tokenReferences());
   if (missing.length > 0) {
@@ -343,7 +324,6 @@ export const buildDesignSystem = (globals: GlobalsCss): DesignSystem => {
     fonts: buildFonts(globals),
     radius: buildRadius(globals),
     reducedMotionCss: buildReducedMotionCss(globals),
-    textLabel: buildTextLabel(globals),
     utilities: buildUtilities(globals),
   };
 };

@@ -10,11 +10,9 @@ import type { DurationSpec, EasingName } from "@/lib/design-system/specs";
 import { cn } from "@/lib/utils";
 
 const easingClassNames = {
-  "in-out-quart": "ease-in-out-quart",
   mechanical: "ease-mechanical",
   "out-expo": "ease-out-expo",
   "out-quart": "ease-out-quart",
-  "out-quint": "ease-out-quint",
 } as const satisfies Record<EasingName, string>;
 
 const EasingTrack = ({

@@ -1,31 +1,31 @@
-# Agent Workshop · Direction v2 (paper and ink)
+# Agent Workshop direction
 
-Ivo's portfolio (Ivan Bongiovanni; the surname appears once, in the dossier). The visual language comes from his GitHub-profile experiment in `~/Projects/visual-taste-vault/src/components/experiments/github-profile` (and `src/components/styles/futuristic-editorial`): a technical document on paper. Small orange 3D agents (the only color) live across the page, working.
+Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper with one small orange 3D companion. Tokens, type, layout and motion live in `docs/design.md`, generated from `lib/design-system/` by `bun run design:md`. Never edit it by hand.
 
 ## Content rules
 
-- Basement Studio may appear only as Ivo's employer: company name, role, dates, type, link, the `@basementstudio` company field, the `basementstudio` org badge and his avatar. Never show Basement code, projects, repos, clients or the kind of companies they work with. `lib/github/privacy.ts` drops anything matching `basement` (case-insensitive) outside those affiliation fields.
-- Less text. Let animation and 3D carry the story. Labels and short lines, not paragraphs.
-- The dossier lives in the home intro, inside the centered reading column: portrait, name, bio, GitHub readouts and links. Index pages (`app/(document)`) share the column and a quiet index or filter list beside it. Detail pages (`app/(detail)`: `/registry/[slug]`, `/lab/[slug]`, `/notes/[slug]`) render without it, so the surname appears nowhere on them.
-- How I work and stack copy come from `lib/site/practice.ts` (Ivo's own words). Identity from `lib/site/config.ts`.
-- Never invent clients, metrics or achievements. Placeholder content is labeled sample.
+- Basement Studio appears only as Ivo's employer: name, role, dates, type, link, the `@basementstudio` company field, the org badge and his avatar. Never show Basement code, projects, repos or clients. `lib/github/privacy.ts` drops anything matching `basement` outside those fields.
+- Less text. Labels and short lines. Figures and the companion carry the story.
+- The home intro holds the identity dossier: portrait, name, nickname kana, bio, GitHub readouts and links. The surname appears only there.
+- How I work and stack copy come from `lib/site/practice.ts`. Identity comes from `lib/site/config.ts`.
+- Never invent clients, metrics or achievements. Label placeholder content as sample.
 
-## Visual system
+## Chrome
 
-- Paper `bg-paper` / `bg-background` (#ededeb), ink `text-ink` / `text-foreground` (#111), `text-graphite`, `text-mist`, `bg-paper-deep`, hairlines `border-rule`, strong rules `border-rule-strong`. Radius 0. Paper grain on body.
-- Orange `clay` is reserved for the agents. No other color except where the experiment uses vermilion sparingly.
-- Type: `font-sans` is Zen Kaku Gothic New (light for big names, `display` utility). `label` utility is Geist Mono micro uppercase tracked. `jp` utility (Noto Sans JP) for Japanese annotations, a rare decoration only on route tabs and page heroes (plus the nickname kana in the home dossier); never on panel headings, filters, chips or labels. `font-wordmark` (Instrument Serif italic) only for the site wordmark.
-- Vocabulary: `[ GH-03 ] LABEL ........ 06 / 06` panel headings, crosshair corner marks, hatch and hazard-stripe fills, dither imagery, tabular numbers, dotted leader rows, barcodes, REDACTED blocks.
+- `components/site/dossier.tsx` wraps every page in a sheet over two backing sheets. Index pages (`app/(document)`) use the 44rem column. Detail pages (`app/(detail)`) use the wide sheet.
+- Route tabs use English labels with a tiny vertical kana on desktop. Japanese appears only there, in index page heroes and in the nickname kana.
+- The thumb index (`thumb-index.tsx`) shows one notch per section from `lib/site/page-sections.ts`.
+- The top line holds the wordmark, back to top, ⌘K search and the GitHub star count. The back cover is the colophon.
 
 ## 3D contract
 
-- One shared Canvas for the whole site, mounted once in `app/layout.tsx`, rendering into DOM-tracked views (drei `View`). Never a second Canvas.
-- One agent on screen: the companion, 48 to 56 px tall beside the dossier sheet (on the thumb index lane when it shows). The route picks its role and action; a route change swaps the outfit with a spin, paper poof and hat toss. It follows the scroll calmly and narrates one short first-person line per section. Pages that show the rig itself (`/dev`, `/registry/agent`, `/registry/agent-stage`, `/lab/module-assembly`) keep it off; `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.
-- The companion is the actor everywhere. Section builds, figure stations, the How I work stages, the 404 stage and the Workshop fitting room register a spot (`components/scene/companion-stages.ts`); it walks there, grows to the spot's size and performs the spot's action.
-- `components/scene/stage-scene.tsx`: `<StageScene stage label className />` renders props only (`components/scene/scenes/`, ids in `lib/agents/stages.ts`): one merged mesh, one instanced mesh and one shadow mesh per stage. Used by How I work (seven steps) and the not-found page (`debug`).
-- Every agent reacts to hover with a reaction from a pool (wave, jump, spin, look, salute, shuffle, surprised, peek), never the same one twice in a row.
-- Static, meaningful fallback when WebGL is off; reduced motion freezes poses and the companion stays put and swaps outfits without the spin.
+- One shared Canvas, mounted once in `app/layout.tsx`, renders into DOM-tracked views. Never add a second Canvas.
+- One agent on screen, the companion, 48×56 on the rail. The route picks its role. It narrates one first-person line per section and builds sections as they scroll in.
+- Section builds, figure stations, the How I work stages, the 404 stage and the Workshop register a spot in `components/scene/companion-stages.ts`. The companion walks there and performs the spot's action.
+- `<StageScene>` renders props only, never an agent.
+- Rig showcase routes (`/dev/agents`, `/registry/agent`, `/registry/agent-stage`, `/lab/module-assembly`) send the companion away. `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.
+- With WebGL off, show a static fallback. With reduced motion, the companion holds a key pose and swaps outfits without the spin.
 
 ## Engineering rules
 
-Same as before: no code comments, Server Components by default, GSAP via `motionKit` from `lib/motion/gsap.ts`, no Playwright (agent-browser only), ultracite lint incl. sort-keys, `bun x ultracite fix`, `bun x oxlint`, `bun run typecheck`, `bun test`, `bun run build` must pass. Read `node_modules/next/dist/docs/` for unfamiliar Next APIs.
+No code comments. Server Components by default. GSAP through `motionKit` in `lib/motion/gsap.ts`. No Playwright. Before a commit, run `bun run typecheck`, `bun x oxlint`, `bun x ultracite check`, `bun test` and `bun run build`. Read `node_modules/next/dist/docs/` for unfamiliar Next APIs.

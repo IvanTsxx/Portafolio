@@ -1,14 +1,10 @@
 export const sectionSpecs = [
   { id: "philosophy", index: "DS-01", label: "Philosophy" },
-  { id: "color", index: "DS-02", label: "Color tokens" },
-  { id: "typography", index: "DS-03", label: "Typography" },
-  {
-    id: "spacing",
-    index: "DS-04",
-    label: "Spacing and grid",
-  },
-  { id: "utilities", index: "DS-05", label: "Utilities" },
-  { id: "motion", index: "DS-06", label: "Motion" },
+  { id: "color", index: "DS-02", label: "Color" },
+  { id: "typography", index: "DS-03", label: "Type" },
+  { id: "spacing", index: "DS-04", label: "Spacing and layout" },
+  { id: "motion", index: "DS-05", label: "Motion" },
+  { id: "utilities", index: "DS-06", label: "Utilities" },
 ] as const;
 
 export type SectionId = (typeof sectionSpecs)[number]["id"];

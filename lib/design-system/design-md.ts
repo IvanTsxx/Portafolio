@@ -2,30 +2,44 @@ import { siteConfig } from "@/lib/site/config";
 
 import type { ColorToken, DesignSystem } from "./model";
 import { guidance, principles } from "./philosophy";
-import { spacingSpecs } from "./specs";
+import { colorGroupLabels, spacingSpecs } from "./specs";
+import type { ColorGroup } from "./specs";
 
 const quote = (value: string) => JSON.stringify(value);
 
 const yamlMap = (
   key: string,
-  entries: readonly (readonly [string, string])[],
-  indent = ""
+  entries: readonly (readonly [string, string])[]
 ) => [
-  `${indent}${key}:`,
-  ...entries.map(([name, value]) => `${indent}  ${name}: ${quote(value)}`),
+  `${key}:`,
+  ...entries.map(([name, value]) => `  ${name}: ${quote(value)}`),
 ];
 
+const paletteGroups = [
+  "surface",
+  "ink",
+  "rule",
+  "agent",
+  "signal",
+] as const satisfies readonly ColorGroup[];
+
+const paletteGroupSet = new Set<ColorGroup>(paletteGroups);
+
+export const paletteColors = (system: DesignSystem) =>
+  system.colors.filter(
+    (token) => token.alias === null && paletteGroupSet.has(token.group)
+  );
+
 const typographyTokens = (system: DesignSystem) => {
-  const sans = system.fonts.find((font) => font.className === "font-sans");
-  const mono = system.fonts.find((font) => font.className === "font-mono");
-  const jp = system.fonts.find((font) => font.className === "font-jp");
-  const sansFamily = sans?.name ?? "Zen Kaku Gothic New";
-  const monoFamily = mono?.name ?? "Geist Mono";
+  const fontName = (className: string, fallback: string) =>
+    system.fonts.find((font) => font.className === className)?.name ?? fallback;
+  const sans = fontName("font-sans", "Zen Kaku Gothic New");
+  const mono = fontName("font-mono", "Geist Mono");
   return [
     [
       "display",
       {
-        fontFamily: sansFamily,
+        fontFamily: sans,
         fontSize: "6rem",
         fontWeight: "300",
         letterSpacing: "-0.05em",
@@ -33,139 +47,62 @@ const typographyTokens = (system: DesignSystem) => {
       },
     ],
     [
-      "title",
-      {
-        fontFamily: sansFamily,
-        fontSize: "3rem",
-        fontWeight: "300",
-        letterSpacing: "-0.05em",
-        lineHeight: "0.88",
-      },
-    ],
-    [
-      "heading",
-      {
-        fontFamily: sansFamily,
-        fontSize: "1.25rem",
-        fontWeight: "300",
-        lineHeight: "1.25",
-      },
-    ],
-    [
-      "body",
-      {
-        fontFamily: sansFamily,
-        fontSize: "1rem",
-        fontWeight: "400",
-        lineHeight: "1.5",
-      },
-    ],
-    [
-      "body-sm",
-      {
-        fontFamily: sansFamily,
-        fontSize: "0.875rem",
-        fontWeight: "400",
-        lineHeight: "1.625",
-      },
-    ],
-    [
       "label",
       {
-        fontFamily: monoFamily,
+        fontFamily: mono,
         fontSize: "0.625rem",
         fontWeight: "400",
         letterSpacing: "0.16em",
         lineHeight: "0.875rem",
       },
     ],
-    [
-      "numeral",
-      {
-        fontFamily: monoFamily,
-        fontFeature: "tnum",
-        fontSize: "1.875rem",
-        fontWeight: "300",
-      },
-    ],
-    [
-      "annotation-jp",
-      {
-        fontFamily: jp?.name ?? "Noto Sans JP",
-        fontSize: "0.625rem",
-        fontWeight: "400",
-      },
-    ],
   ] as const;
 };
 
-const paletteColors = (system: DesignSystem) =>
-  system.colors.filter((token) => token.alias === null);
-
-const frontMatter = (system: DesignSystem) => {
-  const typography = typographyTokens(system).flatMap(([name, style]) => [
+const frontMatter = (system: DesignSystem) => [
+  "---",
+  "version: alpha",
+  `name: ${quote(`${siteConfig.nickname} · Paper and ink`)}`,
+  `description: ${quote("A dossier on paper. Ink type, hairline rules, numbered panels, one orange 3D companion.")}`,
+  ...yamlMap(
+    "colors",
+    paletteColors(system).map((token) => [token.name, token.hex])
+  ),
+  "typography:",
+  ...typographyTokens(system).flatMap(([name, style]) => [
     `  ${name}:`,
     ...Object.entries(style).map(
       ([property, value]) => `    ${property}: ${quote(value)}`
     ),
-  ]);
-  return [
-    "---",
-    "version: alpha",
-    `name: ${quote(`${siteConfig.nickname} · Paper and ink`)}`,
-    `description: ${quote("A technical document on paper. Ink type, hairline rules, numbered panels, and small orange 3D agents as the only color.")}`,
-    ...yamlMap(
-      "colors",
-      paletteColors(system).map((token) => [token.name, token.hex])
-    ),
-    "typography:",
-    ...typography,
-    ...yamlMap("rounded", [
-      ["none", "0px"],
-      ...system.radius.steps.map(
-        (step) => [step.name, `${step.px}px`] as const
-      ),
-    ]),
-    ...yamlMap(
-      "spacing",
-      spacingSpecs.map((step) => [step.step, `${step.px}px`])
-    ),
-    "components:",
-    "  button-primary:",
-    '    backgroundColor: "{colors.ink}"',
-    '    textColor: "{colors.paper}"',
-    '    typography: "{typography.label}"',
-    '    rounded: "{rounded.none}"',
-    '    height: "44px"',
-    "  button-outline:",
-    '    backgroundColor: "{colors.paper}"',
-    '    textColor: "{colors.ink}"',
-    '    typography: "{typography.label}"',
-    '    rounded: "{rounded.none}"',
-    '    height: "44px"',
-    "  chip:",
-    '    backgroundColor: "{colors.paper}"',
-    '    textColor: "{colors.ink}"',
-    '    typography: "{typography.label}"',
-    '    rounded: "{rounded.none}"',
-    '    padding: "4px 8px"',
-    "  chip-active:",
-    '    backgroundColor: "{colors.ink}"',
-    '    textColor: "{colors.paper}"',
-    "  card:",
-    '    backgroundColor: "{colors.paper}"',
-    '    textColor: "{colors.ink}"',
-    '    rounded: "{rounded.none}"',
-    '    padding: "20px"',
-    "  panel-heading:",
-    '    textColor: "{colors.ink}"',
-    '    typography: "{typography.label}"',
-    "---",
-  ];
-};
+  ]),
+  ...yamlMap("rounded", [["none", "0px"]]),
+  ...yamlMap(
+    "spacing",
+    spacingSpecs.map((step) => [step.step, `${step.px}px`])
+  ),
+  "---",
+];
 
-const colorLine = (token: ColorToken) =>
-  `- **${token.name} (${token.hex}):** ${token.role}.`;
+const colorGroupLine = (group: ColorGroup, tokens: readonly ColorToken[]) =>
+  `- ${colorGroupLabels[group].label}: ${tokens
+    .flatMap((token) =>
+      token.group === group && token.alias === null
+        ? [`\`${token.name}\` (${token.role.toLowerCase()})`]
+        : []
+    )
+    .join(", ")}.`;
+
+const motionLines = (system: DesignSystem) =>
+  system.easings.map(
+    (easing) =>
+      `- \`${easing.className}\`: ${system.durations
+        .flatMap((duration) =>
+          duration.ease === easing.name
+            ? [`${duration.ms}ms ${duration.use.toLowerCase()}`]
+            : []
+        )
+        .join(", ")}.`
+  );
 
 export const renderDesignMarkdown = (system: DesignSystem) =>
   [
@@ -173,43 +110,46 @@ export const renderDesignMarkdown = (system: DesignSystem) =>
     "",
     "## Overview",
     "",
-    "A personal portfolio rendered as a technical document on paper: numbered panels, mono labels, hairline rules, hatch fills and dithered imagery. Ink and paper carry the interface. Small orange 3D agents are the only color and the only playful element.",
-    "",
     ...principles.map(
       (principle) => `- **${principle.title}.** ${principle.rule}`
     ),
     "",
     "## Colors",
     "",
-    "High-contrast neutrals on warm paper. Clay orange is reserved for the 3D agents and never used for UI chrome.",
-    "",
-    ...paletteColors(system).map(colorLine),
+    ...paletteGroups.map((group) => colorGroupLine(group, system.colors)),
+    "- shadcn aliases (`background`, `primary`, `muted`, `border` and the rest) resolve to these.",
     "",
     "## Typography",
     "",
-    "Zen Kaku Gothic New, light and tightly tracked, for names and titles. Geist Mono, 10px uppercase and tracked, for every label, number and button. Noto Sans JP for Japanese annotations, a rare decoration used only on route tabs and page heroes. Instrument Serif italic only for the wordmark.",
+    "Zen Kaku Gothic New, light and tight, for titles (`display`) and body. Geist Mono in the `label` utility for every label, number and button. Noto Sans JP (`jp`) only on route tabs, index page heroes and the nickname kana. Instrument Serif italic only for the wordmark.",
     "",
     "## Layout",
     "",
-    "Every page is a dossier sheet: a hairline-framed paper sheet over two offset paper-deep backing sheets. Index pages share one sheet around a 44rem column; detail pages use a wider sheet. Routes are divider tabs on the sheet's left edge, a tab row on its top edge on phones, and the active tab sits flush with the sheet. Long pages carry a thumb index of notches cut into the sheet's right edge, the current one in ink; on phones it becomes a thin progress strip. The top line holds only the wordmark and search. The footer is the back cover: a stamped colophon on the backing sheet. Filters fold under the intro. The home intro carries the identity dossier: portrait, name, bio, GitHub readouts and links. A single hairline closes each page intro. Spacing follows a 4px scale. Sections are separated by 96px and open with a panel heading: `[ XX-NN ]  LABEL ........ 06 / 06` over a strong rule. As a section scrolls in, its scaffold rules draw first and its content fills in while the companion agent builds it.",
-    "",
-    "## Elevation & Depth",
-    "",
-    "Flat. No shadows. Depth comes from rules, recessed paper-deep fills, hatch patterns and crosshair corner marks. The only real depth is the 3D agents, rendered in one shared canvas.",
+    "- Every page is a paper sheet in a strong hairline frame over two offset `paper-deep` backing sheets. Index pages center a 44rem column (`max-w-column`). Detail pages use `max-w-6xl`.",
+    "- Route tabs sit on the sheet's left edge from `lg` and in a row above it on smaller screens. The active tab joins the sheet.",
+    "- Long pages get a thumb index of notches right of the column. Below `lg` it becomes a 4px progress strip.",
+    "- The 48px top line holds the wordmark, back to top, ⌘K search and GitHub stars. The back cover is a stamped colophon below the sheet.",
+    "- Sections sit 96px apart on index pages and 64px on detail pages. Each opens with a panel heading over a strong rule.",
     "",
     "## Shapes",
     "",
-    "Square everything. Radius is 0 on cards, buttons, chips, inputs and images. Frames are 1px hairlines; strong rules mark section boundaries.",
+    "Radius 0 everywhere. Frames are 1px hairlines. No shadows. Depth comes from the backing sheets, `hatch` fills and corner marks.",
     "",
     "## Components",
     "",
-    "- **Panel heading:** index in brackets, mono label, dotted leader, count.",
-    "- **Specimen card:** hairline frame, corner marks, mono index top-left, square badge top-right, light title, one-line summary, mono footer row.",
-    "- **Button:** 44px, square, mono uppercase label. Primary is ink on paper inverted; outline is a 1px ink frame. State flips in 100ms.",
-    "- **Chip:** square hairline frame with a mono label; active chips invert to ink.",
-    "- **Leader row:** mono key, dotted leader, value aligned right.",
-    "- **Hero field:** a 4×4 Bayer dither of seeded noise behind every page hero, ink at 10% on paper, dense in the top right and fading toward the title side and the bottom rule. Each page seeds it with its doc code. It is server-rendered SVG; a hovering mouse drifts its rows like the portrait, gentler, and reduced motion keeps the static field.",
-    "- **Agent:** small orange box-shaped 3D mascot with role accessories. One per view, hover and click reactions, static fallback without WebGL.",
+    "- Panel heading: `[ XX-NN ]`, mono label, dotted leader, aside.",
+    "- Page hero: doc code, display title, hazard stripe, lede, over a seeded dither field at 10% ink.",
+    "- Figure plate: framed figure with corner marks and one readout row.",
+    "- Specimen cell: hairline cell. Hover fills `paper-deep`.",
+    "- Button: mono label, 44px, solid ink or outline. Hover inverts.",
+    "- Chip: mono label in a frame. Pressed chips invert to ink.",
+    "- Link: `ink-underline` draws on hover or focus. Cards show corner marks. Nothing lifts.",
+    "- Companion: the one 3D agent, 48×56 on the rail. It narrates in first person and builds sections.",
+    "",
+    "## Motion",
+    "",
+    ...motionLines(system),
+    "- Reduced motion: CSS snaps, the companion holds a key pose, the hero field stays still.",
     "",
     "## Do's and Don'ts",
     "",

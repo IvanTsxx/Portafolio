@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { parseGlobalsCss } from "./css-parse";
-import { renderDesignMarkdown } from "./design-md";
+import { paletteColors, renderDesignMarkdown } from "./design-md";
 import { designMarkdownPath, globalsCssPath, loadDesignMarkdown } from "./load";
 import { designMarkdownResponse } from "./markdown-response";
 import { buildDesignSystem, findMissingTokens, tokenReferences } from "./model";
@@ -11,6 +11,7 @@ import {
   colorSpecs,
   documentGridSpec,
   durationSpecs,
+  easingSpecs,
   fontFamilySpecs,
   spacingSpecs,
   typeScaleSpecs,
@@ -95,8 +96,7 @@ describe("documented values match the source", () => {
     const facts: readonly (readonly [string, string, string])[] = [
       ["label", "10px", "font-size: 0.625rem"],
       ["display", "0.88", "line-height: 0.88"],
-      ["min-h-below-header", "48px", "--spacing(12)"],
-      ["h-below-header", "48px", "--spacing(12)"],
+      ["ink-underline", "160ms", "160ms"],
     ];
     for (const [name, summaryFact, cssFact] of facts) {
       const utility = system.utilities.find((entry) => entry.name === name);
@@ -142,6 +142,26 @@ describe("documented values match the source", () => {
     }
   });
 
+  test("every easing in the theme is documented and used by the site", async () => {
+    const themeEasings = [...globals.theme.keys()].filter((name) =>
+      name.startsWith("--ease-")
+    );
+    expect(themeEasings.toSorted()).toEqual(
+      easingSpecs.map(({ name }) => `--ease-${name}`).toSorted()
+    );
+    const sources = await Promise.all(
+      [
+        "components/site/styles.ts",
+        "components/site/thumb-index.tsx",
+        "components/lab/experiment-card.tsx",
+      ].map(readProjectFile)
+    );
+    const combined = sources.join("\n");
+    for (const easing of easingSpecs) {
+      expect(combined).toContain(`ease-${easing.name}`);
+    }
+  });
+
   test("the reduced-motion rule is captured from globals.css", () => {
     expect(system.reducedMotionCss).toContain("prefers-reduced-motion: reduce");
     expect(system.reducedMotionCss).toContain("animation-duration: 0.01ms");
@@ -175,14 +195,12 @@ describe("design.md", () => {
       "## Colors",
       "## Typography",
       "## Layout",
-      "## Elevation & Depth",
       "## Shapes",
       "## Components",
+      "## Motion",
       "## Do's and Don'ts",
     ]);
-    for (const token of buildDesignSystem(globals).colors.filter(
-      (color) => color.alias === null
-    )) {
+    for (const token of paletteColors(buildDesignSystem(globals))) {
       expect(markdown).toContain(`\n  ${token.name}: "#`);
     }
   });

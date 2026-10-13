@@ -1,6 +1,6 @@
 import { DocumentSection } from "@/components/site/document-section";
 import { padCount } from "@/lib/design-system/format";
-import type { FontFamily, TextLabelToken } from "@/lib/design-system/model";
+import type { FontFamily } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
 import { typeScaleSpecs } from "@/lib/design-system/specs";
 import type { FontClassName } from "@/lib/design-system/specs";
@@ -18,10 +18,8 @@ const familySampleClassNames = {
 
 export const TypographySection = ({
   fonts,
-  textLabel,
 }: {
   fonts: readonly FontFamily[];
-  textLabel: TextLabelToken;
 }) => {
   const section = sectionById("typography");
   return (
@@ -79,14 +77,6 @@ export const TypographySection = ({
             </li>
           ))}
         </ol>
-        <p className="label text-mist flex flex-wrap items-baseline gap-x-3 gap-y-1 normal-case">
-          <span>Theme step</span>
-          <ClassTag>{textLabel.className}</ClassTag>
-          <span className="tabular-nums">
-            {textLabel.size} / {textLabel.lineHeight} /{" "}
-            {textLabel.letterSpacing}
-          </span>
-        </p>
       </div>
     </DocumentSection>
   );

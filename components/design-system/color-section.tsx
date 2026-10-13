@@ -91,20 +91,6 @@ const AliasList = ({ tokens }: { tokens: readonly ColorToken[] }) => (
   </div>
 );
 
-const ChartStrip = ({ tokens }: { tokens: readonly ColorToken[] }) => (
-  <ul className="border-rule-strong grid grid-cols-5 border">
-    {tokens.map((token) => (
-      <li
-        className="border-rule-strong flex flex-col gap-2 border-r p-2 last:border-r-0"
-        key={token.name}
-      >
-        <Chip className="border-rule-strong block h-8 border" token={token} />
-        <span className="label text-mist normal-case">{token.name}</span>
-      </li>
-    ))}
-  </ul>
-);
-
 export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
   const section = sectionById("color");
   const inGroup = (group: ColorGroup) =>
@@ -147,13 +133,6 @@ export const ColorSection = ({ colors }: { colors: readonly ColorToken[] }) => {
           label={colorGroupLabels.semantic.label}
         />
         <AliasList tokens={inGroup("semantic")} />
-      </div>
-      <div className="flex flex-col gap-3">
-        <SubHeading
-          aside={padCount(inGroup("chart").length)}
-          label={colorGroupLabels.chart.label}
-        />
-        <ChartStrip tokens={inGroup("chart")} />
       </div>
     </DocumentSection>
   );
