@@ -3,7 +3,9 @@ export const HERO_FIELD_ROWS = 72;
 export const HERO_FIELD_CELLS = HERO_FIELD_COLUMNS * HERO_FIELD_ROWS;
 export const PEAK_DENSITY = 0.62;
 
-const BAYER_4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5] as const;
+export const BAYER_4 = [
+  0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5,
+] as const;
 
 export interface HeroFieldBase {
   envelope: Float32Array;
@@ -41,12 +43,12 @@ const valueNoise = (x: number, y: number, seed: number) => {
   return top + (bottom - top) * blendY;
 };
 
-const fbm = (x: number, y: number, seed: number) =>
+export const fbm = (x: number, y: number, seed: number) =>
   0.55 * valueNoise(x, y, seed) +
   0.3 * valueNoise(x * 2.1 + 17, y * 2.1 + 9, seed) +
   0.15 * valueNoise(x * 4.3 + 5, y * 4.3 + 31, seed);
 
-const fade = (edge0: number, edge1: number, value: number) => {
+export const fade = (edge0: number, edge1: number, value: number) => {
   const progress = Math.min(1, Math.max(0, (value - edge0) / (edge1 - edge0)));
   return smooth(progress);
 };
@@ -88,21 +90,18 @@ export const heroFieldCells = ({
   return cells;
 };
 
-export const heroFieldPath = (cells: Uint8Array) => {
+export const cellsPath = (cells: Uint8Array, columns: number, rows: number) => {
   const commands: string[] = [];
-  for (let row = 0; row < HERO_FIELD_ROWS; row += 1) {
+  for (let row = 0; row < rows; row += 1) {
     let rowStart: number | null = null;
     let column = 0;
-    while (column < HERO_FIELD_COLUMNS) {
-      if (!cells[row * HERO_FIELD_COLUMNS + column]) {
+    while (column < columns) {
+      if (!cells[row * columns + column]) {
         column += 1;
         continue;
       }
       const runStart = column;
-      while (
-        column < HERO_FIELD_COLUMNS &&
-        cells[row * HERO_FIELD_COLUMNS + column]
-      ) {
+      while (column < columns && cells[row * columns + column]) {
         column += 1;
       }
       const length = column - runStart;
@@ -116,3 +115,6 @@ export const heroFieldPath = (cells: Uint8Array) => {
   }
   return commands.join("");
 };
+
+export const heroFieldPath = (cells: Uint8Array) =>
+  cellsPath(cells, HERO_FIELD_COLUMNS, HERO_FIELD_ROWS);
