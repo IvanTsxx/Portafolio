@@ -7,15 +7,9 @@ export interface PageSection {
   label: string;
 }
 
-const registrySections = [
-  { id: "install", index: "REG-03", label: "Install" },
-  { id: "components", index: "REG-04", label: "Components" },
-] as const satisfies readonly PageSection[];
-
 const sectionsByRoute = new Map<string, readonly PageSection[]>([
   ["/", homeSections],
   ["/design-system", sectionSpecs],
-  ["/registry", registrySections],
 ]);
 
 const noSections: readonly PageSection[] = [];

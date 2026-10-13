@@ -171,7 +171,7 @@ export const RegistryGrid = ({
     <DocumentSection
       aside={`${pad(visibleEntries.length)} / ${pad(entries.length)}`}
       id="components"
-      index="REG-04"
+      index="REG-03"
       jp="部品"
       label="Components"
       script={sectionScripts.registryComponents}

@@ -8,7 +8,6 @@ import {
   RegistryGrid,
 } from "@/components/registry-docs/registry-browser";
 import { DocumentHero } from "@/components/site/document-hero";
-import { DocumentSection } from "@/components/site/document-section";
 import { FilterFold } from "@/components/site/filter-fold";
 import {
   getRegistryItemUrl,
@@ -21,8 +20,6 @@ import {
   toCategoryLabel,
 } from "@/lib/registry/registry";
 import { siteConfig } from "@/lib/site/config";
-import { sectionScripts } from "@/lib/site/section-scripts";
-import { TechnicalGrid } from "@/registry/ivan/ui/technical-grid";
 
 export const metadata: Metadata = {
   description: `Installable shadcn components. Add any item from ${registryUrlTemplate}.`,
@@ -51,38 +48,19 @@ const RegistryPage = async () => {
   return (
     <>
       <ItemStyles items={registryItems} />
-      <div className="relative isolate overflow-hidden">
-        <TechnicalGrid
-          className="absolute inset-0"
-          fade="bottom"
-          markers={false}
-          nodes={4}
-          scan="none"
-        />
-        <DocumentHero
-          code="REG-01"
-          jp="登録簿"
-          lede="Install with one command"
-          meta={[
-            {
-              label: "Items",
-              value: String(registryItems.length).padStart(2, "0"),
-            },
-          ]}
-          title="Registry"
-        />
-      </div>
-      <FilterFold index="REG-02">
-        <RegistryFilters categories={categories} total={registryItems.length} />
-      </FilterFold>
-      <DocumentSection
-        id="install"
-        index="REG-03"
-        jp="導入"
-        label="Install"
-        script={sectionScripts.registryInstall}
+      <DocumentHero
+        code="REG-01"
+        jp="登録簿"
+        lede="Install with one command"
+        meta={[
+          {
+            label: "Items",
+            value: String(registryItems.length).padStart(2, "0"),
+          },
+        ]}
+        title="Registry"
       >
-        <div className="flex flex-col gap-2">
+        <div className="flex w-full flex-col gap-2">
           <CommandLine
             command={`bunx --bun shadcn@latest add ${getRegistryItemUrl("<name>")}`}
           />
@@ -90,7 +68,10 @@ const RegistryPage = async () => {
             command={`bunx --bun shadcn@latest add ${siteConfig.registryNamespace}/<name>`}
           />
         </div>
-      </DocumentSection>
+      </DocumentHero>
+      <FilterFold index="REG-02">
+        <RegistryFilters categories={categories} total={registryItems.length} />
+      </FilterFold>
       <RegistryGrid categories={categories} entries={entries} />
     </>
   );
