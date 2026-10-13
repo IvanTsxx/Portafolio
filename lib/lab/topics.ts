@@ -5,6 +5,7 @@ export const labTopics = [
   "Shader",
   "Typography",
   "AI",
+  "Image",
 ] as const;
 
 export type LabTopic = (typeof labTopics)[number];
