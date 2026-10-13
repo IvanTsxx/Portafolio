@@ -4,7 +4,6 @@ import "./globals.css";
 import { CompanionGame } from "@/components/agent-game/companion-game";
 import { Companion } from "@/components/scene/companion";
 import { SceneLayer } from "@/components/scene/scene-layer";
-import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { fontClassNames } from "@/lib/fonts";
 import { siteConfig } from "@/lib/site/config";
@@ -41,10 +40,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => (
         Skip to content
       </a>
       <SiteHeader />
-      <main className="flex flex-1 flex-col" id="main">
-        {children}
-      </main>
-      <SiteFooter />
+      {children}
       <SceneLayer />
       <Companion />
       <CompanionGame />

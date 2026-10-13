@@ -1,7 +1,7 @@
-import { DetailShell } from "@/components/site/detail-shell";
+import { Dossier } from "@/components/site/dossier";
 
 const DetailGroupLayout = ({ children }: LayoutProps<"/">) => (
-  <DetailShell>{children}</DetailShell>
+  <Dossier size="detail">{children}</Dossier>
 );
 
 export default DetailGroupLayout;

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 import { NoteArchive } from "@/components/content/note-archive";
-import { NotesPanels } from "@/components/page-panels/notes";
+import { NoteFilters } from "@/components/content/note-filters";
 import { DocumentHero } from "@/components/site/document-hero";
+import { FilterFold } from "@/components/site/filter-fold";
 import {
   countNoteFacets,
   noteKinds,
@@ -48,7 +49,9 @@ const NotesPage = async () => {
         ]}
         title="Notes"
       />
-      <NotesPanels />
+      <FilterFold index="NT-02">
+        <NoteFilters facets={facets} total={notes.length} />
+      </FilterFold>
       <NoteArchive facets={facets} notes={notes.map(toNoteIndexItem)} />
     </>
   );

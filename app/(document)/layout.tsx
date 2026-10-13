@@ -1,7 +1,7 @@
-import { DocumentShell } from "@/components/site/document-shell";
+import { Dossier } from "@/components/site/dossier";
 
 const DocumentGroupLayout = ({ children }: LayoutProps<"/">) => (
-  <DocumentShell>{children}</DocumentShell>
+  <Dossier size="document">{children}</Dossier>
 );
 
 export default DocumentGroupLayout;

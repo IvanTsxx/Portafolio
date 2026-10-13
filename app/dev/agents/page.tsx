@@ -18,7 +18,10 @@ const isAgentRole = (value: unknown): value is AgentRole =>
 const AgentLineupPage = async ({ searchParams }: PageProps<"/dev/agents">) => {
   const { action, motion, role } = await searchParams;
   return (
-    <section className="mx-auto flex w-full max-w-screen-2xl flex-col gap-8 px-4 py-12 md:px-6">
+    <main
+      className="mx-auto flex w-full max-w-screen-2xl flex-col gap-8 px-4 py-12 md:px-6"
+      id="main"
+    >
       <header className="flex flex-col gap-3">
         <p className="label text-clay">Dev · Character rig</p>
         <h1 className="display text-5xl md:text-7xl">Agent lineup</h1>
@@ -32,7 +35,7 @@ const AgentLineupPage = async ({ searchParams }: PageProps<"/dev/agents">) => {
         initialMotion={motion === "reduced" ? "reduced" : "full"}
         soloRole={isAgentRole(role) ? role : undefined}
       />
-    </section>
+    </main>
   );
 };
 

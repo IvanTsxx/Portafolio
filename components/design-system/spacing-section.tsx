@@ -63,17 +63,21 @@ const RadiusScale = ({ steps }: { steps: DesignSystem["radius"]["steps"] }) => (
 
 const GridDiagram = () => (
   <div className="border-rule relative flex flex-col gap-3 border p-3 md:p-4">
-    <div className="grid grid-cols-5 gap-x-1.5 md:gap-x-3">
-      <span className="hatch border-rule-strong label text-ink flex h-24 items-center justify-center border border-dashed text-center">
-        Aside {documentGridSpec.asideWidth}
+    <div className="grid grid-cols-[1fr_6fr_1fr] gap-x-1.5 md:gap-x-3">
+      <span className="hatch border-rule-strong label text-ink flex h-24 items-center justify-center border border-dashed text-center [writing-mode:vertical-rl]">
+        Tabs
       </span>
-      <span className="border-ink label text-ink col-span-3 flex h-24 items-center justify-center border">
-        Column {documentGridSpec.columnWidth}
+      <span className="border-ink label text-ink flex h-24 items-center justify-center border text-center">
+        Sheet · column {documentGridSpec.columnWidth}
       </span>
-      <span aria-hidden className="border-rule h-24 border border-dashed" />
+      <span className="border-rule label text-mist flex h-24 items-center justify-center border border-dashed text-center [writing-mode:vertical-rl]">
+        Thumb
+      </span>
     </div>
     <p className="label text-mist flex flex-wrap justify-between gap-x-4 gap-y-1 normal-case">
-      <span>Aside beside the column from xl · {documentGridSpec.gutter}</span>
+      <span>
+        Sheet inset {documentGridSpec.sheetInset} · {documentGridSpec.gutter}
+      </span>
       <span>Sections {documentGridSpec.sectionGap}</span>
     </p>
   </div>

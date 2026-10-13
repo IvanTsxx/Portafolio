@@ -512,9 +512,10 @@ export const utilitySpecs = [
     variable: "--grid-size",
   },
   {
-    name: "rail-ties",
-    summary: "Track ties every 12px down the section rail.",
-    usage: '<span className="rail-ties block h-24 w-2" />',
+    name: "stamp-press",
+    summary: "Presses a stamp into place as it scrolls in.",
+    usage:
+      '<div className="stamp-press motion-reduce:animate-none border p-1" />',
   },
   {
     name: "grain",
@@ -581,20 +582,20 @@ export const breakpointSpecs = [
     px: 768,
   },
   {
-    changes: "Header nav replaces the mobile menu",
+    changes: "Route tabs move to the sheet edge",
     name: "lg",
     px: 1024,
   },
-  { changes: "Index list sits beside the column", name: "xl", px: 1280 },
+  { changes: "Companion lane widens", name: "xl", px: 1280 },
   { changes: "Container stops at 1536", name: "2xl", px: 1536 },
 ] as const satisfies readonly BreakpointSpec[];
 
 export const documentGridSpec = {
-  asideWidth: "12rem",
   columnWidth: "44rem",
   containerClasses: ["max-w-column", "relative", "mx-auto"],
   gutter: "md:px-8",
   sectionGap: "gap-24",
+  sheetInset: "md:px-12",
 } as const;
 
 export interface AgentMotionSpec {

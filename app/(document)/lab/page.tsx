@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 import { ExperimentCard } from "@/components/lab/experiment-card";
-import { LabArchive } from "@/components/lab/lab-archive";
-import { LabPanels } from "@/components/page-panels/lab";
+import { LabArchive, LabTopicFilter } from "@/components/lab/lab-archive";
 import { DocumentHero } from "@/components/site/document-hero";
+import { FilterFold } from "@/components/site/filter-fold";
 import { activeTopics, experiments } from "@/lib/lab/experiments";
 
 export const metadata: Metadata = {
@@ -12,6 +12,12 @@ export const metadata: Metadata = {
 };
 
 const pad = (value: number) => String(value).padStart(2, "0");
+
+const topicCounts = activeTopics.map((topic) => ({
+  count: experiments.filter((experiment) => experiment.topics.includes(topic))
+    .length,
+  topic,
+}));
 
 const items = experiments.map((experiment) => ({
   card: <ExperimentCard experiment={experiment} />,
@@ -31,7 +37,9 @@ const LabPage = () => (
       ]}
       title="Lab"
     />
-    <LabPanels />
+    <FilterFold index="LAB-02">
+      <LabTopicFilter topics={topicCounts} total={experiments.length} />
+    </FilterFold>
     <LabArchive items={items} />
   </>
 );

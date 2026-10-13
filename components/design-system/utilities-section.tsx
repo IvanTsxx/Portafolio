@@ -41,8 +41,10 @@ const previews = {
       <span className="hatch flex-1" />
     </div>
   ),
-  "rail-ties": (
-    <span className="rail-ties absolute inset-y-3 left-1/2 w-3 -translate-x-1/2" />
+  "stamp-press": (
+    <div className="stamp-press border-ink absolute inset-3 border p-1 motion-reduce:animate-none">
+      <div className="border-ink/60 h-full border" />
+    </div>
   ),
 } as const satisfies Record<UtilityName, ReactNode>;
 

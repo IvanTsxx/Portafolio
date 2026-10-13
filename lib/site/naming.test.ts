@@ -55,9 +55,9 @@ describe("site naming", () => {
       "app/(document)/page.tsx",
       "components/profile/profile-intro.tsx",
     ]);
-    expect(filesContaining("DocumentShell")).toEqual([
+    expect(filesContaining('<Dossier size="document">')).toEqual([
       "app/(document)/layout.tsx",
-      "components/site/document-shell.tsx",
+      "app/dev/stations/page.tsx",
     ]);
   });
 
@@ -70,9 +70,9 @@ describe("site naming", () => {
     expect(
       routePages("document").filter((route) => route.includes("["))
     ).toEqual([]);
-    expect(filesContaining("DetailShell")).toEqual([
+    expect(filesContaining('<Dossier size="detail">')).toEqual([
       "app/(detail)/layout.tsx",
-      "components/site/detail-shell.tsx",
+      "app/not-found.tsx",
     ]);
   });
 });

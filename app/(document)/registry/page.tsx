@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 
-import { RegistryPanels } from "@/components/page-panels/registry";
 import { CommandLine } from "@/components/registry-docs/command-line";
 import { ItemStyles } from "@/components/registry-docs/item-styles";
 import { loadDemoModule } from "@/components/registry-docs/load-demo";
-import { RegistryGrid } from "@/components/registry-docs/registry-browser";
+import {
+  RegistryFilters,
+  RegistryGrid,
+} from "@/components/registry-docs/registry-browser";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
+import { FilterFold } from "@/components/site/filter-fold";
 import {
   getRegistryItemUrl,
   registryUrlTemplate,
@@ -69,7 +72,9 @@ const RegistryPage = async () => {
           title="Registry"
         />
       </div>
-      <RegistryPanels />
+      <FilterFold index="REG-02">
+        <RegistryFilters categories={categories} total={registryItems.length} />
+      </FilterFold>
       <DocumentSection
         id="install"
         index="REG-03"

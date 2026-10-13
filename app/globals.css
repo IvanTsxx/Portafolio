@@ -63,7 +63,6 @@
   --text-label--letter-spacing: 0.08em;
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --container-column: 44rem;
-  --container-aside: 12rem;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }
@@ -161,12 +160,21 @@
   background-size: var(--grid-size, 24px) var(--grid-size, 24px);
 }
 
-@utility rail-ties {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    var(--rule-strong) 0 1px,
-    transparent 1px 12px
-  );
+@keyframes stamp-press {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@utility stamp-press {
+  animation: stamp-press var(--ease-out-quart) both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 100%;
 }
 
 @utility grain {

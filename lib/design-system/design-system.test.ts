@@ -109,9 +109,9 @@ describe("documented values match the source", () => {
     expect(labelStep?.size).toBe("10");
   });
 
-  test("the document grid spec matches DocumentShell", async () => {
+  test("the document grid spec matches the dossier sheet", async () => {
     const [layout, css] = await Promise.all([
-      readProjectFile("components/site/document-shell.tsx"),
+      readProjectFile("components/site/dossier.tsx"),
       readProjectFile("app/globals.css"),
     ]);
     for (const className of documentGridSpec.containerClasses) {
@@ -119,10 +119,10 @@ describe("documented values match the source", () => {
     }
     expect(layout).toContain(documentGridSpec.gutter);
     expect(layout).toContain(documentGridSpec.sectionGap);
+    expect(layout).toContain(documentGridSpec.sheetInset);
     expect(css).toContain(
       `--container-column: ${documentGridSpec.columnWidth}`
     );
-    expect(css).toContain(`--container-aside: ${documentGridSpec.asideWidth}`);
   });
 
   test("every documented duration class is used by the site", async () => {

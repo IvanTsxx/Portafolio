@@ -7,7 +7,6 @@ import { PhilosophySection } from "@/components/design-system/philosophy-section
 import { SpacingSection } from "@/components/design-system/spacing-section";
 import { TypographySection } from "@/components/design-system/typography-section";
 import { UtilitiesSection } from "@/components/design-system/utilities-section";
-import { DesignSystemPanels } from "@/components/page-panels/design-system";
 import { DocumentHero } from "@/components/site/document-hero";
 import { padCount } from "@/lib/design-system/format";
 import { loadDesignMarkdown, loadDesignSystem } from "@/lib/design-system/load";
@@ -43,7 +42,6 @@ const DesignSystemPage = async () => {
           markdown={markdown}
         />
       </DocumentHero>
-      <DesignSystemPanels />
       <PhilosophySection />
       <ColorSection colors={system.colors} />
       <TypographySection fonts={system.fonts} textLabel={system.textLabel} />
