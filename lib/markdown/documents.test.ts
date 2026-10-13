@@ -14,7 +14,7 @@ import { buildLlmsTxt, llmsSections } from "./llms";
 import { assistantPrompt, openInTargets } from "./open-in";
 
 const outsideFences = (markdown: string) =>
-  markdown.replaceAll(/^```[\s\S]*?^```/gmu, "");
+  markdown.replaceAll(/^```[\s\S]*?^```/gmu, "").replaceAll(/`[^`\n]*`/gu, "");
 
 const frontMatterOf = (markdown: string) =>
   markdown.startsWith("---\n")
@@ -39,7 +39,7 @@ describe("note markdown", () => {
     expect(header).toContain('title: "');
     expect(header).toContain('summary: "');
     expect(header).toContain(`canonical: "https://bongi.dev/notes/${slug}"`);
-    expect(header).toMatch(/^(?:date|year): /mu);
+    expect(header).toMatch(/^date: /mu);
     expect(header).toMatch(/^(?:tags|stack): \[/mu);
     expect(markdown).not.toContain("export const meta");
     expect(outsideFences(markdown)).not.toMatch(/<\/?[A-Za-z][\w.]*[\s/>]/u);

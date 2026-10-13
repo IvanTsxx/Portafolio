@@ -86,7 +86,7 @@ export const noteMarkdown = ({ body, entry }: NoteDocument) => {
         ]
       : [
           ...shared,
-          ["year", entry.year],
+          ["date", entry.date],
           ["summary", entry.summary],
           ["role", entry.role],
           ["context", entry.context],
