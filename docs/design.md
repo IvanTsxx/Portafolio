@@ -81,7 +81,7 @@ Radius 0 everywhere. Frames are 1px hairlines. No shadows. Depth comes from the 
 ## Components
 
 - Panel heading: `[ XX-NN ]`, mono label, dotted leader, aside.
-- Page hero: doc code, display title, hazard stripe, lede, over a seeded dither field at 10% ink.
+- Page hero: doc code, display title, hazard stripe, lede, over a seeded dither field at 10% ink. The field breathes while in view and swells under the mouse.
 - Figure plate: framed figure with corner marks and one readout row.
 - Specimen cell: hairline cell. Hover fills `paper-deep`.
 - Button: mono label, 44px, solid ink or outline. Hover inverts.
@@ -94,7 +94,7 @@ Radius 0 everywhere. Frames are 1px hairlines. No shadows. Depth comes from the 
 - `ease-mechanical`: 100ms hover, focus, press, 700ms portrait scan.
 - `ease-out-quart`: 150ms overlays, 200ms tabs, tooltips, 300ms folds, notches.
 - `ease-out-expo`: 500ms image fades.
-- Reduced motion: CSS snaps, the companion holds a key pose, the hero field stays still.
+- Reduced motion: CSS snaps, the companion holds a key pose, the hero field stays on its static frame.
 
 ## Do's and Don'ts
 

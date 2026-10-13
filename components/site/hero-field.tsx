@@ -1,82 +1,184 @@
 "use client";
 
-import { useEffect, useEffectEvent, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { tokenRgb } from "@/components/profile/dither";
-import type { DitherFrame, Rgb } from "@/components/profile/dither";
-import { useDitherDrift } from "@/components/profile/use-dither-drift";
-import type { DriftConfig } from "@/components/profile/use-dither-drift";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 import {
   HERO_FIELD_COLUMNS,
   HERO_FIELD_ROWS,
+  heroFieldBase,
   heroFieldCells,
   heroFieldPath,
 } from "./hero-field-grid";
+import type { HeroFieldBase } from "./hero-field-grid";
+import {
+  AMBIENT_FRAME_MS,
+  createHeroFieldMotion,
+  createLens,
+  isLensSettled,
+  lensSwell,
+  lensTravel,
+  packInk,
+  paintHeroField,
+  rampAt,
+  stepSpring,
+} from "./hero-field-motion";
 
-const heroDrift: DriftConfig = {
-  amplitude: 4,
-  anchor: { x: 1, y: 0 },
-  band: 0.22,
-  cell: 1,
-  easing: 0.06,
-  edge: "clear",
-};
+const MAX_STEP_SECONDS = 0.05;
 
 const pixelated = { imageRendering: "pixelated" } as const;
+
+interface HeroFieldSurface {
+  base: HeroFieldBase;
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D;
+  field: HTMLElement;
+  host: HTMLElement;
+  ink: number;
+}
 
 const readInk = () => {
   const probe = document.createElement("canvas");
   probe.width = 1;
   probe.height = 1;
   const context = probe.getContext("2d", { willReadFrequently: true });
-  return context ? tokenRgb(context, "--ink") : null;
+  return context ? packInk(tokenRgb(context, "--ink")) : null;
 };
 
-const fieldFrame = (cells: Uint8Array, ink: Rgb): DitherFrame => {
-  const data = new Uint8ClampedArray(cells.length * 4);
-  for (const [index, isInk] of cells.entries()) {
-    if (isInk) {
-      data.set([...ink, 255], index * 4);
+const startHeroField = ({
+  base,
+  canvas,
+  context,
+  field,
+  host,
+  ink,
+}: HeroFieldSurface) => {
+  const motion = createHeroFieldMotion(base);
+  const image = context.createImageData(HERO_FIELD_COLUMNS, HERO_FIELD_ROWS);
+  const pixels = new Uint32Array(image.data.buffer);
+  const lens = createLens();
+  const pointer = { isInside: false, x: 0, y: 0 };
+  let seconds = 0;
+  let lastTick: number | null = null;
+  let lastPaint = 0;
+  let isInView = false;
+  let request: number | null = null;
+
+  const paint = () => {
+    paintHeroField(
+      motion,
+      { lens, ramp: rampAt(seconds), time: seconds },
+      pixels,
+      ink
+    );
+    context.putImageData(image, 0, 0);
+  };
+
+  const canRun = () => isInView && document.visibilityState === "visible";
+
+  const tick = (now: number) => {
+    const step =
+      lastTick === null
+        ? 0
+        : Math.min(MAX_STEP_SECONDS, (now - lastTick) / 1000);
+    lastTick = now;
+    seconds += step;
+    stepSpring(lens.x, pointer.x, lensTravel, step);
+    stepSpring(lens.y, pointer.y, lensTravel, step);
+    stepSpring(lens.strength, pointer.isInside ? 1 : 0, lensSwell, step);
+    const isInteractive = pointer.isInside || !isLensSettled(lens);
+    if (isInteractive || now - lastPaint >= AMBIENT_FRAME_MS - 1) {
+      paint();
+      lastPaint = now;
     }
-  }
-  return { data, height: HERO_FIELD_ROWS, width: HERO_FIELD_COLUMNS };
+    request = canRun() ? requestAnimationFrame(tick) : null;
+    if (request === null) {
+      lastTick = null;
+    }
+  };
+
+  const schedule = () => {
+    if (request !== null) {
+      return;
+    }
+    if (!canRun()) {
+      lastTick = null;
+      return;
+    }
+    request = requestAnimationFrame(tick);
+  };
+
+  const handleMove = (event: PointerEvent) => {
+    if (event.pointerType !== "mouse") {
+      return;
+    }
+    const bounds = field.getBoundingClientRect();
+    const scale = Math.max(
+      bounds.width / HERO_FIELD_COLUMNS,
+      bounds.height / HERO_FIELD_ROWS
+    );
+    const offsetX = bounds.width - HERO_FIELD_COLUMNS * scale;
+    pointer.x = (event.clientX - bounds.left - offsetX) / scale;
+    pointer.y = (event.clientY - bounds.top) / scale;
+    if (isLensSettled(lens)) {
+      lens.x.value = pointer.x;
+      lens.y.value = pointer.y;
+    }
+    pointer.isInside = true;
+    schedule();
+  };
+
+  const handleLeave = () => {
+    pointer.isInside = false;
+    schedule();
+  };
+
+  const observer = new IntersectionObserver(([entry]) => {
+    isInView = entry?.isIntersecting ?? false;
+    schedule();
+  });
+
+  canvas.width = HERO_FIELD_COLUMNS;
+  canvas.height = HERO_FIELD_ROWS;
+  paint();
+  canvas.dataset.live = "true";
+  observer.observe(host);
+  host.addEventListener("pointermove", handleMove);
+  host.addEventListener("pointerleave", handleLeave);
+  document.addEventListener("visibilitychange", schedule);
+
+  return () => {
+    if (request !== null) {
+      cancelAnimationFrame(request);
+    }
+    observer.disconnect();
+    host.removeEventListener("pointermove", handleMove);
+    host.removeEventListener("pointerleave", handleLeave);
+    document.removeEventListener("visibilitychange", schedule);
+    canvas.dataset.live = "false";
+  };
 };
 
 export const HeroField = ({ seed }: { seed: string }) => {
-  const cells = useMemo(() => heroFieldCells(seed), [seed]);
-  const path = useMemo(() => heroFieldPath(cells), [cells]);
+  const base = useMemo(() => heroFieldBase(seed), [seed]);
+  const path = useMemo(() => heroFieldPath(heroFieldCells(base)), [base]);
   const fieldRef = useRef<HTMLDivElement>(null);
-  const { canvasRef, onRender, onPointerMove, onPointerLeave } =
-    useDitherDrift(heroDrift);
-  const drift = useEffectEvent((event: globalThis.PointerEvent) =>
-    onPointerMove(event)
-  );
-  const settle = useEffectEvent(() => onPointerLeave());
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isReduced = useReducedMotion();
 
   useEffect(() => {
-    const host = fieldRef.current?.parentElement;
-    const ink = readInk();
-    if (!(host && ink)) {
+    const field = fieldRef.current;
+    const host = field?.parentElement;
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    const ink = isReduced ? null : readInk();
+    if (!(field && host && canvas && context && ink !== null)) {
       return;
     }
-    onRender(fieldFrame(cells, ink));
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry?.isIntersecting) {
-        settle();
-      }
-    });
-    observer.observe(host);
-    const handleMove = (event: globalThis.PointerEvent) => drift(event);
-    const handleLeave = () => settle();
-    host.addEventListener("pointermove", handleMove);
-    host.addEventListener("pointerleave", handleLeave);
-    return () => {
-      observer.disconnect();
-      host.removeEventListener("pointermove", handleMove);
-      host.removeEventListener("pointerleave", handleLeave);
-    };
-  }, [cells, onRender]);
+    return startHeroField({ base, canvas, context, field, host, ink });
+  }, [base, isReduced]);
 
   return (
     <div
@@ -85,13 +187,13 @@ export const HeroField = ({ seed }: { seed: string }) => {
       ref={fieldRef}
     >
       <canvas
-        className="peer invisible absolute inset-0 block size-full object-cover object-right-top data-[active=true]:visible"
-        data-active="false"
+        className="peer ease-out-quart absolute inset-0 block size-full object-cover object-right-top opacity-0 transition-opacity duration-300 data-[live=true]:opacity-100"
+        data-live="false"
         ref={canvasRef}
         style={pixelated}
       />
       <svg
-        className="fill-ink absolute inset-0 size-full [shape-rendering:crispEdges] peer-data-[active=true]:invisible"
+        className="fill-ink absolute inset-0 size-full transition-[visibility] duration-300 [shape-rendering:crispEdges] peer-data-[live=true]:invisible"
         preserveAspectRatio="xMaxYMin slice"
         viewBox={`0 0 ${HERO_FIELD_COLUMNS} ${HERO_FIELD_ROWS}`}
       >

@@ -20,7 +20,6 @@ export interface DriftConfig {
   band: number;
   cell: number;
   easing: number;
-  edge: "wrap" | "clear";
 }
 
 interface DriftPointerEvent {
@@ -53,19 +52,6 @@ const shiftRows = (
       Math.round((intensity * falloff * (amplitude * wave + lean)) / cell) *
       cell;
     const start = y * rowBytes;
-    if (config.edge === "clear") {
-      const reach = Math.min(width, Math.abs(shift)) * 4;
-      target.fill(0, start, start + rowBytes);
-      if (shift >= 0) {
-        target.set(
-          data.subarray(start, start + rowBytes - reach),
-          start + reach
-        );
-      } else {
-        target.set(data.subarray(start + reach, start + rowBytes), start);
-      }
-      continue;
-    }
     const offset = ((shift % width) + width) % width;
     target.set(
       data.subarray(start + (width - offset) * 4, start + rowBytes),

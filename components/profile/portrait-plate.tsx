@@ -16,7 +16,6 @@ const portraitDrift: DriftConfig = {
   band: 0.16,
   cell: 2,
   easing: 0.09,
-  edge: "wrap",
 };
 
 const MAX_SIZE = 480;

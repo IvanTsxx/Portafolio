@@ -1,8 +1,16 @@
 export const HERO_FIELD_COLUMNS = 192;
 export const HERO_FIELD_ROWS = 72;
+export const HERO_FIELD_CELLS = HERO_FIELD_COLUMNS * HERO_FIELD_ROWS;
+export const PEAK_DENSITY = 0.62;
 
 const BAYER_4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5] as const;
-const PEAK_DENSITY = 0.62;
+
+export interface HeroFieldBase {
+  envelope: Float32Array;
+  relief: Float32Array;
+  seed: number;
+  thresholds: Float32Array;
+}
 
 const seedOf = (text: string) =>
   [...text].reduce(
@@ -43,26 +51,38 @@ const fade = (edge0: number, edge1: number, value: number) => {
   return smooth(progress);
 };
 
-const toneAt = (column: number, row: number, seed: number) => {
-  const across = column / HERO_FIELD_COLUMNS;
-  const down = row / HERO_FIELD_ROWS;
-  const textSide = fade(0.28, 0.92, across);
-  const bottom = 1 - fade(0.05, 0.8, down);
-  const grain = fbm(column / 14, row / 14, seed);
-  const relief = Math.min(1, Math.max(0, (grain - 0.42) * 2.4 + 0.4));
-  return relief * textSide * bottom * PEAK_DENSITY;
+export const heroFieldBase = (key: string): HeroFieldBase => {
+  const seed = seedOf(key);
+  const envelope = new Float32Array(HERO_FIELD_CELLS);
+  const relief = new Float32Array(HERO_FIELD_CELLS);
+  const thresholds = new Float32Array(HERO_FIELD_CELLS);
+  for (let row = 0; row < HERO_FIELD_ROWS; row += 1) {
+    const bottom = 1 - fade(0.05, 0.8, row / HERO_FIELD_ROWS);
+    for (let column = 0; column < HERO_FIELD_COLUMNS; column += 1) {
+      const index = row * HERO_FIELD_COLUMNS + column;
+      const textSide = fade(0.28, 0.92, column / HERO_FIELD_COLUMNS);
+      const grain = fbm(column / 14, row / 14, seed);
+      envelope[index] = textSide * bottom * PEAK_DENSITY;
+      relief[index] = Math.min(1, Math.max(0, (grain - 0.42) * 2.4 + 0.4));
+      thresholds[index] =
+        ((BAYER_4[(row % 4) * 4 + (column % 4)] ?? 0) + 0.5) / 16;
+    }
+  }
+  return { envelope, relief, seed, thresholds };
 };
 
-export const heroFieldCells = (key: string) => {
-  const seed = seedOf(key);
-  const cells = new Uint8Array(HERO_FIELD_COLUMNS * HERO_FIELD_ROWS);
-  for (let row = 0; row < HERO_FIELD_ROWS; row += 1) {
-    for (let column = 0; column < HERO_FIELD_COLUMNS; column += 1) {
-      const threshold =
-        ((BAYER_4[(row % 4) * 4 + (column % 4)] ?? 0) + 0.5) / 16;
-      if (toneAt(column, row, seed) > threshold) {
-        cells[row * HERO_FIELD_COLUMNS + column] = 1;
-      }
+export const heroFieldCells = ({
+  envelope,
+  relief,
+  thresholds,
+}: HeroFieldBase) => {
+  const cells = new Uint8Array(HERO_FIELD_CELLS);
+  for (let index = 0; index < HERO_FIELD_CELLS; index += 1) {
+    if (
+      (relief[index] ?? 0) * (envelope[index] ?? 0) >
+      (thresholds[index] ?? 1)
+    ) {
+      cells[index] = 1;
     }
   }
   return cells;
