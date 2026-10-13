@@ -576,7 +576,7 @@ export const breakpointSpecs = [
     px: 768,
   },
   {
-    changes: "Experience stairs pin while scrolling",
+    changes: "Header nav replaces the mobile menu",
     name: "lg",
     px: 1024,
   },
