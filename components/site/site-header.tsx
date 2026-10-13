@@ -2,13 +2,19 @@ import Link from "next/link";
 
 import { CommandPaletteProvider } from "@/components/command/command-palette-provider";
 import { CommandPaletteTrigger } from "@/components/command/command-palette-trigger";
+import { BackToTop } from "@/components/site/back-to-top";
+import { GithubStars } from "@/components/site/github-stars";
 import { focusRingClassName } from "@/components/site/styles";
 import { buildSearchIndex } from "@/lib/search/build-index";
 import { siteConfig } from "@/lib/site/config";
+import { getRepoStars } from "@/lib/site/github-repo";
 import { cn } from "@/lib/utils";
 
 export const SiteHeader = async () => {
-  const searchEntries = await buildSearchIndex();
+  const [searchEntries, stars] = await Promise.all([
+    buildSearchIndex(),
+    getRepoStars(),
+  ]);
   return (
     <CommandPaletteProvider entries={searchEntries}>
       <header className="border-rule bg-paper/90 text-ink sticky top-0 z-50 border-b backdrop-blur-md">
@@ -23,7 +29,11 @@ export const SiteHeader = async () => {
           >
             {siteConfig.nickname}
           </Link>
-          <CommandPaletteTrigger />
+          <div className="flex items-center gap-2">
+            <BackToTop />
+            <CommandPaletteTrigger />
+            <GithubStars count={stars} />
+          </div>
         </div>
       </header>
     </CommandPaletteProvider>

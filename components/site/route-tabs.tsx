@@ -45,11 +45,14 @@ export const RouteTabs = () => {
                 <span className="text-mist group-aria-[current=page]/tab:text-ink tabular-nums">
                   {route.index}
                 </span>
-                <span className="jp hidden [writing-mode:vertical-rl] lg:block">
-                  {route.jp}
-                </span>
-                <span className="lg:hidden lg:[writing-mode:vertical-rl] lg:group-aria-[current=page]/tab:block">
+                <span className="lg:[writing-mode:vertical-rl]">
                   {route.label}
+                </span>
+                <span
+                  aria-hidden
+                  className="jp text-mist/70 hidden [writing-mode:vertical-rl] lg:block"
+                >
+                  {route.jp}
                 </span>
               </Link>
             </li>

@@ -518,6 +518,12 @@ export const utilitySpecs = [
       '<div className="stamp-press motion-reduce:animate-none border p-1" />',
   },
   {
+    name: "scroll-reveal",
+    summary:
+      "Fades a control in once the page has scrolled past its first screen.",
+    usage: '<a className="scroll-reveal" href="#top" />',
+  },
+  {
     name: "grain",
     summary: "Paper noise tile.",
     usage: '<div className="grain bg-paper-deep" />',

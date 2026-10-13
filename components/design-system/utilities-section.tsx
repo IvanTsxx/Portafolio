@@ -41,6 +41,11 @@ const previews = {
       <span className="hatch flex-1" />
     </div>
   ),
+  "scroll-reveal": (
+    <div className="scroll-reveal border-ink absolute inset-x-3 bottom-3 grid size-8 place-items-center border">
+      <span className="bg-ink h-3 w-px" />
+    </div>
+  ),
   "stamp-press": (
     <div className="stamp-press border-ink absolute inset-3 border p-1 motion-reduce:animate-none">
       <div className="border-ink/60 h-full border" />
