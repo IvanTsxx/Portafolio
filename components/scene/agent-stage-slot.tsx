@@ -45,6 +45,7 @@ export const AgentStageSlot = ({
   return (
     <figure
       aria-label={label}
+      data-build-block
       className={cn("relative m-0", className)}
       data-agent-stage={role}
       ref={track}

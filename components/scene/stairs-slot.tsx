@@ -57,6 +57,7 @@ export const StairsSlot = ({
   return (
     <figure
       aria-label={label}
+      data-build-block
       className={cn("relative m-0", className)}
       data-stairs-step={activeIndex}
       onPointerLeave={() => onHover(null)}

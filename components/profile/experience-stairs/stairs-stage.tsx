@@ -137,7 +137,7 @@ export const StairsStage = ({ stairs }: { stairs: readonly Stair[] }) => {
           )}
         >
           {stairs.map((stair, index) => (
-            <li key={stair.id}>
+            <li data-build-block key={stair.id}>
               <button
                 aria-current={index === shownIndex ? "step" : undefined}
                 className={cn(
@@ -173,7 +173,7 @@ export const StairsStage = ({ stairs }: { stairs: readonly Stair[] }) => {
           )}
         >
           {stairs.map((stair, index) => (
-            <li key={stair.id}>
+            <li data-build-block key={stair.id}>
               <button
                 aria-pressed={isReduced ? undefined : index === activeIndex}
                 className="focus-visible:outline-ink block w-full cursor-pointer"

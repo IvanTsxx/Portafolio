@@ -54,6 +54,7 @@ export const ShelfSlot = ({
   return (
     <figure
       aria-label={label}
+      data-build-block
       className={cn("relative m-0", className)}
       data-shelf-active={activeId ?? undefined}
       onPointerLeave={() => onHover(null)}

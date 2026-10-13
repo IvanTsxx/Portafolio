@@ -28,6 +28,7 @@ export const AgentScene = ({ scene, label, className }: AgentSceneProps) => {
   return (
     <figure
       aria-label={label}
+      data-build-block
       className={cn("relative m-0 aspect-4/3 w-full", className)}
       data-agent-scene={scene}
       ref={track}

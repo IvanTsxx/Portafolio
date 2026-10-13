@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { KeyboardEvent } from "react";
 
 import { DocumentSection } from "@/components/site/document-section";
@@ -18,7 +18,6 @@ import {
   monthLabelsFor,
 } from "./contributions";
 import { TechnicalButton } from "./technical-button";
-import { countUp, selectAll, useEnterReveal } from "./use-enter-reveal";
 
 interface CellPosition {
   week: number;
@@ -105,34 +104,7 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
   const width = GUTTER_LEFT + calendar.weeks.length * PITCH;
   const height = GUTTER_TOP + DAYS_PER_WEEK * PITCH;
 
-  const revealRef = useRef<HTMLDivElement>(null);
   const totalLabel = countFormat.format(calendar.total);
-
-  useEnterReveal(revealRef, (root, timeline) => {
-    timeline
-      .from(
-        selectAll(root, "[data-week]"),
-        {
-          clearProps: "opacity,transform",
-          duration: 0.5,
-          opacity: 0,
-          scale: 0.2,
-          stagger: (_, cell: SVGRectElement) =>
-            Number(cell.dataset.week) * 0.014 + Number(cell.dataset.day) * 0.01,
-          transformOrigin: "50% 50%",
-        },
-        0
-      )
-      .from(
-        selectAll(root, "[data-matrix-cursor]"),
-        { duration: 0.4, ease: "power2.out", opacity: 0 },
-        0.7
-      );
-    return countUp(timeline, selectAll(root, "[data-count-to]"), {
-      duration: 1.2,
-      position: 0,
-    });
-  });
 
   const selectYear = (next: number) => {
     setSelectedYear(next);
@@ -189,15 +161,10 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
       label="Contribution matrix"
       script={sectionScripts.homeMatrix}
     >
-      <div className="flex flex-col gap-6" ref={revealRef}>
+      <div className="flex flex-col gap-6">
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-          <p className="flex flex-col gap-1">
-            <span
-              className="text-ink font-mono text-5xl font-light tracking-tight tabular-nums md:text-6xl"
-              data-count-group
-              data-count-to={calendar.total}
-              style={{ minWidth: `${totalLabel.length}ch` }}
-            >
+          <p className="flex flex-col gap-1" data-build-block>
+            <span className="text-ink font-mono text-5xl font-light tracking-tight tabular-nums md:text-6xl">
               {totalLabel}
             </span>
             <span className="label text-graphite">
@@ -205,7 +172,10 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
               <span className="jp"> / {caption.jp}</span>
             </span>
           </p>
-          <div className="flex flex-col gap-1 sm:min-w-48 sm:items-end sm:text-right">
+          <div
+            className="flex flex-col gap-1 sm:min-w-48 sm:items-end sm:text-right"
+            data-build-block
+          >
             <span className="text-ink font-mono text-3xl font-light tracking-tight tabular-nums">
               {String(activeDay?.count ?? 0).padStart(2, "0")}
               <span className="text-graphite ml-1 text-xs tracking-widest">
@@ -219,7 +189,10 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
           </div>
         </div>
 
-        <div className="border-rule relative border-t border-b py-4">
+        <div
+          className="border-rule relative border-t border-b py-4"
+          data-build-block
+        >
           <div
             className="has-focus-visible:outline-clay overflow-x-auto outline-offset-2 has-focus-visible:outline-2"
             key={year}
@@ -328,7 +301,10 @@ export const ContributionMatrix = ({ calendars }: ContributionMatrixProps) => {
           </div>
         </div>
 
-        <div className="label text-mist flex flex-wrap items-center justify-between gap-4">
+        <div
+          className="label text-mist flex flex-wrap items-center justify-between gap-4"
+          data-build-block
+        >
           <span>Hover or ← → ↑ ↓</span>
           <span className="flex items-center gap-2">
             Less <span className="jp">少</span>

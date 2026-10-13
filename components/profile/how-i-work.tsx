@@ -60,6 +60,7 @@ const StepTab = ({
   onComplete: () => void;
 }) => (
   <Tabs.Tab
+    data-build-block
     className="group/step border-rule data-[active]:bg-paper-deep/40 pointer-fine:hover:not-data-[active]:bg-paper-deep/20 focus-visible:outline-ink relative flex w-full cursor-pointer flex-col gap-1.5 border-b px-4 pt-4 pb-5 text-left transition-colors duration-200 focus-visible:outline-1 focus-visible:-outline-offset-4 md:px-5"
     value={step.id}
   >
@@ -179,6 +180,7 @@ export const HowIWork = () => {
           {workSteps.map((step) => (
             <Tabs.Panel
               className="bg-paper-deep/40 relative"
+              data-build-block
               key={step.id}
               value={step.id}
             >
@@ -188,6 +190,7 @@ export const HowIWork = () => {
           <div
             aria-hidden
             className="border-rule grid flex-1 border-t px-4 py-5 md:px-5"
+            data-build-block
           >
             {workSteps.map((step) => (
               <p

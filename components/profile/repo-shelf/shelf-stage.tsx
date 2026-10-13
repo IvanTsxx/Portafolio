@@ -85,7 +85,7 @@ export const ShelfStage = ({ books }: { books: readonly ShelfBook[] }) => {
               {books.map((entry) => {
                 const isActive = entry.id === activeId;
                 return (
-                  <li key={entry.id}>
+                  <li data-build-block key={entry.id}>
                     <button
                       aria-controls={cardId}
                       aria-pressed={entry.id === pinnedId}
@@ -115,6 +115,7 @@ export const ShelfStage = ({ books }: { books: readonly ShelfBook[] }) => {
             <ul
               aria-label="Spine colors"
               className="label text-graphite m-0 ml-auto flex shrink-0 list-none items-center gap-3 p-0"
+              data-build-block
             >
               {legendOf(books).map(([language, tone]) => (
                 <li className="flex items-center gap-2" key={language}>
@@ -134,7 +135,11 @@ export const ShelfStage = ({ books }: { books: readonly ShelfBook[] }) => {
         )}
       >
         {books.map((entry) => (
-          <li className="w-64 shrink-0 snap-start" key={entry.id}>
+          <li
+            className="w-64 shrink-0 snap-start"
+            data-build-block
+            key={entry.id}
+          >
             <RepoCard book={entry} className="h-full" />
           </li>
         ))}

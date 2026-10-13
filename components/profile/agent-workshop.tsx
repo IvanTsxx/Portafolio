@@ -76,7 +76,10 @@ const ControlGroup = ({
   jp: string;
   label: string;
 }) => (
-  <fieldset className="border-rule relative m-0 min-w-0 border-0 border-b p-4 md:p-5">
+  <fieldset
+    className="border-rule relative m-0 min-w-0 border-0 border-b p-4 md:p-5"
+    data-build-block
+  >
     <TickMark />
     <legend className="sr-only">{label}</legend>
     <div
@@ -390,7 +393,7 @@ export const AgentWorkshop = ({
             onPick={(action) => setState({ ...state, action })}
             selected={state.action}
           />
-          <div className="grid grid-cols-3 gap-1.5 p-4 md:p-5">
+          <div className="grid grid-cols-3 gap-1.5 p-4 md:p-5" data-build-block>
             <TechnicalButton
               className="px-2"
               onClick={() =>
