@@ -326,12 +326,12 @@ export const AgentWorkshop = ({
       label="Workshop"
       script={sectionScripts.homeWorkshop}
     >
-      <div className="border-rule grid border xl:grid-cols-12">
-        <div className="border-rule max-xl:bg-paper xl:bg-paper-deep/40 relative z-10 max-xl:sticky max-xl:top-12 max-xl:border-b xl:col-span-6 xl:border-r">
-          <div className="max-xl:bg-paper-deep/40 xl:sticky xl:top-12">
+      <div className="border-rule grid border">
+        <div className="border-rule bg-paper sticky top-12 z-10 border-b">
+          <div className="bg-paper-deep/40">
             <AgentStageSlot
               action={state.action}
-              className="h-[42svh] max-h-120 min-h-64 w-full xl:h-[min(38rem,calc(100svh-6rem))] xl:max-h-none"
+              className="h-[42svh] max-h-120 min-h-64 w-full"
               label="Customizable workshop agent"
               outfit={state.outfit}
               role={state.role}
@@ -369,7 +369,7 @@ export const AgentWorkshop = ({
             </AgentStageSlot>
           </div>
         </div>
-        <div className="flex min-w-0 flex-col xl:col-span-6">
+        <div className="flex min-w-0 flex-col">
           <PresetPicker
             active={preset}
             onPick={(role) => setState(presetState(role))}

@@ -11,15 +11,11 @@ import { getGithubProfile } from "@/lib/site/github-profile";
 export const revalidate = 3600;
 
 const HomePage = async () => {
-  const { profile, source } = await getGithubProfile();
+  const { profile } = await getGithubProfile();
 
   return (
     <>
-      <ProfileIntro
-        fetchedAt={profile.fetchedAt}
-        identity={profile.identity}
-        source={source}
-      />
+      <ProfileIntro identity={profile.identity} />
       <HomePanels />
       <ExperienceSection />
       <PinnedSection repositories={profile.pinned} />

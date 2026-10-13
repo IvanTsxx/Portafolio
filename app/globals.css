@@ -184,6 +184,7 @@
   }
   html {
     @apply bg-background text-foreground font-sans;
+    scroll-behavior: smooth;
     scrollbar-color: var(--rule-strong) transparent;
   }
   body {

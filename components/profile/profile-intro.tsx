@@ -1,6 +1,6 @@
 import { AgentWaypoint } from "@/components/scene/agent-waypoint";
 import { SocialLinks } from "@/components/site/social-links";
-import type { GithubIdentity, GithubProfileSource } from "@/lib/github/model";
+import type { GithubIdentity } from "@/lib/github/model";
 import { siteConfig } from "@/lib/site/config";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
@@ -8,34 +8,13 @@ import { PortraitPlate } from "./portrait-plate";
 
 const portraitSrc = "/avatar";
 
-const readoutsOf = (identity: GithubIdentity) => [
-  { label: "Followers", value: identity.followers },
-  { label: "Following", value: identity.following },
-  { label: "Repos", value: identity.repositories },
-  { label: "Starred", value: identity.starred },
-];
-
 const monogram = siteConfig.name
   .split(/\s+/u)
   .map((part) => part[0])
   .join("")
   .toUpperCase();
 
-export const ProfileIntro = ({
-  fetchedAt,
-  identity,
-  source,
-}: {
-  fetchedAt: string;
-  identity: GithubIdentity;
-  source: GithubProfileSource;
-}) => {
-  const meta = [
-    { label: "Doc", value: "GH-01" },
-    { label: "Login", value: identity.login },
-    { label: "Date", value: fetchedAt.slice(0, 10).replaceAll("-", ".") },
-    { label: "Feed", value: source === "live" ? "Live" : "Snapshot" },
-  ];
+export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
   const { homeIntro } = sectionScripts;
 
   return (
@@ -44,18 +23,6 @@ export const ProfileIntro = ({
       className="border-rule relative flex flex-col gap-10 border-b pb-16"
       id="intro"
     >
-      <div className="label flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
-        <span className="flex flex-wrap items-center gap-x-6 gap-y-1">
-          {meta.map((item) => (
-            <span className="flex gap-2" key={item.label}>
-              <span className="text-mist">{item.label}</span>
-              <span className="text-ink tabular-nums">{item.value}</span>
-            </span>
-          ))}
-        </span>
-        <span className="jp text-graphite">公開記録 / PUBLIC RECORD</span>
-      </div>
-
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
         <div className="w-32 shrink-0 sm:w-40">
           <PortraitPlate
@@ -94,20 +61,6 @@ export const ProfileIntro = ({
           </p>
         ) : null}
       </div>
-
-      <dl className="border-rule grid grid-cols-2 border-t sm:grid-cols-4">
-        {readoutsOf(identity).map((readout) => (
-          <div
-            className="border-rule flex flex-col gap-1 border-b py-3 sm:border-b-0"
-            key={readout.label}
-          >
-            <dt className="label text-mist">{readout.label}</dt>
-            <dd className="text-ink font-mono text-xl font-light tracking-tight tabular-nums">
-              {String(readout.value).padStart(3, "0")}
-            </dd>
-          </div>
-        ))}
-      </dl>
 
       <SocialLinks />
       <AgentWaypoint
