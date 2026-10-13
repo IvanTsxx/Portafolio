@@ -52,10 +52,10 @@ bun run build           # shadcn build (public/r) + next build
 Install from a deployed site:
 
 ```bash
-bunx --bun shadcn@latest add https://bongi.dev/r/technical-grid.json
+bunx --bun shadcn@latest add https://bongi.dev/r/dither-image.json
 ```
 
-Or register the namespace in `components.json` with `"@ivan": "https://bongi.dev/r/{name}.json"` and run `bunx --bun shadcn@latest add @ivan/technical-grid`.
+Or register the namespace in `components.json` with `"@ivan": "https://bongi.dev/r/{name}.json"` and run `bunx --bun shadcn@latest add @ivan/dither-image`.
 
 ## Sample content
 
