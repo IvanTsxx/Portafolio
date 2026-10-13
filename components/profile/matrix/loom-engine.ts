@@ -1,5 +1,5 @@
 import { ASSEMBLIES } from "./loom-geometry";
-import { LIFT, PITCH, translateBy } from "./loom-layout";
+import { PITCH, translateBy } from "./loom-layout";
 import type { LoomLayout } from "./loom-layout";
 import { DAYS } from "./loom-model";
 import type { LoomYear } from "./loom-model";
@@ -37,7 +37,6 @@ interface Loom {
   before: Float32Array;
   bridge: Axis;
   heights: Float32Array;
-  hover: number;
   moving: Set<number>;
   passed: Uint8Array;
   pendingSweep: boolean;
@@ -121,7 +120,6 @@ const loomOf = (layout: LoomLayout, year: LoomYear, index: number): Loom => ({
   before: Float32Array.from(year.heights),
   bridge: { at: layout.parkLeft, rate: 0 },
   heights: Float32Array.from(year.heights),
-  hover: -1,
   moving: new Set(),
   passed: new Uint8Array(layout.weekCount).fill(1),
   pendingSweep: false,
@@ -134,16 +132,13 @@ const loomOf = (layout: LoomLayout, year: LoomYear, index: number): Loom => ({
   year: index,
 });
 
-const baseTargetOf = (state: Loom, cell: number) => {
+const targetOf = (state: Loom, cell: number) => {
   const week = weekOfCell(cell);
   if (state.phase === "sweep" && state.under.has(week)) {
     return 0;
   }
   return (state.passed[week] ? state.after[cell] : state.before[cell]) ?? 0;
 };
-
-const targetOf = (state: Loom, cell: number, isReduced: boolean) =>
-  baseTargetOf(state, cell) + (cell === state.hover && !isReduced ? LIFT : 0);
 
 const markWeek = (state: Loom, week: number) => {
   for (let day = 0; day < DAYS; day += 1) {
@@ -311,7 +306,7 @@ export const createLoomEngine = ({
         loom.heights,
         loom.rates,
         cell,
-        targetOf(loom, cell, isReduced),
+        targetOf(loom, cell),
         dt,
         isReduced
       );
@@ -354,7 +349,7 @@ export const createLoomEngine = ({
 
   const settleNow = (loom: Loom) => {
     for (const cell of loom.moving) {
-      loom.heights[cell] = targetOf(loom, cell, true);
+      loom.heights[cell] = targetOf(loom, cell);
       loom.rates[cell] = 0;
       writePin(scene.pins[cell], field, loom, cell);
     }
@@ -364,30 +359,13 @@ export const createLoomEngine = ({
   const isInstant = () => isReduced || !isRunnable;
 
   return {
-    hover: (cell: number | null) => {
-      const next = cell ?? -1;
-      if (!state || state.hover === next) {
-        return;
-      }
-      for (const touched of [state.hover, next]) {
-        if (touched >= 0) {
-          state.moving.add(touched);
-        }
-      }
-      state.hover = next;
-      if (isInstant()) {
-        settleNow(state);
-      } else {
-        start();
-      }
-    },
     loadYear: (index: number, isReplay: boolean) => {
       const year = years[index];
       if (!(state && year) || (index === state.year && !isReplay)) {
         return;
       }
       for (let cell = 0; cell < state.heights.length; cell += 1) {
-        state.before[cell] = baseTargetOf(state, cell);
+        state.before[cell] = targetOf(state, cell);
       }
       state.after.set(year.heights);
       state.year = index;

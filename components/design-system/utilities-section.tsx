@@ -31,6 +31,11 @@ const previews = {
     <div className="hatch border-rule-strong absolute inset-3 border border-dashed" />
   ),
   "hazard-stripe": <span className="hazard-stripe text-ink block h-3 w-full" />,
+  "ink-underline": (
+    <a className="group/ink label text-ink" href="#utilities">
+      <span className="ink-underline">Hover to draw</span>
+    </a>
+  ),
   jp: <p className="jp text-graphite text-2xl font-light">日本語の注釈</p>,
   label: <p className="label text-ink">Label 0123</p>,
   "min-h-below-header": (

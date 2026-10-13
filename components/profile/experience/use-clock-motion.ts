@@ -160,14 +160,8 @@ const placeCards = (nodes: ClockNodes, desk: Desk, P: Projection) => {
   const airborne = isAirborne(flight);
   for (const [job, rack] of nodes.rackCards.entries()) {
     const isMine = flight?.job === job;
-    const lift = isMine ? (flight?.dz.at ?? 0) : (desk.hover[job]?.at ?? 0);
-    placeRackCard(
-      rack,
-      lift,
-      isMine && airborne,
-      isMine || desk.hovered === job,
-      P
-    );
+    const lift = isMine ? (flight?.dz.at ?? 0) : 0;
+    placeRackCard(rack, lift, isMine && airborne, isMine, P);
     const flying = nodes.flightCards[job];
     if (flying) {
       const isFlying = isMine && airborne;
@@ -327,10 +321,6 @@ const engineOf = ({
       kick();
     },
     hands: () => placeHands(nodes.current, latest.current.projection),
-    preview: (job: number | null) => {
-      desk.hovered = job;
-      kick();
-    },
     release: () => {
       release(desk);
       kick();
@@ -419,7 +409,6 @@ export const useClockMotion = ({
     feed: (job: number) => engine.current?.feed(job),
     isReduced,
     isVisible,
-    preview: (job: number | null) => engine.current?.preview(job),
     release: () => engine.current?.release(),
   };
 };

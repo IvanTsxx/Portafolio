@@ -207,11 +207,18 @@ export interface ReadoutText {
   main: string;
 }
 
+const peakText = (year: LoomYear) =>
+  year.busiest
+    ? [`Peak ${formatShortDay(year.busiest.date)} · ${year.busiest.count}`]
+    : [];
+
 export const restText = (year: LoomYear): ReadoutText => ({
-  detail:
+  detail: [
     year.range === "last-year"
       ? `${year.caption} · ${year.year}`
       : year.caption,
+    ...peakText(year),
+  ].join(" · "),
   main: contributionsText(year.total),
 });
 
@@ -232,12 +239,6 @@ export const sweepText = (year: LoomYear, setSoFar: number): ReadoutText => ({
 
 export const spokenDay = (day: LoomDay) =>
   `${formatDay(day.date)}, ${contributionsText(day.count)}`;
-
-export const focusLineOfDay = (day: LoomDay) =>
-  `${contributionsText(day.count)} on ${formatShortDay(day.date)}`;
-
-export const focusLineOfWeek = (week: LoomWeek) =>
-  `${contributionsText(week.total)} in the week of ${formatShortDay(week.first)}`;
 
 export const loadedText = (year: LoomYear) =>
   `${year.year} loaded, ${contributionsText(year.total)} ${year.caption}`;

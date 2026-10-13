@@ -25,7 +25,6 @@ const socialListVariants = cva("", {
   defaultVariants: { variant: "inline" },
   variants: {
     variant: {
-      contact: "flex flex-wrap gap-x-8 gap-y-2",
       footer: "grid grid-cols-2 gap-x-6",
       inline: "flex flex-wrap gap-x-6 gap-y-2",
     },
@@ -38,11 +37,8 @@ const socialLinkVariants = cva(
     defaultVariants: { variant: "inline" },
     variants: {
       variant: {
-        contact:
-          "border-rule-strong pointer-fine:hover:border-ink h-11 gap-2 border-b",
         footer: "min-h-11 py-1 md:min-h-9",
-        inline:
-          "border-rule-strong pointer-fine:hover:border-ink min-h-11 gap-2 border-b",
+        inline: "group/ink min-h-11 gap-1",
       },
     },
   }
@@ -54,9 +50,8 @@ const iconFrameVariants = cva(
     defaultVariants: { variant: "inline" },
     variants: {
       variant: {
-        contact: "size-5",
         footer: "size-5",
-        inline: "size-5",
+        inline: "hidden",
       },
     },
   }
@@ -86,13 +81,17 @@ const SocialLink = ({
       <span aria-hidden className={iconFrameVariants({ variant })}>
         <Icon className="size-4" weight="light" />
       </span>
-      <span className="shrink-0">{social.label}</span>
+      <span className={cn("shrink-0", variant === "inline" && "ink-underline")}>
+        {social.label}
+      </span>
       <span className="sr-only">{social.handle}</span>
       <ArrowUpRightIcon
         aria-hidden
         className={cn(
-          "ease-out-quart size-3 shrink-0 transition-transform duration-200 group-hover/social:translate-x-0.5 group-hover/social:-translate-y-0.5",
-          variant === "footer" && "text-mist group-hover/social:text-ink"
+          "size-3 shrink-0",
+          variant === "footer"
+            ? "text-mist group-hover/social:text-ink ease-out-quart transition-transform duration-200 group-hover/social:translate-x-0.5 group-hover/social:-translate-y-0.5"
+            : "text-mist"
         )}
       />
     </a>

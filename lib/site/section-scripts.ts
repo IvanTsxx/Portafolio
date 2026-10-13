@@ -56,6 +56,7 @@ export const sectionScripts = {
     `${experience.length} roles since ${firstYear}.`,
     ...pastJobLines,
   ]),
+  homeExperiments: builds(["Shaders, dithers and dot grids I build to learn."]),
   homeHowIWork: builds(workStepLines),
   homeIntro: speaks([`From ${siteConfig.location}.`, ...currentJobLines]),
   homeMatrix: builds([

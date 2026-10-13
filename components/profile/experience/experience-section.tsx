@@ -27,7 +27,7 @@ export const ExperienceSection = () => {
       script={sectionScripts.homeExperience}
     >
       <ClockLive
-        caption={`A punch-clock station with one time card per job since ${career.firstYear}. The ${ended} cards in the left rack were punched in and out; the card in the right rack is the job I am on, punched in and never out. Hover a card to read what I did there, click it to feed it through the clock for its dates, stack and link, and the side lever punches the next card.`}
+        caption={`A punch clock with one time card per job since ${career.firstYear}. ${ended} cards are punched out; the current one is punched in.`}
         mask={mask}
         parts={clockParts(art)}
         pockets={pockets}

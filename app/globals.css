@@ -204,6 +204,31 @@
   border-color: var(--rule);
 }
 
+@utility ink-underline {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 160ms var(--ease-mechanical);
+  }
+  :where(.group\/ink:focus-visible) &::after,
+  &:where(:focus-visible)::after {
+    transform: scaleX(1);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    :where(.group\/ink:hover) &::after,
+    &:where(:hover)::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

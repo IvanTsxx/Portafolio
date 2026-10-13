@@ -59,7 +59,12 @@ export const ClockDrawing = ({
 
   const rackCard = (job: number) => (
     <g data-part="cards" key={ids[job] ?? job}>
-      <g className="cursor-pointer" data-job={job} ref={bind("rackCards", job)}>
+      <g
+        className="cursor-pointer"
+        data-cursor={peek === job ? "" : undefined}
+        data-job={job}
+        ref={bind("rackCards", job)}
+      >
         {parts.cards[job]}
       </g>
     </g>

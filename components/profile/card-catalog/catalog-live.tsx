@@ -1,22 +1,13 @@
 "use client";
 
 import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
-import type { KeyboardEvent, MouseEvent, PointerEvent, ReactNode } from "react";
+import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 
-import {
-  setFigureFocus,
-  useFigureStation,
-} from "@/components/iso/figure-stations";
-import { CornerMarks } from "@/components/site/corner-marks";
+import { useFigureStation } from "@/components/iso/figure-stations";
+import { FigurePlate, FigureReadout } from "@/components/profile/figure-plate";
 
 import type { Catalog, CatalogCard } from "./catalog";
-import {
-  cardDetail,
-  catalogTitle,
-  focusLine,
-  languageText,
-  spokenCard,
-} from "./catalog";
+import { cardDetail, catalogTitle, languageText, spokenCard } from "./catalog";
 import type { CatalogParts } from "./catalog-art";
 import { CATALOG_HEIGHT, CATALOG_WIDTH } from "./catalog-geometry";
 import type { CatalogRig, CounterArt } from "./catalog-geometry";
@@ -71,56 +62,6 @@ const slotAfterKey = (key: string, slot: number, count: number) => {
 const counterText = (card: CatalogCard | undefined) =>
   card ? String(Math.min(99, card.stars)).padStart(2, "0") : "--";
 
-const Readout = ({
-  card,
-  catalog,
-}: {
-  card: CatalogCard | undefined;
-  catalog: Catalog;
-}) => (
-  <span className="ml-auto flex flex-col items-end text-right" data-readout>
-    <span className="text-ink text-sm leading-tight font-medium tracking-tight wrap-anywhere">
-      {card ? card.name : catalogTitle(catalog)}
-    </span>
-    <span className="label text-graphite tabular-nums">
-      {card ? cardDetail(card) : languageText(catalog)}
-    </span>
-  </span>
-);
-
-const CatalogCardFrame = ({
-  card,
-  catalog,
-  children,
-}: {
-  card: CatalogCard | undefined;
-  catalog: Catalog;
-  children: ReactNode;
-}) => (
-  <div className="border-rule-strong bg-paper relative flex flex-col border">
-    <CornerMarks />
-    <div className="label text-graphite flex items-start justify-between gap-4 px-4 pt-3">
-      <span className="tabular-nums">Fig 04</span>
-      <span className="text-ink">Card catalog</span>
-    </div>
-    {children}
-    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1 px-4">
-      <span className="label text-mist">
-        <span className="pointer-coarse:hidden">
-          Hover a card, click to read it
-        </span>
-        <span className="hidden pointer-coarse:inline">
-          Tap a card to read it
-        </span>
-      </span>
-      <Readout card={card} catalog={catalog} />
-    </div>
-    <p className="text-graphite m-0 min-h-10 px-4 pt-1 pb-3 text-right text-sm leading-snug text-pretty">
-      {card?.description ?? ""}
-    </p>
-  </div>
-);
-
 const Counter = ({ art, text }: { art: CounterArt; text: string }) => (
   <g transform={`translate(${art.origin[0]} ${art.origin[1]})`}>
     <g transform={art.matrix}>
@@ -173,7 +114,7 @@ export const CatalogLive = ({
   const [seatedSlot, setSeatedSlot] = useState<number | null>(null);
   const [spoken, setSpoken] = useState("");
   const shown = hovered ?? toured;
-  const lifted = readingSlot ?? shown;
+  const lifted = readingSlot ?? (isEngaged ? null : toured);
 
   const motion = useCatalogMotion({
     nodes,
@@ -281,8 +222,6 @@ export const CatalogLive = ({
   const preview = (slot: number | null) => {
     touch();
     setHovered(slot);
-    const card = slot === null ? undefined : catalog.cards[slot];
-    setFigureFocus(STATION_ID, card ? focusLine(card) : null);
   };
 
   const onCardClick = (event: MouseEvent<Element>, slot: number) => {
@@ -307,7 +246,9 @@ export const CatalogLive = ({
     nodes.current.cards[slot] = node;
   };
 
-  const shownCard = lifted === null ? undefined : catalog.cards[lifted];
+  const displayedSlot = readingSlot ?? shown;
+  const shownCard =
+    displayedSlot === null ? undefined : catalog.cards[displayedSlot];
   const seatedCard =
     seatedSlot === null ? undefined : catalog.cards[seatedSlot];
 
@@ -336,93 +277,97 @@ export const CatalogLive = ({
       }}
     >
       <figure
-        className="iso m-0 flex flex-col gap-2"
+        className="iso m-0"
         data-build-block
         data-build-self
         data-figure={STATION_ID}
         ref={root}
       >
-        <CatalogCardFrame card={shownCard} catalog={catalog}>
-          <div className="-my-1 touch-pan-y overflow-hidden px-1 select-none sm:px-4">
-            <p aria-live="polite" className="sr-only">
-              {spoken}
-            </p>
-            <svg
-              aria-label={label}
-              className="iso-svg"
-              viewBox={`0 0 ${CATALOG_WIDTH} ${CATALOG_HEIGHT}`}
-            >
-              <defs>
-                <clipPath clipPathUnits="userSpaceOnUse" id={clipId}>
-                  <path d={rig.clip} />
-                </clipPath>
-              </defs>
-              {parts.base}
-              <g data-part="tray">{parts.trayBack}</g>
-              {catalog.cards.map((card, slot) => (
-                <g data-part={`card-${slot}`} key={card.id}>
-                  <a
-                    aria-label={spokenCard(card)}
-                    className="focus-visible:outline-ink cursor-pointer outline-none focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-solid"
-                    data-card={slot}
-                    href={card.url}
-                    onClick={(event) => onCardClick(event, slot)}
-                    onFocus={() => preview(slot)}
-                    onKeyDown={(event) => onCardKey(event, slot)}
-                    onPointerEnter={(event) => {
-                      if (event.pointerType === "mouse") {
-                        preview(slot);
-                      }
-                    }}
-                    onPointerLeave={() => preview(null)}
-                    rel="noreferrer"
-                    target="_blank"
+        <FigurePlate
+          readout={
+            <FigureReadout
+              lead={shownCard ? shownCard.name : catalogTitle(catalog)}
+              trail={shownCard ? cardDetail(shownCard) : languageText(catalog)}
+            />
+          }
+        >
+          <p aria-live="polite" className="sr-only">
+            {spoken}
+          </p>
+          <svg
+            aria-label={label}
+            className="iso-svg"
+            viewBox={`0 0 ${CATALOG_WIDTH} ${CATALOG_HEIGHT}`}
+          >
+            <defs>
+              <clipPath clipPathUnits="userSpaceOnUse" id={clipId}>
+                <path d={rig.clip} />
+              </clipPath>
+            </defs>
+            {parts.base}
+            <g data-part="tray">{parts.trayBack}</g>
+            {catalog.cards.map((card, slot) => (
+              <g data-part={`card-${slot}`} key={card.id}>
+                <a
+                  aria-label={spokenCard(card)}
+                  className="focus-visible:outline-ink cursor-pointer outline-none focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-solid"
+                  data-card={slot}
+                  href={card.url}
+                  onClick={(event) => onCardClick(event, slot)}
+                  onFocus={() => preview(slot)}
+                  onKeyDown={(event) => onCardKey(event, slot)}
+                  onPointerEnter={(event) => {
+                    if (event.pointerType === "mouse") {
+                      preview(slot);
+                    }
+                  }}
+                  onPointerLeave={() => preview(null)}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <g
+                    data-cursor={slot === hovered ? "" : undefined}
+                    data-on={slot === lifted ? "" : undefined}
+                    ref={bindCard(slot)}
                   >
-                    <g
-                      data-on={slot === lifted ? "" : undefined}
-                      ref={bindCard(slot)}
-                    >
-                      {parts.cards[slot]}
-                    </g>
-                  </a>
-                </g>
-              ))}
-              <g data-part="tray">{parts.trayFront}</g>
-              <g data-part="reader">
-                {parts.reader}
-                <Counter art={counter} text={counterText(seatedCard)} />
+                    {parts.cards[slot]}
+                  </g>
+                </a>
               </g>
-              <g aria-hidden clipPath={`url(#${clipId})`}>
-                <g
-                  data-on=""
-                  ref={(node) => {
-                    nodes.current.overlay = node;
-                  }}
-                  visibility="hidden"
-                >
-                  {readingSlot === null ? null : parts.cards[readingSlot]}
-                </g>
+            ))}
+            <g data-part="tray">{parts.trayFront}</g>
+            <g data-part="reader">
+              {parts.reader}
+              <Counter art={counter} text={counterText(seatedCard)} />
+            </g>
+            <g aria-hidden clipPath={`url(#${clipId})`}>
+              <g
+                data-on=""
+                ref={(node) => {
+                  nodes.current.overlay = node;
+                }}
+                visibility="hidden"
+              >
+                {readingSlot === null ? null : parts.cards[readingSlot]}
               </g>
-              <g data-part="reader">
-                <g data-on={seatedCard ? "" : undefined}>{parts.lamp}</g>
-                <g
-                  className="transition-transform duration-150 ease-out motion-reduce:transition-none"
-                  ref={key}
-                  style={{
-                    transform: seatedCard
-                      ? `translateY(${KEY_TRAVEL}px)`
-                      : undefined,
-                  }}
-                >
-                  {parts.key}
-                </g>
+            </g>
+            <g data-part="reader">
+              <g data-on={seatedCard ? "" : undefined}>{parts.lamp}</g>
+              <g
+                className="transition-transform duration-150 ease-out motion-reduce:transition-none"
+                ref={key}
+                style={{
+                  transform: seatedCard
+                    ? `translateY(${KEY_TRAVEL}px)`
+                    : undefined,
+                }}
+              >
+                {parts.key}
               </g>
-            </svg>
-          </div>
-        </CatalogCardFrame>
-        <figcaption className="text-graphite text-sm leading-relaxed text-pretty">
-          {caption}
-        </figcaption>
+            </g>
+          </svg>
+        </FigurePlate>
+        <figcaption className="sr-only">{caption}</figcaption>
       </figure>
     </div>
   );

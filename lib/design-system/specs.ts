@@ -534,6 +534,12 @@ export const utilitySpecs = [
     usage: '<div className="hairline border" />',
   },
   {
+    name: "ink-underline",
+    summary: "Hairline that draws in on hover or focus, 160ms.",
+    usage:
+      '<a className="group/ink" href="#top"><span className="ink-underline">Link</span></a>',
+  },
+  {
     name: "min-h-below-header",
     summary: "Viewport minus the 48px header, minimum.",
     usage: '<section className="min-h-below-header" />',

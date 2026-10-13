@@ -49,7 +49,6 @@ export const DIAL_DEPTH = 3;
 export const SLOT_CARD_Y = SLOT.y + SLOT.d / 2 - CARD_T / 2;
 export const HELD_BOTTOM = 66;
 export const TRAVEL_BOTTOM = 91;
-export const HOVER_LIFT = 8;
 
 export const HUB: Point3 = [SIDE_X + 6, 6, 66];
 export const HUB_R = 5;

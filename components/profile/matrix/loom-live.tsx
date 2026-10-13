@@ -2,13 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import {
-  setFigureFocus,
-  useFigureStation,
-} from "@/components/iso/figure-stations";
+import { useFigureStation } from "@/components/iso/figure-stations";
+import { FigurePlate, FigureReadout } from "@/components/profile/figure-plate";
 
 import type { LoomParts } from "./loom-art";
-import { LoomCard, YearKeys } from "./loom-card";
 import { LoomDrawing } from "./loom-drawing";
 import type { LoomControl } from "./loom-drawing";
 import type { LoomSignals } from "./loom-engine";
@@ -26,10 +23,9 @@ import { weekOfCell } from "./loom-motion";
 import { pinFieldOf, pinShadesOf } from "./loom-pins";
 import {
   filledCellsOf,
-  focusLineOf,
   keyActionOf,
-  lightCells,
   litCellsOf,
+  markCells,
   markPart,
   pressYearKey,
   readoutOf,
@@ -38,6 +34,7 @@ import {
 import type { Sweeping } from "./loom-view";
 import { useLoomMotion } from "./use-loom-motion";
 import { useLoomTour } from "./use-loom-tour";
+import { YearKeys } from "./year-keys";
 
 const STATION_ID = "contribution-loom";
 const STATION_TITLE = "Pin loom";
@@ -95,6 +92,7 @@ export const LoomLive = ({
   const mainRef = useRef<HTMLSpanElement>(null);
   const detailRef = useRef<HTMLSpanElement>(null);
   const lit = useRef<ReadonlySet<number>>(new Set());
+  const cursor = useRef<ReadonlySet<number>>(new Set());
   const sweeping = useRef<Sweeping | null>(null);
   const lastTouch = useRef(Number.NEGATIVE_INFINITY);
   const [shown, setShown] = useState(initial);
@@ -199,24 +197,22 @@ export const LoomLive = ({
   });
 
   useEffect(() => {
-    engine.hover(cell);
-  }, [engine, cell]);
-
-  useEffect(() => {
     engine.seek(pinned);
     markPart(svg.current, "[data-lamp]", pinned !== null);
   }, [engine, pinned]);
 
   useEffect(() => {
-    const next = litCellsOf(year, cell, pinned);
-    lightCells(svg.current, next, lit.current);
-    lit.current = next;
+    const nextLit = litCellsOf(year, pinned);
+    markCells(svg.current, "on", nextLit, lit.current);
+    lit.current = nextLit;
+    const nextCursor = new Set(cell === null ? [] : [cell]);
+    markCells(svg.current, "cursor", nextCursor, cursor.current);
+    cursor.current = nextCursor;
     writeReadout(
       mainRef.current,
       detailRef.current,
       readoutOf(year, cell, pinned, sweeping.current)
     );
-    setFigureFocus(STATION_ID, focusLineOf(year, cell, pinned));
   }, [year, cell, pinned]);
 
   useEffect(() => {
@@ -248,81 +244,73 @@ export const LoomLive = ({
       }}
       onPointerLeave={() => setIsEngaged(false)}
     >
-      <figure
-        className="iso m-0 flex flex-col gap-2"
-        data-build-block
-        data-build-self
-        ref={root}
-      >
-        <LoomCard
-          detailRef={detailRef}
-          hint="Hover a day · click pins its week"
-          mainRef={mainRef}
-          rest={restText(year)}
-          title={STATION_TITLE}
+      <figure className="iso m-0" data-build-block data-build-self ref={root}>
+        <FigurePlate
+          readout={
+            <FigureReadout
+              lead={<span ref={mainRef}>{restText(year).main}</span>}
+              trail={<span ref={detailRef}>{restText(year).detail}</span>}
+            />
+          }
         >
-          <div className="-my-1 touch-pan-y overflow-hidden px-1 select-none sm:px-2">
-            <input
-              aria-label={label}
-              aria-valuetext={
-                activeDay
-                  ? spokenDay(activeDay)
-                  : `${restText(year).main} ${year.caption}, no day selected`
+          <input
+            aria-label={label}
+            aria-valuetext={
+              activeDay
+                ? spokenDay(activeDay)
+                : `${restText(year).main} ${year.caption}, no day selected`
+            }
+            className="sr-only"
+            max={Math.max(filled.length - 1, 0)}
+            min={0}
+            onChange={(event) =>
+              setCell(filled[Number(event.target.value)] ?? null)
+            }
+            onKeyDown={(event) => {
+              const action = keyActionOf(event.key, year, active);
+              if (action.type === "none") {
+                return;
               }
-              className="sr-only"
-              max={Math.max(filled.length - 1, 0)}
-              min={0}
-              onChange={(event) =>
-                setCell(filled[Number(event.target.value)] ?? null)
+              event.preventDefault();
+              touch();
+              if (action.type === "cursor") {
+                setCell(action.cell);
+              } else if (action.type === "pin") {
+                pinWeek(pinned === action.week ? null : action.week);
+              } else if (action.type === "year") {
+                pickYear(shown + action.by);
+              } else {
+                setCell(null);
+                setPinned(null);
               }
-              onKeyDown={(event) => {
-                const action = keyActionOf(event.key, year, active);
-                if (action.type === "none") {
-                  return;
-                }
-                event.preventDefault();
+            }}
+            type="range"
+            value={Math.max(filled.indexOf(active), 0)}
+          />
+          <LoomDrawing
+            consoleRef={consoleRef}
+            field={field}
+            initialYear={initialYear}
+            layout={layout}
+            onCell={(next) => {
+              if (next !== cell) {
                 touch();
-                if (action.type === "cursor") {
-                  setCell(action.cell);
-                } else if (action.type === "pin") {
-                  pinWeek(pinned === action.week ? null : action.week);
-                } else if (action.type === "year") {
-                  pickYear(shown + action.by);
-                } else {
-                  setCell(null);
-                  setPinned(null);
-                }
-              }}
-              type="range"
-              value={Math.max(filled.indexOf(active), 0)}
-            />
-            <LoomDrawing
-              consoleRef={consoleRef}
-              field={field}
-              initialYear={initialYear}
-              layout={layout}
-              onCell={(next) => {
-                if (next !== cell) {
-                  touch();
-                  setCell(next);
-                }
-              }}
-              onControl={onControl}
-              onPick={(picked) => {
-                const week = weekOfCell(picked);
-                setCell(picked);
-                pinWeek(pinned === week ? null : week);
-              }}
-              parts={parts}
-              shades={shades}
-              svgRef={svg}
-              year={year}
-            />
-          </div>
-        </LoomCard>
-        <figcaption className="text-graphite text-sm leading-relaxed text-pretty">
-          {caption}
-        </figcaption>
+                setCell(next);
+              }
+            }}
+            onControl={onControl}
+            onPick={(picked) => {
+              const week = weekOfCell(picked);
+              setCell(picked);
+              pinWeek(pinned === week ? null : week);
+            }}
+            parts={parts}
+            shades={shades}
+            svgRef={svg}
+            year={year}
+          />
+        </FigurePlate>
+        <figcaption className="sr-only">{caption}</figcaption>
       </figure>
       <YearKeys
         onPick={(index) => pickYear(index)}
