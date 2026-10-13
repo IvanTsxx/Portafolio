@@ -28,6 +28,7 @@ export type ContentEntry<Meta> = Meta & {
 
 export interface ContentDocument<Meta> {
   Content: MdxModule["default"];
+  body: string;
   entry: ContentEntry<Meta>;
   headings: readonly Heading[];
 }
@@ -103,6 +104,7 @@ export const createCollection = <Meta extends object>(
 
     return {
       Content: module.default,
+      body,
       entry: {
         ...parsed.data,
         readingTimeMinutes: readingTimeMinutes(wordCount),

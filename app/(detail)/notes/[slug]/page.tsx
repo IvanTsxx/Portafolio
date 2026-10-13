@@ -12,12 +12,14 @@ import { SampleBadge } from "@/components/content/sample-badge";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { JsonLd } from "@/components/site/json-ld";
+import { OpenInMenu } from "@/components/site/open-in-menu";
 import { chipClassName } from "@/components/site/styles";
 import { buildNoteMetadata } from "@/lib/content/metadata";
 import {
   formatNoteCode,
   leadSectionCount,
   noteKinds,
+  notePath,
   noteSource,
   stampOf,
   toNoteIndexItem,
@@ -29,6 +31,7 @@ import {
   getNoteSlugs,
   getRelatedNotes,
 } from "@/lib/content/notes";
+import { markdownPathOf } from "@/lib/markdown/paths";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { noteJsonLd } from "@/lib/site/structured-data";
 
@@ -110,6 +113,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
         {note.kind === "case-study" ? (
           <CaseStudyLinks caseStudy={note} />
         ) : null}
+        <OpenInMenu markdownPath={markdownPathOf(notePath(note.slug))} />
       </DocumentHero>
       <JsonLd data={noteJsonLd(note)} />
       {note.kind === "case-study" ? (

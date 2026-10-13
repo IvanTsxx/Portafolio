@@ -91,7 +91,9 @@ const generatedCases = async (): Promise<RouteCase[]> => {
   return perPage.flat();
 };
 
-const routes = [...staticCases, ...(await generatedCases())];
+const detailRoutes = await generatedCases();
+
+const routes = [...staticCases, ...detailRoutes];
 
 const socialTitleOf = (metadata: Metadata) =>
   String(metadata.openGraph?.title ?? "");
@@ -125,6 +127,21 @@ describe("every public route has complete metadata", () => {
       ).toBe(true);
     }
   );
+
+  test.each(detailRoutes.map((route) => [route.path, route] as const))(
+    "%s links its Markdown alternate",
+    (routePath, { metadata }) => {
+      expect(metadata.alternates?.types).toEqual({
+        "text/markdown": `${routePath}.md`,
+      });
+    }
+  );
+
+  test("index pages carry no Markdown alternate", () => {
+    for (const route of staticCases) {
+      expect(route.metadata.alternates?.types).toBeUndefined();
+    }
+  });
 
   test("titles are unique", () => {
     const titles = routes.map((route) => socialTitleOf(route.metadata));

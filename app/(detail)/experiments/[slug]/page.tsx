@@ -5,10 +5,16 @@ import { ExperimentCard } from "@/components/lab/experiment-card";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { JsonLd } from "@/components/site/json-ld";
+import { OpenInMenu } from "@/components/site/open-in-menu";
 import { experiments, getExperiment } from "@/lib/lab/experiments";
+import { markdownPathOf } from "@/lib/markdown/paths";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { relatedExperimentsOf } from "@/lib/site/sections";
-import { buildPageMetadata, experimentSeo } from "@/lib/site/seo";
+import {
+  buildPageMetadata,
+  experimentPath,
+  experimentSeo,
+} from "@/lib/site/seo";
 import { experimentJsonLd } from "@/lib/site/structured-data";
 
 export const dynamicParams = false;
@@ -48,6 +54,9 @@ const ExperimentPage = async ({ params }: PageProps<"/experiments/[slug]">) => {
         <p className="text-graphite max-w-prose text-base text-pretty">
           {experiment.summary}
         </p>
+        <OpenInMenu
+          markdownPath={markdownPathOf(experimentPath(experiment.slug))}
+        />
       </DocumentHero>
       <DocumentSection
         id="preview"
