@@ -2,6 +2,8 @@ import type { ComponentType } from "react";
 
 import { AsciiLive } from "@/components/lab/experiments/ascii/live";
 import { AsciiPoster } from "@/components/lab/experiments/ascii/poster";
+import { CrtLive } from "@/components/lab/experiments/crt/live";
+import { CrtPoster } from "@/components/lab/experiments/crt/poster";
 import { DitherFieldLive } from "@/components/lab/experiments/dither-field/live";
 import { DitherFieldPoster } from "@/components/lab/experiments/dither-field/poster";
 import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
@@ -12,8 +14,12 @@ import { HalftoneLive } from "@/components/lab/experiments/halftone/live";
 import { HalftonePoster } from "@/components/lab/experiments/halftone/poster";
 import { MatrixRainLive } from "@/components/lab/experiments/matrix-rain/live";
 import { MatrixRainPoster } from "@/components/lab/experiments/matrix-rain/poster";
+import { MisregistrationLive } from "@/components/lab/experiments/misregistration/live";
+import { MisregistrationPoster } from "@/components/lab/experiments/misregistration/poster";
 import { SignalTypeLive } from "@/components/lab/experiments/signal-type/live";
 import { SignalTypePoster } from "@/components/lab/experiments/signal-type/poster";
+import { ThresholdCutLive } from "@/components/lab/experiments/threshold-cut/live";
+import { ThresholdCutPoster } from "@/components/lab/experiments/threshold-cut/poster";
 import { labTopics } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
 
@@ -24,7 +30,10 @@ export type ExperimentSlug =
   | "matrix-rain"
   | "error-diffusion"
   | "halftone"
-  | "ascii";
+  | "ascii"
+  | "misregistration"
+  | "crt"
+  | "threshold-cut";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -65,6 +74,30 @@ const experimentsBySlug = {
     technologies: ["React Three Fiber", "GLSL", "Canvas 2D", "Geist Mono"],
     title: "ASCII scanner",
     topics: ["Shader", "Typography", "WebGL"],
+    year: 2026,
+  },
+  crt: {
+    Poster: CrtPoster,
+    Preview: CrtLive,
+    hasControls: true,
+    implementation: [
+      "One full-viewport plane. Each pixel is bent through a barrel warp, then finds its slot in a staggered phosphor mask.",
+      "The slot reads the source tone at its center and grows taller with it, so the scanline gaps stay open.",
+      "A refresh band rolls up the screen, lifting the tone and tearing the slots sideways as it passes.",
+      "Pointer speed charges a decaying wobble. A ripple around the pointer bends the warp like a degauss.",
+    ],
+    index: "LAB-12",
+    related: ["halftone", "ascii"],
+    slug: "crt",
+    summary: "A lit form on an old monitor, printed in ink scanlines.",
+    technicalNotes: [
+      "Warp, mask, band and wobble share one pass and one source lookup per slot.",
+      "Slot height follows the square root of the tone, so dark areas fill the row without closing it.",
+      "The render loop stops offscreen. Reduced motion renders a single frame with the band at rest.",
+    ],
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
+    title: "CRT print",
+    topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
   "dither-field": {
@@ -177,6 +210,31 @@ const experimentsBySlug = {
     topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
+  misregistration: {
+    Poster: MisregistrationPoster,
+    Preview: MisregistrationLive,
+    hasControls: true,
+    implementation: [
+      "Ink, graphite and mist plates each run their own halftone screen at 45°, 15° and 75°.",
+      "Each plate shifts along its own heading. The shift fades out in a Gaussian field around the pointer.",
+      "A spring with light overshoot drives that field, so the plates snap into register and drift back on leave.",
+      "Plates overprint by multiplying against the paper, like ink laid on ink.",
+    ],
+    index: "LAB-11",
+    related: ["halftone", "dot-grid"],
+    slug: "misregistration",
+    summary:
+      "Halftone ink plates out of register that align under the pointer.",
+    technicalNotes: [
+      "Two or three plates share one pass. Each plate tests its four nearest cells.",
+      "Ink prints only the shadows. Graphite and mist carry the midtones at lower coverage.",
+      "The render loop stops offscreen. Reduced motion renders a single frame.",
+    ],
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
+    title: "Misregistration",
+    topics: ["Shader", "WebGL", "Image"],
+    year: 2026,
+  },
   "signal-type": {
     Poster: SignalTypePoster,
     Preview: SignalTypeLive,
@@ -196,6 +254,29 @@ const experimentsBySlug = {
     technologies: ["GSAP", "useGSAP", "Variable fonts", "Archivo"],
     title: "Signal type",
     topics: ["Typography", "GSAP", "Motion"],
+    year: 2026,
+  },
+  "threshold-cut": {
+    Poster: ThresholdCutPoster,
+    Preview: ThresholdCutLive,
+    hasControls: true,
+    implementation: [
+      "One full-viewport plane. Each pixel compares the source tone, plus chip and gouge noise, against a threshold.",
+      "The threshold carries a slow diagonal sine sweep. The pointer lowers it in a Gaussian, so ink spreads under it.",
+      "The cut is antialiased with fwidth. Small unprinted specks open inside the ink as roughness rises.",
+    ],
+    index: "LAB-13",
+    related: ["error-diffusion", "halftone"],
+    slug: "threshold-cut",
+    summary: "A two-tone stamp cut of a lit form, with a sweeping threshold.",
+    technicalNotes: [
+      "Noise lives in stage units, so the cut keeps its grain at any pixel ratio.",
+      "The portrait is read a few mip levels down, so the edge follows shapes rather than pores.",
+      "The render loop stops offscreen. Reduced motion renders a single frame.",
+    ],
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
+    title: "Threshold cut",
+    topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
 } as const satisfies Record<ExperimentSlug, Experiment>;
