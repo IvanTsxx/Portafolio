@@ -17,7 +17,9 @@ import { CornerMarks } from "@/components/site/corner-marks";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { JsonLd } from "@/components/site/json-ld";
+import { OpenInMenu } from "@/components/site/open-in-menu";
 import { focusRingClassName } from "@/components/site/styles";
+import { markdownPathOf } from "@/lib/markdown/paths";
 import { highlightCode } from "@/lib/registry/highlight";
 import {
   getInstallCommand,
@@ -36,7 +38,11 @@ import { buildItemCodeFiles } from "@/lib/registry/source";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { registrySections } from "@/lib/site/sections";
 import type { RegistrySectionId } from "@/lib/site/sections";
-import { buildPageMetadata, registryItemSeo } from "@/lib/site/seo";
+import {
+  buildPageMetadata,
+  registryItemPath,
+  registryItemSeo,
+} from "@/lib/site/seo";
 import { registryItemJsonLd } from "@/lib/site/structured-data";
 import { cn } from "@/lib/utils";
 
@@ -128,6 +134,9 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
         <p className="text-graphite max-w-prose text-base text-pretty">
           {item.description}
         </p>
+        <OpenInMenu
+          markdownPath={markdownPathOf(registryItemPath(item.name))}
+        />
       </DocumentHero>
       <DocumentSection
         {...sectionProps("preview")}

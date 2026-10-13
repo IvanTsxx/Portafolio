@@ -117,6 +117,24 @@ const socialProblems = (html: string, routePath: string) => [
   ...jsonLdProblems(html),
 ];
 
+const detailPathPattern = /^\/(?:experiments|notes|registry)\/[^/]+$/u;
+
+const markdownBodyOf = (routePath: string) =>
+  path.join(builtAppDir, "markdown", `${routePath.slice(1)}.body`);
+
+const markdownProblems = (html: string, routePath: string) => {
+  if (!detailPathPattern.test(routePath)) {
+    return [];
+  }
+  const alternate = `<link rel="alternate" type="text/markdown" href="${absoluteUrl(`${routePath}.md`)}"/>`;
+  return [
+    ...(html.includes(alternate) ? [] : ["no text/markdown alternate link"]),
+    ...(existsSync(markdownBodyOf(routePath))
+      ? []
+      : [`${routePath}.md was not prerendered`]),
+  ];
+};
+
 const checkPage = (page: BuiltPage) => {
   if (!existsSync(page.file)) {
     return { ...page, description: "", problems: ["not built"], title: "" };
@@ -133,7 +151,10 @@ const checkPage = (page: BuiltPage) => {
       : [wantsNoIndex ? "missing noindex" : "indexable route is noindex"]),
     ...(page.expectation === "noindex-only"
       ? []
-      : socialProblems(html, page.path)),
+      : [
+          ...socialProblems(html, page.path),
+          ...markdownProblems(html, page.path),
+        ]),
   ];
   return { ...page, description, problems, title };
 };
@@ -198,6 +219,10 @@ for (const report of reports) {
   console.log(`| ${report.label} | ${report.title} | ${report.description} |`);
 }
 
+const missingLlms = ["llms.txt", "llms-full.txt"].filter(
+  (file) => !existsSync(path.join(builtAppDir, `${file}.body`))
+);
+
 const failures = reports.filter((report) => report.problems.length > 0);
 for (const failure of failures) {
   console.error(`FAIL ${failure.label}: ${failure.problems.join("; ")}`);
@@ -205,7 +230,10 @@ for (const failure of failures) {
 for (const leak of leaks) {
   console.error(`FAIL ${leak} mentions ${removedNote}`);
 }
-if (failures.length > 0 || leaks.length > 0) {
+for (const file of missingLlms) {
+  console.error(`FAIL /${file} was not prerendered`);
+}
+if (failures.length > 0 || leaks.length > 0 || missingLlms.length > 0) {
   process.exit(1);
 }
 console.log(`\nok: ${reports.length} built pages checked`);

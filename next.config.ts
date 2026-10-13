@@ -6,6 +6,19 @@ import { codeTheme } from "./lib/content/code-theme";
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   reactCompiler: true,
+  rewrites: () =>
+    Promise.resolve([
+      { destination: "/markdown/notes/:slug", source: "/notes/:slug.md" },
+      { destination: "/markdown/notes/:slug", source: "/notes/:slug.mdx" },
+      {
+        destination: "/markdown/experiments/:slug",
+        source: "/experiments/:slug.md",
+      },
+      {
+        destination: "/markdown/registry/:slug",
+        source: "/registry/:slug.md",
+      },
+    ]),
 };
 
 const withMDX = createMDX({

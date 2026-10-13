@@ -2,6 +2,7 @@ import { isIndexable } from "@/lib/content/metadata";
 import { notePath } from "@/lib/content/note-domain";
 import type { Note } from "@/lib/content/note-domain";
 import type { Experiment } from "@/lib/lab/experiments";
+import { markdownPathOf } from "@/lib/markdown/paths";
 import type { RegistryItem } from "@/lib/registry/schema";
 
 import { siteConfig } from "./config";
@@ -173,6 +174,12 @@ export const designSystemJsonLd = () =>
     ])
   );
 
+const markdownEncoding = (path: `/${string}`) => ({
+  "@type": "MediaObject",
+  contentUrl: absoluteUrl(markdownPathOf(path)),
+  encodingFormat: "text/markdown",
+});
+
 const notesCrumb: Crumb = {
   name: pageSeo.notes.title,
   path: pageSeo.notes.path,
@@ -183,6 +190,7 @@ export const noteJsonLd = (note: Note) => {
   const shared = {
     author: personRef,
     description: note.summary,
+    encoding: markdownEncoding(path),
     headline: note.title,
     inLanguage: "en",
     mainEntityOfPage: absoluteUrl(path),
@@ -216,6 +224,7 @@ export const experimentJsonLd = (experiment: Experiment) => {
       author: personRef,
       dateCreated: String(experiment.year),
       description: experiment.summary,
+      encoding: markdownEncoding(path),
       genre: experiment.topics.join(", "),
       inLanguage: "en",
       isBasedOn: experiment.sourceUrl,
@@ -243,6 +252,7 @@ export const registryItemJsonLd = (item: RegistryItem) => {
       author: personRef,
       codeRepository: `https://github.com/${siteConfig.repository}`,
       description: item.description,
+      encoding: markdownEncoding(path),
       name: item.title,
       programmingLanguage: languageOf(item),
       runtimePlatform: "React",

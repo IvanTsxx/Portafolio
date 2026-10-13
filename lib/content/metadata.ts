@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { markdownPathOf } from "@/lib/markdown/paths";
 import { siteConfig } from "@/lib/site/config";
 import { buildPageMetadata } from "@/lib/site/seo";
 import type { PageSeo } from "@/lib/site/seo";
@@ -20,6 +21,7 @@ export const noteSeo = (note: Note): PageSeo => ({
   description: `${note.summary} ${noteKinds[note.kind].label} by ${siteConfig.nickname} on ${topicsOf(note).slice(0, 3).join(", ")}.`,
   indexable: isIndexable(note),
   keywords: topicsOf(note),
+  markdownPath: markdownPathOf(notePath(note.slug)),
   path: notePath(note.slug),
   title: note.title,
 });

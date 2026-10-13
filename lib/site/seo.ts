@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import type { Experiment } from "@/lib/lab/experiments";
+import { markdownPathOf } from "@/lib/markdown/paths";
 import { registryUrlTemplate } from "@/lib/registry/install";
 import type { RegistryItem } from "@/lib/registry/schema";
 
@@ -21,6 +22,7 @@ export interface PageSeo {
   description: string;
   indexable?: boolean;
   keywords?: readonly string[];
+  markdownPath?: `/${string}.md`;
   path: `/${string}`;
   title: string;
 }
@@ -48,7 +50,12 @@ const openGraphOf = (page: PageSeo): Metadata["openGraph"] => {
 };
 
 export const buildPageMetadata = (page: PageSeo): Metadata => ({
-  alternates: { canonical: page.path },
+  alternates: {
+    canonical: page.path,
+    types: page.markdownPath
+      ? { "text/markdown": page.markdownPath }
+      : undefined,
+  },
   description: page.description,
   keywords: page.keywords ? [...page.keywords] : undefined,
   openGraph: openGraphOf(page),
@@ -99,6 +106,7 @@ export const registryItemPath = (name: string) => `/registry/${name}` as const;
 export const experimentSeo = (experiment: Experiment): PageSeo => ({
   description: `${experiment.summary} An interactive ${experiment.topics.join(", ")} experiment with a live preview and implementation notes.`,
   keywords: [...experiment.topics, ...experiment.technologies],
+  markdownPath: markdownPathOf(experimentPath(experiment.slug)),
   path: experimentPath(experiment.slug),
   title: `${experiment.title} · Experiments`,
 });
@@ -106,6 +114,7 @@ export const experimentSeo = (experiment: Experiment): PageSeo => ({
 export const registryItemSeo = (item: RegistryItem): PageSeo => ({
   description: `${item.description} Install it with the shadcn CLI from Ivo's registry.`,
   keywords: ["shadcn", "React", ...item.categories],
+  markdownPath: markdownPathOf(registryItemPath(item.name)),
   path: registryItemPath(item.name),
   title: `${item.title} · Registry`,
 });
