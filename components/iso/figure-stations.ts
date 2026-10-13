@@ -77,7 +77,8 @@ export const setFigureFocus = (stationId: string, line: string | null) => {
 };
 
 const getStations = () => stationSnapshot;
-const getServerStations = (): readonly FigureStation[] => [];
+const noStations: readonly FigureStation[] = [];
+const getServerStations = () => noStations;
 const getFocus = () => focus;
 const getServerFocus = () => null;
 
