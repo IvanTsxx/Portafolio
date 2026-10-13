@@ -11,7 +11,6 @@ export type ReadPhase = "going" | "seated" | "returning" | "home";
 
 export interface Read {
   held: number;
-  opens: boolean;
   phase: ReadPhase;
   slot: number;
   u: number;
@@ -55,9 +54,8 @@ export const liftPose = (route: CardRoute, hoverShare: number): Point3 => [
   hoverShare * route.hover,
 ];
 
-export const startRead = (slot: number, opens: boolean): Read => ({
+export const startRead = (slot: number): Read => ({
   held: 0,
-  opens,
   phase: "going",
   slot,
   u: 0,

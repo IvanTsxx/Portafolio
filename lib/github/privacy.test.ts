@@ -45,17 +45,27 @@ const emptyCollection = {
   totalPullRequestReviewContributions: 0,
 };
 
+interface PinnedExtras {
+  homepageUrl?: string | null;
+  topics?: readonly string[];
+}
+
 const pinnedNode = (
   nameWithOwner: string,
-  description: string | null = null
+  description: string | null = null,
+  { homepageUrl = null, topics = [] }: PinnedExtras = {}
 ) => ({
   createdAt: "2025-03-14T12:00:00Z",
   description,
+  forkCount: 0,
+  homepageUrl,
   isPrivate: false,
   isTemplate: false,
   name: nameWithOwner.split("/")[1] ?? nameWithOwner,
   nameWithOwner,
   primaryLanguage: { name: "TypeScript" },
+  pushedAt: "2025-04-01T09:30:00Z",
+  repositoryTopics: { nodes: topics.map((name) => ({ topic: { name } })) },
   stargazerCount: 1,
 });
 
@@ -196,6 +206,51 @@ describe("parsePinned", () => {
       )
     ).toEqual(["IvanTsxx/Portafolio"]);
   });
+
+  test("removes pinned repositories by topic or homepage", () => {
+    const user = rawUser({
+      pinnedItems: {
+        nodes: [
+          pinnedNode("IvanTsxx/kit", null, { topics: ["nextjs", "basement"] }),
+          pinnedNode("IvanTsxx/demo", null, {
+            homepageUrl: "https://demo.basement.studio",
+          }),
+          pinnedNode("IvanTsxx/better-auth-mp", "Mercado Pago plugin", {
+            homepageUrl: "https://better-auth-mp-docs.vercel.app",
+            topics: ["better-auth", "payments"],
+          }),
+        ],
+      },
+    });
+
+    expect(parsePinned(user.pinnedItems.nodes)).toEqual([
+      {
+        createdAt: "2025-03-14",
+        description: "Mercado Pago plugin",
+        forks: 0,
+        homepage: "https://better-auth-mp-docs.vercel.app",
+        language: "TypeScript",
+        name: "better-auth-mp",
+        nameWithOwner: "IvanTsxx/better-auth-mp",
+        pushedAt: "2025-04-01",
+        stars: 1,
+        topics: ["better-auth", "payments"],
+        visibility: "public",
+      },
+    ]);
+  });
+
+  test("drops a homepage that is not a URL", () => {
+    const [repository] = parsePinned(
+      rawUser({
+        pinnedItems: {
+          nodes: [pinnedNode("IvanTsxx/notes", null, { homepageUrl: "soon" })],
+        },
+      }).pinnedItems.nodes
+    );
+
+    expect(repository?.homepage).toBeNull();
+  });
 });
 
 describe("parseActivity", () => {
@@ -313,10 +368,14 @@ describe("assertPublicProfile", () => {
         {
           createdAt: "2025-03-14",
           description: null,
+          forks: 0,
+          homepage: null,
           language: null,
           name: "site",
           nameWithOwner: "basementstudio/site",
+          pushedAt: "2025-03-14",
           stars: 0,
+          topics: [],
           visibility: "public",
         },
       ],

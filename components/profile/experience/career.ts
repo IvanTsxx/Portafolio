@@ -1,3 +1,6 @@
+import type { DossierFile } from "@/components/profile/dossier-file";
+import { fileCode, hostOf } from "@/components/profile/dossier-file";
+import { isRedacted } from "@/lib/github/privacy";
 import type { Experience } from "@/lib/site/experience";
 import { formatMonth } from "@/lib/site/experience";
 
@@ -48,6 +51,7 @@ export const careerOf = (
   const tenures = sorted.map((job, step): Tenure => {
     const startMonth = monthIndex(job.start, firstYear);
     const endMonth = monthIndex(job.end ?? nowStamp, firstYear) + 1;
+    const isEmployerOnly = isRedacted(job.company) || isRedacted(job.id);
     return {
       company: job.company,
       dates: formatDates(job.start, job.end),
@@ -56,10 +60,10 @@ export const careerOf = (
       isCurrent: job.end === null,
       months: endMonth - startMonth,
       role: job.role,
-      stack: job.stack,
+      stack: isEmployerOnly ? [] : job.stack,
       startMonth,
       step,
-      summary: job.summary,
+      summary: isEmployerOnly ? null : job.summary,
       type: job.type,
       website: job.website,
       year: job.start.slice(0, 4),
@@ -85,10 +89,31 @@ export const detailText = (tenure: Tenure) =>
 export const spokenText = (tenure: Tenure) =>
   `${tenure.company}, ${tenure.role}, ${tenure.dates.replace("→", "to")}, ${spanText(tenure)}, ${tenure.type}`;
 
-export const glanceText = (tenure: Tenure) =>
-  tenure.summary ?? (tenure.isCurrent ? `${tenure.role}, now` : tenure.role);
+export const lineText = (tenure: Tenure) =>
+  tenure.summary ? `${tenure.role} · ${tenure.summary}` : tenure.role;
 
-export const hostOf = (website: string) =>
-  website.replace(/^https?:\/\/(?:www\.)?/u, "").replace(/\/$/u, "");
+const lengthText = (tenure: Tenure) =>
+  `${tenure.months} ${tenure.months === 1 ? "month" : "months"}${tenure.isCurrent ? " so far" : ""}`;
+
+export const tenureFile = (
+  tenure: Tenure,
+  section: string,
+  count: number
+): DossierFile => ({
+  chips:
+    tenure.stack.length > 0 ? { items: tenure.stack, label: "Stack" } : null,
+  code: fileCode(section, tenure.step, count),
+  fields: [
+    { label: "Dates", span: "full", value: tenure.dates },
+    { label: "Type", value: tenure.type },
+    { label: "Length", value: lengthText(tenure) },
+  ],
+  kicker: tenure.role,
+  links: tenure.website
+    ? [{ href: tenure.website, label: hostOf(tenure.website) }]
+    : [],
+  note: tenure.summary ? { label: "Summary", text: tenure.summary } : null,
+  title: tenure.company,
+});
 
 export const currentMonthStamp = () => monthStampOf(new Date());

@@ -46,7 +46,7 @@ describe("card read route", () => {
   });
 
   test("seats once, holds, then returns home", () => {
-    const read = startRead(2, true);
+    const read = startRead(2);
     const going = run(read, 0.9);
     expect(going).toEqual(["seated"]);
     expect(read.phase).toBe("seated");
@@ -56,7 +56,7 @@ describe("card read route", () => {
   });
 
   test("jumps straight to the slot under reduced motion", () => {
-    const read = startRead(0, false);
+    const read = startRead(0);
     expect(stepRead(read, 1 / 60, true)).toBe("seated");
     expect(read.u).toBe(SEATED_AT);
   });
