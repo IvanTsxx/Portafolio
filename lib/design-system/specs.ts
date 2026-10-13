@@ -239,7 +239,7 @@ export const fontFamilySpecs = [
     cssVar: "--font-jp",
     name: "Noto Sans JP",
     role: "Route tabs, page heroes, nickname kana",
-    sample: "日本語の注釈",
+    sample: "イヴォ",
     sourceVar: "--font-noto-jp",
     weights: "300 400 500",
   },

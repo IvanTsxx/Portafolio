@@ -26,7 +26,7 @@ const previews = {
       <span className="ink-underline">Hover to draw</span>
     </a>
   ),
-  jp: <p className="jp text-graphite text-2xl font-light">日本語の注釈</p>,
+  jp: <p className="jp text-graphite text-2xl font-light">イヴォ</p>,
   label: <p className="label text-ink">Label 0123</p>,
   "scroll-reveal": (
     <div className="scroll-reveal border-ink absolute inset-x-3 bottom-3 grid size-8 place-items-center border">
