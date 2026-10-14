@@ -79,7 +79,7 @@ export const RegistrySection = async () => {
       script={sectionScripts.homeRegistry}
     >
       <ItemStyles items={registryItems} />
-      <ul className="border-rule grid grid-cols-2 border-t border-l sm:grid-cols-3">
+      <ul className="border-rule grid grid-cols-2 border-t border-l sm:grid-cols-3 lg:grid-cols-4">
         {entries.map((entry) => (
           <RegistryCell entry={entry} key={entry.name} />
         ))}

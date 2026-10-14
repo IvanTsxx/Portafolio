@@ -16,7 +16,7 @@ const easeOutExpo = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 const along = (offset: number) => `translate3d(0, ${offset}px, 0)`;
 
-export const sendWave = ({ at, lens, reduced }: EdgePress) => {
+const sendWave = ({ at, lens, reduced }: EdgePress) => {
   const start = at - lens.offsetHeight / 2;
   const directions = reduced ? [0] : [-1, 1];
   for (const direction of directions) {
@@ -47,7 +47,7 @@ const punchPart = (className: string, center: number) => {
   return part;
 };
 
-export const punchHole = ({ at, marks, reduced }: EdgePress) => {
+const punchHole = ({ at, marks, reduced }: EdgePress) => {
   const center = edgeHoleCenter(at);
   const plug = punchPart("bg-ink size-2.5", center);
   marks.append(plug);

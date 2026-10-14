@@ -178,7 +178,7 @@ export const RegistryGrid = ({
         {visibleEntries.length} of {entries.length} items
       </output>
       {visibleEntries.length > 0 ? (
-        <ul className="border-graphite/30 grid border-t border-l sm:grid-cols-2">
+        <ul className="border-graphite/30 grid border-t border-l sm:grid-cols-2 lg:grid-cols-3">
           {visibleEntries.map((entry) => (
             <RegistryCard entry={entry} key={entry.name} />
           ))}

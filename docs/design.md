@@ -68,11 +68,12 @@ Zen Kaku Gothic New, light and tight, for titles (`display`) and body. Geist Mon
 
 ## Layout
 
-- Every page is a paper sheet in a strong hairline frame over two offset `paper-deep` backing sheets. Index pages center a 44rem column (`max-w-column`). Detail pages use `max-w-6xl`.
+- Every page is a paper sheet in a strong hairline frame over two offset `paper-deep` backing sheets. Every route, index or detail, uses the same 72rem sheet (`max-w-sheet`). Sections, grids, figures and heroes take its full width. Paragraphs keep a 44rem measure (`max-w-column`) or `max-w-prose`.
+- The sheet's left edge is a bound strip: punched holes with dithered toner around them. Hover lights a lens that follows the pointer. A press punches the nearest hole and sends a ripple along the strip.
 - Route tabs sit on the sheet's left edge from `lg` and in a row above it on smaller screens. The active tab joins the sheet.
-- Long pages get a thumb index of notches right of the column. Below `lg` it becomes a 4px progress strip.
-- The 48px top line holds the wordmark, back to top, ⌘K search and GitHub stars. The back cover is a stamped colophon below the sheet.
-- Sections sit 96px apart on index pages and 64px on detail pages. Each opens with a panel heading over a strong rule.
+- Long pages get a thumb index of notches on the sheet's right edge. Below `lg` it becomes a 4px progress strip. From `2xl` the companion rides a rail lane beside it.
+- The 48px top line holds the wordmark, ⌘K search and GitHub stars. Back to top is a 44px button docked on the bound edge, bottom left, once the reader is 1.5 screens down. The back cover is a stamped colophon below the sheet.
+- Sections sit 96px apart. Each opens with a panel heading over a strong rule.
 
 ## Shapes
 

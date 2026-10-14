@@ -327,7 +327,14 @@ export const utilitySpecs = [
   },
   { name: "blueprint-dots", summary: "Dot grid.", variable: "--grid-size" },
   { name: "stamp-press", summary: "Stamps in as it scrolls into view." },
-  { name: "scroll-reveal", summary: "Fades in past the first screen." },
+  {
+    name: "scroll-reveal",
+    summary: "Fades and rises 8px in after 150vh of scroll.",
+  },
+  {
+    name: "scroll-dock",
+    summary: "Sticky dock 250svh down, held 24px above the floor.",
+  },
   {
     name: "ink-underline",
     summary: "Underline draws in on hover or focus, 160ms.",
@@ -351,8 +358,8 @@ export const spacingSpecs = [
   { px: 32, step: "8", use: "Page gutter, md" },
   { px: 44, step: "11", use: "Touch target" },
   { px: 48, step: "12", use: "Sheet inset, md" },
-  { px: 64, step: "16", use: "Detail section gap" },
-  { px: 96, step: "24", use: "Index section gap" },
+  { px: 64, step: "16", use: "Hero bottom inset" },
+  { px: 96, step: "24", use: "Section gap" },
 ] as const satisfies readonly SpacingStepSpec[];
 
 export const radiusStepNames = ["sm", "md", "lg", "xl", "2xl"] as const;
@@ -361,10 +368,11 @@ export type RadiusStepName = (typeof radiusStepNames)[number];
 
 export const documentGridSpec = {
   columnWidth: "44rem",
-  containerClasses: ["max-w-column", "relative", "mx-auto"],
+  containerClasses: ["max-w-sheet", "relative", "mx-auto"],
   gutter: "md:px-8",
   sectionGap: "gap-24",
   sheetInset: "md:px-12",
+  sheetWidth: "72rem",
 } as const;
 
 export interface AgentMotionSpec {

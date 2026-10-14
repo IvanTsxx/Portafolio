@@ -48,7 +48,7 @@ const DossierDiagram = () => (
           className="bg-paper-deep border-rule-strong/40 absolute inset-0 translate-x-0.5 translate-y-0.5 border"
         />
         <span className="border-rule-strong/50 bg-paper label text-ink relative flex h-28 items-center justify-center border text-center">
-          Sheet · {documentGridSpec.columnWidth}
+          Sheet · {documentGridSpec.sheetWidth}
         </span>
       </div>
       <span className="border-rule label text-mist flex h-28 items-center justify-center border border-dashed [writing-mode:vertical-rl]">

@@ -1,44 +1,17 @@
-import { cva } from "class-variance-authority";
-import type { VariantProps } from "class-variance-authority";
 import type { ReactNode } from "react";
 
 import { BackCover } from "@/components/site/back-cover";
-import { DossierEdgeReview } from "@/components/site/dossier-edge-review";
+import { BackToTop } from "@/components/site/back-to-top";
+import { DossierEdge } from "@/components/site/dossier-edge";
 import { RouteTabs } from "@/components/site/route-tabs";
 import { RouteThumbIndex } from "@/components/site/thumb-index";
-
-const frameVariants = cva("relative mx-auto w-full", {
-  variants: {
-    size: {
-      detail: "max-w-6xl",
-      document: "max-w-[calc(var(--container-column)+6rem)]",
-    },
-  },
-});
-
-const contentVariants = cva("relative mx-auto flex flex-col", {
-  variants: {
-    size: {
-      detail: "gap-16",
-      document: "max-w-column gap-24",
-    },
-  },
-});
-
-type DossierSize = NonNullable<VariantProps<typeof frameVariants>["size"]>;
 
 const backingSheetClassName =
   "bg-paper-deep border-rule-strong/40 absolute inset-0 border";
 
-export const Dossier = ({
-  children,
-  size,
-}: {
-  children: ReactNode;
-  size: DossierSize;
-}) => (
+export const Dossier = ({ children }: { children: ReactNode }) => (
   <div className="flex w-full flex-1 flex-col px-3 pt-6 md:px-8 lg:px-12 lg:pt-12">
-    <div className={frameVariants({ size })}>
+    <div className="max-w-sheet relative mx-auto w-full">
       <RouteTabs />
       <div className="relative">
         <span
@@ -56,14 +29,15 @@ export const Dossier = ({
             id="main"
           >
             <div className="px-4 pt-10 pb-24 md:px-12 md:pt-16 md:pb-32">
-              <div className={contentVariants({ size })}>{children}</div>
+              <div className="relative flex flex-col gap-24">{children}</div>
             </div>
           </main>
-          <DossierEdgeReview />
+          <DossierEdge />
         </div>
         <BackCover />
       </div>
+      <BackToTop />
     </div>
-    {size === "document" ? <RouteThumbIndex /> : null}
+    <RouteThumbIndex />
   </div>
 );

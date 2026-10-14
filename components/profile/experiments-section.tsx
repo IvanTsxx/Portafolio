@@ -58,7 +58,7 @@ export const ExperimentsSection = () => {
       label={section.label}
       script={sectionScripts.homeExperiments}
     >
-      <ul className="border-rule grid grid-cols-2 border-t border-l sm:grid-cols-3">
+      <ul className="border-rule grid grid-cols-2 border-t border-l sm:grid-cols-3 lg:grid-cols-4">
         {newestFirst.map((experiment) => (
           <ExperimentCell experiment={experiment} key={experiment.slug} />
         ))}

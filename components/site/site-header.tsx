@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { CommandPaletteProvider } from "@/components/command/command-palette-provider";
 import { CommandPaletteTrigger } from "@/components/command/command-palette-trigger";
-import { BackToTop } from "@/components/site/back-to-top";
 import { GithubStars } from "@/components/site/github-stars";
 import { focusRingClassName } from "@/components/site/styles";
 import { buildSearchIndex } from "@/lib/search/build-index";
@@ -30,7 +29,6 @@ export const SiteHeader = async () => {
             {siteConfig.nickname}
           </Link>
           <div className="flex items-center gap-2">
-            <BackToTop />
             <CommandPaletteTrigger />
             <GithubStars count={stars} />
           </div>

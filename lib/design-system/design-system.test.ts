@@ -97,6 +97,8 @@ describe("documented values match the source", () => {
       ["label", "10px", "font-size: 0.625rem"],
       ["display", "0.88", "line-height: 0.88"],
       ["ink-underline", "160ms", "160ms"],
+      ["scroll-reveal", "150vh", "150vh"],
+      ["scroll-dock", "250svh", "250svh"],
     ];
     for (const [name, summaryFact, cssFact] of facts) {
       const utility = system.utilities.find((entry) => entry.name === name);
@@ -123,6 +125,7 @@ describe("documented values match the source", () => {
     expect(css).toContain(
       `--container-column: ${documentGridSpec.columnWidth}`
     );
+    expect(css).toContain(`--container-sheet: ${documentGridSpec.sheetWidth}`);
   });
 
   test("every documented duration class is used by the site", async () => {

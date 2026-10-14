@@ -9,13 +9,10 @@ import {
   EDGE_HOLE_RADIUS,
   EDGE_HOLE_X,
   boundTile,
-  ditherTile,
   edgeDitherCells,
   edgeDitherDotsPath,
 } from "./dossier-edge-grid";
-import type { EdgeDitherTile } from "./dossier-edge-grid";
-import type { DossierEdgeVariant } from "./dossier-edge-model";
-import { punchAndRipple, punchHole, sendWave } from "./edge/edge-press";
+import { punchAndRipple } from "./edge/edge-press";
 import { EdgeStrip } from "./edge/edge-strip";
 
 const stripWidth = 48;
@@ -46,10 +43,10 @@ const PatternLayer = ({
   );
 };
 
-const HoleLayer = ({ rimClassName }: { rimClassName: string }) => (
+const HoleLayer = () => (
   <PatternLayer height={EDGE_HOLE_PITCH}>
     <circle
-      className={`fill-paper-deep ${rimClassName}`}
+      className="fill-paper-deep stroke-ink/30"
       cx={EDGE_HOLE_X}
       cy={holeCenter}
       r={EDGE_HOLE_RADIUS}
@@ -86,15 +83,15 @@ const LitHoleLayer = () => (
   </PatternLayer>
 );
 
-const useDots = (tile: EdgeDitherTile) =>
+const useDots = () =>
   useMemo(() => {
-    const cells = edgeDitherCells(tile);
+    const cells = edgeDitherCells(boundTile);
     return {
-      height: tile.rows * EDGE_DITHER_CELL,
+      height: boundTile.rows * EDGE_DITHER_CELL,
       rest: edgeDitherDotsPath(cells, 2),
       swollen: edgeDitherDotsPath(cells, 3.5),
     };
-  }, [tile]);
+  }, []);
 
 const RestDots = ({ dots }: { dots: ReturnType<typeof useDots> }) => (
   <PatternLayer height={dots.height}>
@@ -108,33 +105,14 @@ const SwollenDots = ({ dots }: { dots: ReturnType<typeof useDots> }) => (
   </PatternLayer>
 );
 
-const BindingEdge = () => (
-  <EdgeStrip
-    base={<HoleLayer rimClassName="stroke-rule-strong" />}
-    lit={<LitHoleLayer />}
-    onPress={punchHole}
-  />
-);
-
-const DitherEdge = () => {
-  const dots = useDots(ditherTile);
-  return (
-    <EdgeStrip
-      base={<RestDots dots={dots} />}
-      lit={<SwollenDots dots={dots} />}
-      onPress={sendWave}
-    />
-  );
-};
-
-const BoundEdge = () => {
-  const dots = useDots(boundTile);
+export const DossierEdge = () => {
+  const dots = useDots();
   return (
     <EdgeStrip
       base={
         <>
           <RestDots dots={dots} />
-          <HoleLayer rimClassName="stroke-ink/30" />
+          <HoleLayer />
         </>
       }
       lit={
@@ -146,15 +124,4 @@ const BoundEdge = () => {
       onPress={punchAndRipple}
     />
   );
-};
-
-const edgeRenderers = {
-  binding: BindingEdge,
-  bound: BoundEdge,
-  dither: DitherEdge,
-} as const satisfies Record<DossierEdgeVariant, () => ReactNode>;
-
-export const DossierEdge = ({ variant }: { variant: DossierEdgeVariant }) => {
-  const Edge = edgeRenderers[variant];
-  return <Edge />;
 };

@@ -170,7 +170,7 @@ export const ThumbIndex = ({
     <>
       <nav
         aria-label="On this page"
-        className="ease-out-quart pointer-events-none fixed top-24 right-[calc(50%-var(--container-column)/2-3rem)] bottom-16 z-20 hidden w-12 transition-[opacity,translate,visibility] duration-300 data-[cover=true]:invisible data-[cover=true]:translate-x-2 data-[cover=true]:opacity-0 lg:block"
+        className="ease-out-quart pointer-events-none fixed top-24 right-[max(3rem,calc(50%-var(--container-sheet)/2))] bottom-16 z-20 hidden w-12 transition-[opacity,translate,visibility] duration-300 data-[cover=true]:invisible data-[cover=true]:translate-x-2 data-[cover=true]:opacity-0 lg:block"
         data-cover={isCoverInView}
         ref={strip}
       >
@@ -220,7 +220,7 @@ export const ThumbIndex = ({
       </nav>
       <span
         aria-hidden
-        className="pointer-events-none fixed top-24 bottom-16 left-[calc(50%+var(--container-column)/2+8.5rem)] hidden w-px lg:block xl:left-[calc(50%+var(--container-column)/2+10.5rem)]"
+        className="pointer-events-none fixed top-24 bottom-16 left-[calc(50%+var(--container-sheet)/2+6rem)] hidden w-px 2xl:block"
         ref={lane}
       />
       <div

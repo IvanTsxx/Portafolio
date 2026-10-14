@@ -54,6 +54,7 @@
   --radius-2xl: calc(var(--radius) * 2);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --container-column: 44rem;
+  --container-sheet: 72rem;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -164,7 +165,7 @@
 @keyframes scroll-reveal {
   from {
     opacity: 0;
-    translate: 0 4px;
+    translate: 0 var(--scroll-reveal-rise, 8px);
     visibility: hidden;
   }
   to {
@@ -177,7 +178,13 @@
 @utility scroll-reveal {
   animation: scroll-reveal linear both;
   animation-timeline: scroll(root);
-  animation-range: 40vh 60vh;
+  animation-range: 150vh 170vh;
+}
+
+@utility scroll-dock {
+  position: sticky;
+  top: calc(100svh - 4.25rem);
+  margin-top: 250svh;
 }
 
 @utility ink-underline {
@@ -233,6 +240,7 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+      --scroll-reveal-rise: 0px;
     }
   }
 }

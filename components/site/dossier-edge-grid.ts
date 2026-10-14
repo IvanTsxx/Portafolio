@@ -65,8 +65,6 @@ const tonerAroundHoles: EdgeDensity = (column, row, rows) => {
   return band + (1 - band) * toner;
 };
 
-export const ditherTile: EdgeDitherTile = { density: sheetEdgeBand, rows: 256 };
-
 export const boundTile: EdgeDitherTile = {
   density: tonerAroundHoles,
   rows: (EDGE_HOLE_PITCH / EDGE_DITHER_CELL) * 36,

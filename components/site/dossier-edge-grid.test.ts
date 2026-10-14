@@ -6,7 +6,6 @@ import {
   EDGE_HOLE_PITCH,
   EDGE_HOLE_RADIUS,
   boundTile,
-  ditherTile,
   edgeDitherCells,
   edgeDitherDotsPath,
   edgeHoleCenter,
@@ -56,10 +55,8 @@ const inkWhere = (
   return { count, density: ink / count, ink };
 };
 
-describe.each([
-  ["dither", ditherTile],
-  ["bound", boundTile],
-])("%s tile", (_, tile) => {
+describe("bound tile", () => {
+  const tile = boundTile;
   const cells = edgeDitherCells(tile);
 
   test("ink gathers at the sheet edge and clears before the content", () => {
@@ -92,10 +89,6 @@ describe.each([
   test("the swollen dots stay small enough to inline", () => {
     expect(edgeDitherDotsPath(cells, 3.5).length).toBeLessThan(24_000);
   });
-});
-
-describe("bound tile", () => {
-  const cells = edgeDitherCells(boundTile);
 
   test("tiles a whole number of holes", () => {
     expect((boundTile.rows * EDGE_DITHER_CELL) % EDGE_HOLE_PITCH).toBe(0);

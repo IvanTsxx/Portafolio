@@ -24,7 +24,7 @@ const filler =
   "Scroll on. This section only exists to give the page some length, so the rail has distance to cover and the station has somewhere to scroll into and out of view.";
 
 const StationBenchPage = () => (
-  <Dossier size="document">
+  <Dossier>
     <header className="flex flex-col gap-3">
       <p className="label text-clay">Dev · Companion operator</p>
       <h1 className="display text-5xl md:text-7xl">Station bench</h1>

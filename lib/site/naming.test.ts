@@ -55,10 +55,6 @@ describe("site naming", () => {
       "app/(document)/page.tsx",
       "components/profile/profile-intro.tsx",
     ]);
-    expect(filesContaining('<Dossier size="document">')).toEqual([
-      "app/(document)/layout.tsx",
-      "app/dev/stations/page.tsx",
-    ]);
   });
 
   test("keeps every detail route outside the document group", () => {
@@ -70,8 +66,10 @@ describe("site naming", () => {
     expect(
       routePages("document").filter((route) => route.includes("["))
     ).toEqual([]);
-    expect(filesContaining('<Dossier size="detail">')).toEqual([
+    expect(filesContaining("<Dossier>")).toEqual([
       "app/(detail)/layout.tsx",
+      "app/(document)/layout.tsx",
+      "app/dev/stations/page.tsx",
       "app/not-found.tsx",
     ]);
   });

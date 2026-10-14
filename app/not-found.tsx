@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 const NotFound = () => (
-  <Dossier size="detail">
+  <Dossier>
     <section
       aria-labelledby="not-found-title"
       className="grid w-full content-center gap-10 lg:grid-cols-12 lg:gap-6"

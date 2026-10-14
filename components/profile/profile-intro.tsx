@@ -51,7 +51,7 @@ export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
         </div>
       </div>
 
-      <p className="text-ink text-xl leading-snug font-light text-pretty sm:text-2xl">
+      <p className="text-ink max-w-column text-xl leading-snug font-light text-pretty sm:text-2xl">
         {siteConfig.role} in {siteConfig.location}.
       </p>
 

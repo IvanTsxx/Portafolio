@@ -12,11 +12,13 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 
 ## Chrome
 
-- `components/site/dossier.tsx` wraps every page in a sheet over two backing sheets. Index pages (`app/(document)`) use the 44rem column. Detail pages (`app/(detail)`) use the wide sheet.
+- `components/site/dossier.tsx` wraps every page in the same 72rem sheet (`max-w-sheet`) over two backing sheets, index and detail alike. Sections, grids, figures and heroes use the full width. Paragraphs keep the 44rem measure (`max-w-column`) or `max-w-prose`.
+- The sheet's left edge is the bound strip (`dossier-edge.tsx`): punched holes in dithered toner. A press punches the nearest hole and sends a ripple. It is the only edge.
 - Route tabs use English labels with a tiny vertical kana on desktop. Japanese appears only there, in index page heroes and in the nickname kana.
 - The thumb index (`thumb-index.tsx`) shows one notch per section from `lib/site/page-sections.ts`. Notch numbers come from the section heading codes, and section components read their code from the same list.
 - `components/scene/active-section.ts` decides the active section for the notches, the companion's rail position and its line.
-- The top line holds the wordmark, back to top, ⌘K search and the GitHub star count. The back cover is the colophon.
+- The top line holds the wordmark, ⌘K search and the GitHub star count. The back cover is the colophon.
+- Back to top (`back-to-top.tsx`) docks on the bound edge, bottom left, clear of the companion. It rises in after 1.5 screens of scroll and hides near the top. No JavaScript.
 
 ## 3D contract
 
