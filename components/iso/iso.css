@@ -120,3 +120,239 @@
 .iso [data-on] .iso-solid > .iso-line[data-tone="lo"] {
   stroke: var(--iso-lit);
 }
+
+.iso .iso-text {
+  fill: var(--iso-lo);
+  stroke: none;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: fill 240ms var(--ease-out-quart);
+}
+
+.iso .iso-text[data-strong] {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.iso .iso-text[data-tone="hi"] {
+  fill: var(--iso-hi);
+}
+
+.iso .iso-text[data-tone="mid"] {
+  fill: var(--iso-mid);
+}
+
+.iso .iso-text[data-tone="faint"] {
+  fill: var(--iso-faint);
+}
+
+.iso .iso-item {
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.iso .iso-lift {
+  transition: translate 320ms var(--ease-out-quart);
+}
+
+.iso .iso-shadow {
+  fill: var(--iso-hi);
+  stroke: none;
+  opacity: 0;
+  transition: opacity 320ms var(--ease-out-quart);
+}
+
+.iso .iso-focus {
+  fill: none;
+  stroke: var(--iso-hi);
+  stroke-dasharray: 2 2;
+  opacity: 0;
+}
+
+.iso .iso-item:is(:hover, :focus-visible, [data-active]) > .iso-lift {
+  translate: 0 -6px;
+}
+
+.iso .iso-item:is(:hover, :focus-visible, [data-active]) > .iso-shadow {
+  opacity: 0.07;
+}
+
+.iso .iso-item:is(:hover, :focus-visible, [data-active]) .iso-print .iso-text {
+  fill: var(--iso-hi);
+}
+
+.iso .iso-item:is(:hover, :focus-visible, [data-active]) .iso-edge {
+  stroke: var(--iso-hi);
+}
+
+.iso .iso-floor,
+.iso .iso-above {
+  transition: translate 360ms var(--ease-out-quart);
+}
+
+.iso
+  .iso-floor:is(:hover, :focus-visible, [data-active])
+  ~ :is(.iso-floor, .iso-above) {
+  translate: 0 -14px;
+}
+
+.iso .iso-floor:is(:hover, :focus-visible, [data-active]) > .iso-lift {
+  translate: 0 -4px;
+}
+
+.iso .iso-item:is(:hover, :focus-visible, [data-active]) .iso-screen .iso-top,
+.iso
+  .iso-item:is(:hover, :focus-visible, [data-active])
+  .iso-screen
+  .iso-shade {
+  fill: var(--iso-hi);
+}
+
+.iso
+  .iso-item:is(:hover, :focus-visible, [data-active])
+  .iso-callout
+  .iso-line {
+  stroke: var(--iso-hi);
+}
+
+.iso .iso-bob {
+  animation: iso-bob 3.6s ease-in-out infinite;
+}
+
+@keyframes iso-bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -4px;
+  }
+}
+
+.iso .iso-swatch {
+  fill: var(--iso-paper);
+  stroke: var(--iso-hi);
+  stroke-width: var(--iso-weight);
+}
+
+.iso .iso-swatch[data-swatch="ink"] {
+  fill: var(--iso-hi);
+}
+
+.iso .iso-swatch[data-swatch="graphite"] {
+  fill: var(--iso-mid);
+}
+
+.iso .iso-swatch[data-swatch="mist"] {
+  fill: var(--iso-faint);
+}
+
+.iso .iso-recess {
+  fill: var(--iso-shade-0);
+  stroke: var(--iso-faint);
+  stroke-width: var(--iso-weight);
+}
+
+.iso .iso-lid,
+.iso .iso-sheets {
+  transition:
+    translate 340ms var(--ease-out-quart),
+    opacity 240ms var(--ease-out-quart);
+}
+
+.iso .iso-sheets {
+  opacity: 0;
+}
+
+.iso .iso-item:is(:hover, :focus-visible, [data-active]) > .iso-lid {
+  translate: var(--lid-x, 0) var(--lid-y, -26px);
+}
+
+.iso .iso-item:is(:hover, :focus-visible, [data-active]) .iso-sheets {
+  opacity: 1;
+  translate: 0 -8px;
+}
+
+.iso .iso-window {
+  fill: var(--iso-shade-0);
+  stroke: var(--iso-faint);
+  stroke-width: var(--iso-weight);
+  transition:
+    fill 220ms var(--ease-out-quart),
+    stroke 220ms var(--ease-out-quart);
+  transition-delay: calc(var(--storey, 0) * 50ms);
+}
+
+.iso .iso-item:is(:hover, :focus-visible, [data-active]) .iso-window {
+  fill: var(--iso-top);
+  stroke: var(--iso-hi);
+}
+
+.iso .iso-door {
+  fill: var(--iso-mid);
+  stroke: none;
+}
+
+.iso .iso-item:focus-visible .iso-focus {
+  opacity: 1;
+}
+
+.iso .iso-wafer {
+  opacity: 0.2;
+  animation: iso-grow 2.8s var(--ease-out-quart) infinite;
+}
+
+.iso .iso-wafer:nth-child(2) {
+  animation-delay: 0.45s;
+}
+
+.iso .iso-wafer:nth-child(3) {
+  animation-delay: 0.9s;
+}
+
+.iso:not([data-running]) .iso-wafer,
+.iso:not([data-running]) .iso-bob {
+  animation-play-state: paused;
+}
+
+@keyframes iso-grow {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+
+  35% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iso .iso-lift,
+  .iso .iso-lid,
+  .iso .iso-sheets,
+  .iso .iso-floor,
+  .iso .iso-above,
+  .iso .iso-shadow,
+  .iso .iso-window,
+  .iso .iso-text {
+    transition: none;
+  }
+
+  .iso .iso-wafer,
+  .iso .iso-bob {
+    animation: none;
+  }
+
+  .iso .iso-wafer:nth-child(1) {
+    opacity: 0.7;
+  }
+
+  .iso .iso-wafer:nth-child(2) {
+    opacity: 0.4;
+  }
+}
