@@ -285,7 +285,6 @@
   transition:
     fill 220ms var(--ease-out-quart),
     stroke 220ms var(--ease-out-quart);
-  transition-delay: calc(var(--storey, 0) * 50ms);
 }
 
 .iso .iso-item:is(:hover, :focus-visible, [data-active]) .iso-window {

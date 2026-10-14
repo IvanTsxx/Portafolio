@@ -1,5 +1,6 @@
 import "@/components/iso/iso.css";
 import { ConceptReview } from "@/components/iso/concept-review";
+import type { IsoLink } from "@/components/iso/draw";
 import { IsoPicker } from "@/components/iso/iso-picker";
 import type { PickerEntry } from "@/components/iso/iso-picker";
 import {
@@ -20,20 +21,22 @@ import { towerFrames, towerSceneOf } from "./tower-geometry";
 const pickerEntriesOf = (ledger: Ledger): PickerEntry[] =>
   ledger.entries.toReversed().map((entry) => ({
     file: entry.file,
-    href: entry.file.links[0]?.href ?? null,
     lead: `${entry.ordinal} · ${entry.company}`,
     trail: `${entry.role} · ${entry.dates} · ${entry.length}`,
   }));
 
-const labelsOf = (ledger: Ledger) =>
-  ledger.entries.toReversed().map((entry) => `${entry.spoken}. Open file.`);
+const linksOf = (ledger: Ledger, fallback: string): IsoLink[] =>
+  ledger.entries.toReversed().map((entry) => ({
+    href: entry.file.links[0]?.href ?? fallback,
+    label: `${entry.spoken}. Open file.`,
+  }));
 
 export const ExperienceSection = () => {
   const section = homeSectionById("experience");
   const ledger = ledgerOf(experience, currentMonthStamp(), section.index);
   const count = ledger.entries.length;
   const entries = pickerEntriesOf(ledger);
-  const labels = labelsOf(ledger);
+  const links = linksOf(ledger, `#${section.id}`);
   const rest = {
     lead: `${String(count).padStart(2, "0")} roles`,
     trail: `${ledger.firstYear} → now · select one to open its file`,
@@ -55,13 +58,13 @@ export const ExperienceSection = () => {
             rest={rest}
             tall={
               <TimelineFigure
-                labels={labels}
+                links={links}
                 scene={timelineSceneOf(ledger, timelineFrames.tall)}
               />
             }
             wide={
               <TimelineFigure
-                labels={labels}
+                links={links}
                 scene={timelineSceneOf(ledger, timelineFrames.wide)}
               />
             }
@@ -74,13 +77,13 @@ export const ExperienceSection = () => {
             rest={rest}
             tall={
               <TowerFigure
-                labels={labels}
+                links={links}
                 scene={towerSceneOf(ledger, towerFrames.tall)}
               />
             }
             wide={
               <TowerFigure
-                labels={labels}
+                links={links}
                 scene={towerSceneOf(ledger, towerFrames.wide)}
               />
             }

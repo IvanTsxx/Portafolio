@@ -1,17 +1,16 @@
-import type { CSSProperties } from "react";
-
-import { Dots, FaceText, Line, Solid } from "@/components/iso/draw";
+import { Dots, FaceText, IsoItem, Line, Solid } from "@/components/iso/draw";
+import type { IsoLink } from "@/components/iso/draw";
 
 import type { CityScene, CityTower } from "./city-geometry";
 
-const TowerItem = ({ label, tower }: { label: string; tower: CityTower }) => (
-  <g
-    aria-label={label}
-    className="iso-item"
-    data-item={tower.index}
-    role="button"
-    tabIndex={0}
-  >
+const TowerItem = ({
+  link,
+  tower,
+}: {
+  link: IsoLink | undefined;
+  tower: CityTower;
+}) => (
+  <IsoItem index={tower.index} link={link}>
     <path className="iso-shadow" d={tower.shadow} />
     <g className="iso-lift">
       <Solid crease="faint" paths={tower.lobby} tone="mid" />
@@ -24,7 +23,7 @@ const TowerItem = ({ label, tower }: { label: string; tower: CityTower }) => (
           className="iso-window"
           d={pane.d}
           key={pane.d}
-          style={{ "--storey": pane.storey } as CSSProperties}
+          style={{ transitionDelay: `${pane.storey * 50}ms` }}
         />
       ))}
       <Solid crease="faint" paths={tower.parapet} tone="mid" />
@@ -54,19 +53,19 @@ const TowerItem = ({ label, tower }: { label: string; tower: CityTower }) => (
         {tower.stars}
       </FaceText>
     </g>
-  </g>
+  </IsoItem>
 );
 
 export const CityFigure = ({
-  labels,
+  links,
   scene,
 }: {
-  labels: readonly string[];
+  links: readonly IsoLink[];
   scene: CityScene;
 }) => {
   const { plate, towers } = scene;
   return (
-    <svg className="iso-svg" role="group" viewBox={scene.viewBox}>
+    <svg className="iso-svg" viewBox={scene.viewBox}>
       <path className="iso-halo" d={plate.halo} />
       {plate.feet.map((foot) => (
         <Solid crease="none" key={foot.outline} paths={foot} tone="lo" />
@@ -79,11 +78,7 @@ export const CityFigure = ({
         <Solid crease="faint" key={block.outline} paths={block} tone="lo" />
       ))}
       {towers.map((tower) => (
-        <TowerItem
-          key={tower.index}
-          label={labels[tower.index] ?? tower.name}
-          tower={tower}
-        />
+        <TowerItem key={tower.index} link={links[tower.index]} tower={tower} />
       ))}
     </svg>
   );

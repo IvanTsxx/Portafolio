@@ -1,23 +1,18 @@
-import { Dots, FaceText, Line, Solid } from "@/components/iso/draw";
+import { Dots, FaceText, IsoItem, Line, Solid } from "@/components/iso/draw";
+import type { IsoLink } from "@/components/iso/draw";
 
 import type { TowerCrane, TowerFloor, TowerScene } from "./tower-geometry";
 
 const FloorItem = ({
   floor,
-  label,
+  link,
   type,
 }: {
   floor: TowerFloor;
-  label: string;
+  link: IsoLink | undefined;
   type: number;
 }) => (
-  <g
-    aria-label={label}
-    className="iso-item iso-floor"
-    data-item={floor.index}
-    role="button"
-    tabIndex={0}
-  >
+  <IsoItem className="iso-floor" index={floor.index} link={link}>
     <g className="iso-lift">
       <Solid crease="faint" paths={floor.slab} tone="mid" />
       <Line d={floor.slabSeams} tone="faint" />
@@ -84,7 +79,7 @@ const FloorItem = ({
         </text>
       ))}
     </g>
-  </g>
+  </IsoItem>
 );
 
 const Crane = ({ crane }: { crane: TowerCrane }) => (
@@ -123,15 +118,15 @@ const Crane = ({ crane }: { crane: TowerCrane }) => (
 );
 
 export const TowerFigure = ({
-  labels,
+  links,
   scene,
 }: {
-  labels: readonly string[];
+  links: readonly IsoLink[];
   scene: TowerScene;
 }) => {
   const { crane, floors, ground, roof } = scene;
   return (
-    <svg className="iso-svg" role="group" viewBox={scene.viewBox}>
+    <svg className="iso-svg" viewBox={scene.viewBox}>
       <path className="iso-halo" d={ground.halo} />
       <Solid
         crease="faint"
@@ -147,7 +142,7 @@ export const TowerFigure = ({
         <FloorItem
           floor={floor}
           key={floor.index}
-          label={labels[floor.index] ?? floor.company}
+          link={links[floor.index]}
           type={scene.type}
         />
       ))}

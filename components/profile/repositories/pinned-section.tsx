@@ -22,7 +22,6 @@ const pickerEntriesOf = (
 ): PickerEntry[] =>
   specimens.map((specimen) => ({
     file: specimen.file,
-    href: specimen.url,
     lead: `${specimen.owner}/${specimen.name}`,
     trail: `${specimen.language} · ★ ${specimen.stars} · pushed ${specimen.pushed}`,
   }));
@@ -36,7 +35,10 @@ export const PinnedSection = ({
   const specimens = specimensOf(repositories, section.index);
   const count = specimens.length;
   const entries = pickerEntriesOf(specimens);
-  const labels = specimens.map((specimen) => `${specimen.spoken}. Open file.`);
+  const links = specimens.map((specimen) => ({
+    href: specimen.url,
+    label: `${specimen.spoken}. Open file.`,
+  }));
   const rest = {
     lead: `${String(count).padStart(2, "0")} pinned`,
     trail: "Select one to open its file",
@@ -60,14 +62,14 @@ export const PinnedSection = ({
               tall={
                 <ShelfFigure
                   idPrefix="shelf-tall"
-                  labels={labels}
+                  links={links}
                   scene={shelfSceneOf(specimens, shelfFrames.tall)}
                 />
               }
               wide={
                 <ShelfFigure
                   idPrefix="shelf-wide"
-                  labels={labels}
+                  links={links}
                   scene={shelfSceneOf(specimens, shelfFrames.wide)}
                 />
               }
@@ -80,13 +82,13 @@ export const PinnedSection = ({
               rest={rest}
               tall={
                 <CityFigure
-                  labels={labels}
+                  links={links}
                   scene={citySceneOf(specimens, cityFrames.tall)}
                 />
               }
               wide={
                 <CityFigure
-                  labels={labels}
+                  links={links}
                   scene={citySceneOf(specimens, cityFrames.wide)}
                 />
               }

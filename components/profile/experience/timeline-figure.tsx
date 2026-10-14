@@ -1,21 +1,16 @@
-import { Dots, FaceText, Line, Solid } from "@/components/iso/draw";
+import { Dots, FaceText, IsoItem, Line, Solid } from "@/components/iso/draw";
+import type { IsoLink } from "@/components/iso/draw";
 
 import type { TimelineBlock, TimelineScene } from "./timeline-geometry";
 
 const BlockItem = ({
   block,
-  label,
+  link,
 }: {
   block: TimelineBlock;
-  label: string;
+  link: IsoLink | undefined;
 }) => (
-  <g
-    aria-label={label}
-    className="iso-item"
-    data-item={block.index}
-    role="button"
-    tabIndex={0}
-  >
+  <IsoItem index={block.index} link={link}>
     <path className="iso-shadow" d={block.shadow} />
     <g className="iso-print">
       <Line d={block.tie} tone="faint" />
@@ -50,19 +45,19 @@ const BlockItem = ({
       </g>
       <path className="iso-focus" d={block.lift.fill} />
     </g>
-  </g>
+  </IsoItem>
 );
 
 export const TimelineFigure = ({
-  labels,
+  links,
   scene,
 }: {
-  labels: readonly string[];
+  links: readonly IsoLink[];
   scene: TimelineScene;
 }) => {
   const { base, blocks, growth, now, ruler } = scene;
   return (
-    <svg className="iso-svg" role="group" viewBox={scene.viewBox}>
+    <svg className="iso-svg" viewBox={scene.viewBox}>
       <path className="iso-halo" d={base.halo} />
       {base.feet.map((foot) => (
         <Solid crease="none" key={foot.outline} paths={foot} tone="lo" />
@@ -76,6 +71,7 @@ export const TimelineFigure = ({
       <Line d={base.groove} tone="faint" />
       <Line d={base.yearLines} tone="faint" />
       <Line d={base.lanes} tone="faint" />
+      <Line d={now.hairline} tone="mid" />
       <Line d={base.screwRings} tone="lo" />
       <Dots points={base.screws} size={0.55} tone="mid" />
       {base.laneMarks.map((mark) => (
@@ -92,11 +88,7 @@ export const TimelineFigure = ({
         </FaceText>
       ))}
       {blocks.map((block) => (
-        <BlockItem
-          block={block}
-          key={block.index}
-          label={labels[block.index] ?? block.company}
-        />
+        <BlockItem block={block} key={block.index} link={links[block.index]} />
       ))}
       <g className="iso-growth">
         {growth.map((wafer) => (
@@ -105,10 +97,11 @@ export const TimelineFigure = ({
           </g>
         ))}
       </g>
-      <Solid crease="none" paths={now.socket} tone="mid" />
-      <Solid crease="none" paths={now.post} tone="mid" />
-      <Solid crease="none" paths={now.flag} tone="hi" />
-      <FaceText size={6} tone="hi" transform={now.labelAt}>
+      {now.posts.map((post) => (
+        <Solid crease="none" key={post.outline} paths={post} tone="mid" />
+      ))}
+      <Solid crease="none" paths={now.bridge} tone="hi" />
+      <FaceText size={7} strong tone="hi" transform={now.labelAt}>
         Now
       </FaceText>
     </svg>

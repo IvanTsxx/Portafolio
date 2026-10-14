@@ -1,6 +1,35 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import type { Flat, LineTone, SolidPaths, Tone } from "./iso-kit";
+
+export interface IsoLink {
+  href: string;
+  label: string;
+}
+
+export const IsoItem = ({
+  children,
+  className,
+  index,
+  link,
+  style,
+}: {
+  children: ReactNode;
+  className?: string;
+  index: number;
+  link: IsoLink | undefined;
+  style?: CSSProperties;
+}) => (
+  <a
+    aria-label={link?.label}
+    className={className ? `iso-item ${className}` : "iso-item"}
+    data-item={index}
+    href={link?.href}
+    style={style}
+  >
+    {children}
+  </a>
+);
 
 const tenth = (value: number) => Math.round(value * 10) / 10;
 

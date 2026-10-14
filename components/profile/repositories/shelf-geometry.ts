@@ -21,37 +21,42 @@ import type { RepositorySpecimen, SwatchTone } from "./repositories";
 import { log2Stars, PLATE_TOP, plotOf } from "./repository-plot";
 import type { PlotFrame } from "./repository-plot";
 
+interface ShelfFrame extends PlotFrame {
+  lidSlide: number;
+}
+
 export const shelfFrames = {
   tall: {
     azimuth: 80,
     cols: 1,
     elevation: 44,
+    lidSlide: 34,
     pitchX: 0,
-    pitchY: 112,
+    pitchY: 128,
     width: 380,
   },
   wide: {
     azimuth: 58,
     cols: 3,
     elevation: 36,
+    lidSlide: 62,
     pitchX: 196,
     pitchY: 122,
     width: 1040,
   },
-} as const satisfies Record<string, PlotFrame>;
+} as const satisfies Record<string, ShelfFrame>;
 
 const BOX_W = 164;
 const BOX_D = 66;
-const BASE_H = 20;
-const STAR_H = 13;
+const BASE_H = 12;
+const STAR_H = 17;
 const LID_H = 6;
 const LID_LIP = 1.2;
 const SHEETS = 3;
 const TAG_GAP = 3;
 const CHAR_W = 3.5;
-const LID_RISE = 22;
+const LID_RISE = 26;
 const SHEET_SINK = 14;
-const LID_SLIDE = 44;
 
 const ACROSS: Point3 = [1, 0, 0];
 const TOWARD: Point3 = [0, 1, 0];
@@ -177,7 +182,8 @@ const boxOf = (
   specimen: RepositorySpecimen,
   plan: Plan,
   index: number,
-  P: Projection
+  P: Projection,
+  lidSlide: number
 ): ShelfBox => {
   const height = boxHeight(specimen.stars);
   const bodyTop = PLATE_TOP + height - LID_H;
@@ -195,7 +201,7 @@ const boxOf = (
     const top = bodyTop + 30 - step * 4;
     return {
       rules: join(
-        Array.from({ length: 4 }, (_, line) =>
+        Array.from({ length: 4 }, (_rule, line) =>
           segment(
             [sheet.x + 6, sheet.y + sheet.d, top - 5 - line * 4],
             [
@@ -226,9 +232,11 @@ const boxOf = (
   return {
     body: slabOf(plan, PLATE_TOP, height - LID_H, P, 2, 0.6),
     bodySeam: sideSeam(plan, PLATE_TOP + 4, P, 2),
-    corners: cornerPlans
-      .filter((corner) => corner.x > plan.x || corner.y > plan.y)
-      .map((corner) => slabOf(insetPlan(corner, -0.5), PLATE_TOP, 7, P, 1)),
+    corners: cornerPlans.flatMap((corner) =>
+      corner.x > plan.x || corner.y > plan.y
+        ? [slabOf(insetPlan(corner, -0.5), PLATE_TOP, 7, P, 1)]
+        : []
+    ),
     index,
     label: quadOn(
       [plan.x + 6, front + 0.05, PLATE_TOP + height - LID_H - 3],
@@ -245,7 +253,7 @@ const boxOf = (
     ),
     lid: slabOf(lidPlan, bodyTop, LID_H, P, 2, 0.6),
     lidGroove: planOutline(insetPlan(lidPlan, 3), lidTop, P, 2),
-    lidOpen: axisVector(P, [0, -LID_SLIDE, LID_RISE]),
+    lidOpen: axisVector(P, [0, -lidSlide, LID_RISE]),
     mouth: mouthOf(insetPlan(plan, 3), bodyTop, P),
     name: specimen.name,
     nameAt: planeMatrix([plan.x + 7, plan.y + 31, lidTop], ACROSS, TOWARD, P),
@@ -296,14 +304,14 @@ const boxOf = (
 
 export const shelfSceneOf = (
   specimens: readonly RepositorySpecimen[],
-  frame: PlotFrame
+  frame: ShelfFrame
 ): ShelfScene => {
   const tallest = Math.max(...specimens.map((item) => boxHeight(item.stars)));
   const plot = plotOf(
     specimens.length,
     frame,
     { d: BOX_D, w: BOX_W },
-    { margin: 26, rise: tallest + 24 }
+    { margin: 26, rise: tallest + LID_RISE + 40 }
   );
   const P = plot.projection;
   const { plate } = plot;
@@ -315,7 +323,7 @@ export const shelfSceneOf = (
   return {
     boxes: specimens.flatMap((specimen, index) => {
       const plan = plot.slots[index];
-      return plan ? [boxOf(specimen, plan, index, P)] : [];
+      return plan ? [boxOf(specimen, plan, index, P, frame.lidSlide)] : [];
     }),
     plate: {
       feet: corners(plate, 16)

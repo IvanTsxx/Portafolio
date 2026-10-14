@@ -53,7 +53,6 @@ const SIGN_Y = 62;
 const CHAR_W = 4.3;
 
 const ACROSS: Point3 = [1, 0, 0];
-const TOWARD: Point3 = [0, 1, 0];
 const DOWN: Point3 = [0, 0, -1];
 
 export interface CityWindow {
@@ -104,8 +103,10 @@ const join = (paths: readonly string[]) => paths.join("");
 
 const quad = (points: readonly Point3[], P: Projection) =>
   `M${points
-    .map((point) => iso(point, P))
-    .map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`)
+    .map((point) => {
+      const [x, y] = iso(point, P);
+      return `${x.toFixed(1)} ${y.toFixed(1)}`;
+    })
     .join("L")}Z`;
 
 export const storeysOf = (stars: number) => Math.max(1, stars);

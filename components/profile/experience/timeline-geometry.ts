@@ -23,6 +23,7 @@ import type { Ledger, LedgerEntry } from "./ledger";
 export interface TimelineFrame {
   azimuth: number;
   block: number;
+  blockH: number;
   elevation: number;
   lane: number;
   month: number;
@@ -34,6 +35,7 @@ export const timelineFrames = {
   tall: {
     azimuth: 78,
     block: 100,
+    blockH: 9,
     elevation: 40,
     lane: 0,
     month: 9,
@@ -43,8 +45,9 @@ export const timelineFrames = {
   wide: {
     azimuth: 70,
     block: 24,
+    blockH: 20,
     elevation: 38,
-    lane: 58,
+    lane: 46,
     month: 19,
     run: "across",
     width: 1040,
@@ -56,13 +59,13 @@ const LEAD = 2;
 const PLATE_H = 9;
 const FOOT_H = 5;
 const TOP = PLATE_H + FOOT_H;
-const BLOCK_H = 20;
 const BLOCK_GAP = 2.4;
 const RULER_D = 26;
 const SIDE_PAD = 14;
 const PRINT_W = 136;
 const WAFERS = 3;
-const POST_H = 62;
+const CURSOR_LIFT = 8;
+const CURSOR_W = 5;
 
 interface Span {
   across: number;
@@ -106,10 +109,10 @@ export interface TimelineScene {
   blocks: readonly TimelineBlock[];
   growth: readonly SolidPaths[];
   now: {
-    flag: SolidPaths;
+    bridge: SolidPaths;
+    hairline: string;
     labelAt: string;
-    post: SolidPaths;
-    socket: SolidPaths;
+    posts: readonly SolidPaths[];
   };
   ruler: {
     majors: string;
@@ -174,7 +177,7 @@ const blockOf = (
   const length = entry.months * frame.month - BLOCK_GAP;
   const across = laneAt(frame, lane) + 4;
   const plan = planOf(frame, { across, along, d: frame.block, w: length });
-  const top = TOP + BLOCK_H;
+  const top = TOP + frame.blockH;
   const seams = Array.from({ length: entry.months - 1 }, (_, month) => {
     const at = monthAt(frame, entry.startMonth + month + 1);
     return frame.run === "across"
@@ -198,7 +201,12 @@ const blockOf = (
     company: entry.company,
     companyAt: planeMatrix([plan.x + 5, plan.y + 14, top], ACROSS, TOWARD, P),
     ends: compactDates(entry.dates),
-    endsAt: planeMatrix([px, py + 9, pz], ACROSS, TOWARD, P),
+    endsAt: planeMatrix(
+      [px, py + (frame.run === "across" ? 13 : 9), pz],
+      ACROSS,
+      TOWARD,
+      P
+    ),
     index: lane,
     length: entry.length,
     lengthAt: planeMatrix(
@@ -207,7 +215,7 @@ const blockOf = (
       TOWARD,
       P
     ),
-    lift: slabOf(plan, TOP, BLOCK_H, P, 4, 0.8),
+    lift: slabOf(plan, TOP, frame.blockH, P, 4, 0.8),
     role: entry.role,
     roleAt: planeMatrix([px, py, pz], ACROSS, TOWARD, P),
     screws: corners(plan, 2.6).map(([x, y]) => iso([x, y, top], P)),
@@ -296,8 +304,8 @@ export const timelineSceneOf = (
     [plate.x + plate.w, plate.y, 0],
     [plate.x, plate.y + plate.d, 0],
     [plate.x + plate.w, plate.y + plate.d, 0],
-    [plate.x, plate.y, TOP + POST_H],
-    [plate.x + plate.w, plate.y, TOP + POST_H],
+    [plate.x, plate.y, TOP + frame.blockH + CURSOR_LIFT + 4],
+    [plate.x + plate.w, plate.y, TOP + frame.blockH + CURSOR_LIFT + 4],
   ];
   const { height, projection: P } = fitWidth(box, frame.width, {
     azimuth: frame.azimuth,
@@ -351,15 +359,27 @@ export const timelineSceneOf = (
               w: frame.month * 0.45,
             }),
             TOP,
-            BLOCK_H,
+            frame.blockH,
             P,
             3
           )
         )
       : [];
-  const postAcross =
-    frame.run === "across" ? rulerEdge - 3 : currentAcross + frame.block + 5;
-  const [postX, postY] = pointOf(frame, nowAt, postAcross, 0);
+  const cursorFrom = 6;
+  const cursorTo = (frame.run === "across" ? plate.d : plate.w) - 6;
+  const cursorZ = TOP + frame.blockH + CURSOR_LIFT;
+  const bridgePlan = planOf(frame, {
+    across: cursorFrom,
+    along: nowAt - CURSOR_W / 2,
+    d: cursorTo - cursorFrom,
+    w: CURSOR_W,
+  });
+  const postAt = (across: number) => pointOf(frame, nowAt, across, 0);
+  const posts = [cursorFrom + 2, cursorTo - 2].map((across) => {
+    const [x, y] = postAt(across);
+    return cylinder(x, y, 2, TOP, cursorZ - TOP, P, 20);
+  });
+  const labelPoint = pointOf(frame, nowAt + 5, rulerEdge + 15.5, TOP + 1.2);
   return {
     base: {
       feet: corners(plate, 16)
@@ -386,21 +406,14 @@ export const timelineSceneOf = (
     blocks: oldestFirst.map((entry, lane) => blockOf(frame, entry, lane, P)),
     growth,
     now: {
-      flag: slabOf(
-        { d: 1, r: 0, w: 24, x: postX + 1, y: postY - 0.5 },
-        TOP + POST_H - 14,
-        12,
-        P,
-        0
-      ),
-      labelAt: planeMatrix(
-        [postX + 5, postY + 0.6, TOP + POST_H - 5.2],
-        ACROSS,
-        [0, 0, -1],
+      bridge: slabOf(bridgePlan, cursorZ, 3.5, P, 0.8),
+      hairline: segment(
+        pointOf(frame, nowAt, cursorFrom, TOP),
+        pointOf(frame, nowAt, cursorTo, TOP),
         P
       ),
-      post: cylinder(postX, postY, 1, TOP + 1.6, POST_H - 1.6, P, 16),
-      socket: cylinder(postX, postY, 3, TOP, 1.6, P, 20),
+      labelAt: planeMatrix(labelPoint, ACROSS, TOWARD, P),
+      posts,
     },
     ruler: rulerOf(frame, ledger, lanes, plate, P),
     viewBox: `0 0 ${frame.width} ${height}`,

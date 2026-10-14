@@ -1,31 +1,27 @@
 import type { CSSProperties } from "react";
 
-import { Dots, FaceText, Line, Solid } from "@/components/iso/draw";
+import { Dots, FaceText, IsoItem, Line, Solid } from "@/components/iso/draw";
+import type { IsoLink } from "@/components/iso/draw";
 
 import type { ShelfBox, ShelfScene } from "./shelf-geometry";
+
+type LidStyle = CSSProperties & { "--lid-x": string; "--lid-y": string };
+
+const lidStyleOf = (box: ShelfBox): LidStyle => ({
+  "--lid-x": `${box.lidOpen[0].toFixed(1)}px`,
+  "--lid-y": `${box.lidOpen[1].toFixed(1)}px`,
+});
 
 const BoxItem = ({
   box,
   clipId,
-  label,
+  link,
 }: {
   box: ShelfBox;
   clipId: string;
-  label: string;
+  link: IsoLink | undefined;
 }) => (
-  <g
-    aria-label={label}
-    className="iso-item"
-    data-item={box.index}
-    role="button"
-    style={
-      {
-        "--lid-x": `${box.lidOpen[0].toFixed(1)}px`,
-        "--lid-y": `${box.lidOpen[1].toFixed(1)}px`,
-      } as CSSProperties
-    }
-    tabIndex={0}
-  >
+  <IsoItem index={box.index} link={link} style={lidStyleOf(box)}>
     <path className="iso-shadow" d={box.shadow} />
     <Solid
       crease="faint"
@@ -85,21 +81,21 @@ const BoxItem = ({
       </g>
       <path className="iso-focus" d={box.lid.fill} />
     </g>
-  </g>
+  </IsoItem>
 );
 
 export const ShelfFigure = ({
   idPrefix,
-  labels,
+  links,
   scene,
 }: {
   idPrefix: string;
-  labels: readonly string[];
+  links: readonly IsoLink[];
   scene: ShelfScene;
 }) => {
   const { boxes, plate } = scene;
   return (
-    <svg className="iso-svg" role="group" viewBox={scene.viewBox}>
+    <svg className="iso-svg" viewBox={scene.viewBox}>
       <path className="iso-halo" d={plate.halo} />
       {plate.feet.map((foot) => (
         <Solid crease="none" key={foot.outline} paths={foot} tone="lo" />
@@ -118,7 +114,7 @@ export const ShelfFigure = ({
           box={box}
           clipId={`${idPrefix}-mouth-${box.index}`}
           key={box.index}
-          label={labels[box.index] ?? box.name}
+          link={links[box.index]}
         />
       ))}
     </svg>
