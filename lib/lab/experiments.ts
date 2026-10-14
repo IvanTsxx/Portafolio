@@ -6,14 +6,20 @@ import { DitherFieldLive } from "@/components/lab/experiments/dither-field/live"
 import { DitherFieldPoster } from "@/components/lab/experiments/dither-field/poster";
 import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
 import { DotGridPoster } from "@/components/lab/experiments/dot-grid/poster";
+import { EngravingLive } from "@/components/lab/experiments/engraving/live";
+import { EngravingPoster } from "@/components/lab/experiments/engraving/poster";
 import { ErrorDiffusionLive } from "@/components/lab/experiments/error-diffusion/live";
 import { ErrorDiffusionPoster } from "@/components/lab/experiments/error-diffusion/poster";
 import { HalftoneLive } from "@/components/lab/experiments/halftone/live";
 import { HalftonePoster } from "@/components/lab/experiments/halftone/poster";
 import { MatrixRainLive } from "@/components/lab/experiments/matrix-rain/live";
 import { MatrixRainPoster } from "@/components/lab/experiments/matrix-rain/poster";
+import { PlotterHatchingLive } from "@/components/lab/experiments/plotter-hatching/live";
+import { PlotterHatchingPoster } from "@/components/lab/experiments/plotter-hatching/poster";
 import { SignalTypeLive } from "@/components/lab/experiments/signal-type/live";
 import { SignalTypePoster } from "@/components/lab/experiments/signal-type/poster";
+import { StippleLive } from "@/components/lab/experiments/stipple/live";
+import { StipplePoster } from "@/components/lab/experiments/stipple/poster";
 import { labTopics } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
 
@@ -24,7 +30,10 @@ export type ExperimentSlug =
   | "matrix-rain"
   | "error-diffusion"
   | "halftone"
-  | "ascii";
+  | "ascii"
+  | "engraving"
+  | "plotter-hatching"
+  | "stipple";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -109,6 +118,35 @@ const experimentsBySlug = {
     topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
+  engraving: {
+    Poster: EngravingPoster,
+    Preview: EngravingLive,
+    hasControls: true,
+    implementation: [
+      "One full-viewport plane. Each pixel measures its distance to the nearest line of a ruled field.",
+      "A relief height shifts that field, so the lines bend over the form like a burin following it.",
+      "Line width follows tone. Past 62% ink a second set crosses at 60°.",
+    ],
+    index: "LAB-08",
+    related: ["halftone", "plotter-hatching"],
+    slug: "engraving",
+    summary:
+      "Banknote line engraving that swells in shadow and bends over the form.",
+    technicalNotes: [
+      "Edges are antialiased with fwidth, so any pitch stays crisp without supersampling.",
+      "The portrait relief is a blurred mip of its own luminance.",
+      "The render loop stops offscreen. Reduced motion renders a single frame.",
+    ],
+    technologies: [
+      "React Three Fiber",
+      "GLSL",
+      "ShaderMaterial",
+      "Derivatives",
+    ],
+    title: "Engraving",
+    topics: ["Shader", "WebGL", "Image"],
+    year: 2026,
+  },
   "error-diffusion": {
     Poster: ErrorDiffusionPoster,
     Preview: ErrorDiffusionLive,
@@ -177,6 +215,29 @@ const experimentsBySlug = {
     topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
+  "plotter-hatching": {
+    Poster: PlotterHatchingPoster,
+    Preview: PlotterHatchingLive,
+    hasControls: true,
+    implementation: [
+      "The lit form is sampled to ink on a coarse grid. Each hatch layer has its own tone threshold and pen angle.",
+      "Each scan line keeps the runs above its threshold as straight strokes, in serpentine order like a plotter.",
+      "Playback walks a timeline of pen length. Pen-up travel counts at a quarter of drawing time.",
+    ],
+    index: "LAB-09",
+    related: ["engraving", "stipple"],
+    slug: "plotter-hatching",
+    summary: "A lit form plotted stroke by stroke in up to three hatch layers.",
+    technicalNotes: [
+      "Planning runs in 4 ms slices per frame, so the pen starts before the plan is done.",
+      "Playing forward draws only the new pieces. Scrubbing back clears and redraws once.",
+      "Playback pauses offscreen. Reduced motion draws the finished plot in one frame.",
+    ],
+    technologies: ["Canvas 2D", "TypedArrays", "requestAnimationFrame"],
+    title: "Plotter hatching",
+    topics: ["Image", "Motion"],
+    year: 2026,
+  },
   "signal-type": {
     Poster: SignalTypePoster,
     Preview: SignalTypeLive,
@@ -196,6 +257,30 @@ const experimentsBySlug = {
     technologies: ["GSAP", "useGSAP", "Variable fonts", "Archivo"],
     title: "Signal type",
     topics: ["Typography", "GSAP", "Motion"],
+    year: 2026,
+  },
+  stipple: {
+    Poster: StipplePoster,
+    Preview: StippleLive,
+    hasControls: true,
+    implementation: [
+      "Dots start from rejection sampling on the ink, then Lloyd relaxation moves each to the weighted centroid of its Voronoi cell.",
+      "Cells are found on a grid with a spatial hash, searched ring by ring until no closer dot can exist.",
+      "The pointer pushes and swirls nearby dots. Relaxation pulls them back into place.",
+    ],
+    index: "LAB-10",
+    related: ["error-diffusion", "plotter-hatching"],
+    slug: "stipple",
+    summary:
+      "Stipple dots that relax into a portrait and resettle when stirred.",
+    technicalNotes: [
+      "Each pass is split by rows into 4 ms slices. The stage prints its time.",
+      "The loop stops once the dots settle and only wakes on a stir.",
+      "Reduced motion settles out of sight and draws one frame.",
+    ],
+    technologies: ["Canvas 2D", "Lloyd relaxation", "Voronoi", "TypedArrays"],
+    title: "Stipple",
+    topics: ["Image", "Motion"],
     year: 2026,
   },
 } as const satisfies Record<ExperimentSlug, Experiment>;
