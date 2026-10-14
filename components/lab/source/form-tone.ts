@@ -1,17 +1,21 @@
-const formCenter = { x: 0, y: 0.04 } as const;
-const formRadius = 0.34;
+export const formCenter = { x: 0, y: 0.04 } as const;
+export const formRadius = 0.34;
 const groundLine = -0.37;
 
 export const posterLight = { x: -0.38, y: 0.3 } as const;
 
 const clamp01 = (value: number) => Math.min(Math.max(value, 0), 1);
 
-const smoothstep = (edgeLow: number, edgeHigh: number, value: number) => {
+export const smoothstep = (
+  edgeLow: number,
+  edgeHigh: number,
+  value: number
+) => {
   const amount = clamp01((value - edgeLow) / (edgeHigh - edgeLow));
   return amount * amount * (3 - 2 * amount);
 };
 
-const sphereInk = (offsetX: number, offsetY: number, depth: number) => {
+export const sphereInk = (offsetX: number, offsetY: number, depth: number) => {
   const towardX = posterLight.x - formCenter.x - offsetX;
   const towardY = posterLight.y - formCenter.y - offsetY;
   const towardZ = 0.75 - depth;
@@ -25,7 +29,7 @@ const sphereInk = (offsetX: number, offsetY: number, depth: number) => {
   return clamp01(0.94 - 0.74 * diffuse - 0.55 * specular);
 };
 
-const groundInk = (x: number, y: number) => {
+export const groundInk = (x: number, y: number) => {
   const shadowX = formCenter.x - (posterLight.x - formCenter.x) * 0.45;
   const shadowWidth = formRadius + Math.abs(posterLight.x) * 0.12;
   const shadowReach = Math.hypot(

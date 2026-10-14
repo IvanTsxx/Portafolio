@@ -2,6 +2,8 @@ import type { ComponentType } from "react";
 
 import { AsciiLive } from "@/components/lab/experiments/ascii/live";
 import { AsciiPoster } from "@/components/lab/experiments/ascii/poster";
+import { ContourMapLive } from "@/components/lab/experiments/contour-map/live";
+import { ContourMapPoster } from "@/components/lab/experiments/contour-map/poster";
 import { DitherFieldLive } from "@/components/lab/experiments/dither-field/live";
 import { DitherFieldPoster } from "@/components/lab/experiments/dither-field/poster";
 import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
@@ -12,8 +14,12 @@ import { HalftoneLive } from "@/components/lab/experiments/halftone/live";
 import { HalftonePoster } from "@/components/lab/experiments/halftone/poster";
 import { MatrixRainLive } from "@/components/lab/experiments/matrix-rain/live";
 import { MatrixRainPoster } from "@/components/lab/experiments/matrix-rain/poster";
+import { PaperFoldLive } from "@/components/lab/experiments/paper-fold/live";
+import { PaperFoldPoster } from "@/components/lab/experiments/paper-fold/poster";
 import { SignalTypeLive } from "@/components/lab/experiments/signal-type/live";
 import { SignalTypePoster } from "@/components/lab/experiments/signal-type/poster";
+import { StampTypeLive } from "@/components/lab/experiments/stamp-type/live";
+import { StampTypePoster } from "@/components/lab/experiments/stamp-type/poster";
 import { labTopics } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
 
@@ -24,7 +30,10 @@ export type ExperimentSlug =
   | "matrix-rain"
   | "error-diffusion"
   | "halftone"
-  | "ascii";
+  | "ascii"
+  | "paper-fold"
+  | "contour-map"
+  | "stamp-type";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -65,6 +74,30 @@ const experimentsBySlug = {
     technologies: ["React Three Fiber", "GLSL", "Canvas 2D", "Geist Mono"],
     title: "ASCII scanner",
     topics: ["Shader", "Typography", "WebGL"],
+    year: 2026,
+  },
+  "contour-map": {
+    Poster: ContourMapPoster,
+    Preview: ContourMapLive,
+    hasControls: true,
+    implementation: [
+      "One full-viewport plane. The fragment shader reads the source brightness as height and adds a Gaussian hill at the pointer.",
+      "Lines come from fract(height × levels) divided by its screen-space derivative, so every line stays the same pixel width.",
+      "A click reads the ground height on the CPU from the same function and drops a benchmark with its elevation.",
+    ],
+    index: "LAB-15",
+    related: ["halftone", "dot-grid"],
+    slug: "contour-map",
+    summary:
+      "A lit form surveyed as contour lines around a hill the pointer raises.",
+    technicalNotes: [
+      "Every fifth line is an index contour. The poster runs marching squares on the server.",
+      "The portrait is read at a coarse mip, so its contours stay smooth.",
+      "The render loop stops offscreen. Reduced motion renders a single frame.",
+    ],
+    technologies: ["React Three Fiber", "GLSL", "fwidth", "Marching squares"],
+    title: "Contour map",
+    topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
   "dither-field": {
@@ -177,6 +210,29 @@ const experimentsBySlug = {
     topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
+  "paper-fold": {
+    Poster: PaperFoldPoster,
+    Preview: PaperFoldLive,
+    hasControls: true,
+    implementation: [
+      "Each panel is one quad on a hinge group. A damped spring drives fold progress, and each hinge maps it to an angle.",
+      "The fragment shader prints a halftone, rules and text bars in page space, so the print travels with its panel.",
+      "Light comes from a fixed world direction. Each facet shades by its own normal, and the back shows a faint show-through.",
+    ],
+    index: "LAB-14",
+    related: ["halftone", "dot-grid"],
+    slug: "paper-fold",
+    summary: "A printed dossier page that folds along its creases on a spring.",
+    technicalNotes: [
+      "Three quads and one shader program. No lights, shadows or textures.",
+      "Dragging sets the spring target. Release snaps to open or shut, carrying the drag's velocity.",
+      "The spring stops offscreen. Reduced motion jumps between states.",
+    ],
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "Springs"],
+    title: "Paper fold",
+    topics: ["WebGL", "Shader", "Motion"],
+    year: 2026,
+  },
   "signal-type": {
     Poster: SignalTypePoster,
     Preview: SignalTypeLive,
@@ -196,6 +252,30 @@ const experimentsBySlug = {
     technologies: ["GSAP", "useGSAP", "Variable fonts", "Archivo"],
     title: "Signal type",
     topics: ["Typography", "GSAP", "Motion"],
+    year: 2026,
+  },
+  "stamp-type": {
+    Poster: StampTypePoster,
+    Preview: StampTypeLive,
+    hasControls: true,
+    implementation: [
+      "Each press draws its text in Geist Mono into its own row of a canvas atlas, so older prints keep their words.",
+      "One full-viewport shader loops over twelve impressions. Noise sets ink pressure, rubber chips and the paper's tooth.",
+      "The pad loses ink on every press. Prints fade until it is re-inked.",
+    ],
+    index: "LAB-16",
+    related: ["ascii", "signal-type"],
+    slug: "stamp-type",
+    summary:
+      "Mono type pressed like a rubber stamp, fading as the pad runs dry.",
+    technicalNotes: [
+      "Twelve impressions in one draw call. The thirteenth reuses the oldest slot.",
+      "Ink pools at the rubber's edges, read from a blurred mip of the same glyph.",
+      "Reduced motion prints each press at once, with no bloom.",
+    ],
+    technologies: ["React Three Fiber", "GLSL", "Canvas 2D", "Geist Mono"],
+    title: "Stamp type",
+    topics: ["Typography", "Shader", "WebGL"],
     year: 2026,
   },
 } as const satisfies Record<ExperimentSlug, Experiment>;
