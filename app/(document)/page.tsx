@@ -1,5 +1,4 @@
 import { AgentWorkshop } from "@/components/profile/agent-workshop";
-import { PinnedSection } from "@/components/profile/card-catalog/pinned-section";
 import { ContactRow } from "@/components/profile/contact-row";
 import { ExperienceSection } from "@/components/profile/experience/experience-section";
 import { ExperimentsSection } from "@/components/profile/experiments-section";
@@ -7,6 +6,7 @@ import { HowIWork } from "@/components/profile/how-i-work/how-i-work-section";
 import { MatrixSection } from "@/components/profile/matrix/matrix-section";
 import { ProfileIntro } from "@/components/profile/profile-intro";
 import { RegistrySection } from "@/components/profile/registry-section";
+import { PinnedSection } from "@/components/profile/repositories/pinned-section";
 import { JsonLd } from "@/components/site/json-ld";
 import { getGithubProfile } from "@/lib/site/github-profile";
 import { buildPageMetadata, pageSeo } from "@/lib/site/seo";

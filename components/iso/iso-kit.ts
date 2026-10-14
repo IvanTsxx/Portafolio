@@ -423,6 +423,68 @@ export const axisVector = (projection: Projection, by: Point3): Flat => {
   return [moved[0] - origin[0], moved[1] - origin[1]];
 };
 
+const thousandth = (value: number) => String(Math.round(value * 1000) / 1000);
+
+export const planeMatrix = (
+  origin: Point3,
+  across: Point3,
+  down: Point3,
+  projection: Projection
+) => {
+  const [ox, oy] = iso(origin, projection);
+  const [ax, ay] = axisVector(projection, across);
+  const [dx, dy] = axisVector(projection, down);
+  return `matrix(${[ax, ay, dx, dy, ox, oy].map(thousandth).join(" ")})`;
+};
+
+export const fitWidth = (
+  points: readonly Point3[],
+  width: number,
+  {
+    azimuth,
+    elevation = 30,
+    maxHeight = Number.POSITIVE_INFINITY,
+    pad = 24,
+  }: {
+    azimuth: number;
+    elevation?: number;
+    maxHeight?: number;
+    pad?: number;
+  }
+) => {
+  const unit: Projection = { azimuth, elevation, origin: [0, 0], scale: 1 };
+  const flat = points.map((point) => iso(point, unit));
+  const xs = flat.map(([x]) => x);
+  const ys = flat.map(([, y]) => y);
+  const left = Math.min(...xs);
+  const up = Math.min(...ys);
+  const spanX = Math.max(...xs) - left;
+  const spanY = Math.max(...ys) - up;
+  const scale = Math.min(
+    (width - pad * 2) / spanX,
+    (maxHeight - pad * 2) / spanY
+  );
+  const projection: Projection = {
+    azimuth,
+    elevation,
+    origin: [pad - left * scale, pad - up * scale],
+    scale,
+  };
+  return {
+    height: Math.ceil(spanY * scale + pad * 2),
+    projection,
+    width: Math.ceil(spanX * scale + pad * 2),
+  };
+};
+
+export const shiftProjection = (
+  projection: Projection,
+  [dx, dy]: Flat
+): Projection => ({
+  ...projection,
+  origin: [projection.origin[0] + dx, projection.origin[1] + dy],
+});
+
 export const fitProjection = (
   points: readonly Point3[],
   width: number,

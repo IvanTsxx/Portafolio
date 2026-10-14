@@ -79,3 +79,36 @@ export const Dots = ({
     ))}
   </g>
 );
+
+export const FaceText = ({
+  anchor = "start",
+  children,
+  size,
+  strong = false,
+  tone = "mid",
+  transform,
+  x = 0,
+  y = 0,
+}: {
+  anchor?: "start" | "middle" | "end";
+  children: ReactNode;
+  size: number;
+  strong?: boolean;
+  tone?: LineTone;
+  transform: string;
+  x?: number;
+  y?: number;
+}) => (
+  <text
+    className="iso-text"
+    data-strong={strong ? "" : undefined}
+    data-tone={tone}
+    fontSize={size}
+    textAnchor={anchor}
+    transform={transform}
+    x={x}
+    y={y}
+  >
+    {children}
+  </text>
+);
