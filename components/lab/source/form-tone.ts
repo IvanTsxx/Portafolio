@@ -11,9 +11,19 @@ const smoothstep = (edgeLow: number, edgeHigh: number, value: number) => {
   return amount * amount * (3 - 2 * amount);
 };
 
-const sphereInk = (offsetX: number, offsetY: number, depth: number) => {
-  const towardX = posterLight.x - formCenter.x - offsetX;
-  const towardY = posterLight.y - formCenter.y - offsetY;
+export interface LightPoint {
+  x: number;
+  y: number;
+}
+
+const sphereInk = (
+  offsetX: number,
+  offsetY: number,
+  depth: number,
+  light: LightPoint
+) => {
+  const towardX = light.x - formCenter.x - offsetX;
+  const towardY = light.y - formCenter.y - offsetY;
   const towardZ = 0.75 - depth;
   const towardLength = Math.hypot(towardX, towardY, towardZ);
   const facing =
@@ -25,25 +35,29 @@ const sphereInk = (offsetX: number, offsetY: number, depth: number) => {
   return clamp01(0.94 - 0.74 * diffuse - 0.55 * specular);
 };
 
-const groundInk = (x: number, y: number) => {
-  const shadowX = formCenter.x - (posterLight.x - formCenter.x) * 0.45;
-  const shadowWidth = formRadius + Math.abs(posterLight.x) * 0.12;
+const groundInk = (x: number, y: number, light: LightPoint) => {
+  const shadowX = formCenter.x - (light.x - formCenter.x) * 0.45;
+  const shadowWidth = formRadius + Math.abs(light.x) * 0.12;
   const shadowReach = Math.hypot(
     (x - shadowX) / shadowWidth,
     (y - groundLine) / 0.07
   );
   const shadow =
-    (1 - smoothstep(0.55, 1.15, shadowReach)) *
-    smoothstep(-0.4, 0.1, posterLight.y);
-  const falloff = smoothstep(
-    0.15,
-    1.3,
-    Math.hypot(posterLight.x - x, posterLight.y - y)
-  );
+    (1 - smoothstep(0.55, 1.15, shadowReach)) * smoothstep(-0.4, 0.1, light.y);
+  const falloff = smoothstep(0.15, 1.3, Math.hypot(light.x - x, light.y - y));
   return clamp01(0.02 + 0.2 * falloff + 0.55 * shadow);
 };
 
-export const formInkAt = (x: number, y: number) => {
+export const formReliefAt = (x: number, y: number) => {
+  const reach = (x - formCenter.x) ** 2 + (y - formCenter.y) ** 2;
+  return Math.max(1 - reach / (formRadius * formRadius), 0);
+};
+
+export const formInkAt = (
+  x: number,
+  y: number,
+  light: LightPoint = posterLight
+) => {
   const offsetX = x - formCenter.x;
   const offsetY = y - formCenter.y;
   const reach = offsetX * offsetX + offsetY * offsetY;
@@ -51,8 +65,9 @@ export const formInkAt = (x: number, y: number) => {
     return sphereInk(
       offsetX,
       offsetY,
-      Math.sqrt(formRadius * formRadius - reach)
+      Math.sqrt(formRadius * formRadius - reach),
+      light
     );
   }
-  return groundInk(x, y);
+  return groundInk(x, y, light);
 };
