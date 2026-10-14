@@ -8,20 +8,20 @@ import {
   defaultDossierEdge,
   dossierEdges,
 } from "@/components/site/dossier-edge-model";
-import type {
-  DossierEdgeSize,
-  DossierEdgeVariant,
-} from "@/components/site/dossier-edge-model";
 
-const parseEdge = (value: string | null): DossierEdgeVariant =>
-  dossierEdges.find((edge) => edge === value) ?? defaultDossierEdge;
+const EdgeFromSearch = () => {
+  const requested = useSearchParams().get("edge");
+  return (
+    <DossierEdge
+      variant={
+        dossierEdges.find((edge) => edge === requested) ?? defaultDossierEdge
+      }
+    />
+  );
+};
 
-const EdgeFromSearch = ({ size }: { size: DossierEdgeSize }) => (
-  <DossierEdge size={size} variant={parseEdge(useSearchParams().get("edge"))} />
-);
-
-export const DossierEdgeReview = ({ size }: { size: DossierEdgeSize }) => (
-  <Suspense fallback={<DossierEdge size={size} variant={defaultDossierEdge} />}>
-    <EdgeFromSearch size={size} />
+export const DossierEdgeReview = () => (
+  <Suspense fallback={<DossierEdge variant={defaultDossierEdge} />}>
+    <EdgeFromSearch />
   </Suspense>
 );

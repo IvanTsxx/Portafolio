@@ -59,7 +59,7 @@ export const Dossier = ({
               <div className={contentVariants({ size })}>{children}</div>
             </div>
           </main>
-          <DossierEdgeReview size={size} />
+          <DossierEdgeReview />
         </div>
         <BackCover />
       </div>
