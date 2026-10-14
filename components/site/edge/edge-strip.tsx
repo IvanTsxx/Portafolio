@@ -1,67 +1,36 @@
 "use client";
 
-import { cva } from "class-variance-authority";
 import { useEffect, useRef } from "react";
 import type { PointerEvent, ReactNode } from "react";
 
-import { cn } from "@/lib/utils";
-
-import type { EdgeAxis, EdgePress } from "./edge-press";
+import type { EdgePress } from "./edge-press";
 
 const followShare = 0.32;
 const settleDistance = 0.4;
 
-const lensVariants = cva(
-  "ease-out-quart pointer-events-none absolute top-0 left-0 overflow-hidden opacity-0 transition-opacity duration-200 group-hover/edge:opacity-100 motion-reduce:transition-none",
-  {
-    variants: {
-      axis: {
-        x: "inset-y-0 w-40 mask-x-from-60%",
-        y: "inset-x-0 h-40 mask-y-from-60%",
-      },
-    },
-  }
-);
-
-const lensContentVariants = cva("absolute top-0 left-0", {
-  variants: {
-    axis: {
-      x: "inset-y-0 w-(--edge-length)",
-      y: "inset-x-0 h-(--edge-length)",
-    },
-  },
-});
-
-const readoutClassName =
-  "label text-ink ease-out-quart pointer-events-none absolute top-0 left-0 tabular-nums opacity-0 transition-opacity duration-200 group-hover/edge:opacity-100 motion-reduce:transition-none";
+const lensClassName =
+  "ease-out-quart pointer-events-none absolute inset-x-0 top-0 h-40 overflow-hidden opacity-0 mask-y-from-60% transition-opacity duration-200 group-hover/edge:opacity-100 motion-reduce:transition-none";
 
 const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const along = (axis: EdgeAxis, offset: number) =>
-  axis === "y"
-    ? `translate3d(0, ${offset}px, 0)`
-    : `translate3d(${offset}px, 0, 0)`;
+const along = (offset: number) => `translate3d(0, ${offset}px, 0)`;
+
+const pointerAt = (event: PointerEvent<HTMLDivElement>) =>
+  event.clientY - event.currentTarget.getBoundingClientRect().top;
 
 export const EdgeStrip = ({
-  axis,
   base,
-  className,
   lit,
   onPress,
-  readout,
 }: {
-  axis: EdgeAxis;
   base: ReactNode;
-  className: string;
   lit: ReactNode;
   onPress: (press: EdgePress) => void;
-  readout?: (at: number) => string;
 }) => {
   const root = useRef<HTMLDivElement>(null);
   const lens = useRef<HTMLDivElement>(null);
   const lensContent = useRef<HTMLDivElement>(null);
-  const readoutLabel = useRef<HTMLSpanElement>(null);
   const marks = useRef<HTMLDivElement>(null);
   const follow = useRef({ current: 0, frame: 0, target: 0 });
 
@@ -71,10 +40,9 @@ export const EdgeStrip = ({
       return;
     }
     const measure = () => {
-      const box = element.getBoundingClientRect();
       element.style.setProperty(
         "--edge-length",
-        `${axis === "y" ? box.height : box.width}px`
+        `${element.getBoundingClientRect().height}px`
       );
     };
     measure();
@@ -85,7 +53,7 @@ export const EdgeStrip = ({
       observer.disconnect();
       cancelAnimationFrame(state.frame);
     };
-  }, [axis]);
+  }, []);
 
   const paint = () => {
     const state = follow.current;
@@ -93,17 +61,12 @@ export const EdgeStrip = ({
     if (!lensElement) {
       return;
     }
-    const half =
-      (axis === "y" ? lensElement.offsetHeight : lensElement.offsetWidth) / 2;
-    lensElement.style.transform = along(axis, state.current - half);
+    const half = lensElement.offsetHeight / 2;
+    lensElement.style.transform = along(state.current - half);
     lensContent.current?.style.setProperty(
       "transform",
-      along(axis, half - state.current)
+      along(half - state.current)
     );
-    if (readoutLabel.current && readout) {
-      readoutLabel.current.style.transform = `${along(axis, state.current)} translateX(-50%)`;
-      readoutLabel.current.textContent = readout(state.current);
-    }
   };
 
   const step = () => {
@@ -120,18 +83,10 @@ export const EdgeStrip = ({
     }
   };
 
-  const pointerAt = (event: PointerEvent<HTMLDivElement>) => {
-    const box = event.currentTarget.getBoundingClientRect();
-    return axis === "y" ? event.clientY - box.top : event.clientX - box.left;
-  };
-
   return (
     <div
       aria-hidden
-      className={cn(
-        "group/edge absolute touch-manipulation select-none",
-        className
-      )}
+      className="group/edge absolute inset-y-4 left-0 z-20 hidden w-12 cursor-pointer touch-manipulation select-none md:block"
       onPointerDown={(event) => {
         if (event.button !== 0 || !lens.current || !marks.current) {
           return;
@@ -142,7 +97,6 @@ export const EdgeStrip = ({
         paint();
         onPress({
           at,
-          axis,
           lens: lens.current,
           marks: marks.current,
           reduced: prefersReducedMotion(),
@@ -163,15 +117,15 @@ export const EdgeStrip = ({
       ref={root}
     >
       {base}
-      <div className={lensVariants({ axis })} ref={lens}>
-        <div className={lensContentVariants({ axis })} ref={lensContent}>
+      <div className={lensClassName} ref={lens}>
+        <div
+          className="absolute inset-x-0 top-0 h-(--edge-length)"
+          ref={lensContent}
+        >
           {lit}
         </div>
       </div>
       <div className="pointer-events-none absolute inset-0" ref={marks} />
-      {readout ? (
-        <span className={readoutClassName} ref={readoutLabel} />
-      ) : null}
     </div>
   );
 };

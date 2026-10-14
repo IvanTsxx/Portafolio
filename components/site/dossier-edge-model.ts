@@ -1,13 +1,5 @@
-export const dossierEdges = [
-  "binding",
-  "stitch",
-  "dither",
-  "ruler",
-  "none",
-] as const;
+export const dossierEdges = ["bound", "binding", "dither"] as const;
 
 export type DossierEdgeVariant = (typeof dossierEdges)[number];
 
-export type DossierEdgeSize = "detail" | "document";
-
-export const defaultDossierEdge: DossierEdgeVariant = "binding";
+export const defaultDossierEdge: DossierEdgeVariant = "bound";
