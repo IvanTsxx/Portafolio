@@ -12,7 +12,6 @@ export const swatchTones = ["ink", "graphite", "mist", "hollow"] as const;
 export type SwatchTone = (typeof swatchTones)[number];
 
 export interface RepositorySpecimen {
-  callNumber: readonly string[];
   description: string | null;
   file: DossierFile;
   forks: number;
@@ -53,14 +52,6 @@ const languageCodes = new Map([
 
 const languageCodeOf = (language: string) =>
   languageCodes.get(language) ?? language.slice(0, 2).toUpperCase();
-
-const PROGRAMMING_CLASS = "005.13";
-
-const callNumberOf = (owner: string, languageCode: string, index: number) => [
-  PROGRAMMING_CLASS,
-  languageCode,
-  `${owner.slice(0, 3).toUpperCase()} ${String(index + 1).padStart(2, "0")}`,
-];
 
 export const starStep = (stars: number, most: number, steps: number) =>
   most <= 0
@@ -135,7 +126,6 @@ export const specimensOf = (
     const [owner = ""] = repository.nameWithOwner.split("/");
     const languageCode = languageCodeOf(language);
     return {
-      callNumber: callNumberOf(owner, languageCode, index),
       description: repository.description,
       file: fileOf(
         repository,

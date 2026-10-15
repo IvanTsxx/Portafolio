@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
 
-const reviewKeys = ["a", "b", "c", "d"] as const;
+const reviewKeys = ["d", "e", "f", "g"] as const;
 
 type ReviewKey = (typeof reviewKeys)[number];
 
@@ -15,11 +15,11 @@ const isReviewKey = (value: string | null): value is ReviewKey =>
 
 const ConceptFromSearch = ({ concepts }: { concepts: ReviewConcepts }) => {
   const asked = useSearchParams().get("repos");
-  return concepts[isReviewKey(asked) ? asked : "a"];
+  return concepts[isReviewKey(asked) ? asked : "d"];
 };
 
 export const ReposReview = (concepts: ReviewConcepts) => (
-  <Suspense fallback={concepts.a}>
+  <Suspense fallback={concepts.d}>
     <ConceptFromSearch concepts={concepts} />
   </Suspense>
 );
