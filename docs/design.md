@@ -72,7 +72,7 @@ Zen Kaku Gothic New, light and tight, for titles (`display`) and body. Geist Mon
 - The sheet's left edge is a bound strip: punched holes with dithered toner around them. Hover lights a lens that follows the pointer. A press punches the nearest hole and sends a ripple along the strip.
 - Route tabs sit on the sheet's left edge from `lg` and in a row above it on smaller screens. The active tab joins the sheet.
 - Long pages get a thumb index of notches on the sheet's right edge. Below `lg` it becomes a 4px progress strip. From `2xl` the companion rides a rail lane beside it. On phones it peeks from the bottom right corner.
-- The 48px top line holds the wordmark, ⌘K search and GitHub stars. Back to top is a 44px button floating on the bound edge, bottom left, once the reader is 1.5 screens down. The back cover is a stamped colophon below the sheet.
+- The 48px top line holds the wordmark, ⌘K search and GitHub stars. The back cover is a stamped colophon below the sheet.
 - Sections sit 96px apart. Each opens with a panel heading over a strong rule.
 
 ## Shapes
@@ -93,7 +93,6 @@ Radius 0 everywhere. Frames are 1px hairlines. No shadows. Depth comes from the 
 - Cassette tower: Repos. The most-starred tape opens first. One tape out at a time.
 - Contribution graph: Compact week grid. Cells turn clay on hover and focus.
 - Open in menu: Copies the page Markdown or opens it in ChatGPT, Claude or Perplexity.
-- Back to top: 44px button floating on the bound edge, bottom left.
 - Companion: The one 3D agent, 48×56 on the rail, peeking from the corner on phones. It narrates and builds.
 
 ## Motion

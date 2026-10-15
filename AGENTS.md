@@ -19,7 +19,7 @@ Read before any change:
 
 ## Stack
 
-Next.js 16 App Router, React 19, Tailwind v4, base-ui, cva + `cn`, GSAP through `lib/motion/gsap.ts`, React Three Fiber on one shared canvas, MDX content, shadcn registry, Bun for scripts and tests.
+Next.js 16.4 App Router with Cache Components and Partial Prefetching, React 19, Tailwind v4, base-ui, cva + `cn`, GSAP through `lib/motion/gsap.ts`, React Three Fiber on one shared canvas, MDX content, shadcn registry, Bun for scripts and tests.
 
 ## Hard rules
 
@@ -33,6 +33,8 @@ Next.js 16 App Router, React 19, Tailwind v4, base-ui, cva + `cn`, GSAP through 
 - Section builds never make content wait: 300ms per block, at most 40ms stagger, 500ms per section. Sections on screen at load and reduced motion skip the build. `lib/site/section-construction.test.ts` enforces the budget.
 - Card thumbnails and posters are static markup: no `<a>`, `<button>` or `tabindex`, because the card is already a link. `components/registry-docs/thumbnails.test.tsx` and `components/lab/posters.test.tsx` enforce it.
 - Server Components by default. `"use client"` only where interaction needs it.
+- Cache Components is on. Never export `dynamic`, `revalidate`, `fetchCache` or `dynamicParams`. Remote data goes through a `"use cache"` function with `cacheLife`, like `getGithubProfile` and `getRepoStars`. Files from the repo (MDX, `globals.css`, registry source, fonts) are read with sync `node:fs`, so routes stay prerendered. A `"use cache"` function that calls `cacheLife` cannot run under `bun test`; keep the tested logic in a plain function and wrap it.
+- Partial Prefetching is on. Links prefetch the route's shared shell. Every dynamic route lists its params in `generateStaticParams`; unknown slugs call `notFound()`.
 - Basement Studio appears only as employer: name, role, dates, type and link. Never its projects, code, repos or clients. `lib/github/privacy.ts` and the career tests enforce it.
 - Never invent clients, metrics or achievements. Placeholder content carries `sample: true`.
 - The legal surname appears only in the home intro. Titles and metadata use "Ivo". `lib/site/naming.test.ts` enforces it.
@@ -98,7 +100,7 @@ Profile data comes from `lib/github/`. `lib/github/snapshot.json` is the offline
 - `app/(document)`: index pages (`/`, `/notes`, `/experiments`, `/registry`, `/design-system`).
 - `app/(detail)`: detail pages for notes, experiments and registry items.
 - `app/markdown`, `app/llms.txt`, `app/llms-full.txt`: plain Markdown for agents. `next.config.ts` rewrites `/notes/<slug>.md`, `/experiments/<slug>.md` and `/registry/<slug>.md` to `app/markdown`. `components/site/open-in-menu.tsx` copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
-- `components/site`: dossier chrome (one 60rem sheet, the bound edge in `dossier-edge.tsx`, back to top floating on the bound edge), route tabs, thumb index, hero field, headings, section build.
+- `components/site`: dossier chrome (one 60rem sheet, the bound edge in `dossier-edge.tsx`), route tabs, thumb index, hero field, headings, section build.
 - `components/scene`: shared canvas, companion, stages, narration, active section. `companion-placement.ts` docks the companion. On phones it peeks from the bottom right corner.
 - `components/profile`: home sections in `homeSections` order. Experience is window envelopes that open on the current job (`experience/`). Repos is a cassette tower that opens on the most-starred repo, with one tape out at a time (`repositories/`). Contribution matrix is a compact contribution graph (`matrix/`).
 - `components/lab`: experiments. `lib/lab`: their registry.
