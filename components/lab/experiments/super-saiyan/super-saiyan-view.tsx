@@ -22,7 +22,10 @@ import {
 import type { StagePointer } from "@/components/lab/source/use-source";
 import { requestSceneFrame } from "@/components/scene/view-registry";
 
-import { flashEnvelope, firstStrikeAt, nextStrikeGap } from "./storm";
+import { colorLinger, ditherShaderIndex, inkFor } from "./settings";
+import type { SuperSaiyanSettings } from "./settings";
+import { advanceStorm, createStorm } from "./storm";
+import type { StormMode } from "./storm";
 import { SuperSaiyanMaterial } from "./super-saiyan-material";
 
 const SuperSaiyanMaterialElement = extend(SuperSaiyanMaterial);
@@ -36,19 +39,13 @@ const followSpring = { damping: 16, stiffness: 120 } as const;
 const auraSpring = { damping: 10, stiffness: 85 } as const;
 const burstKick = 7;
 const rainRate = 4;
-
-export type DitherKind = "bayer" | "blue-noise";
-
-export interface SuperSaiyanSettings {
-  cell: number;
-  threshold: number;
-  dither: DitherKind;
-  rain: boolean;
-  lightning: boolean;
-}
+const shakeLength = 0.32;
+const shakeCells = 2;
+const auraReach = 11;
 
 export interface KiPointer extends StagePointer {
   presses: number;
+  strikes: number;
 }
 
 export interface SuperSaiyanViewProps {
@@ -107,6 +104,13 @@ const useStageTexture = (path: string, isTile: boolean, isWanted = true) => {
   return texture;
 };
 
+const stormModeFor = (animate: boolean, isPaused: boolean): StormMode => {
+  if (!animate) {
+    return "still";
+  }
+  return isPaused ? "paused" : "running";
+};
+
 const SuperSaiyanView = ({
   settings,
   animate,
@@ -114,6 +118,10 @@ const SuperSaiyanView = ({
 }: SuperSaiyanViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof SuperSaiyanMaterial>>(null);
+  const live = useRef(settings);
+  useEffect(() => {
+    live.current = settings;
+  }, [settings]);
   const motion = useRef({
     aura: {
       strength: createSpring(0),
@@ -121,12 +129,11 @@ const SuperSaiyanView = ({
       y: createSpring(0.6),
     },
     burst: { age: Infinity, x: 0.5, y: 0.5 },
-    flash: 0,
     handledPresses: 0,
-    nextStrike: firstStrikeAt,
-    rain: 1,
-    strikeAt: -Infinity,
-    time: 0,
+    rain: settings.rainAmount,
+    shakeX: 0,
+    shakeY: 0,
+    storm: createStorm(),
   });
   const isBlue = settings.dither === "blue-noise";
   const image = useStageTexture(imagePath, false);
@@ -134,38 +141,50 @@ const SuperSaiyanView = ({
 
   useFrame((_, delta) => {
     const state = motion.current;
+    const { current } = live;
     const step = frameStep(delta);
     const { current: hover } = pointer;
-    if (animate) {
-      state.time += step;
-    }
+    const mode = stormModeFor(animate, current.isPaused);
+    const isMoving = mode === "running";
 
-    const rainTarget = settings.rain ? 1 : 0;
-    state.rain = animate
+    advanceStorm(
+      state.storm,
+      {
+        colorLinger: colorLinger(current.colorHold),
+        frequency: current.frequency,
+        intensity: current.intensity,
+        isLightning: current.isLightning,
+      },
+      { mode, random: Math.random, requestedStrikes: hover.strikes, step }
+    );
+
+    state.rain = isMoving
       ? state.rain +
-        (rainTarget - state.rain) * (1 - Math.exp(-step * rainRate))
-      : rainTarget;
-
-    if (animate && settings.lightning && state.time >= state.nextStrike) {
-      state.strikeAt = state.time;
-      state.nextStrike = state.time + nextStrikeGap(Math.random());
-    }
-    state.flash =
-      animate && settings.lightning
-        ? flashEnvelope(state.time - state.strikeAt)
-        : 0;
+        (current.rainAmount - state.rain) * (1 - Math.exp(-step * rainRate))
+      : current.rainAmount;
 
     const { aura, burst } = state;
     if (hover.presses !== state.handledPresses) {
       state.handledPresses = hover.presses;
-      if (animate) {
+      if (isMoving) {
         burst.age = 0;
         burst.x = hover.x;
         burst.y = hover.y;
         aura.strength.velocity += burstKick;
       }
     }
-    burst.age = animate ? burst.age + step : Infinity;
+    if (mode === "still") {
+      burst.age = Infinity;
+    } else if (isMoving) {
+      burst.age += step;
+    }
+
+    const shake =
+      isMoving && burst.age < shakeLength
+        ? (1 - burst.age / shakeLength) ** 2 * shakeCells
+        : 0;
+    state.shakeX = Math.round((Math.random() * 2 - 1) * shake);
+    state.shakeY = Math.round((Math.random() * 2 - 1) * shake);
 
     const targetX = hover.isHovering ? hover.x : aura.x.value;
     const targetY = hover.isHovering ? hover.y : aura.y.value;
@@ -176,7 +195,7 @@ const SuperSaiyanView = ({
       hover.isHovering ? 1 : 0,
       auraSpring,
       step,
-      animate
+      isMoving
     );
   });
 
@@ -190,21 +209,35 @@ const SuperSaiyanView = ({
       if (!shader) {
         return;
       }
+      const { current } = live;
       renderer.getCurrentViewport(viewport);
-      const { aura, burst, flash, rain, time } = motion.current;
+      const { aura, burst, rain, shakeX, shakeY, storm } = motion.current;
+      const cell = current.cell * renderer.getPixelRatio();
+      const ink = inkFor(current);
       shader.uOrigin.set(viewport.x, viewport.y);
       shader.uResolution.set(viewport.z, viewport.w);
-      shader.uCell = settings.cell * renderer.getPixelRatio();
-      shader.uThreshold = settings.threshold;
-      shader.uTime = time;
+      shader.uCell = cell;
+      shader.uThreshold = current.threshold;
+      shader.uContrast = current.contrast;
+      shader.uGamma = current.gamma;
+      shader.uInvert = current.isInverted ? 1 : 0;
+      shader.uInk.set(ink[0] / 255, ink[1] / 255, ink[2] / 255);
+      shader.uTime = storm.time;
       shader.uRain = rain;
-      shader.uFlash = flash;
+      shader.uRainSpeed = current.rainSpeed;
+      shader.uRainSlant = Math.tan((current.rainAngle * Math.PI) / 180);
+      shader.uFlash = storm.flash;
+      shader.uColor = current.print === "retro" ? 1 : storm.color;
+      shader.uStrikeSeed = storm.seed;
+      shader.uShake.set(shakeX * cell, shakeY * cell);
       shader.uAura.set(aura.x.value * viewport.z, aura.y.value * viewport.w);
-      shader.uAuraStrength = Math.max(aura.strength.value, 0);
+      shader.uAuraStrength =
+        Math.max(aura.strength.value, 0) * current.auraStrength;
+      shader.uAuraReach = auraReach / current.auraRadius ** 2;
       shader.uBurst.set(burst.x * viewport.z, burst.y * viewport.w);
       shader.uBurstAge = Number.isFinite(burst.age) ? burst.age : 10;
     };
-  }, [settings.cell, settings.threshold]);
+  }, []);
 
   return (
     <>
@@ -214,8 +247,12 @@ const SuperSaiyanView = ({
           key={SuperSaiyanMaterial.key}
           ref={material}
           toneMapped={false}
-          uBlue={isBlue && blueNoise ? 1 : 0}
           uBlueNoise={blueNoise}
+          uDither={
+            isBlue && !blueNoise
+              ? ditherShaderIndex("bayer-8")
+              : ditherShaderIndex(settings.dither)
+          }
           uHasImage={image ? 1 : 0}
           uImage={image}
         />
