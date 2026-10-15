@@ -1,3 +1,4 @@
+import { displayLanguage } from "./language";
 import type {
   ActivityOverview,
   ContributionCalendar,
@@ -131,7 +132,7 @@ export const parsePinned = (nodes: readonly RawPinned[]): PinnedRepository[] =>
       description: node.description,
       forks: node.forkCount,
       homepage: homepageOf(node.homepageUrl),
-      language: node.primaryLanguage?.name ?? null,
+      language: displayLanguage(node.primaryLanguage?.name ?? null),
       name: node.name,
       nameWithOwner: node.nameWithOwner,
       pushedAt: node.pushedAt.slice(0, 10),
