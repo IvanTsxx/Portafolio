@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import type { PinnedRepository } from "@/lib/github/model";
 
-import { specimensOf, swatchesOf } from "./repositories";
+import { specimensOf, starStep, swatchesOf } from "./repositories";
 
 const repository = (
   name: string,
@@ -124,5 +124,25 @@ describe("repository specimens", () => {
     expect(specimen?.file.note).toBeNull();
     expect(specimen?.file.chips).toBeNull();
     expect(specimen?.file.links.map((link) => link.label)).toEqual(["GitHub"]);
+  });
+
+  test("files each repository under a call number from its language and owner", () => {
+    const specimens = specimensOf(
+      [repository("a", "TypeScript", 1), repository("b", "Elixir", 1)],
+      "GH-04"
+    );
+    expect(specimens.map((specimen) => specimen.callNumber)).toEqual([
+      ["005.13", "TS", "IVA 01"],
+      ["005.13", "EL", "IVA 02"],
+    ]);
+    expect(specimens[1]?.index).toBe(1);
+    expect(specimens[0]?.pushedOn).toBe("2026-04-09");
+  });
+
+  test("steps star counts onto a fixed scale with the most starred on top", () => {
+    expect([0, 1, 3, 5].map((stars) => starStep(stars, 5, 5))).toEqual([
+      0, 1, 2, 4,
+    ]);
+    expect(starStep(3, 0, 5)).toBe(0);
   });
 });

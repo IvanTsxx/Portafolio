@@ -58,6 +58,31 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@theme {
+  --animate-misregister-ink: misregister-ink 360ms var(--ease-out-quart);
+  --animate-misregister-tint: misregister-tint 360ms var(--ease-out-quart);
+
+  @keyframes misregister-ink {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    30% {
+      translate: -1.2px 0.8px;
+    }
+  }
+
+  @keyframes misregister-tint {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    30% {
+      translate: 1.4px -1px;
+    }
+  }
+}
+
 :root {
   --paper: oklch(0.94 0.003 106);
   --paper-deep: oklch(0.905 0.004 100);

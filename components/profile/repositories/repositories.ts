@@ -12,14 +12,18 @@ export const swatchTones = ["ink", "graphite", "mist", "hollow"] as const;
 export type SwatchTone = (typeof swatchTones)[number];
 
 export interface RepositorySpecimen {
+  callNumber: readonly string[];
   description: string | null;
   file: DossierFile;
   forks: number;
   id: string;
+  index: number;
   language: string;
+  languageCode: string;
   name: string;
   owner: string;
   pushed: string;
+  pushedOn: string;
   spoken: string;
   stars: number;
   swatch: SwatchTone;
@@ -37,6 +41,34 @@ const visibilityLabels = {
 
 const languageOf = (repository: PinnedRepository) =>
   repository.language ?? "Unknown";
+
+const languageCodes = new Map([
+  ["Go", "GO"],
+  ["JavaScript", "JS"],
+  ["Python", "PY"],
+  ["Rust", "RS"],
+  ["TypeScript", "TS"],
+  ["Unknown", "XX"],
+]);
+
+const languageCodeOf = (language: string) =>
+  languageCodes.get(language) ?? language.slice(0, 2).toUpperCase();
+
+const PROGRAMMING_CLASS = "005.13";
+
+const callNumberOf = (owner: string, languageCode: string, index: number) => [
+  PROGRAMMING_CLASS,
+  languageCode,
+  `${owner.slice(0, 3).toUpperCase()} ${String(index + 1).padStart(2, "0")}`,
+];
+
+export const starStep = (stars: number, most: number, steps: number) =>
+  most <= 0
+    ? 0
+    : Math.min(
+        steps - 1,
+        Math.max(0, Math.round((stars / most) * (steps - 1)))
+      );
 
 const plural = (count: number, one: string, many: string) =>
   `${count} ${count === 1 ? one : many}`;
@@ -101,7 +133,9 @@ export const specimensOf = (
     const url = `https://github.com/${repository.nameWithOwner}`;
     const language = languageOf(repository);
     const [owner = ""] = repository.nameWithOwner.split("/");
+    const languageCode = languageCodeOf(language);
     return {
+      callNumber: callNumberOf(owner, languageCode, index),
       description: repository.description,
       file: fileOf(
         repository,
@@ -110,10 +144,13 @@ export const specimensOf = (
       ),
       forks: repository.forks,
       id: repository.nameWithOwner,
+      index,
       language,
+      languageCode,
       name: repository.name,
       owner,
       pushed: formatDay(repository.pushedAt),
+      pushedOn: repository.pushedAt,
       spoken: `${repository.nameWithOwner}, ${language}, ${plural(repository.stars, "star", "stars")}, ${plural(repository.forks, "fork", "forks")}`,
       stars: repository.stars,
       swatch: swatches.get(language) ?? "hollow",
