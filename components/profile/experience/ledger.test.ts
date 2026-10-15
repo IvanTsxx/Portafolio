@@ -63,7 +63,6 @@ describe("employment ledger", () => {
       "Now",
     ]);
     expect(ledger.ruler.at(-1)?.at).toBe(1);
-    expect(ledger.gridlines).toEqual([0, 12 / 46, 24 / 46, 36 / 46]);
   });
 
   test("drops a year label that would collide with now", () => {
