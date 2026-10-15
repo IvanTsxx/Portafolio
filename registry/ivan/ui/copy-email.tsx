@@ -7,7 +7,7 @@ import type { ComponentProps, MouseEvent } from "react";
 
 import { cn } from "@/lib/utils";
 
-export const copyEmailVariants = cva(
+const copyEmailVariants = cva(
   "group/copy text-foreground focus-visible:ring-ring focus-visible:ring-offset-background inline-flex min-h-11 cursor-pointer items-baseline gap-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
   {
     defaultVariants: { size: "md" },
@@ -91,3 +91,23 @@ export const CopyEmail = ({
     </>
   );
 };
+
+export interface CopyEmailFaceProps
+  extends
+    Omit<ComponentProps<"span">, "children">,
+    VariantProps<typeof copyEmailVariants> {
+  email: string;
+  label?: string;
+}
+
+export const CopyEmailFace = ({
+  email,
+  label,
+  size,
+  className,
+  ...props
+}: CopyEmailFaceProps) => (
+  <span className={cn(copyEmailVariants({ size }), className)} {...props}>
+    <span className={underlineClassName}>{label ?? email}</span>
+  </span>
+);

@@ -71,7 +71,7 @@ bun run seo:check
 
 ### Add or remove a registry component
 
-1. Source goes in `registry/ivan/`, the entry in `registry.json`, and a demo with a thumbnail in `components/registry-docs/demos/<name>.tsx`. Follow an existing item such as `magnetic-button`. The thumbnail draws the component with spans and the exported `cva` variants, never the live component.
+1. Source goes in `registry/ivan/`, the entry in `registry.json`, and a demo with a thumbnail in `components/registry-docs/demos/<name>.tsx`. Follow an existing item such as `magnetic-button`. The thumbnail renders a static face of the component (`MagneticButtonFace`, `CopyEmailFace`) or plain spans, never the live component.
 2. Run `bun run registry:build` to refresh `public/r/`.
 3. Removing an item: delete its source, entry, demo, examples and `public/r/<name>.json`.
 4. Commit, then run `bun run seo:dates` and commit the dates.

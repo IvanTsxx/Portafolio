@@ -240,5 +240,29 @@ const MagneticLink = ({
   );
 };
 
-export { MagneticButton, MagneticLink, magneticButtonVariants };
-export type { MagneticButtonProps, MagneticLinkProps };
+type MagneticButtonFaceProps = Omit<ComponentProps<"span">, "children"> &
+  Omit<MagneticOwnProps, "strength"> & { children: ReactNode };
+
+const MagneticButtonFace = ({
+  children,
+  className,
+  index,
+  size,
+  style,
+  variant,
+  ...props
+}: MagneticButtonFaceProps) => (
+  <span
+    className={cn(fieldClassName, className)}
+    data-slot="magnetic-button-face"
+    style={{ ...restStyle, ...style }}
+    {...props}
+  >
+    <MagneticSurface index={index} size={size} variant={variant}>
+      {children}
+    </MagneticSurface>
+  </span>
+);
+
+export { MagneticButton, MagneticButtonFace, MagneticLink };
+export type { MagneticButtonFaceProps, MagneticButtonProps, MagneticLinkProps };

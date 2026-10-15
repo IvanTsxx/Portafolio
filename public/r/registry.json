@@ -84,6 +84,23 @@
                   "description": "Destination."
                 }
               ]
+            },
+            {
+              "component": "MagneticButtonFace",
+              "description": "The same surface as a static span, for previews inside links.",
+              "props": [
+                {
+                  "name": "variant",
+                  "type": "\"outline\" | \"solid\" | \"accent\" | \"ghost\"",
+                  "default": "\"outline\"",
+                  "description": "Surface treatment."
+                },
+                {
+                  "name": "index",
+                  "type": "string",
+                  "description": "Decorative mono index."
+                }
+              ]
             }
           ],
           "variants": [
@@ -964,6 +981,18 @@
                   "type": "number",
                   "default": "1800",
                   "description": "Milliseconds before the hint resets."
+                }
+              ]
+            },
+            {
+              "component": "CopyEmailFace",
+              "description": "The same text as a static span, for previews inside links.",
+              "props": [
+                {
+                  "name": "email",
+                  "type": "string",
+                  "required": true,
+                  "description": "Address to show."
                 }
               ]
             }
