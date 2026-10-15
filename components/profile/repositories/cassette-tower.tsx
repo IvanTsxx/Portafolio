@@ -4,31 +4,62 @@ import { cn } from "@/lib/utils";
 
 import { PullControls, PullLink } from "./pull-link";
 import { PullRack } from "./pull-rack";
-import { SleeveCover } from "./record-crate";
+import { openingPickOf } from "./repositories";
 import type { RepositorySpecimen } from "./repositories";
 import { RepositoryDescription, RepositoryHeading } from "./repository-facts";
+import { COVER_CELLS, sleeveCoverOf } from "./sleeve-cover";
 import { swatchClassNames } from "./swatch";
+
+const SleeveCover = ({ specimen }: { specimen: RepositorySpecimen }) => (
+  <svg
+    aria-hidden
+    className="text-ink size-full [shape-rendering:crispEdges]"
+    preserveAspectRatio="xMidYMid slice"
+    viewBox={`0 0 ${COVER_CELLS} ${COVER_CELLS}`}
+  >
+    <path
+      d={sleeveCoverOf(specimen.id, specimen.language)}
+      fill="currentColor"
+    />
+  </svg>
+);
+
+const SpineLine = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => (
+  <span className={cn("font-mono text-sm leading-6", className)}>
+    {children}
+  </span>
+);
 
 const CassetteSpine = ({ specimen }: { specimen: RepositorySpecimen }) => (
   <>
     <span
       className={cn(
         swatchClassNames[specimen.swatch],
-        "label flex w-11 shrink-0 items-center justify-center border-r"
+        "flex w-11 shrink-0 items-center justify-center border-r"
       )}
     >
-      {specimen.languageCode}
+      <SpineLine>
+        <span className="label">{specimen.languageCode}</span>
+      </SpineLine>
     </span>
-    <span className="flex min-w-0 flex-1 items-baseline gap-1 px-3">
-      <span className="label text-mist shrink-0 normal-case max-sm:hidden">
-        {specimen.owner}/
-      </span>
-      <span className="text-ink truncate font-mono text-sm">
+    <span className="flex min-w-0 flex-1 items-center px-3">
+      <SpineLine className="text-ink min-w-0 truncate">
+        <span className="label text-mist pr-1 normal-case max-sm:hidden">
+          {specimen.owner}/
+        </span>
         {specimen.name}
-      </span>
+      </SpineLine>
     </span>
-    <span className="label text-ink border-rule flex shrink-0 items-center border-l px-3 tabular-nums">
-      ★{specimen.stars}
+    <span className="border-rule flex shrink-0 items-center border-l px-3">
+      <SpineLine>
+        <span className="label text-ink tabular-nums">★{specimen.stars}</span>
+      </SpineLine>
     </span>
   </>
 );
@@ -104,32 +135,36 @@ export const CassetteTower = ({
   specimens,
 }: {
   specimens: readonly RepositorySpecimen[];
-}) => (
-  <PullRack
-    classNames={{
-      item: "ease-out-quart transition-transform duration-300 data-active:translate-x-3 data-open:translate-x-6 motion-reduce:transition-none",
-      list: "border-ink mr-6 flex flex-col gap-1 border-x-4 border-b-4 p-1 lg:w-88 lg:shrink-0",
-      reveal: "min-w-0 lg:flex-1",
-      root: "flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8",
-    }}
-    items={specimens.map((specimen) => ({
-      id: specimen.id,
-      node: (
-        <PullLink
-          action="Unfold the J-card"
-          className="border-ink bg-paper flex h-12 w-full border"
-          specimen={specimen}
-        >
-          <CassetteSpine specimen={specimen} />
-        </PullLink>
-      ),
-    }))}
-    label="Pinned repositories as cassettes in a tower. Arrow keys move, Enter unfolds the J-card."
-    panels={specimens.map((specimen) => ({
-      id: specimen.id,
-      node: <JCard specimen={specimen} />,
-    }))}
-    revealLabel="Cassette J-card"
-    revealOn="active"
-  />
-);
+}) => {
+  const opening = openingPickOf(specimens);
+  return (
+    <PullRack
+      classNames={{
+        item: "ease-out-quart transition-transform duration-300 data-active:translate-x-3 data-open:translate-x-6 motion-reduce:transition-none",
+        list: "border-ink mr-6 flex flex-col gap-1 border-x-4 border-b-4 p-1 lg:w-88 lg:shrink-0",
+        reveal: "min-w-0 lg:flex-1",
+        root: "flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8",
+      }}
+      initialOpen={opening}
+      items={specimens.map((specimen) => ({
+        id: specimen.id,
+        node: (
+          <PullLink
+            action="Unfold the J-card"
+            className="border-ink bg-paper flex h-12 w-full border"
+            isOpen={specimen.index === opening}
+            specimen={specimen}
+          >
+            <CassetteSpine specimen={specimen} />
+          </PullLink>
+        ),
+      }))}
+      label="Repositories as cassettes in a tower. Arrow keys move, Enter unfolds the J-card."
+      panels={specimens.map((specimen) => ({
+        id: specimen.id,
+        node: <JCard specimen={specimen} />,
+      }))}
+      revealLabel="Cassette J-card"
+    />
+  );
+};

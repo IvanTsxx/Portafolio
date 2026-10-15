@@ -140,3 +140,10 @@ export const ledgerOf = (
   });
   return { entries };
 };
+
+export const openingEntryOf = (
+  entries: readonly Pick<LedgerEntry, "isCurrent">[]
+) => {
+  const index = entries.findIndex((entry) => entry.isCurrent);
+  return index === -1 ? null : index;
+};

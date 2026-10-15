@@ -6,7 +6,7 @@ import { HowIWork } from "@/components/profile/how-i-work/how-i-work-section";
 import { MatrixSection } from "@/components/profile/matrix/matrix-section";
 import { ProfileIntro } from "@/components/profile/profile-intro";
 import { RegistrySection } from "@/components/profile/registry-section";
-import { PinnedSection } from "@/components/profile/repositories/pinned-section";
+import { ReposSection } from "@/components/profile/repositories/repos-section";
 import { JsonLd } from "@/components/site/json-ld";
 import { getGithubProfile } from "@/lib/site/github-profile";
 import { buildPageMetadata, pageSeo } from "@/lib/site/seo";
@@ -24,7 +24,7 @@ const HomePage = async () => {
       <JsonLd data={homeJsonLd()} />
       <ProfileIntro identity={profile.identity} />
       <ExperienceSection />
-      <PinnedSection repositories={profile.pinned} />
+      <ReposSection repositories={profile.pinned} />
       <MatrixSection calendars={profile.calendars} />
       <HowIWork />
       <AgentWorkshop />

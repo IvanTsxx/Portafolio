@@ -56,8 +56,8 @@ export const sectionScripts = {
     "I build each section as you reach it.",
   ]),
   homeMatrix: builds(["Weaving a year of commits."]),
-  homePinned: builds(["Pinning the repos Ivo is proud of."]),
   homeRegistry: builds(["Stocking parts you can install."]),
+  homeRepos: builds(["Stacking the tapes Ivo is proud of."]),
   homeWorkshop: builds([
     "My fitting room. Dress me up.",
     "The link keeps the look.",

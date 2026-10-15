@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import type { PinnedRepository } from "@/lib/github/model";
 
-import { specimensOf, starStep, swatchesOf } from "./repositories";
+import { openingPickOf, specimensOf, swatchesOf } from "./repositories";
 
 const repository = (
   name: string,
@@ -125,11 +125,39 @@ describe("repository specimens", () => {
     expect(specimen?.file.chips).toBeNull();
     expect(specimen?.file.links.map((link) => link.label)).toEqual(["GitHub"]);
   });
+});
 
-  test("steps star counts onto a fixed scale with the most starred on top", () => {
-    expect([0, 1, 3, 5].map((stars) => starStep(stars, 5, 5))).toEqual([
-      0, 1, 2, 4,
-    ]);
-    expect(starStep(3, 0, 5)).toBe(0);
+const pushed = (name: string, stars: number, pushedAt: string) => ({
+  ...repository(name, "TypeScript", stars),
+  pushedAt,
+});
+
+describe("opening tape", () => {
+  test("is the most starred repository", () => {
+    const specimens = specimensOf(
+      [
+        pushed("a", 2, "2026-05-01"),
+        pushed("b", 9, "2025-01-01"),
+        pushed("c", 4, "2026-06-01"),
+      ],
+      "GH-03"
+    );
+    expect(specimens[openingPickOf(specimens) ?? -1]?.name).toBe("b");
+  });
+
+  test("breaks a star tie with the most recent push", () => {
+    const specimens = specimensOf(
+      [
+        pushed("older", 7, "2026-03-01"),
+        pushed("newer", 7, "2026-08-14"),
+        pushed("oldest", 7, "2025-12-01"),
+      ],
+      "GH-03"
+    );
+    expect(specimens[openingPickOf(specimens) ?? -1]?.name).toBe("newer");
+  });
+
+  test("is none without repositories", () => {
+    expect(openingPickOf([])).toBeNull();
   });
 });

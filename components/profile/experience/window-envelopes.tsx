@@ -6,6 +6,7 @@ import { focusRingClassName } from "@/components/site/styles";
 import { cn } from "@/lib/utils";
 
 import { FiledSheet, RoomPlaceholder, sheetRoomClassName } from "./filed-sheet";
+import { openingEntryOf } from "./ledger";
 import type { FiledFacts } from "./ledger";
 import { letterOrigin, pullPose } from "./poses";
 import type { PullPose } from "./poses";
@@ -75,7 +76,10 @@ export const WindowEnvelopes = ({
 }: {
   entries: readonly FiledFacts[];
 }) => {
-  const { fileBack, itemProps, pull, pulled } = usePull(entries.length);
+  const { fileBack, itemProps, pull, pulled } = usePull(
+    entries.length,
+    openingEntryOf(entries)
+  );
 
   return (
     <div className="flex flex-col gap-3" data-build-block>

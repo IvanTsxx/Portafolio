@@ -25,9 +25,9 @@ export const useEscapeKey = (isListening: boolean, onEscape: () => void) => {
   }, [isListening]);
 };
 
-export const usePull = (count: number) => {
-  const deck = useDeck(count);
-  const [pulled, setPulled] = useState<number | null>(null);
+export const usePull = (count: number, initialPulled: number | null) => {
+  const deck = useDeck(count, initialPulled ?? 0);
+  const [pulled, setPulled] = useState(initialPulled);
 
   const pull = (index: number) => {
     setPulled((current) => pulledAfter(current, index));

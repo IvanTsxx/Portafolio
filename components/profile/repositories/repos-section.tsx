@@ -7,21 +7,15 @@ import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
 import { CassetteTower } from "./cassette-tower";
-import { FloppyRack } from "./floppy-rack";
-import { OpenShelf } from "./open-shelf";
-import { PullCrate } from "./pull-crate";
-import { RecordCrate } from "./record-crate";
-import { ReposReview } from "./repos-review";
 import { specimensOf } from "./repositories";
 import { RepositoryFiles } from "./repository-files";
-import { SpineShelf } from "./spine-shelf";
 
-export const PinnedSection = ({
+export const ReposSection = ({
   repositories,
 }: {
   repositories: readonly PinnedRepository[];
 }) => {
-  const section = homeSectionById("pinned");
+  const section = homeSectionById("repos");
   const specimens = specimensOf(repositories, section.index);
   const count = specimens.length;
 
@@ -31,18 +25,11 @@ export const PinnedSection = ({
       id={section.id}
       index={section.index}
       label={section.label}
-      script={sectionScripts.homePinned}
+      script={sectionScripts.homeRepos}
     >
       {count > 0 ? (
         <RepositoryFiles files={specimens.map((specimen) => specimen.file)}>
-          <ReposReview
-            d={<SpineShelf specimens={specimens} />}
-            e={<OpenShelf specimens={specimens} />}
-            f={<RecordCrate specimens={specimens} />}
-            h={<PullCrate specimens={specimens} />}
-            i={<FloppyRack specimens={specimens} />}
-            j={<CassetteTower specimens={specimens} />}
-          />
+          <CassetteTower specimens={specimens} />
         </RepositoryFiles>
       ) : null}
     </DocumentSection>

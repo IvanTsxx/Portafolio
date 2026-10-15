@@ -5,65 +5,12 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-import type { RackItem } from "./panel-stack";
 import { usePull } from "./use-pull";
 
-export const PullReveals = ({
-  className,
-  label,
-  open,
-  over,
-  panels,
-  shown,
-  under,
-}: {
-  className?: string;
-  label: string;
-  open: number | null;
-  over?: ReactNode;
-  panels: readonly RackItem[];
-  shown: number | null;
-  under?: ReactNode;
-}) => (
-  <section
-    aria-label={label}
-    className={cn("group/stage grid", className)}
-    data-build-block
-    data-empty={open === null || undefined}
-    data-reveal
-  >
-    {under ? (
-      <div aria-hidden className="col-start-1 row-start-1 grid">
-        {under}
-      </div>
-    ) : null}
-    {panels.map(({ id, node }, index) => {
-      const isShown = index === shown;
-      return (
-        <div
-          aria-hidden={!isShown}
-          className={cn(
-            "group/reveal ease-out-quart col-start-1 row-start-1 grid transition-opacity duration-200",
-            isShown ? "opacity-100" : "pointer-events-none opacity-0"
-          )}
-          data-open={index === open || undefined}
-          inert={!isShown}
-          key={id}
-        >
-          {node}
-        </div>
-      );
-    })}
-    {over ? (
-      <div
-        aria-hidden
-        className="pointer-events-none col-start-1 row-start-1 grid"
-      >
-        {over}
-      </div>
-    ) : null}
-  </section>
-);
+export interface RackItem {
+  id: string;
+  node: ReactNode;
+}
 
 export interface PullRackClassNames {
   item: string;
@@ -74,24 +21,22 @@ export interface PullRackClassNames {
 
 export const PullRack = ({
   classNames,
+  initialOpen,
   items,
   label,
   panels,
   revealLabel,
-  revealOn,
-  under,
 }: {
   classNames: PullRackClassNames;
+  initialOpen: number | null;
   items: readonly RackItem[];
   label: string;
   panels: readonly RackItem[];
   revealLabel: string;
-  revealOn: "open" | "active";
-  under?: ReactNode;
 }) => {
   const root = useRef<HTMLDivElement>(null);
-  const { active, open } = usePull(root, revealOn === "active" ? 0 : null);
-  const shown = revealOn === "open" ? open : (open ?? active ?? 0);
+  const { active, open } = usePull(root, initialOpen);
+  const shown = open ?? active;
 
   return (
     <div className={classNames.root} ref={root}>
@@ -107,14 +52,31 @@ export const PullRack = ({
           </li>
         ))}
       </ul>
-      <PullReveals
-        className={classNames.reveal}
-        label={revealLabel}
-        open={open}
-        panels={panels}
-        shown={shown}
-        under={under}
-      />
+      <section
+        aria-label={revealLabel}
+        className={cn("group/stage grid", classNames.reveal)}
+        data-build-block
+        data-empty={open === null || undefined}
+        data-reveal
+      >
+        {panels.map(({ id, node }, index) => {
+          const isShown = index === shown;
+          return (
+            <div
+              aria-hidden={!isShown}
+              className={cn(
+                "group/reveal ease-out-quart col-start-1 row-start-1 grid transition-opacity duration-200",
+                isShown ? "opacity-100" : "pointer-events-none opacity-0"
+              )}
+              data-open={index === open || undefined}
+              inert={!isShown}
+              key={id}
+            >
+              {node}
+            </div>
+          );
+        })}
+      </section>
     </div>
   );
 };

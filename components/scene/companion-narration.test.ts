@@ -20,7 +20,7 @@ const maxScroll = 6000;
 const page = [
   { id: "intro", lines: ["Opening the file.", "Second look."], top: 0 },
   { id: "experience", lines: ["Laying out roles."], top: 1000 },
-  { id: "pinned", lines: ["Pinning repos."], top: 2000 },
+  { id: "repos", lines: ["Stacking tapes."], top: 2000 },
   { id: "matrix", lines: [], top: 3000 },
   { id: "workshop", lines: ["Fitting room.", "Link keeps it."], top: 4000 },
   { id: "contact", lines: ["Last page."], top: 5200 },
@@ -80,18 +80,18 @@ describe("companion narration", () => {
     const handover = (stops[2] ?? 0) - viewportHeight * 0.3;
     expect(
       play([{ scrollY: handover - 20 }, { scrollY: handover + 20 }])
-    ).toEqual(["Laying out roles.", "Pinning repos."]);
+    ).toEqual(["Laying out roles.", "Stacking tapes."]);
   });
 
   test("a fast scroll hides the bubble and skips the sections it passes", () => {
     const lines = play([
       { scrollY: restingOn("experience") },
-      { scrollY: restingOn("pinned"), velocity: fastScrollSpeed * 3 },
+      { scrollY: restingOn("repos"), velocity: fastScrollSpeed * 3 },
       { scrollY: restingOn("workshop") - 400, velocity: fastScrollSpeed * 2 },
       { scrollY: restingOn("workshop") },
     ]);
     expect(lines).toEqual(["Laying out roles.", null, null, "Fitting room."]);
-    expect(lines).not.toContain("Pinning repos.");
+    expect(lines).not.toContain("Stacking tapes.");
   });
 
   test("scrolling back up narrates the earlier section again and rotates its lines", () => {
@@ -103,7 +103,7 @@ describe("companion narration", () => {
         { scrollY: 100 },
         { scrollY: restingOn("workshop"), velocity: fastScrollSpeed * 4 },
         { scrollY: restingOn("workshop") },
-        { scrollY: restingOn("pinned") },
+        { scrollY: restingOn("repos") },
       ])
     ).toEqual([
       "Opening the file.",
@@ -112,14 +112,14 @@ describe("companion narration", () => {
       "Second look.",
       null,
       "Fitting room.",
-      "Pinning repos.",
+      "Stacking tapes.",
     ]);
   });
 
   test("a section without lines silences the previous one", () => {
     expect(
-      play([{ scrollY: restingOn("pinned") }, { scrollY: restingOn("matrix") }])
-    ).toEqual(["Pinning repos.", null]);
+      play([{ scrollY: restingOn("repos") }, { scrollY: restingOn("matrix") }])
+    ).toEqual(["Stacking tapes.", null]);
   });
 
   test("nothing is said before the first section is reached", () => {

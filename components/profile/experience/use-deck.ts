@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
+import type { KeyboardEvent, PointerEvent } from "react";
 
 const deckSteps = new Map([
   ["ArrowDown", 1],
@@ -15,9 +15,9 @@ export const deckStep = (active: number, key: string, count: number) => {
   return by === undefined ? null : (active + by + count) % count;
 };
 
-export const useDeck = (count: number) => {
+export const useDeck = (count: number, initialActive: number) => {
   const items = useRef<(HTMLElement | null)[]>([]);
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(initialActive);
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     const next = deckStep(active, event.key, count);
@@ -43,15 +43,5 @@ export const useDeck = (count: number) => {
     tabIndex: index === active ? 0 : -1,
   });
 
-  const selectBeforeOpening =
-    (index: number) => (event: MouseEvent<HTMLElement>) => {
-      if (index === active) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      setActive(index);
-    };
-
-  return { active, itemProps, items, selectBeforeOpening };
+  return { active, itemProps, items };
 };

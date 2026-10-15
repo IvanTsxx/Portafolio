@@ -27,14 +27,15 @@ const isOutOfView = (element: Element) => {
 
 export const usePull = (
   root: RefObject<HTMLElement | null>,
-  rest: number | null
+  initialOpen: number | null
 ) => {
-  const active = useRackFocus(root, rest, "pick");
-  const [open, setOpen] = useState<number | null>(null);
+  const active = useRackFocus(root, initialOpen ?? 0);
+  const [open, setOpen] = useState(initialOpen);
   const openRef = useRef(open);
   const isReduced = useReducedMotion();
 
   useEffect(() => {
+    const hasChanged = openRef.current !== open;
     openRef.current = open;
     const element = root.current;
     if (!element) {
@@ -47,7 +48,7 @@ export const usePull = (
       );
     }
     const reveal = element.querySelector("[data-reveal]");
-    if (open !== null && reveal && isOutOfView(reveal)) {
+    if (hasChanged && open !== null && reveal && isOutOfView(reveal)) {
       reveal.scrollIntoView({
         behavior: isReduced ? "auto" : "smooth",
         block: "nearest",

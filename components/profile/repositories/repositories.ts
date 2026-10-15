@@ -53,14 +53,6 @@ const languageCodes = new Map([
 const languageCodeOf = (language: string) =>
   languageCodes.get(language) ?? language.slice(0, 2).toUpperCase();
 
-export const starStep = (stars: number, most: number, steps: number) =>
-  most <= 0
-    ? 0
-    : Math.min(
-        steps - 1,
-        Math.max(0, Math.round((stars / most) * (steps - 1)))
-      );
-
 const plural = (count: number, one: string, many: string) =>
   `${count} ${count === 1 ? one : many}`;
 
@@ -151,3 +143,12 @@ export const specimensOf = (
     };
   });
 };
+
+export const openingPickOf = (specimens: readonly RepositorySpecimen[]) =>
+  specimens
+    .toSorted(
+      (first, second) =>
+        second.stars - first.stars ||
+        second.pushedOn.localeCompare(first.pushedOn)
+    )
+    .at(0)?.index ?? null;

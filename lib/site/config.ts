@@ -52,7 +52,7 @@ export const primaryRoutes = [
 
 export const homeSections = [
   { id: "experience", index: "GH-02", label: "Experience" },
-  { id: "pinned", index: "GH-03", label: "Pinned" },
+  { id: "repos", index: "GH-03", label: "Repos" },
   {
     id: "matrix",
     index: "GH-04",

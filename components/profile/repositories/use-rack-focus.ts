@@ -10,25 +10,22 @@ const steps = new Map([
   ["ArrowUp", -1],
 ]);
 
-export type RackKey = "file" | "pick";
-
-const rackLinkOf = (target: EventTarget | null, key: RackKey) =>
+const pickLinkOf = (target: EventTarget | null) =>
   target instanceof Element
-    ? target.closest<HTMLAnchorElement>(`a[data-${key}]`)
+    ? target.closest<HTMLAnchorElement>("a[data-pick]")
     : null;
 
-const rackIndexOf = (target: EventTarget | null, key: RackKey) => {
-  const link = rackLinkOf(target, key);
-  const index = Number(link?.dataset[key]);
+const pickIndexOf = (target: EventTarget | null) => {
+  const link = pickLinkOf(target);
+  const index = Number(link?.dataset.pick);
   return link && Number.isInteger(index) ? index : null;
 };
 
 export const useRackFocus = (
   root: RefObject<HTMLElement | null>,
-  rest: number | null,
-  key: RackKey = "file"
+  initialActive: number
 ) => {
-  const [active, setActive] = useState<number | null>(rest);
+  const [active, setActive] = useState(initialActive);
 
   useEffect(() => {
     const element = root.current;
@@ -36,7 +33,7 @@ export const useRackFocus = (
       return;
     }
     const show = (event: Event) => {
-      const index = rackIndexOf(event.target, key);
+      const index = pickIndexOf(event.target);
       if (index !== null) {
         setActive(index);
       }
@@ -46,51 +43,28 @@ export const useRackFocus = (
         show(event);
       }
     };
-    const settleOnLeave = (event: PointerEvent) => {
-      if (
-        rest === null &&
-        event.pointerType === "mouse" &&
-        !element.contains(document.activeElement)
-      ) {
-        setActive(null);
-      }
-    };
-    const settleOnBlur = (event: FocusEvent) => {
-      const next = event.relatedTarget;
-      if (
-        rest === null &&
-        !(next instanceof Node && element.contains(next)) &&
-        !element.matches(":hover")
-      ) {
-        setActive(null);
-      }
-    };
     const step = (event: KeyboardEvent) => {
       const by = steps.get(event.key);
-      const link = rackLinkOf(event.target, key);
+      const link = pickLinkOf(event.target);
       if (by === undefined || !link || event.altKey || event.metaKey) {
         return;
       }
       const links = [
-        ...element.querySelectorAll<HTMLAnchorElement>(`a[data-${key}]`),
+        ...element.querySelectorAll<HTMLAnchorElement>("a[data-pick]"),
       ];
       const position = links.indexOf(link);
       event.preventDefault();
       links[(position + by + links.length) % links.length]?.focus();
     };
     element.addEventListener("focusin", show);
-    element.addEventListener("focusout", settleOnBlur);
     element.addEventListener("pointerover", showOnMouse);
-    element.addEventListener("pointerleave", settleOnLeave);
     element.addEventListener("keydown", step);
     return () => {
       element.removeEventListener("focusin", show);
-      element.removeEventListener("focusout", settleOnBlur);
       element.removeEventListener("pointerover", showOnMouse);
-      element.removeEventListener("pointerleave", settleOnLeave);
       element.removeEventListener("keydown", step);
     };
-  }, [root, rest, key]);
+  }, [root]);
 
   return active;
 };

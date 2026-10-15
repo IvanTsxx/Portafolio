@@ -12,15 +12,17 @@ export const PullLink = ({
   action,
   children,
   className,
+  isOpen,
   specimen,
 }: {
   action: string;
   children: ReactNode;
   className?: string;
+  isOpen: boolean;
   specimen: RepositorySpecimen;
 }) => (
   <a
-    aria-expanded={false}
+    aria-expanded={isOpen}
     aria-label={`${specimen.spoken}. ${action}.`}
     className={cn(focusRingClassName, className)}
     data-pick={specimen.index}
