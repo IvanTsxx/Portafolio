@@ -1,47 +1,28 @@
-import "@/components/iso/iso.css";
 import { DocumentSection } from "@/components/site/document-section";
 import type { ContributionCalendar } from "@/lib/github/model";
 import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
-import { loomParts } from "./loom-art";
-import { loomArtOf } from "./loom-geometry";
-import { loomLayoutOf } from "./loom-layout";
-import { LoomLive } from "./loom-live";
-import {
-  contributionsText,
-  loomSourcesOf,
-  loomYearOf,
-  weekCountOf,
-} from "./loom-model";
-import type { LoomYear } from "./loom-model";
+import { ContributionGraph } from "./contribution-graph";
+import { contributionsText, graphSourcesOf } from "./contribution-model";
+import type { GraphSource } from "./contribution-model";
 
-const captionOf = (weekCount: number, latest: LoomYear | undefined) => {
-  const machine = `A pin loom with one pin per day across ${weekCount} weeks, each raised by that day's contributions.`;
-  return latest
-    ? `${machine} ${contributionsText(latest.total)} ${latest.caption}.`
-    : machine;
-};
+const captionOf = (latest: GraphSource) =>
+  `A grid of days by week, darker where there were more contributions. ${contributionsText(latest.total)} ${
+    latest.range === "last-year" ? "in the last year" : `in ${latest.year}`
+  }.`;
 
 export const MatrixSection = ({
   calendars,
 }: {
   calendars: readonly ContributionCalendar[];
 }) => {
-  const [head, ...rest] = loomSourcesOf(calendars);
+  const [head, ...rest] = graphSourcesOf(calendars);
   if (!head) {
     return null;
   }
   const sources = [head, ...rest] as const;
-  const weekCount = weekCountOf(calendars);
-  const years = sources.map(loomYearOf);
-  const tallest = Math.max(0, ...years.flatMap((year) => year.heights));
-  const initial = Math.max(0, years.length - 1);
-  const layout = loomLayoutOf(weekCount, tallest);
-  const art = loomArtOf(
-    layout,
-    sources.map((source) => source.year)
-  );
+  const initial = sources.length - 1;
   const section = homeSectionById("matrix");
 
   return (
@@ -51,14 +32,11 @@ export const MatrixSection = ({
       label={section.label}
       script={sectionScripts.homeMatrix}
     >
-      <LoomLive
-        caption={captionOf(weekCount, years[initial])}
+      <ContributionGraph
+        caption={captionOf(sources[initial] ?? head)}
         initial={initial}
-        label={`Pin loom, ${years.length} years of contributions. Arrow keys read each day, Home and End jump, Enter pins the week, Page Up and Page Down change the year.`}
-        parts={loomParts(art)}
+        label="Contributions by day. Arrow keys move between days, Home and End jump to the first and latest day."
         sources={sources}
-        tallest={tallest}
-        weekCount={weekCount}
       />
     </DocumentSection>
   );

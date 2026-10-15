@@ -25,7 +25,7 @@ Next.js 16 App Router, React 19, Tailwind v4, base-ui, cva + `cn`, GSAP through 
 
 - No code comments. No AI attribution in commits.
 - No Playwright and no browser automation. Verify with tests, the build and the checks below.
-- Paper and ink tokens only. Clay orange belongs to the companion. Radius 0, no shadows, no arbitrary Tailwind values unless they are a theme token.
+- Paper and ink tokens only. Clay orange belongs to the companion, plus two owner-approved exceptions: the hover accent of the contribution graph and the color print inside the Super Saiyan experiment. Radius 0, no shadows, no arbitrary Tailwind values unless they are a theme token.
 - Labels and short lines, not paragraphs.
 - One shared WebGL canvas (`components/scene/shared-canvas.tsx`). Render 3D or shaders through `useViewSlot`. Never add a second `Canvas`.
 - One agent on screen: the companion. `components/scene/one-agent.test.ts` enforces it.

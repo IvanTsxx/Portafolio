@@ -55,7 +55,7 @@ export const sectionScripts = {
     "Opening Ivo's file.",
     "I build each section as you reach it.",
   ]),
-  homeMatrix: builds(["Weaving a year of commits."]),
+  homeMatrix: builds(["I wrote most of these commits."]),
   homeRegistry: builds(["Stocking parts you can install."]),
   homeRepos: builds(["Stacking the tapes Ivo is proud of."]),
   homeWorkshop: builds([
