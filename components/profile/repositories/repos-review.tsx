@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import type { ReactNode } from "react";
 
-const reviewKeys = ["d", "e", "f", "g"] as const;
+const reviewKeys = ["d", "e", "f", "h", "i", "j"] as const;
 
 type ReviewKey = (typeof reviewKeys)[number];
 

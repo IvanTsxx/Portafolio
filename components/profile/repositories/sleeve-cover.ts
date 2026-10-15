@@ -16,7 +16,7 @@ interface Seed {
   phase: number;
 }
 
-const hashOf = (text: string) =>
+export const hashOf = (text: string) =>
   [...text].reduce(
     (total, character, index) =>
       (total * 31 + (character.codePointAt(0) ?? 0) * (index + 7)) %
@@ -84,7 +84,7 @@ const motifOf = (language: string): Motif =>
   motifOrder[hashOf(language) % motifOrder.length] ??
   "sun";
 
-const thresholdAt = (column: number, row: number) =>
+export const thresholdAt = (column: number, row: number) =>
   ((BAYER[(row % BAYER_SIDE) * BAYER_SIDE + (column % BAYER_SIDE)] ?? 8) +
     0.5) /
   BAYER.length;

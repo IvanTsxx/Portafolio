@@ -6,9 +6,11 @@ import type { PinnedRepository } from "@/lib/github/model";
 import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
+import { CassetteTower } from "./cassette-tower";
+import { FloppyRack } from "./floppy-rack";
 import { OpenShelf } from "./open-shelf";
+import { PullCrate } from "./pull-crate";
 import { RecordCrate } from "./record-crate";
-import { RepoCards } from "./repo-cards";
 import { ReposReview } from "./repos-review";
 import { specimensOf } from "./repositories";
 import { RepositoryFiles } from "./repository-files";
@@ -37,7 +39,9 @@ export const PinnedSection = ({
             d={<SpineShelf specimens={specimens} />}
             e={<OpenShelf specimens={specimens} />}
             f={<RecordCrate specimens={specimens} />}
-            g={<RepoCards specimens={specimens} />}
+            h={<PullCrate specimens={specimens} />}
+            i={<FloppyRack specimens={specimens} />}
+            j={<CassetteTower specimens={specimens} />}
           />
         </RepositoryFiles>
       ) : null}

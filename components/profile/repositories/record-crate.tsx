@@ -12,7 +12,7 @@ import { RepositoryLink } from "./repository-link";
 import { COVER_CELLS, sleeveCoverOf } from "./sleeve-cover";
 import { swatchClassNames } from "./swatch";
 
-const SleeveCover = ({ specimen }: { specimen: RepositorySpecimen }) => (
+export const SleeveCover = ({ specimen }: { specimen: RepositorySpecimen }) => (
   <svg
     aria-hidden
     className="text-ink size-full [shape-rendering:crispEdges]"
@@ -26,11 +26,8 @@ const SleeveCover = ({ specimen }: { specimen: RepositorySpecimen }) => (
   </svg>
 );
 
-const Sleeve = ({ specimen }: { specimen: RepositorySpecimen }) => (
-  <RepositoryLink
-    className="border-ink bg-paper flex size-full flex-col border"
-    specimen={specimen}
-  >
+export const SleeveFace = ({ specimen }: { specimen: RepositorySpecimen }) => (
+  <>
     <span
       className={cn(
         swatchClassNames[specimen.swatch],
@@ -50,6 +47,15 @@ const Sleeve = ({ specimen }: { specimen: RepositorySpecimen }) => (
         {specimen.language}
       </span>
     </span>
+  </>
+);
+
+const Sleeve = ({ specimen }: { specimen: RepositorySpecimen }) => (
+  <RepositoryLink
+    className="border-ink bg-paper flex size-full flex-col border"
+    specimen={specimen}
+  >
+    <SleeveFace specimen={specimen} />
   </RepositoryLink>
 );
 
