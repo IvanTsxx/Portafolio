@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-import type { LoomYear } from "./loom-model";
+import type { GraphYear } from "./contribution-model";
 
 export const YearKeys = ({
   onPick,
@@ -11,7 +11,7 @@ export const YearKeys = ({
 }: {
   onPick: (index: number) => void;
   shown: number;
-  years: readonly LoomYear[];
+  years: readonly GraphYear[];
 }) => (
   <fieldset className="m-0 flex flex-wrap gap-1 border-0 p-0">
     <legend className="sr-only">Contribution year</legend>
