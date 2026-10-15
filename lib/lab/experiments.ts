@@ -30,6 +30,8 @@ import { StampTypeLive } from "@/components/lab/experiments/stamp-type/live";
 import { StampTypePoster } from "@/components/lab/experiments/stamp-type/poster";
 import { StippleLive } from "@/components/lab/experiments/stipple/live";
 import { StipplePoster } from "@/components/lab/experiments/stipple/poster";
+import { SuperSaiyanLive } from "@/components/lab/experiments/super-saiyan/live";
+import { SuperSaiyanPoster } from "@/components/lab/experiments/super-saiyan/poster";
 import { ThresholdCutLive } from "@/components/lab/experiments/threshold-cut/live";
 import { ThresholdCutPoster } from "@/components/lab/experiments/threshold-cut/poster";
 import { labTopics } from "@/lib/lab/topics";
@@ -51,7 +53,8 @@ export type ExperimentSlug =
   | "stipple"
   | "paper-fold"
   | "contour-map"
-  | "stamp-type";
+  | "stamp-type"
+  | "super-saiyan";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -419,6 +422,32 @@ const experimentsBySlug = {
     technologies: ["Canvas 2D", "Lloyd relaxation", "Voronoi", "TypedArrays"],
     title: "Stipple",
     topics: ["Image", "Motion"],
+    year: 2026,
+  },
+  "super-saiyan": {
+    Poster: SuperSaiyanPoster,
+    Preview: SuperSaiyanLive,
+    hasControls: true,
+    implementation: [
+      "One full-viewport plane. Each cell samples the image at a mip matched to its size, sharpens it against a blurrier mip and runs a contrast curve.",
+      "The cell compares that tone with a Bayer 8×8 level or a 64×64 void-and-cluster blue-noise tile generated ahead of time.",
+      "Rain is three layers of slanted one-cell columns. Lightning lifts the sky and the threshold for under a second.",
+      "The aura springs to the pointer. It brightens the hair, swells the dots and sends ink rings outward. A click fires a burst ring.",
+    ],
+    index: "LAB-17",
+    related: ["error-diffusion", "dither-field"],
+    slug: "super-saiyan",
+    summary:
+      "Goku in a storm, dithered live in ink, with a ki aura on the pointer.",
+    technicalNotes: [
+      "The tone curve is one table shared by the shader and the poster script, so the card matches the live frame.",
+      "The poster is a 2 KB 1-bit PNG used as an SVG mask over ink.",
+      "Strikes are two pulses at least five seconds apart. Reduced motion draws one still frame with no flashes.",
+      "The render loop stops offscreen and nothing animates through React state.",
+    ],
+    technologies: ["React Three Fiber", "GLSL", "Bayer", "Blue noise"],
+    title: "Super Saiyan",
+    topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
   "threshold-cut": {
