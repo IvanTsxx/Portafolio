@@ -25,11 +25,14 @@ export interface LedgerEntry {
   file: DossierFile;
   id: string;
   length: string;
+  logo: string;
   months: number;
   ordinal: string;
   role: string;
   spoken: string;
   startMonth: number;
+  type: Experience["type"];
+  year: string;
 }
 
 export interface RulerMark {
@@ -41,7 +44,6 @@ export interface Ledger {
   entries: readonly LedgerEntry[];
   firstYear: number;
   ruler: readonly RulerMark[];
-  gridlines: readonly number[];
   scaleMonths: number;
 }
 
@@ -170,20 +172,19 @@ export const ledgerOf = (
       ),
       id: job.id,
       length,
+      logo: job.logo,
       months,
       ordinal: String(newestFirst.length - index).padStart(2, "0"),
       role: job.role,
       spoken: `${job.company}, ${job.role}, ${dates.replace("→", "to")}, ${spokenDuration(months)}, ${job.type}`,
       startMonth,
+      type: job.type,
+      year: job.start.slice(0, 4),
     };
   });
   return {
     entries,
     firstYear,
-    gridlines: Array.from(
-      { length: Math.ceil(scaleMonths / 12) },
-      (_, index) => (index * 12) / scaleMonths
-    ),
     ruler: rulerOf(firstYear, scaleMonths),
     scaleMonths,
   };
