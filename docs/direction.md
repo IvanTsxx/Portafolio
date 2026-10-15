@@ -12,7 +12,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 
 ## Chrome
 
-- `components/site/dossier.tsx` wraps every page in the same 72rem sheet (`max-w-sheet`) over two backing sheets, index and detail alike. Sections, grids, figures and heroes use the full width. Paragraphs keep the 44rem measure (`max-w-column`) or `max-w-prose`.
+- `components/site/dossier.tsx` wraps every page in the same 60rem sheet (`max-w-sheet`) over two backing sheets, index and detail alike. Sections, grids, figures and heroes use the full width. Paragraphs keep the 44rem measure (`max-w-column`) or `max-w-prose`.
 - The sheet's left edge is the bound strip (`dossier-edge.tsx`): punched holes in dithered toner. A press punches the nearest hole and sends a ripple. It is the only edge.
 - Route tabs use English labels with a tiny vertical kana on desktop. Japanese appears only there, in index page heroes and in the nickname kana.
 - The thumb index (`thumb-index.tsx`) shows one notch per section from `lib/site/page-sections.ts`. Notch numbers come from the section heading codes, and section components read their code from the same list.

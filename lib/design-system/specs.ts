@@ -372,7 +372,7 @@ export const documentGridSpec = {
   gutter: "md:px-8",
   sectionGap: "gap-24",
   sheetInset: "md:px-12",
-  sheetWidth: "72rem",
+  sheetWidth: "60rem",
 } as const;
 
 export interface AgentMotionSpec {
