@@ -1,4 +1,4 @@
-import { readdir, readFile } from "node:fs/promises";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { MDXComponents } from "mdx/types";
@@ -45,7 +45,7 @@ export interface CollectionConfig<Meta> {
 export interface Collection<Meta> {
   getBySlug: (slug: string) => Promise<ContentDocument<Meta> | undefined>;
   list: () => Promise<ContentEntry<Meta>[]>;
-  slugs: () => Promise<string[]>;
+  slugs: () => string[];
 }
 
 export class ContentError extends Error {
@@ -62,8 +62,8 @@ export const createCollection = <Meta extends object>(
 
   const labelFor = (slug: string) => `${config.label}/${slug}${extension}`;
 
-  const slugs = async () => {
-    const files = await readdir(config.directoryPath);
+  const slugs = () => {
+    const files = readdirSync(config.directoryPath);
     const names: string[] = [];
     for (const file of files.toSorted()) {
       if (!file.endsWith(extension)) {
@@ -81,10 +81,8 @@ export const createCollection = <Meta extends object>(
   };
 
   const load = async (slug: string): Promise<ContentDocument<Meta>> => {
-    const [module, source] = await Promise.all([
-      config.importModule(slug),
-      readFile(filePathFor(slug), "utf-8"),
-    ]);
+    const source = readFileSync(filePathFor(slug), "utf-8");
+    const mdxModule = await config.importModule(slug);
 
     if (!hasMetaExport(source)) {
       throw new ContentError(
@@ -92,7 +90,7 @@ export const createCollection = <Meta extends object>(
       );
     }
 
-    const parsed = config.metaSchema.safeParse(module.meta);
+    const parsed = config.metaSchema.safeParse(mdxModule.meta);
     if (!parsed.success) {
       throw new ContentError(
         `${labelFor(slug)}: invalid meta\n${z.prettifyError(parsed.error)}`
@@ -103,7 +101,7 @@ export const createCollection = <Meta extends object>(
     const wordCount = countWords(body);
 
     return {
-      Content: module.default,
+      Content: mdxModule.default,
       body,
       entry: {
         ...parsed.data,
@@ -116,7 +114,7 @@ export const createCollection = <Meta extends object>(
   };
 
   const list = async () => {
-    const documentSlugs = await slugs();
+    const documentSlugs = slugs();
     const documents = await Promise.all(documentSlugs.map(load));
     const entries = documents.map((document) => document.entry);
     const issues = config.findIssues?.(entries) ?? [];
@@ -130,8 +128,8 @@ export const createCollection = <Meta extends object>(
     if (!slugPattern.test(slug)) {
       return;
     }
-    const knownSlugs = await slugs();
-    return knownSlugs.includes(slug) ? load(slug) : undefined;
+    const knownSlugs = slugs();
+    return knownSlugs.includes(slug) ? await load(slug) : undefined;
   };
 
   return { getBySlug, list, slugs };

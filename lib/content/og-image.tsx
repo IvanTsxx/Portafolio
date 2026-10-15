@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { ImageResponse } from "next/og";
@@ -60,7 +60,7 @@ const cornerPlacements = [
 ] satisfies { id: string; style: CSSProperties }[];
 
 const readGeistFont = (family: "geist-mono" | "geist-sans", file: string) =>
-  readFile(
+  readFileSync(
     path.join(process.cwd(), "node_modules/geist/dist/fonts", family, file)
   );
 
@@ -77,15 +77,13 @@ const monoLine = {
   textTransform: "uppercase",
 } as const;
 
-export const renderOgImage = async ({
+export const renderOgImage = ({
   eyebrow,
   sample = false,
   title,
 }: OgImageContent) => {
-  const [sansLight, monoRegular] = await Promise.all([
-    readGeistFont("geist-sans", "Geist-Light.ttf"),
-    readGeistFont("geist-mono", "GeistMono-Regular.ttf"),
-  ]);
+  const sansLight = readGeistFont("geist-sans", "Geist-Light.ttf");
+  const monoRegular = readGeistFont("geist-mono", "GeistMono-Regular.ttf");
 
   return new ImageResponse(
     <div

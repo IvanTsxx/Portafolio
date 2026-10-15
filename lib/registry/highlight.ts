@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import { codeToTokens } from "shiki";
 
 import { codeTheme } from "@/lib/content/code-theme";
@@ -25,6 +26,8 @@ export const highlightCode = async (
   code: string,
   language: CodeLanguage
 ): Promise<HighlightedLine[]> => {
+  "use cache";
+  cacheLife("max");
   const { tokens } = await codeToTokens(code.trimEnd(), {
     lang: language,
     theme: codeTheme,

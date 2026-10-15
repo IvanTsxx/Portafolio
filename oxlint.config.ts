@@ -16,6 +16,12 @@ export default defineConfig({
     ".claude/**",
   ],
   jsPlugins: jsPlugins.jsPlugins,
+  overrides: [
+    {
+      files: ["components/profile/experience/experience-section.tsx"],
+      rules: { "require-await": "off" },
+    },
+  ],
   rules: {
     "jsx-a11y/aria-role": ["error", { ignoreNonDOM: true }],
   },

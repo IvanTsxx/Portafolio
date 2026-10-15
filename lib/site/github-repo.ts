@@ -1,9 +1,7 @@
-import { cache } from "react";
+import { cacheLife } from "next/cache";
 import { z } from "zod";
 
 import { siteConfig } from "@/lib/site/config";
-
-const REPO_REVALIDATE_SECONDS = 3600;
 
 const repoResponseSchema = z.object({
   stargazers_count: z.number().int().nonnegative(),
@@ -26,13 +24,12 @@ const requestHeaders = (token: string | undefined) => {
   return headers;
 };
 
-export const getRepoStars = cache(async (): Promise<number | null> => {
+export const fetchRepoStars = async (): Promise<number | null> => {
   try {
     const response = await fetch(
       `https://api.github.com/repos/${siteConfig.repository}`,
       {
         headers: requestHeaders(process.env.GITHUB_TOKEN),
-        next: { revalidate: REPO_REVALIDATE_SECONDS },
       }
     );
     if (!response.ok) {
@@ -42,4 +39,10 @@ export const getRepoStars = cache(async (): Promise<number | null> => {
   } catch {
     return null;
   }
-});
+};
+
+export const getRepoStars = async () => {
+  "use cache";
+  cacheLife("hours");
+  return await fetchRepoStars();
+};

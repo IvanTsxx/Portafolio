@@ -15,10 +15,8 @@ export const ExampleBlock = async ({
 }: {
   example: RegistryItemDocs["examples"][number];
 }) => {
-  const [{ Example }, source] = await Promise.all([
-    loadExampleModule(example.file),
-    readRegistrySource(example.file),
-  ]);
+  const { Example } = await loadExampleModule(example.file);
+  const source = readRegistrySource(example.file);
   const file = await buildHighlightedFile(
     example.file,
     path.basename(example.file),

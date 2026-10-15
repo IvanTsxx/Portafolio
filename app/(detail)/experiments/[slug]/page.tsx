@@ -17,8 +17,6 @@ import {
 } from "@/lib/site/seo";
 import { experimentJsonLd } from "@/lib/site/structured-data";
 
-export const dynamicParams = false;
-
 export const generateStaticParams = () =>
   experiments.map((experiment) => ({ slug: experiment.slug }));
 

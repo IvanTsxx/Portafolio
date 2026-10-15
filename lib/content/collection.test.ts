@@ -171,6 +171,6 @@ describe("slugs", () => {
     await writeEntry("zulu", { order: 1, title: "Zulu" });
     await writeEntry("alpha", { order: 2, title: "Alpha" });
 
-    expect(await buildCollection().slugs()).toEqual(["alpha", "zulu"]);
+    expect(buildCollection().slugs()).toEqual(["alpha", "zulu"]);
   });
 });

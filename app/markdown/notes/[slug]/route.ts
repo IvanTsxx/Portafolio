@@ -4,14 +4,8 @@ import { getNote, getNoteSlugs } from "@/lib/content/notes";
 import { noteMarkdown } from "@/lib/markdown/documents";
 import { markdownResponse } from "@/lib/markdown/response";
 
-export const dynamic = "force-static";
-
-export const dynamicParams = false;
-
-export const generateStaticParams = async () => {
-  const slugs = await getNoteSlugs();
-  return slugs.map((slug) => ({ slug }));
-};
+export const generateStaticParams = () =>
+  getNoteSlugs().map((slug) => ({ slug }));
 
 export const GET = async (
   _request: Request,

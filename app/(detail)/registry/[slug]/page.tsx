@@ -46,8 +46,6 @@ import {
 import { registryItemJsonLd } from "@/lib/site/structured-data";
 import { cn } from "@/lib/utils";
 
-export const dynamicParams = false;
-
 export const generateStaticParams = () =>
   registryItems.map((item) => ({ slug: item.name }));
 

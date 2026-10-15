@@ -4,8 +4,6 @@ import { buildLlmsTxt, llmsSections } from "@/lib/markdown/llms";
 import { plainTextResponse } from "@/lib/markdown/response";
 import { registryItems } from "@/lib/registry/registry";
 
-export const dynamic = "force-static";
-
 export const GET = async () =>
   plainTextResponse(
     buildLlmsTxt(

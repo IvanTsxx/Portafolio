@@ -7,10 +7,8 @@ import { renderOgImage } from "@/lib/content/og-image";
 export const alt = "Note";
 export { contentType, size } from "@/lib/content/og-image";
 
-export const generateStaticParams = async () => {
-  const slugs = await getNoteSlugs();
-  return slugs.map((slug) => ({ slug }));
-};
+export const generateStaticParams = () =>
+  getNoteSlugs().map((slug) => ({ slug }));
 
 const NoteOpenGraphImage = async ({
   params,

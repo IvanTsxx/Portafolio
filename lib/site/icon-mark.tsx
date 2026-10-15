@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { ImageResponse } from "next/og";
@@ -22,7 +22,9 @@ export const iconMarks = {
 export type IconMarkId = keyof typeof iconMarks;
 
 const readWordmarkFont = () =>
-  readFile(path.join(process.cwd(), "assets/fonts/InstrumentSerif-Italic.ttf"));
+  readFileSync(
+    path.join(process.cwd(), "assets/fonts/InstrumentSerif-Italic.ttf")
+  );
 
 const cornerPlacements = (size: number) => {
   const stroke = Math.max(1, Math.round(size / 36));
@@ -70,7 +72,7 @@ const cornerPlacements = (size: number) => {
 const heavyInkShadow = (size: number) =>
   `${size / 48}px 0 0 ${printColors.ink}, -${size / 96}px 0 0 ${printColors.ink}`;
 
-export const renderIconMark = async (id: IconMarkId) => {
+export const renderIconMark = (id: IconMarkId) => {
   const mark: IconMark = iconMarks[id];
   const { size } = mark;
   const cornerLength = Math.round(size * 0.14);
@@ -119,7 +121,7 @@ export const renderIconMark = async (id: IconMarkId) => {
     {
       fonts: [
         {
-          data: await readWordmarkFont(),
+          data: readWordmarkFont(),
           name: "Instrument Serif",
           style: "italic",
           weight: 400,

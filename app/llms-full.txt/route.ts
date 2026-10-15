@@ -10,8 +10,6 @@ import { buildLlmsFullTxt } from "@/lib/markdown/llms";
 import { plainTextResponse } from "@/lib/markdown/response";
 import { registryItems } from "@/lib/registry/registry";
 
-export const dynamic = "force-static";
-
 const indexableNoteMarkdown = async () => {
   const allNotes = await getNotes();
   const notes = allNotes.filter(isIndexable);
@@ -22,15 +20,12 @@ const indexableNoteMarkdown = async () => {
 };
 
 export const GET = async () => {
-  const [notes, registry] = await Promise.all([
-    indexableNoteMarkdown(),
-    Promise.all(registryItems.map(registryItemMarkdown)),
-  ]);
+  const notes = await indexableNoteMarkdown();
   return plainTextResponse(
     buildLlmsFullTxt([
       ...notes,
       ...experiments.map(experimentMarkdown),
-      ...registry,
+      ...registryItems.map(registryItemMarkdown),
     ])
   );
 };

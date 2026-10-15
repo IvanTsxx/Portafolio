@@ -12,8 +12,6 @@ import { getGithubProfile } from "@/lib/site/github-profile";
 import { buildPageMetadata, pageSeo } from "@/lib/site/seo";
 import { homeJsonLd } from "@/lib/site/structured-data";
 
-export const revalidate = 3600;
-
 export const metadata = buildPageMetadata(pageSeo.home);
 
 const HomePage = async () => {

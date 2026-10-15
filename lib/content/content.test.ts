@@ -95,7 +95,7 @@ describe("shipped notes", () => {
   });
 
   test("table of contents ids match the ids rendered into the page", async () => {
-    const slugs = await getNoteSlugs();
+    const slugs = getNoteSlugs();
     const results = await compareHeadingIds(slugs, getNote);
 
     for (const result of results) {

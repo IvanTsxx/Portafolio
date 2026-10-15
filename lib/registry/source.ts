@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { serializeRegistryCss, serializeRegistryCssVars } from "./css";
@@ -23,7 +23,7 @@ const resolveSourcePath = (relativePath: string) => {
 };
 
 export const readRegistrySource = (relativePath: string) =>
-  readFile(resolveSourcePath(relativePath), "utf-8");
+  readFileSync(resolveSourcePath(relativePath), "utf-8");
 
 export interface HighlightedFile {
   id: string;
@@ -58,11 +58,11 @@ export const buildItemCodeFiles = async (
   item: RegistryItem
 ): Promise<HighlightedFile[]> => {
   const sourceFiles = await Promise.all(
-    item.files.map(async (file) =>
+    item.files.map((file) =>
       buildHighlightedFile(
         file.path,
         toInstalledPath(file),
-        toInstalledSource(await readRegistrySource(file.path)),
+        toInstalledSource(readRegistrySource(file.path)),
         getLanguage(file.path)
       )
     )

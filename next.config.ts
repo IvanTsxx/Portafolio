@@ -4,6 +4,7 @@ import type { NextConfig } from "next";
 import { codeTheme } from "./lib/content/code-theme";
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   reactCompiler: true,
   rewrites: () =>

@@ -1,4 +1,6 @@
 import "./experience.css";
+import { cacheLife } from "next/cache";
+
 import {
   DocumentSection,
   PanelCount,
@@ -11,9 +13,19 @@ import { FileDesk } from "./file-desk";
 import { currentMonthStamp, ledgerOf } from "./ledger";
 import { WindowEnvelopes } from "./window-envelopes";
 
-export const ExperienceSection = () => {
+const loadMonthStamp = async () => {
+  "use cache";
+  cacheLife("hours");
+  return currentMonthStamp();
+};
+
+export const ExperienceSection = async () => {
   const section = homeSectionById("experience");
-  const { entries } = ledgerOf(experience, currentMonthStamp(), section.index);
+  const { entries } = ledgerOf(
+    experience,
+    await loadMonthStamp(),
+    section.index
+  );
 
   return (
     <DocumentSection

@@ -35,12 +35,8 @@ import { markdownPathOf } from "@/lib/markdown/paths";
 import { sectionScripts } from "@/lib/site/section-scripts";
 import { noteJsonLd } from "@/lib/site/structured-data";
 
-export const dynamicParams = false;
-
-export const generateStaticParams = async () => {
-  const slugs = await getNoteSlugs();
-  return slugs.map((slug) => ({ slug }));
-};
+export const generateStaticParams = () =>
+  getNoteSlugs().map((slug) => ({ slug }));
 
 export const generateMetadata = async ({
   params,

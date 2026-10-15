@@ -16,11 +16,9 @@ import { designSystemJsonLd } from "@/lib/site/structured-data";
 
 export const metadata = buildPageMetadata(pageSeo.designSystem);
 
-const DesignSystemPage = async () => {
-  const [system, markdown] = await Promise.all([
-    loadDesignSystem(),
-    loadDesignMarkdown(),
-  ]);
+const DesignSystemPage = () => {
+  const system = loadDesignSystem();
+  const markdown = loadDesignMarkdown();
 
   return (
     <>

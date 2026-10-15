@@ -2,7 +2,7 @@ import { afterEach, describe, expect, spyOn, test } from "bun:test";
 
 import { siteConfig } from "@/lib/site/config";
 
-import { formatStarCount, getRepoStars } from "./github-repo";
+import { formatStarCount, fetchRepoStars } from "./github-repo";
 
 const originalToken = process.env.GITHUB_TOKEN;
 
@@ -21,14 +21,14 @@ afterEach(() => {
   }
 });
 
-describe("getRepoStars", () => {
+describe("fetchRepoStars", () => {
   test("reads the star count of the configured repository", async () => {
     delete process.env.GITHUB_TOKEN;
     const fetchStub = stubFetch().mockResolvedValue(
       Response.json({ stargazers_count: 42 })
     );
 
-    expect(await getRepoStars()).toBe(42);
+    expect(await fetchRepoStars()).toBe(42);
     expect(lastRequest(fetchStub).url).toBe(
       `https://api.github.com/repos/${siteConfig.repository}`
     );
@@ -41,13 +41,13 @@ describe("getRepoStars", () => {
       .mockResolvedValueOnce(Response.json({ stargazers_count: 1 }));
 
     process.env.GITHUB_TOKEN = "token-for-test";
-    await getRepoStars();
+    await fetchRepoStars();
     expect(lastRequest(fetchStub).headers.get("authorization")).toBe(
       "Bearer token-for-test"
     );
 
     delete process.env.GITHUB_TOKEN;
-    await getRepoStars();
+    await fetchRepoStars();
     expect(lastRequest(fetchStub).headers.get("authorization")).toBeNull();
     fetchStub.mockRestore();
   });
@@ -57,7 +57,7 @@ describe("getRepoStars", () => {
       new Response("rate limited", { status: 403 })
     );
 
-    expect(await getRepoStars()).toBeNull();
+    expect(await fetchRepoStars()).toBeNull();
     fetchStub.mockRestore();
   });
 
@@ -66,14 +66,14 @@ describe("getRepoStars", () => {
       Response.json({ stargazers_count: "many" })
     );
 
-    expect(await getRepoStars()).toBeNull();
+    expect(await fetchRepoStars()).toBeNull();
     fetchStub.mockRestore();
   });
 
   test("returns null when the request fails", async () => {
     const fetchStub = stubFetch().mockRejectedValue(new Error("offline"));
 
-    expect(await getRepoStars()).toBeNull();
+    expect(await fetchRepoStars()).toBeNull();
     fetchStub.mockRestore();
   });
 });

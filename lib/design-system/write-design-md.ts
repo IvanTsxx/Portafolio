@@ -5,7 +5,7 @@ import { designMarkdownPath, loadDesignMarkdown } from "./load";
 
 const projectRoot = process.cwd();
 
-const markdown = await loadDesignMarkdown(projectRoot);
+const markdown = loadDesignMarkdown(projectRoot);
 const target = path.join(projectRoot, designMarkdownPath);
 
 await mkdir(path.dirname(target), { recursive: true });

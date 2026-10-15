@@ -1,9 +1,13 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { getGithubProfile } from "@/lib/site/github-profile";
+import { cacheLife, cacheTag } from "next/cache";
 
-export const revalidate = 3600;
+import {
+  GITHUB_PROFILE_TAG,
+  GITHUB_REVALIDATE_SECONDS,
+} from "@/lib/github/api";
+import { getGithubProfile } from "@/lib/site/github-profile";
 
 const fallbackPortraitPath = path.join(
   process.cwd(),
@@ -12,33 +16,48 @@ const fallbackPortraitPath = path.join(
   "portrait.jpg"
 );
 
-const imageResponse = (body: ArrayBuffer | Buffer, contentType: string) =>
-  new Response(new Uint8Array(body), {
+interface AvatarImage {
+  bytes: Uint8Array<ArrayBuffer>;
+  contentType: string;
+}
+
+const fallbackPortrait = async (): Promise<AvatarImage> => ({
+  bytes: new Uint8Array(await readFile(fallbackPortraitPath)),
+  contentType: "image/jpeg",
+});
+
+const fetchAvatar = async (avatarUrl: string): Promise<AvatarImage> => {
+  try {
+    const response = await fetch(avatarUrl, {
+      next: { revalidate: GITHUB_REVALIDATE_SECONDS },
+    });
+    if (!response.ok) {
+      return fallbackPortrait();
+    }
+    return {
+      bytes: new Uint8Array(await response.arrayBuffer()),
+      contentType: response.headers.get("content-type") ?? "image/jpeg",
+    };
+  } catch {
+    return fallbackPortrait();
+  }
+};
+
+const loadAvatar = async (): Promise<AvatarImage> => {
+  "use cache";
+  cacheLife("hours");
+  cacheTag(GITHUB_PROFILE_TAG);
+  const { profile } = await getGithubProfile();
+  const { avatarUrl } = profile.identity;
+  return avatarUrl ? fetchAvatar(avatarUrl) : fallbackPortrait();
+};
+
+export const GET = async () => {
+  const { bytes, contentType } = await loadAvatar();
+  return new Response(bytes, {
     headers: {
       "cache-control": "public, max-age=3600, stale-while-revalidate=86400",
       "content-type": contentType,
     },
   });
-
-const fallbackPortrait = async () =>
-  imageResponse(await readFile(fallbackPortraitPath), "image/jpeg");
-
-export const GET = async () => {
-  const { profile } = await getGithubProfile();
-  const { avatarUrl } = profile.identity;
-  if (!avatarUrl) {
-    return fallbackPortrait();
-  }
-  try {
-    const response = await fetch(avatarUrl, { next: { revalidate } });
-    if (!response.ok) {
-      return fallbackPortrait();
-    }
-    return imageResponse(
-      await response.arrayBuffer(),
-      response.headers.get("content-type") ?? "image/jpeg"
-    );
-  } catch {
-    return fallbackPortrait();
-  }
 };

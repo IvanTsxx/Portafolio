@@ -3,10 +3,6 @@ import { markdownResponse } from "@/lib/markdown/response";
 import { getRegistryItem, registryItems } from "@/lib/registry/registry";
 import { registryItemPath } from "@/lib/site/seo";
 
-export const dynamic = "force-static";
-
-export const dynamicParams = false;
-
 export const generateStaticParams = () =>
   registryItems.map((item) => ({ slug: item.name }));
 
@@ -19,7 +15,7 @@ export const GET = async (
   if (!item) {
     return new Response("Not found", { status: 404 });
   }
-  return markdownResponse(await registryItemMarkdown(item), {
+  return markdownResponse(registryItemMarkdown(item), {
     canonicalPath: registryItemPath(slug),
   });
 };

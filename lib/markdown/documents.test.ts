@@ -21,7 +21,7 @@ const frontMatterOf = (markdown: string) =>
     ? markdown.slice(4, markdown.indexOf("\n---\n", 4))
     : "";
 
-const noteSlugs = await getNoteSlugs();
+const noteSlugs = getNoteSlugs();
 
 const noteDocuments = await Promise.all(
   noteSlugs.map(async (slug) => {
@@ -69,8 +69,8 @@ describe("experiment markdown", () => {
 describe("registry markdown", () => {
   test.each(registryItems.map((item) => [item.name, item]))(
     "%s carries install commands, props and examples",
-    async (name, item) => {
-      const markdown = await registryItemMarkdown(item);
+    (name, item) => {
+      const markdown = registryItemMarkdown(item);
       expect(frontMatterOf(markdown)).toContain(
         `canonical: "https://bongi.dev/registry/${name}"`
       );
@@ -87,12 +87,12 @@ describe("registry markdown", () => {
     }
   );
 
-  test("escapes union pipes inside table cells", async () => {
+  test("escapes union pipes inside table cells", () => {
     const item = getRegistryItem("magnetic-button");
     if (!item) {
       throw new Error("magnetic-button is missing");
     }
-    const markdown = await registryItemMarkdown(item);
+    const markdown = registryItemMarkdown(item);
     const variantRow = markdown
       .split("\n")
       .find((line) => line.startsWith("| `variant`"));

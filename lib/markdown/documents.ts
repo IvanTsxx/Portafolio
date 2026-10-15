@@ -155,17 +155,15 @@ const dependencySection = (item: RegistryItem): RootContent[] => {
     : [];
 };
 
-const exampleSection = async (item: RegistryItem) => {
-  const examples = await Promise.all(
-    item.meta.docs.examples.map(async (example) => [
-      heading(3, example.title),
-      ...(example.description ? [textParagraph(example.description)] : []),
-      code(
-        toInstalledSource(await readRegistrySource(example.file)),
-        path.extname(example.file).slice(1)
-      ),
-    ])
-  );
+const exampleSection = (item: RegistryItem) => {
+  const examples = item.meta.docs.examples.map((example) => [
+    heading(3, example.title),
+    ...(example.description ? [textParagraph(example.description)] : []),
+    code(
+      toInstalledSource(readRegistrySource(example.file)),
+      path.extname(example.file).slice(1)
+    ),
+  ]);
   return [heading(2, "Usage"), ...examples.flat()];
 };
 
@@ -224,7 +222,7 @@ const animationSection = (item: RegistryItem): RootContent[] =>
         textParagraph("Static. Nothing to switch off."),
       ];
 
-export const registryItemMarkdown = async (item: RegistryItem) => {
+export const registryItemMarkdown = (item: RegistryItem) => {
   const canonical = absoluteUrl(registryItemPath(item.name));
   return toDocument(
     [
@@ -255,7 +253,7 @@ export const registryItemMarkdown = async (item: RegistryItem) => {
         getNamespacedInstallCommand(runner.id, item.name)
       ),
       ...dependencySection(item),
-      ...(await exampleSection(item)),
+      ...exampleSection(item),
       ...propsSection(item),
       ...variantsSection(item),
       heading(2, "Accessibility"),
