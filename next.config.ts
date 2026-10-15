@@ -6,6 +6,7 @@ import { codeTheme } from "./lib/content/code-theme";
 const nextConfig: NextConfig = {
   cacheComponents: true,
   pageExtensions: ["ts", "tsx", "md", "mdx"],
+  partialPrefetching: true,
   reactCompiler: true,
   rewrites: () =>
     Promise.resolve([
