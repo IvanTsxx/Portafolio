@@ -22,7 +22,6 @@ export const metadata: Metadata = {
     template: `%s · ${siteConfig.nickname}`,
   },
   twitter: { card: "summary_large_image", creator: `@${siteConfig.handle}` },
-  verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
 };
 
 export const viewport: Viewport = {
