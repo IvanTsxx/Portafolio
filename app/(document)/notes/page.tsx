@@ -36,7 +36,7 @@ const NotesPage = async () => {
         ]}
         title="Notes"
       />
-      <FilterFold index="NT-02">
+      <FilterFold>
         <NoteFilters facets={facets} total={notes.length} />
       </FilterFold>
       <NoteArchive facets={facets} notes={notes.map(toNoteIndexItem)} />

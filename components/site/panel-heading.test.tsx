@@ -12,21 +12,17 @@ const headingOf = (markup: string) => {
 };
 
 describe("PanelHeading", () => {
-  test("the code and the label sit in the same heading element", () => {
+  test("the heading shows the label and no section code", () => {
     const heading = headingOf(
-      renderToStaticMarkup(<PanelHeading index="GH-03" label="Experience" />)
+      renderToStaticMarkup(<PanelHeading label="Experience" />)
     );
-    expect(heading).toContain("GH-03");
     expect(heading).toContain("Experience");
+    expect(heading).not.toContain("[");
   });
 
   test("a blank label renders no code and no rule", () => {
-    expect(renderToStaticMarkup(<PanelHeading index="GH-03" label="" />)).toBe(
-      ""
-    );
-    expect(
-      renderToStaticMarkup(<PanelHeading index="GH-03" label="   " />)
-    ).toBe("");
+    expect(renderToStaticMarkup(<PanelHeading label="" />)).toBe("");
+    expect(renderToStaticMarkup(<PanelHeading label="   " />)).toBe("");
   });
 
   test("a document section names itself after the label, not the code", () => {
@@ -38,8 +34,7 @@ describe("PanelHeading", () => {
     expect(markup).toContain('aria-labelledby="experience-heading"');
     const heading = headingOf(markup);
     expect(heading).toContain("Experience");
-    expect(heading).toMatch(
-      /<span aria-hidden="true"[^>]*>\[ GH-03 \]<\/span>/u
-    );
+    expect(heading).not.toContain("GH-03");
+    expect(markup).toContain('data-index="GH-03"');
   });
 });

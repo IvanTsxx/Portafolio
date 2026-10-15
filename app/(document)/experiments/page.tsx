@@ -36,7 +36,7 @@ const ExperimentsPage = () => (
       ]}
       title="Experiments"
     />
-    <FilterFold index="LAB-02">
+    <FilterFold>
       <LabTopicFilter topics={topicCounts} total={experiments.length} />
     </FilterFold>
     <LabArchive items={items} />

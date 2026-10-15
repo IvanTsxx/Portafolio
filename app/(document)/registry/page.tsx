@@ -65,7 +65,7 @@ const RegistryPage = async () => {
           />
         </div>
       </DocumentHero>
-      <FilterFold index="REG-02">
+      <FilterFold>
         <RegistryFilters categories={categories} total={registryItems.length} />
       </FilterFold>
       <RegistryGrid categories={categories} entries={entries} />

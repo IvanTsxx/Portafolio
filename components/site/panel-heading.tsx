@@ -9,14 +9,12 @@ export const PanelHeading = ({
   as: Tag = "h2",
   className,
   id,
-  index,
   label,
 }: {
   aside?: ReactNode;
   as?: HeadingTag;
   className?: string;
   id?: string;
-  index: string;
   label: string;
 }) =>
   label.trim() === "" ? null : (
@@ -26,13 +24,7 @@ export const PanelHeading = ({
         className
       )}
     >
-      <Tag
-        className="text-ink m-0 flex shrink-0 items-baseline gap-x-3 font-normal"
-        id={id}
-      >
-        <span aria-hidden className="text-mist tabular-nums">
-          [ {index} ]
-        </span>
+      <Tag className="text-ink m-0 shrink-0 font-normal" id={id}>
         {label}
       </Tag>
       <span

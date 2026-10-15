@@ -208,7 +208,7 @@ export const CommandPalette = ({
         value={selectedId}
       >
         <div className="px-3 pt-3 pb-2">
-          <PanelHeading aside="Esc" as="p" index="SRCH" label="Search" />
+          <PanelHeading aside="Esc" as="p" label="Search" />
         </div>
         <CommandInput
           className="text-base md:text-sm"

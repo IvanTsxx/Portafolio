@@ -33,14 +33,10 @@ export const DocumentSection = ({
       "relative flex min-w-0 scroll-mt-20 flex-col gap-6",
       className
     )}
+    data-index={index}
     id={id}
   >
-    <PanelHeading
-      aside={aside}
-      id={`${id}-heading`}
-      index={index}
-      label={label}
-    />
+    <PanelHeading aside={aside} id={`${id}-heading`} label={label} />
     <CompanionLines lines={script?.lines ?? silentLines} />
     {script?.reveal === "build" ? (
       <SectionBuild id={id}>{children}</SectionBuild>

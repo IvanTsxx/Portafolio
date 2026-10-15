@@ -3,13 +3,7 @@ import type { ReactNode } from "react";
 import { focusRingClassName } from "@/components/site/styles";
 import { cn } from "@/lib/utils";
 
-export const FilterFold = ({
-  children,
-  index,
-}: {
-  children: ReactNode;
-  index: string;
-}) => (
+export const FilterFold = ({ children }: { children: ReactNode }) => (
   <details className="group/fold border-rule-strong -mt-16 border-b">
     <summary
       className={cn(
@@ -17,7 +11,6 @@ export const FilterFold = ({
         focusRingClassName
       )}
     >
-      <span className="text-mist tabular-nums">[ {index} ]</span>
       <span className="text-ink">Filter</span>
       <span
         aria-hidden
