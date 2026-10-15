@@ -40,6 +40,7 @@ const speaks = (lines: readonly string[] = []): SectionScript => ({
 
 export const sectionScripts = {
   designColor: builds(),
+  designComponents: builds(),
   designMotion: builds(),
   designPhilosophy: builds(),
   designSpacing: builds(),

@@ -1,3 +1,9 @@
+import {
+  blockBuildSeconds,
+  buildBudgetSeconds,
+  maxStaggerSeconds,
+} from "@/lib/site/section-construction";
+
 export const colorGroups = [
   "surface",
   "ink",
@@ -384,5 +390,84 @@ export const agentMotionSpecs = [
   { label: "Clip crossfade", value: "0.38 s" },
   { label: "Stage loop", value: "8 s" },
   { label: "Hover reaction", value: "Shuffled deck of 8" },
+  { label: "Phone dock", value: "Two thirds of the body above the edge" },
   { label: "Reduced motion", value: "Held key pose" },
 ] as const satisfies readonly AgentMotionSpec[];
+
+const milliseconds = (seconds: number) => `${Math.round(seconds * 1000)} ms`;
+
+export const componentMotionSpecs = [
+  {
+    label: "Section build",
+    value: `${milliseconds(blockBuildSeconds)} per block, ${milliseconds(maxStaggerSeconds)} stagger, ${milliseconds(buildBudgetSeconds)} max`,
+  },
+  { label: "Cassette tape", value: "Out 24 px, peek 12 px, nudge 4 px" },
+  { label: "J-card fold", value: "450 ms out-quart" },
+  { label: "Graph cell", value: "100 ms to clay" },
+] as const satisfies readonly AgentMotionSpec[];
+
+export interface ComponentSpec {
+  name: string;
+  summary: string;
+}
+
+export const componentSpecs = [
+  {
+    name: "Panel heading",
+    summary: "[ XX-NN ] code, mono label, dotted leader, aside.",
+  },
+  {
+    name: "Page hero",
+    summary:
+      "Doc code, display title, hazard stripe, lede, over a seeded dither field at 10% ink.",
+  },
+  {
+    name: "Figure plate",
+    summary: "Framed figure with corner marks and one readout row.",
+  },
+  { name: "Specimen cell", summary: "Hairline cell. Hover fills paper-deep." },
+  {
+    name: "Button",
+    summary: "Mono label, 44px, solid ink or outline. Hover inverts.",
+  },
+  {
+    name: "Chip",
+    summary: "Mono label in a frame. Pressed chips invert to ink.",
+  },
+  {
+    name: "Link",
+    summary: "ink-underline draws on hover or focus. Cards show corner marks.",
+  },
+  {
+    name: "Card thumbnail",
+    summary:
+      "Static markup inside the card link. No links, buttons or focus stops.",
+  },
+  {
+    name: "Window envelopes",
+    summary: "Experience. One envelope per role. The current job opens first.",
+  },
+  {
+    name: "Cassette tower",
+    summary:
+      "Repos. The most-starred tape opens first. One tape out at a time.",
+  },
+  {
+    name: "Contribution graph",
+    summary: "Compact week grid. Cells turn clay on hover and focus.",
+  },
+  {
+    name: "Open in menu",
+    summary:
+      "Copies the page Markdown or opens it in ChatGPT, Claude or Perplexity.",
+  },
+  {
+    name: "Back to top",
+    summary: "44px button floating on the bound edge, bottom left.",
+  },
+  {
+    name: "Companion",
+    summary:
+      "The one 3D agent, 48×56 on the rail, peeking from the corner on phones. It narrates and builds.",
+  },
+] as const satisfies readonly ComponentSpec[];

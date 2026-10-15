@@ -9,6 +9,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - The home intro holds the identity dossier: portrait, name, nickname kana, bio, GitHub readouts and links. The surname appears only there.
 - How I work and stack copy come from `lib/site/practice.ts`. Identity comes from `lib/site/config.ts`.
 - Never invent clients, metrics or achievements. Label placeholder content as sample.
+- Clay belongs to the companion. The two exceptions are the contribution graph hover and the Super Saiyan color print.
 
 ## Chrome
 
@@ -18,12 +19,21 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - The thumb index (`thumb-index.tsx`) shows one notch per section from `lib/site/page-sections.ts`. Notch numbers come from the section heading codes, and section components read their code from the same list.
 - `components/scene/active-section.ts` decides the active section for the notches, the companion's rail position and its line.
 - The top line holds the wordmark, ⌘K search and the GitHub star count. The back cover is the colophon.
-- Back to top (`back-to-top.tsx`) docks on the bound edge, bottom left, clear of the companion. It rises in after 1.5 screens of scroll and hides near the top. No JavaScript.
+- Back to top (`back-to-top.tsx`) floats on the bound edge, bottom left, clear of the companion. It rises in after 1.5 screens of scroll and hides near the top. No JavaScript.
+- Notes, experiments and registry items also serve Markdown at `<path>.md`. `/llms.txt` and `/llms-full.txt` index it. The Open in menu copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
+
+## Home sections
+
+- Experience: window envelopes. The current job opens first.
+- Repos: a cassette tower. The most-starred repo opens first. One tape is out at a time. Hovering another tape nudges it 4px.
+- Contribution matrix: a compact contribution graph. Its cells turn clay on hover and focus.
+- Python repositories read as TypeScript (`lib/github/language.ts`).
 
 ## 3D contract
 
 - One shared Canvas, mounted once in `app/layout.tsx`, renders into DOM-tracked views. Never add a second Canvas.
-- One agent on screen, the companion, 48×56 on the rail. The route picks its role. It narrates one first-person line per section while that section is active, stays quiet during fast scrolls, and builds sections as they scroll in.
+- One agent on screen, the companion, 48×56 on the rail. On phones it peeks from the bottom right corner with about two thirds of its body above the edge. The route picks its role. It narrates one first-person line per section while that section is active and stays quiet during fast scrolls.
+- Section builds are light. Blocks fade and rise 8px in 300ms, at most 40ms apart, within 500ms per section. The companion plays its build action at the first block, and content never waits for its walk. Sections on screen at load and reduced motion skip the build.
 - Section builds, figure stations, the contribution graph, the How I work stages, the 404 stage and the Workshop register a spot in `components/scene/companion-stages.ts`. The companion walks there and performs the spot's action.
 - `<StageScene>` renders props only, never an agent.
 - Rig showcase routes (`/dev/agents`, `/registry/agent`, `/registry/agent-stage`) send the companion away. `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.
@@ -31,4 +41,4 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 
 ## Engineering rules
 
-No code comments. Server Components by default. GSAP through `motionKit` in `lib/motion/gsap.ts`. No Playwright. Before a commit, run `bun run typecheck`, `bun x oxlint`, `bun x ultracite check`, `bun test` and `bun run build`. Read `node_modules/next/dist/docs/` for unfamiliar Next APIs.
+No code comments. Server Components by default. GSAP through `motionKit` in `lib/motion/gsap.ts`. No Playwright. Before a commit, run the definition of done in `AGENTS.md`. Read `node_modules/next/dist/docs/` for unfamiliar Next APIs.

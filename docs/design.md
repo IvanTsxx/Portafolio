@@ -48,7 +48,7 @@ spacing:
 
 - **A dossier on paper.** A paper sheet with ink type and numbered panels.
 - **80/20 minimalism.** Labels and short lines. Figures carry the story.
-- **Ink only.** Ink on paper. Clay belongs to the companion.
+- **Ink only.** Ink on paper. Clay belongs to the companion and the graph hover.
 - **Hairlines, not shadows.** Radius 0. Rules, hatch and backing sheets, no shadows.
 - **One companion.** One WebGL canvas, one agent. It narrates and builds.
 - **Motion with a twin.** Every animation has a reduced-motion twin.
@@ -71,8 +71,8 @@ Zen Kaku Gothic New, light and tight, for titles (`display`) and body. Geist Mon
 - Every page is a paper sheet in a strong hairline frame over two offset `paper-deep` backing sheets. Every route, index or detail, uses the same 60rem sheet (`max-w-sheet`). Sections, grids, figures and heroes take its full width. Paragraphs keep a 44rem measure (`max-w-column`) or `max-w-prose`.
 - The sheet's left edge is a bound strip: punched holes with dithered toner around them. Hover lights a lens that follows the pointer. A press punches the nearest hole and sends a ripple along the strip.
 - Route tabs sit on the sheet's left edge from `lg` and in a row above it on smaller screens. The active tab joins the sheet.
-- Long pages get a thumb index of notches on the sheet's right edge. Below `lg` it becomes a 4px progress strip. From `2xl` the companion rides a rail lane beside it.
-- The 48px top line holds the wordmark, ⌘K search and GitHub stars. Back to top is a 44px button docked on the bound edge, bottom left, once the reader is 1.5 screens down. The back cover is a stamped colophon below the sheet.
+- Long pages get a thumb index of notches on the sheet's right edge. Below `lg` it becomes a 4px progress strip. From `2xl` the companion rides a rail lane beside it. On phones it peeks from the bottom right corner.
+- The 48px top line holds the wordmark, ⌘K search and GitHub stars. Back to top is a 44px button floating on the bound edge, bottom left, once the reader is 1.5 screens down. The back cover is a stamped colophon below the sheet.
 - Sections sit 96px apart. Each opens with a panel heading over a strong rule.
 
 ## Shapes
@@ -81,21 +81,31 @@ Radius 0 everywhere. Frames are 1px hairlines. No shadows. Depth comes from the 
 
 ## Components
 
-- Panel heading: `[ XX-NN ]`, mono label, dotted leader, aside.
-- Page hero: doc code, display title, hazard stripe, lede, over a seeded dither field at 10% ink. The field breathes while in view and swells under the mouse.
-- Figure plate: framed figure with corner marks and one readout row.
-- Specimen cell: hairline cell. Hover fills `paper-deep`.
-- Button: mono label, 44px, solid ink or outline. Hover inverts.
-- Chip: mono label in a frame. Pressed chips invert to ink.
-- Link: `ink-underline` draws on hover or focus. Cards show corner marks. Nothing lifts.
-- Companion: the one 3D agent, 48×56 on the rail. It narrates in first person and builds sections.
+- Panel heading: [ XX-NN ] code, mono label, dotted leader, aside.
+- Page hero: Doc code, display title, hazard stripe, lede, over a seeded dither field at 10% ink.
+- Figure plate: Framed figure with corner marks and one readout row.
+- Specimen cell: Hairline cell. Hover fills paper-deep.
+- Button: Mono label, 44px, solid ink or outline. Hover inverts.
+- Chip: Mono label in a frame. Pressed chips invert to ink.
+- Link: ink-underline draws on hover or focus. Cards show corner marks.
+- Card thumbnail: Static markup inside the card link. No links, buttons or focus stops.
+- Window envelopes: Experience. One envelope per role. The current job opens first.
+- Cassette tower: Repos. The most-starred tape opens first. One tape out at a time.
+- Contribution graph: Compact week grid. Cells turn clay on hover and focus.
+- Open in menu: Copies the page Markdown or opens it in ChatGPT, Claude or Perplexity.
+- Back to top: 44px button floating on the bound edge, bottom left.
+- Companion: The one 3D agent, 48×56 on the rail, peeking from the corner on phones. It narrates and builds.
 
 ## Motion
 
 - `ease-mechanical`: 100ms hover, focus, press, 700ms portrait scan.
 - `ease-out-quart`: 150ms overlays, 200ms tabs, tooltips, 300ms folds, notches.
 - `ease-out-expo`: 500ms image fades.
-- Reduced motion: CSS snaps, the companion holds a key pose, the hero field stays on its static frame.
+- Section build: 300 ms per block, 40 ms stagger, 500 ms max.
+- Cassette tape: Out 24 px, peek 12 px, nudge 4 px.
+- J-card fold: 450 ms out-quart.
+- Graph cell: 100 ms to clay.
+- Reduced motion: CSS snaps, sections show without a build, the companion holds a key pose, the hero field stays on its static frame.
 
 ## Do's and Don'ts
 

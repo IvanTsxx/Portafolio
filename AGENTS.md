@@ -30,6 +30,8 @@ Next.js 16 App Router, React 19, Tailwind v4, base-ui, cva + `cn`, GSAP through 
 - One shared WebGL canvas (`components/scene/shared-canvas.tsx`). Render 3D or shaders through `useViewSlot`. Never add a second `Canvas`.
 - One agent on screen: the companion. `components/scene/one-agent.test.ts` enforces it.
 - Every animation has a reduced-motion version. Animate transform and opacity only. Stop loops offscreen.
+- Section builds never make content wait: 300ms per block, at most 40ms stagger, 500ms per section. Sections on screen at load and reduced motion skip the build. `lib/site/section-construction.test.ts` enforces the budget.
+- Card thumbnails and posters are static markup: no `<a>`, `<button>` or `tabindex`, because the card is already a link. `components/registry-docs/thumbnails.test.tsx` and `components/lab/posters.test.tsx` enforce it.
 - Server Components by default. `"use client"` only where interaction needs it.
 - Basement Studio appears only as employer: name, role, dates, type and link. Never its projects, code, repos or clients. `lib/github/privacy.ts` and the career tests enforce it.
 - Never invent clients, metrics or achievements. Placeholder content carries `sample: true`.
@@ -49,7 +51,7 @@ bun run build
 bun run seo:check
 ```
 
-`seo:check` reads the build output, so it runs after `bun run build`. Commit with a short imperative English message. Do not push unless asked.
+`seo:check` reads the build output, so it runs after `bun run build`. Commit with a short imperative English message. Do not push unless asked. After any commit that adds or changes a note, experiment or registry item, run `bun run seo:dates` and commit `lib/site/route-dates.json`.
 
 ## Routine tasks
 
@@ -69,7 +71,7 @@ bun run seo:check
 
 ### Add or remove a registry component
 
-1. Source goes in `registry/ivan/`, the entry in `registry.json`, and a demo with a thumbnail in `components/registry-docs/demos/<name>.tsx`. Follow an existing item such as `magnetic-button`.
+1. Source goes in `registry/ivan/`, the entry in `registry.json`, and a demo with a thumbnail in `components/registry-docs/demos/<name>.tsx`. Follow an existing item such as `magnetic-button`. The thumbnail draws the component with spans and the exported `cva` variants, never the live component.
 2. Run `bun run registry:build` to refresh `public/r/`.
 3. Removing an item: delete its source, entry, demo, examples and `public/r/<name>.json`.
 4. Commit, then run `bun run seo:dates` and commit the dates.
@@ -89,15 +91,16 @@ bun run seo:check
 
 ### Change GitHub data
 
-Profile data comes from `lib/github/`. `lib/github/snapshot.json` is the offline fallback. Keep `privacy.ts` filtering intact and keep its tests passing.
+Profile data comes from `lib/github/`. `lib/github/snapshot.json` is the offline fallback. Keep `privacy.ts` filtering intact and keep its tests passing. `lib/github/language.ts` shows Python repositories as TypeScript.
 
 ## Map
 
 - `app/(document)`: index pages (`/`, `/notes`, `/experiments`, `/registry`, `/design-system`).
 - `app/(detail)`: detail pages for notes, experiments and registry items.
-- `components/site`: dossier chrome, route tabs, thumb index, hero field, headings.
-- `components/scene`: shared canvas, companion, stages, narration, active section.
-- `components/profile`: home sections.
+- `app/markdown`, `app/llms.txt`, `app/llms-full.txt`: plain Markdown for agents. `next.config.ts` rewrites `/notes/<slug>.md`, `/experiments/<slug>.md` and `/registry/<slug>.md` to `app/markdown`. `components/site/open-in-menu.tsx` copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
+- `components/site`: dossier chrome (one 60rem sheet, the bound edge in `dossier-edge.tsx`, back to top floating on the bound edge), route tabs, thumb index, hero field, headings, section build.
+- `components/scene`: shared canvas, companion, stages, narration, active section. `companion-placement.ts` docks the companion. On phones it peeks from the bottom right corner.
+- `components/profile`: home sections in `homeSections` order. Experience is window envelopes that open on the current job (`experience/`). Repos is a cassette tower that opens on the most-starred repo, with one tape out at a time (`repositories/`). Contribution matrix is a compact contribution graph (`matrix/`).
 - `components/lab`: experiments. `lib/lab`: their registry.
 - `lib/site`: config, section list, narration, SEO, structured data, route dates.
 - `lib/design-system`: design tokens and the `docs/design.md` generator.

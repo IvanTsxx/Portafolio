@@ -28,7 +28,7 @@ export const principles = [
   },
   {
     id: "ink",
-    rule: "Ink on paper. Clay belongs to the companion.",
+    rule: "Ink on paper. Clay belongs to the companion and the graph hover.",
     title: "Ink only",
   },
   {

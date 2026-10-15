@@ -5,6 +5,7 @@ export const sectionSpecs = [
   { id: "spacing", index: "DS-04", label: "Spacing and layout" },
   { id: "motion", index: "DS-05", label: "Motion" },
   { id: "utilities", index: "DS-06", label: "Utilities" },
+  { id: "components", index: "DS-07", label: "Components" },
 ] as const;
 
 export type SectionId = (typeof sectionSpecs)[number]["id"];

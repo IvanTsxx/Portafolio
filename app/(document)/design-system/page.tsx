@@ -1,4 +1,5 @@
 import { ColorSection } from "@/components/design-system/color-section";
+import { ComponentsSection } from "@/components/design-system/components-section";
 import { ExportActions } from "@/components/design-system/export-actions";
 import { MotionSection } from "@/components/design-system/motion-section";
 import { PhilosophySection } from "@/components/design-system/philosophy-section";
@@ -43,6 +44,7 @@ const DesignSystemPage = async () => {
       <SpacingSection radius={system.radius} />
       <MotionSection system={system} />
       <UtilitiesSection utilities={system.utilities} />
+      <ComponentsSection />
     </>
   );
 };

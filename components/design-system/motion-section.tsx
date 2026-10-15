@@ -4,7 +4,10 @@ import { LeaderList, LeaderRow } from "@/components/site/leader-list";
 import { padCount } from "@/lib/design-system/format";
 import type { DesignSystem } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
-import { agentMotionSpecs } from "@/lib/design-system/specs";
+import {
+  agentMotionSpecs,
+  componentMotionSpecs,
+} from "@/lib/design-system/specs";
 import { highlightCode } from "@/lib/registry/highlight";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
@@ -39,6 +42,16 @@ export const MotionSection = async ({ system }: { system: DesignSystem }) => {
         <SubHeading label="Agent motion" />
         <LeaderList>
           {agentMotionSpecs.map((spec) => (
+            <LeaderRow key={spec.label} label={spec.label}>
+              {spec.value}
+            </LeaderRow>
+          ))}
+        </LeaderList>
+      </div>
+      <div className="flex flex-col gap-3">
+        <SubHeading label="Component motion" />
+        <LeaderList>
+          {componentMotionSpecs.map((spec) => (
             <LeaderRow key={spec.label} label={spec.label}>
               {spec.value}
             </LeaderRow>

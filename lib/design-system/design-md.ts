@@ -2,7 +2,12 @@ import { siteConfig } from "@/lib/site/config";
 
 import type { ColorToken, DesignSystem } from "./model";
 import { guidance, principles } from "./philosophy";
-import { colorGroupLabels, spacingSpecs } from "./specs";
+import {
+  colorGroupLabels,
+  componentMotionSpecs,
+  componentSpecs,
+  spacingSpecs,
+} from "./specs";
 import type { ColorGroup } from "./specs";
 
 const quote = (value: string) => JSON.stringify(value);
@@ -128,8 +133,8 @@ export const renderDesignMarkdown = (system: DesignSystem) =>
     "- Every page is a paper sheet in a strong hairline frame over two offset `paper-deep` backing sheets. Every route, index or detail, uses the same 60rem sheet (`max-w-sheet`). Sections, grids, figures and heroes take its full width. Paragraphs keep a 44rem measure (`max-w-column`) or `max-w-prose`.",
     "- The sheet's left edge is a bound strip: punched holes with dithered toner around them. Hover lights a lens that follows the pointer. A press punches the nearest hole and sends a ripple along the strip.",
     "- Route tabs sit on the sheet's left edge from `lg` and in a row above it on smaller screens. The active tab joins the sheet.",
-    "- Long pages get a thumb index of notches on the sheet's right edge. Below `lg` it becomes a 4px progress strip. From `2xl` the companion rides a rail lane beside it.",
-    "- The 48px top line holds the wordmark, ⌘K search and GitHub stars. Back to top is a 44px button docked on the bound edge, bottom left, once the reader is 1.5 screens down. The back cover is a stamped colophon below the sheet.",
+    "- Long pages get a thumb index of notches on the sheet's right edge. Below `lg` it becomes a 4px progress strip. From `2xl` the companion rides a rail lane beside it. On phones it peeks from the bottom right corner.",
+    "- The 48px top line holds the wordmark, ⌘K search and GitHub stars. Back to top is a 44px button floating on the bound edge, bottom left, once the reader is 1.5 screens down. The back cover is a stamped colophon below the sheet.",
     "- Sections sit 96px apart. Each opens with a panel heading over a strong rule.",
     "",
     "## Shapes",
@@ -138,19 +143,13 @@ export const renderDesignMarkdown = (system: DesignSystem) =>
     "",
     "## Components",
     "",
-    "- Panel heading: `[ XX-NN ]`, mono label, dotted leader, aside.",
-    "- Page hero: doc code, display title, hazard stripe, lede, over a seeded dither field at 10% ink. The field breathes while in view and swells under the mouse.",
-    "- Figure plate: framed figure with corner marks and one readout row.",
-    "- Specimen cell: hairline cell. Hover fills `paper-deep`.",
-    "- Button: mono label, 44px, solid ink or outline. Hover inverts.",
-    "- Chip: mono label in a frame. Pressed chips invert to ink.",
-    "- Link: `ink-underline` draws on hover or focus. Cards show corner marks. Nothing lifts.",
-    "- Companion: the one 3D agent, 48×56 on the rail. It narrates in first person and builds sections.",
+    ...componentSpecs.map((spec) => `- ${spec.name}: ${spec.summary}`),
     "",
     "## Motion",
     "",
     ...motionLines(system),
-    "- Reduced motion: CSS snaps, the companion holds a key pose, the hero field stays on its static frame.",
+    ...componentMotionSpecs.map((spec) => `- ${spec.label}: ${spec.value}.`),
+    "- Reduced motion: CSS snaps, sections show without a build, the companion holds a key pose, the hero field stays on its static frame.",
     "",
     "## Do's and Don'ts",
     "",
