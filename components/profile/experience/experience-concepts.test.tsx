@@ -6,14 +6,14 @@ import type { Experience } from "@/lib/site/experience";
 import { experience } from "@/lib/site/experience";
 
 import { conceptOf } from "./concept";
-import { DictionaryIndex } from "./dictionary-index";
+import { FannedCards } from "./fanned-cards";
 import { FileDesk } from "./file-desk";
 import { FileStack } from "./file-stack";
+import { FolderDrawer } from "./folder-drawer";
 import { ledgerOf } from "./ledger";
-import { PunchedTape } from "./punched-tape";
-import { codeOf, columnCodes, holesOf } from "./tape";
-import { TypedResume } from "./typed-resume";
-import { stampsOf, typeSchedule } from "./typing";
+import { fanSlot, folderPose, sheetPose } from "./poses";
+import { RingBinder } from "./ring-binder";
+import { deckStep } from "./use-deck";
 
 const jobs: Experience[] = [
   {
@@ -42,19 +42,14 @@ const jobs: Experience[] = [
   },
 ];
 
-const ledger = ledgerOf(jobs, "2026-10", "GH-02");
+const { entries } = ledgerOf(jobs, "2026-10", "GH-02");
 
 const concepts = {
-  a: <FileStack entries={ledger.entries} />,
-  b: <TypedResume entries={ledger.entries} />,
-  c: <PunchedTape ledger={ledger} />,
-  d: <DictionaryIndex entries={ledger.entries} />,
+  a: <FileStack entries={entries} />,
+  e: <RingBinder entries={entries} />,
+  f: <FannedCards entries={entries} />,
+  g: <FolderDrawer entries={entries} />,
 };
-
-const visibleText = (markup: string) =>
-  markup
-    .replaceAll(/<span class="sr-only">[^<]*<\/span>/gu, "")
-    .replaceAll(/<[^>]+>/gu, "");
 
 describe.each(Object.entries(concepts))("experience concept %s", (_, view) => {
   const markup = renderToStaticMarkup(<FileDesk>{view}</FileDesk>);
@@ -66,6 +61,8 @@ describe.each(Object.entries(concepts))("experience concept %s", (_, view) => {
   test("shows only employer facts for Basement", () => {
     expect(markup).toContain("basement studio");
     expect(markup).toContain("Frontend Developer");
+    expect(markup).toContain("Apr 2026");
+    expect(markup).toContain("Full-time");
     expect(markup).not.toContain("secret");
     expect(markup).not.toContain("Three.js");
     expect(markup).not.toContain("HealthTech");
@@ -76,72 +73,75 @@ describe.each(Object.entries(concepts))("experience concept %s", (_, view) => {
   });
 });
 
-describe("typed résumé", () => {
-  test("types every line in order without overlap", () => {
-    const starts = typeSchedule(ledger.entries).flatMap((entry) =>
-      entry.lines.map((line) => line.at)
-    );
-    expect(starts).toEqual(starts.toSorted((first, second) => first - second));
-    expect(new Set(starts).size).toBe(starts.length);
-  });
-
-  test("stamps the current job and its contract type", () => {
-    expect(ledger.entries.map(stampsOf)).toEqual([
-      ["Current", "Full-time"],
-      ["Contract"],
-    ]);
-  });
-
-  test("keeps the typed text whole for readers", () => {
-    const markup = renderToStaticMarkup(
-      <FileDesk>
-        <TypedResume entries={ledger.entries} />
-      </FileDesk>
-    );
-    expect(markup).toContain(
-      '<span class="sr-only">Apr 2026 → now · 7 mo</span>'
-    );
-    expect(visibleText(markup)).toContain("Current");
+describe.each(["e", "f", "g"] as const)("experience concept %s", (key) => {
+  test("lets exactly one item take keyboard focus", () => {
+    const markup = renderToStaticMarkup(<FileDesk>{concepts[key]}</FileDesk>);
+    expect(markup.match(/tabindex="0"/gu)).toHaveLength(1);
   });
 });
 
-describe("punched tape", () => {
-  test("encodes letters as five-bit codes and spaces as blank columns", () => {
-    expect(["A", "z", " ", "4"].map(codeOf)).toEqual([1, 26, 0, 0]);
-    expect(columnCodes("AB", 6)).toEqual([1, 2, 0, 0, 1, 2]);
+describe("deck keys", () => {
+  test("steps with the arrow keys and wraps at both ends", () => {
+    expect(deckStep(0, "ArrowRight", 4)).toBe(1);
+    expect(deckStep(0, "ArrowUp", 4)).toBe(3);
+    expect(deckStep(3, "ArrowDown", 4)).toBe(0);
+    expect(deckStep(1, "Enter", 4)).toBeNull();
+  });
+});
+
+describe("ring binder", () => {
+  test("turns earlier sheets flat against the rings and above the open sheet", () => {
+    const turned = sheetPose(-1, false);
+    const open = sheetPose(0, false);
+    expect(turned.transform).toContain("scaleX(0)");
+    expect(Number(turned.zIndex)).toBeGreaterThan(Number(open.zIndex));
   });
 
-  test("punches one hole per set bit", () => {
-    expect(holesOf("C", 1).map((hole) => hole.row)).toEqual([5, 6]);
-    expect(holesOf("O", 1).map((hole) => hole.row)).toEqual([2, 4, 5, 6]);
+  test("fades instead of turning when motion is reduced", () => {
+    expect(sheetPose(-1, true)).toEqual({ opacity: 0, zIndex: 29 });
   });
+});
 
-  test("gives each stretch a length proportional to its tenure", () => {
-    const [current, oldest] = ledger.entries;
-    expect(current && oldest && current.bar.span / oldest.bar.span).toBeCloseTo(
-      7 / 6
-    );
+describe("fanned cards", () => {
+  test("centres the fan and keeps the focused card on top", () => {
+    const slots = [0, 1, 2, 3].map((index) => fanSlot(index, 1, 4));
+    expect(slots.map((slot) => slot["--slot"])).toEqual([-1.5, -0.5, 0.5, 1.5]);
+    const layers = slots.map((slot) => Number(slot.zIndex));
+    expect(Math.max(...layers)).toBe(layers[1] ?? Number.NaN);
+  });
+});
+
+describe("folder drawer", () => {
+  test("parts the folders in front of the pulled one and leaves the rest", () => {
+    expect([0, 1, 2, 3].map((index) => folderPose(index, 2))).toEqual([
+      "parted",
+      "parted",
+      "lifted",
+      "resting",
+    ]);
   });
 });
 
 describe("review switch", () => {
   test("reads ?exp= and falls back to the file stack", () => {
-    expect(["a", "b", "c", "d", "e", null].map(conceptOf)).toEqual([
+    expect(["a", "e", "f", "g", "b", "c", "d", null].map(conceptOf)).toEqual([
       "a",
-      "b",
-      "c",
-      "d",
+      "e",
+      "f",
+      "g",
+      "a",
+      "a",
       "a",
       "a",
     ]);
   });
 });
 
-test("the live data feeds one stretch per role", () => {
+test("the live data files one folder per role", () => {
   const live = ledgerOf(experience, "2026-10", "GH-03");
   const markup = renderToStaticMarkup(
     <FileDesk>
-      <PunchedTape ledger={live} />
+      <FolderDrawer entries={live.entries} />
     </FileDesk>
   );
   expect(markup.match(/aria-haspopup="dialog"/gu)).toHaveLength(4);

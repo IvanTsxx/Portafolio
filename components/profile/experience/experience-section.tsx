@@ -7,22 +7,21 @@ import { experience } from "@/lib/site/experience";
 import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
-import { DictionaryIndex } from "./dictionary-index";
 import { ExperienceReview } from "./experience-review";
+import { FannedCards } from "./fanned-cards";
 import { FileDesk } from "./file-desk";
 import { FileStack } from "./file-stack";
+import { FolderDrawer } from "./folder-drawer";
 import { currentMonthStamp, ledgerOf } from "./ledger";
-import { PunchedTape } from "./punched-tape";
-import { TypedResume } from "./typed-resume";
+import { RingBinder } from "./ring-binder";
 
 export const ExperienceSection = () => {
   const section = homeSectionById("experience");
-  const ledger = ledgerOf(experience, currentMonthStamp(), section.index);
-  const count = ledger.entries.length;
+  const { entries } = ledgerOf(experience, currentMonthStamp(), section.index);
 
   return (
     <DocumentSection
-      aside={<PanelCount current={count} total={count} />}
+      aside={<PanelCount current={entries.length} total={entries.length} />}
       id={section.id}
       index={section.index}
       label={section.label}
@@ -31,10 +30,10 @@ export const ExperienceSection = () => {
       <FileDesk>
         <ExperienceReview
           views={{
-            a: <FileStack entries={ledger.entries} />,
-            b: <TypedResume entries={ledger.entries} />,
-            c: <PunchedTape ledger={ledger} />,
-            d: <DictionaryIndex entries={ledger.entries} />,
+            a: <FileStack entries={entries} />,
+            e: <RingBinder entries={entries} />,
+            f: <FannedCards entries={entries} />,
+            g: <FolderDrawer entries={entries} />,
           }}
         />
       </FileDesk>

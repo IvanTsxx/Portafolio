@@ -22,18 +22,17 @@ export const FileDesk = ({ children }: { children: ReactNode }) => {
 
 export const OpenFile = ({
   children,
-  className,
   file,
   label,
-}: {
+  ...trigger
+}: Omit<Dialog.Trigger.Props<DossierFile>, "handle" | "payload"> & {
   children: ReactNode;
-  className?: string;
   file: DossierFile;
   label?: string;
 }) => (
   <Dialog.Trigger
+    {...trigger}
     aria-label={label}
-    className={className}
     handle={use(DeskHandle)}
     payload={file}
   >

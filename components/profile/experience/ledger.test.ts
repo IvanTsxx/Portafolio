@@ -38,42 +38,12 @@ describe("employment ledger", () => {
     ]);
   });
 
-  test("places each bar by its real months on a scale from January of the first year to now", () => {
-    const scale = 46;
-    expect(ledger.entries.map((entry) => entry.bar)).toEqual([
-      { isOpen: true, span: 7 / scale, start: 39 / scale },
-      { isOpen: false, span: 11 / scale, start: 29 / scale },
-      { isOpen: false, span: 5 / scale, start: 6 / scale },
-      { isOpen: false, span: 6 / scale, start: 0 },
-    ]);
-  });
-
-  test("runs the current job to the right edge of the ruler", () => {
-    const [current] = ledger.entries;
-    expect(current && current.bar.start + current.bar.span).toBe(1);
+  test("dates the current job up to now and spans its years", () => {
+    const current = ledger.entries.at(0);
+    const oldest = ledger.entries.at(-1);
     expect(current?.dates).toBe("Apr 2026 → now");
-  });
-
-  test("marks every year on the ruler and ends it at now", () => {
-    expect(ledger.ruler.map((mark) => mark.label)).toEqual([
-      "2023",
-      "2024",
-      "2025",
-      "2026",
-      "Now",
-    ]);
-    expect(ledger.ruler.at(-1)?.at).toBe(1);
-  });
-
-  test("drops a year label that would collide with now", () => {
-    const january = ledgerOf(experience, "2027-01", "GH-03");
-    expect(january.ruler.map((mark) => mark.label)).toEqual([
-      "2023",
-      "2024",
-      "2025",
-      "2026",
-      "Now",
-    ]);
+    expect(current?.years).toBe("2026–now");
+    expect(oldest?.years).toBe("2023–2023");
   });
 
   test("counts both the first and the last month of a job", () => {
@@ -101,9 +71,6 @@ describe("employment ledger", () => {
 describe("employment file", () => {
   test("files a job with its dates, length, summary, stack and site", () => {
     const tensolite = entryOf("Tensolite SA");
-    expect(tensolite?.spoken).toBe(
-      "Tensolite SA, Full Stack Developer, Jul 2023 to Nov 2023, 5 months, Full-time"
-    );
     expect(tensolite?.detail).toEqual({
       stack: ["React", "Node.js", "Automation"],
       summary:

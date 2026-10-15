@@ -86,7 +86,7 @@ const DateStamp = ({ dates }: { dates: string }) => (
   </span>
 );
 
-const FileCard = ({ entry }: { entry: LedgerEntry }) => (
+export const FileCard = ({ entry }: { entry: LedgerEntry }) => (
   <span className="relative flex h-full flex-col">
     <CornerMarks />
     <span className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-6 sm:pt-6">
