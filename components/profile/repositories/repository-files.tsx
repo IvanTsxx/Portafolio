@@ -7,12 +7,7 @@ import type { ReactNode } from "react";
 import type { DossierFile } from "@/components/profile/dossier-file";
 import { FileModal } from "@/components/profile/file-modal";
 
-const opensElsewhere = (event: MouseEvent) =>
-  event.metaKey ||
-  event.ctrlKey ||
-  event.shiftKey ||
-  event.altKey ||
-  event.button !== 0;
+import { opensElsewhere } from "./opens-elsewhere";
 
 const fileLinkOf = (target: EventTarget | null) =>
   target instanceof Element

@@ -1,28 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
+import { crateHeight, sleevePose } from "./crate-pose";
 import { PanelStack } from "./panel-stack";
 import type { RackItem } from "./panel-stack";
 import { useRackFocus } from "./use-rack-focus";
-
-const STRIP_REM = 1.75;
-const LIP_REM = 2.5;
-const BAND_REM = 3;
-const REVEAL_PERCENT = 60;
-
-const sleevePose = (index: number, active: number): CSSProperties => {
-  const isTipped = index > active;
-  return {
-    transform: `translate3d(0, calc(${index * STRIP_REM}rem + ${isTipped ? REVEAL_PERCENT : 0}% - ${isTipped ? STRIP_REM : 0}rem), 0)`,
-    zIndex: index + 1,
-  };
-};
-
-const crateHeight = (count: number): CSSProperties => ({
-  height: `calc(${Math.max(0, count - 2) * STRIP_REM + LIP_REM + BAND_REM}rem + ${REVEAL_PERCENT}cqw)`,
-});
 
 export const CrateStage = ({
   band,

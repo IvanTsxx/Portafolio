@@ -10,19 +10,23 @@ const steps = new Map([
   ["ArrowUp", -1],
 ]);
 
-const fileLinkOf = (target: EventTarget | null) =>
+export type RackKey = "file" | "pick";
+
+const rackLinkOf = (target: EventTarget | null, key: RackKey) =>
   target instanceof Element
-    ? target.closest<HTMLAnchorElement>("a[data-file]")
+    ? target.closest<HTMLAnchorElement>(`a[data-${key}]`)
     : null;
 
-const fileIndexOf = (target: EventTarget | null) => {
-  const index = Number(fileLinkOf(target)?.dataset.file);
-  return Number.isInteger(index) ? index : null;
+const rackIndexOf = (target: EventTarget | null, key: RackKey) => {
+  const link = rackLinkOf(target, key);
+  const index = Number(link?.dataset[key]);
+  return link && Number.isInteger(index) ? index : null;
 };
 
 export const useRackFocus = (
   root: RefObject<HTMLElement | null>,
-  rest: number | null
+  rest: number | null,
+  key: RackKey = "file"
 ) => {
   const [active, setActive] = useState<number | null>(rest);
 
@@ -32,7 +36,7 @@ export const useRackFocus = (
       return;
     }
     const show = (event: Event) => {
-      const index = fileIndexOf(event.target);
+      const index = rackIndexOf(event.target, key);
       if (index !== null) {
         setActive(index);
       }
@@ -63,12 +67,12 @@ export const useRackFocus = (
     };
     const step = (event: KeyboardEvent) => {
       const by = steps.get(event.key);
-      const link = fileLinkOf(event.target);
+      const link = rackLinkOf(event.target, key);
       if (by === undefined || !link || event.altKey || event.metaKey) {
         return;
       }
       const links = [
-        ...element.querySelectorAll<HTMLAnchorElement>("a[data-file]"),
+        ...element.querySelectorAll<HTMLAnchorElement>(`a[data-${key}]`),
       ];
       const position = links.indexOf(link);
       event.preventDefault();
@@ -86,7 +90,7 @@ export const useRackFocus = (
       element.removeEventListener("pointerleave", settleOnLeave);
       element.removeEventListener("keydown", step);
     };
-  }, [root, rest]);
+  }, [root, rest, key]);
 
   return active;
 };
