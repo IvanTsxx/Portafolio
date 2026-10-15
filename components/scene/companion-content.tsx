@@ -102,7 +102,6 @@ interface Candidate {
   view: StationView;
 }
 
-
 const baseTilt = 0.16;
 const depthClearPriority = 2.5;
 const operatorSpeechSeconds = 3.2;
