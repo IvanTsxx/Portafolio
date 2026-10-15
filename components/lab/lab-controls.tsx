@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
@@ -233,4 +234,44 @@ export const ActionControl = ({
       {actionLabel}
     </button>
   </div>
+);
+
+interface ControlTab {
+  value: string;
+  label: string;
+  content: ReactNode;
+}
+
+interface ControlTabsProps {
+  label: string;
+  tabs: readonly ControlTab[];
+}
+
+export const ControlTabs = ({ label, tabs }: ControlTabsProps) => (
+  <Tabs className="gap-0" defaultValue={tabs[0]?.value}>
+    <TabsList
+      aria-label={label}
+      className="border-rule h-auto w-full gap-0 border-b p-0"
+      variant="line"
+    >
+      {tabs.map((tab) => (
+        <TabsTrigger
+          className="label min-h-11 md:min-h-9"
+          key={tab.value}
+          value={tab.value}
+        >
+          {tab.label}
+        </TabsTrigger>
+      ))}
+    </TabsList>
+    {tabs.map((tab) => (
+      <TabsContent
+        className="divide-rule flex flex-col divide-y"
+        key={tab.value}
+        value={tab.value}
+      >
+        {tab.content}
+      </TabsContent>
+    ))}
+  </Tabs>
 );
