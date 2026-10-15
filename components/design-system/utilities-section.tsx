@@ -28,19 +28,6 @@ const previews = {
   ),
   jp: <p className="jp text-graphite text-2xl font-light">イヴォ</p>,
   label: <p className="label text-ink">Label 0123</p>,
-  "scroll-dock": (
-    <div className="absolute inset-3 flex flex-col items-start justify-end">
-      <span className="border-rule-strong absolute inset-y-0 left-4 border-l border-dashed" />
-      <span className="border-ink bg-paper relative grid size-8 place-items-center border">
-        <span className="bg-ink h-3 w-px" />
-      </span>
-    </div>
-  ),
-  "scroll-reveal": (
-    <div className="scroll-reveal border-ink absolute inset-x-3 bottom-3 grid size-8 place-items-center border">
-      <span className="bg-ink h-3 w-px" />
-    </div>
-  ),
   "stamp-press": (
     <div className="stamp-press border-ink absolute inset-3 border p-1 motion-reduce:animate-none">
       <div className="border-ink/60 h-full border" />

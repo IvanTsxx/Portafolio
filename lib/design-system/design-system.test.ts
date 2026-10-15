@@ -97,8 +97,6 @@ describe("documented values match the source", () => {
       ["label", "10px", "font-size: 0.625rem"],
       ["display", "0.88", "line-height: 0.88"],
       ["ink-underline", "160ms", "160ms"],
-      ["scroll-reveal", "150vh", "150vh"],
-      ["scroll-dock", "250svh", "250svh"],
     ];
     for (const [name, summaryFact, cssFact] of facts) {
       const utility = system.utilities.find((entry) => entry.name === name);
@@ -179,7 +177,7 @@ describe("documented values match the source", () => {
 describe("design.md", () => {
   test("docs/design.md is the current generated output", async () => {
     const committed = await readProjectFile(designMarkdownPath);
-    const generated = await loadDesignMarkdown(projectRoot);
+    const generated = loadDesignMarkdown(projectRoot);
     expect(
       committed === generated
         ? "in sync"
@@ -209,10 +207,10 @@ describe("design.md", () => {
   });
 
   test("the raw route serves markdown", async () => {
-    const response = await designMarkdownResponse();
+    const response = designMarkdownResponse();
     expect(response.headers.get("content-type")).toBe(
       "text/markdown; charset=utf-8"
     );
-    expect(await response.text()).toBe(await loadDesignMarkdown(projectRoot));
+    expect(await response.text()).toBe(loadDesignMarkdown(projectRoot));
   });
 });

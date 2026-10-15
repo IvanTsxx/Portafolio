@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
 import { BackCover } from "@/components/site/back-cover";
-import { BackToTop } from "@/components/site/back-to-top";
 import { DossierEdge } from "@/components/site/dossier-edge";
 import { RouteTabs } from "@/components/site/route-tabs";
 import { RouteThumbIndex } from "@/components/site/thumb-index";
@@ -36,7 +35,6 @@ export const Dossier = ({ children }: { children: ReactNode }) => (
         </div>
         <BackCover />
       </div>
-      <BackToTop />
     </div>
     <RouteThumbIndex />
   </div>

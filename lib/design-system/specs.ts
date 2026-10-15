@@ -334,14 +334,6 @@ export const utilitySpecs = [
   { name: "blueprint-dots", summary: "Dot grid.", variable: "--grid-size" },
   { name: "stamp-press", summary: "Stamps in as it scrolls into view." },
   {
-    name: "scroll-reveal",
-    summary: "Fades and rises 8px in after 150vh of scroll.",
-  },
-  {
-    name: "scroll-dock",
-    summary: "Sticky dock 250svh down, held 24px above the floor.",
-  },
-  {
     name: "ink-underline",
     summary: "Underline draws in on hover or focus, 160ms.",
   },
@@ -460,10 +452,6 @@ export const componentSpecs = [
     name: "Open in menu",
     summary:
       "Copies the page Markdown or opens it in ChatGPT, Claude or Perplexity.",
-  },
-  {
-    name: "Back to top",
-    summary: "44px button floating on the bound edge, bottom left.",
   },
   {
     name: "Companion",

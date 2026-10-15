@@ -12,7 +12,6 @@ import {
 } from "./companion-placement";
 
 const columnWidth = 800;
-const backToTopLane = 64;
 
 const centeredColumn = (width: number): ColumnBounds => {
   const left = Math.max(16, (width - columnWidth) / 2);
@@ -98,7 +97,6 @@ describe("companion dock", () => {
       expect(shownShare).toBeLessThanOrEqual(0.7);
       expect(dock.restY).toBeGreaterThan(viewport.height);
       expect(dock.x + dock.frame.agentWidth / 2).toBeLessThanOrEqual(width);
-      expect(dock.x - dock.frame.agentWidth / 2).toBeGreaterThan(backToTopLane);
     }
   });
 

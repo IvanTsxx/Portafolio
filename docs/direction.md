@@ -19,7 +19,6 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - The thumb index (`thumb-index.tsx`) shows one notch per section from `lib/site/page-sections.ts`. Notch numbers come from the section heading codes, and section components read their code from the same list.
 - `components/scene/active-section.ts` decides the active section for the notches, the companion's rail position and its line.
 - The top line holds the wordmark, ⌘K search and the GitHub star count. The back cover is the colophon.
-- Back to top (`back-to-top.tsx`) floats on the bound edge, bottom left, clear of the companion. It rises in after 1.5 screens of scroll and hides near the top. No JavaScript.
 - Notes, experiments and registry items also serve Markdown at `<path>.md`. `/llms.txt` and `/llms-full.txt` index it. The Open in menu copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
 
 ## Home sections
