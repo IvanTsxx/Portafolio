@@ -25,6 +25,22 @@ export interface LedgerEntry {
   years: string;
 }
 
+export type FiledFacts = Pick<
+  LedgerEntry,
+  | "company"
+  | "dates"
+  | "file"
+  | "id"
+  | "isCurrent"
+  | "length"
+  | "logo"
+  | "ordinal"
+  | "role"
+  | "type"
+  | "year"
+  | "years"
+>;
+
 export interface Ledger {
   entries: readonly LedgerEntry[];
 }

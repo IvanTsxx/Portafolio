@@ -7,13 +7,14 @@ import { experience } from "@/lib/site/experience";
 import { homeSectionById } from "@/lib/site/page-sections";
 import { sectionScripts } from "@/lib/site/section-scripts";
 
+import { DrawerPull } from "./drawer-pull";
 import { ExperienceReview } from "./experience-review";
-import { FannedCards } from "./fanned-cards";
 import { FileDesk } from "./file-desk";
 import { FileStack } from "./file-stack";
 import { FolderDrawer } from "./folder-drawer";
 import { currentMonthStamp, ledgerOf } from "./ledger";
-import { RingBinder } from "./ring-binder";
+import { Talonario } from "./talonario";
+import { WindowEnvelopes } from "./window-envelopes";
 
 export const ExperienceSection = () => {
   const section = homeSectionById("experience");
@@ -31,9 +32,10 @@ export const ExperienceSection = () => {
         <ExperienceReview
           views={{
             a: <FileStack entries={entries} />,
-            e: <RingBinder entries={entries} />,
-            f: <FannedCards entries={entries} />,
             g: <FolderDrawer entries={entries} />,
+            h: <DrawerPull entries={entries} />,
+            i: <Talonario entries={entries} />,
+            j: <WindowEnvelopes entries={entries} />,
           }}
         />
       </FileDesk>
