@@ -240,5 +240,5 @@ const MagneticLink = ({
   );
 };
 
-export { MagneticButton, MagneticLink };
+export { MagneticButton, MagneticLink, magneticButtonVariants };
 export type { MagneticButtonProps, MagneticLinkProps };

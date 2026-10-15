@@ -7,7 +7,7 @@ import type { ComponentProps, MouseEvent } from "react";
 
 import { cn } from "@/lib/utils";
 
-const copyEmailVariants = cva(
+export const copyEmailVariants = cva(
   "group/copy text-foreground focus-visible:ring-ring focus-visible:ring-offset-background inline-flex min-h-11 cursor-pointer items-baseline gap-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
   {
     defaultVariants: { size: "md" },

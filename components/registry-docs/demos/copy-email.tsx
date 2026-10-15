@@ -2,7 +2,7 @@
 
 import { Playground } from "@/components/registry-docs/playground";
 import type { Control } from "@/components/registry-docs/playground";
-import { CopyEmail } from "@/registry/ivan/ui/copy-email";
+import { CopyEmail, copyEmailVariants } from "@/registry/ivan/ui/copy-email";
 import type { CopyEmailProps } from "@/registry/ivan/ui/copy-email";
 
 interface CopyEmailValues {
@@ -37,6 +37,6 @@ export const Demo = () => (
 
 export const Thumbnail = () => (
   <div className="absolute inset-0 flex items-center justify-center p-6">
-    <CopyEmail email="hello@example.com" />
+    <span className={copyEmailVariants()}>hello@example.com</span>
   </div>
 );

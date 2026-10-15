@@ -5,6 +5,7 @@ import type { Control } from "@/components/registry-docs/playground";
 import {
   MagneticButton,
   MagneticLink,
+  magneticButtonVariants,
 } from "@/registry/ivan/ui/magnetic-button";
 import type { MagneticButtonProps } from "@/registry/ivan/ui/magnetic-button";
 
@@ -87,7 +88,12 @@ export const Demo = () => (
 
 export const Thumbnail = () => (
   <div className="absolute inset-0 flex flex-wrap items-center justify-center gap-4 p-6">
-    <MagneticButton variant="accent">Approve</MagneticButton>
-    <MagneticButton index="02">Inspect</MagneticButton>
+    <span className={magneticButtonVariants({ variant: "accent" })}>
+      Approve
+    </span>
+    <span className={magneticButtonVariants()}>
+      <span className="tabular-nums opacity-60">02</span>
+      Inspect
+    </span>
   </div>
 );
