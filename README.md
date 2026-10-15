@@ -37,6 +37,7 @@ bun run build           # shadcn build (public/r) + next build
 - Shared canvas: `components/scene/scene-layer.tsx` is mounted once in the root layout and loads three.js only when a slot appears. The companion picks its role from the route and docks beside the reading column. Stage props with `<StageScene stage label />`; the companion walks in and acts.
 - GitHub data: `lib/github/profile.ts` reads `GITHUB_TOKEN` from `.env.local`, revalidates hourly, and falls back to `lib/github/snapshot.json` (refresh with `bun lib/github/write-snapshot.ts`). `lib/github/privacy.ts` strips anything matching basement before render.
 - How I work and stack copy: `lib/site/practice.ts`.
+- Analytics and search: `<Analytics />` from `@vercel/analytics` sits in the root layout. Google Search Console verification reads `GOOGLE_SITE_VERIFICATION` and renders the `google-site-verification` meta tag only when it is set. `app/sitemap.ts` and `app/robots.ts` feed the crawlers.
 
 ## Adding content
 
