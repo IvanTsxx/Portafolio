@@ -4,6 +4,7 @@ import type { ColumnBounds, Viewport } from "./companion-placement";
 import {
   bubbleMaxWidth,
   bubbleSide,
+  companionBodyShare,
   companionDock,
   dockGoal,
   headBubbleSlot,
@@ -11,6 +12,7 @@ import {
 } from "./companion-placement";
 
 const columnWidth = 800;
+const backToTopLane = 64;
 
 const centeredColumn = (width: number): ColumnBounds => {
   const left = Math.max(16, (width - columnWidth) / 2);
@@ -77,15 +79,26 @@ describe("companion dock", () => {
     }
   });
 
-  test("a phone has no gutter, so the companion docks in the corner mostly below the fold", () => {
-    const viewport = viewportOf(390, 844);
-    const dock = companionDock(viewport, { left: 16, right: 374 });
-    expect(dock.kind).toBe("corner");
-    if (dock.kind === "corner") {
-      const head = dock.restY - dock.frame.agentHeight;
-      expect(head).toBeGreaterThan(viewport.height - dock.frame.agentHeight);
+  test("on a phone the companion peeks from the bottom right corner with 60 to 70% of its body above the edge", () => {
+    for (const [width, height] of [
+      [320, 568],
+      [375, 667],
+      [390, 844],
+      [430, 932],
+    ] as const) {
+      const viewport = viewportOf(width, height);
+      const dock = companionDock(viewport, { left: 16, right: width - 16 });
+      if (dock.kind !== "corner") {
+        throw new Error("expected a corner dock");
+      }
+      const body = dock.frame.agentHeight * companionBodyShare;
+      const top = dock.restY - body;
+      const shownShare = (viewport.height - top) / body;
+      expect(shownShare).toBeGreaterThanOrEqual(0.6);
+      expect(shownShare).toBeLessThanOrEqual(0.7);
       expect(dock.restY).toBeGreaterThan(viewport.height);
-      expect(dock.x + dock.frame.agentWidth / 2).toBeLessThanOrEqual(390);
+      expect(dock.x + dock.frame.agentWidth / 2).toBeLessThanOrEqual(width);
+      expect(dock.x - dock.frame.agentWidth / 2).toBeGreaterThan(backToTopLane);
     }
   });
 

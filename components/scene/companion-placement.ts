@@ -1,3 +1,5 @@
+import { bodyBase, bodySize } from "@/components/agents/rig";
+
 export interface Viewport {
   height: number;
   width: number;
@@ -66,7 +68,7 @@ const gutterFrames: readonly CompanionFrame[] = [
   { agentHeight: 56, agentWidth: 48 },
   { agentHeight: 48, agentWidth: 42 },
 ];
-const cornerFrame: CompanionFrame = { agentHeight: 48, agentWidth: 42 };
+const cornerFrame: CompanionFrame = { agentHeight: 56, agentWidth: 48 };
 export const sheetShadow = 12;
 const laneInset = 8;
 const columnGap = 24;
@@ -77,7 +79,10 @@ const bubbleRoom = 80;
 const bubbleGap = 8;
 const bubbleMinWidth = 132;
 export const bubbleMaxWidth = 224;
-const cornerHiddenShare = 0.3;
+export const companionModelHeight = 2.2;
+export const companionBodyShare =
+  (bodyBase + bodySize.height) / companionModelHeight;
+const cornerHiddenBodyShare = 0.35;
 const restYaw = -0.32;
 export const watchYaw = -0.75;
 
@@ -149,7 +154,9 @@ export const companionDock = (
     return {
       frame: cornerFrame,
       kind: "corner",
-      restY: viewport.height + cornerFrame.agentHeight * cornerHiddenShare,
+      restY:
+        viewport.height +
+        cornerFrame.agentHeight * companionBodyShare * cornerHiddenBodyShare,
       tuckY: viewport.height + cornerFrame.agentHeight,
       x: viewport.width - edgeInset - cornerFrame.agentWidth / 2,
     };

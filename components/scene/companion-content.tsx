@@ -53,6 +53,7 @@ import type {
 import {
   bubbleSide,
   companionDock,
+  companionModelHeight,
   dockGoal,
   headBubbleSlot,
   headerClearance,
@@ -101,7 +102,7 @@ interface Candidate {
   view: StationView;
 }
 
-const modelHeight = 2.2;
+
 const baseTilt = 0.16;
 const depthClearPriority = 2.5;
 const operatorSpeechSeconds = 3.2;
@@ -289,7 +290,7 @@ const CompanionContent = ({
       toss: { id: tossCount.current, role: cue.tossed },
     });
     poof.current?.burst(
-      swapOrigin.copy(feet).setY(feet.y + modelHeight * 0.55),
+      swapOrigin.copy(feet).setY(feet.y + companionModelHeight * 0.55),
       1
     );
     hat.current?.launch(feet, -1, 1);
@@ -405,7 +406,7 @@ const CompanionContent = ({
       });
       return;
     }
-    const zoom = dock.frame.agentHeight / modelHeight;
+    const zoom = dock.frame.agentHeight / companionModelHeight;
     if (Math.abs(view.zoom - zoom) > 0.001) {
       view.zoom = zoom;
       view.updateProjectionMatrix();
