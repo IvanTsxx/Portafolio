@@ -36,7 +36,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - Section builds are light. Blocks fade and rise 8px in 300ms, at most 40ms apart, within 500ms per section. The companion plays its build action at the first block, and content never waits for its walk. Sections on screen at load and reduced motion skip the build.
 - Section builds, figure stations, the contribution graph, the How I work stages, the 404 stage and the Workshop register a spot in `components/scene/companion-stages.ts`. The companion walks there and performs the spot's action.
 - `<StageScene>` renders props only, never an agent.
-- Rig showcase routes (`/dev/agents`, `/registry/agent`, `/registry/agent-stage`) send the companion away. `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.
+- Rig showcase routes (`/registry/agent`, `/registry/agent-stage`) send the companion away. `components/scene/one-agent.test.ts` fails if any other file renders `<Agent>`.
 - With WebGL off, show a static fallback. With reduced motion, the companion holds a key pose and swaps outfits without the spin.
 
 ## Engineering rules

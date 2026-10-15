@@ -4,10 +4,7 @@ import path from "node:path";
 export const agentSourceDirectory = "components/agents";
 export const agentRegistryDirectory = "registry/ivan/components/agent";
 
-export const agentSourceExclusions = [
-  "agent-lineup-scene.tsx",
-  "agent-lineup.tsx",
-] as const;
+export const agentSourceExclusions = [] as const;
 
 export const agentRegistryOnlyFiles = ["types.ts"] as const;
 

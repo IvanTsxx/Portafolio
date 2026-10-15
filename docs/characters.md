@@ -47,7 +47,6 @@ The site renders every 3D view through one Canvas. `SceneLayer` (`components/sce
 - `frameloop` is `always` while a near slot exists and motion is allowed, and `demand` otherwise (scroll and resize invalidate). A priority 1 pass clears the buffer every frame so stale pixels never linger.
 - Views supply their own camera and `ViewLights` (soft warm key, cool fill, hemisphere fill, a shared PMREM room environment at 0.38). No shadow maps: agents and props use a tinted radial blob shadow, which suits the paper background.
 - Render stats are written to `document.documentElement.dataset.sceneStats` once per second (draw calls summed across all views).
-- The dev lineup at `/dev/agents` (noindex) renders through the shared canvas. Query params: `action=<AgentAction>`, `role=<AgentRole>` for a solo close-up, `motion=reduced`.
 
 Contracts:
 

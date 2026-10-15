@@ -25,11 +25,10 @@ describe("companion cast per route", () => {
 
   test("unknown routes and lookalike prefixes fall back to the home cast", () => {
     expect(companionCastFor("/notebook")).toEqual(companionCastFor("/"));
-    expect(companionCastFor("/dev/agents")).toEqual(companionCastFor("/"));
+    expect(companionCastFor("/unknown/page")).toEqual(companionCastFor("/"));
   });
 
   test("pages that show the rig itself keep the companion off, so one agent is ever on screen", () => {
-    expect(showcasesTheRig("/dev/agents")).toBe(true);
     expect(showcasesTheRig("/registry/agent")).toBe(true);
     expect(showcasesTheRig("/registry/agent-stage/")).toBe(true);
     expect(showcasesTheRig("/registry")).toBe(false);

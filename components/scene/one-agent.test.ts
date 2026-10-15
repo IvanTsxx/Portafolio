@@ -5,7 +5,6 @@ import { showcasesTheRig } from "@/lib/site/companion-roles";
 const companionFile = "components/scene/companion-content.tsx";
 
 const showcaseRoutes = {
-  "components/agents/agent-lineup-scene.tsx": "/dev/agents",
   "registry/ivan/components/agent-stage/agent-stage-scene.tsx":
     "/registry/agent-stage",
   "registry/ivan/examples/agent/action-ref.tsx": "/registry/agent",

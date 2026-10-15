@@ -69,7 +69,6 @@ describe("site naming", () => {
     expect(filesContaining("<Dossier>")).toEqual([
       "app/(detail)/layout.tsx",
       "app/(document)/layout.tsx",
-      "app/dev/stations/page.tsx",
       "app/not-found.tsx",
     ]);
   });

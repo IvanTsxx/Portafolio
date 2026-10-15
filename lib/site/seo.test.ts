@@ -12,8 +12,6 @@ import * as experimentsPage from "@/app/(document)/experiments/page";
 import * as notesPage from "@/app/(document)/notes/page";
 import * as homePage from "@/app/(document)/page";
 import * as registryPage from "@/app/(document)/registry/page";
-import * as devAgentsPage from "@/app/dev/agents/page";
-import * as devStationsPage from "@/app/dev/stations/page";
 import { metadata as rootMetadata } from "@/app/layout";
 import { metadata as notFoundMetadata } from "@/app/not-found";
 import sitemap from "@/app/sitemap";
@@ -160,13 +158,12 @@ describe("every public route has complete metadata", () => {
 });
 
 describe("dev and error routes stay out of search", () => {
-  test.each([
-    ["/dev/agents", devAgentsPage.metadata],
-    ["/dev/stations", devStationsPage.metadata],
-    ["not-found", notFoundMetadata],
-  ])("%s is noindex", (_route, metadata) => {
-    expect(metadata.robots).toMatchObject({ index: false });
-  });
+  test.each([["not-found", notFoundMetadata]])(
+    "%s is noindex",
+    (_route, metadata) => {
+      expect(metadata.robots).toMatchObject({ index: false });
+    }
+  );
 });
 
 describe("sitemap", () => {

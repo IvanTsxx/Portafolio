@@ -25,7 +25,6 @@ export const companionCastFor = (pathname: string): CompanionCast => {
 };
 
 const rigShowcases: readonly (readonly string[])[] = [
-  ["dev"],
   ["registry", "agent"],
   ["registry", "agent-stage"],
 ];
