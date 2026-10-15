@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+import { rackPoseData, rackPoseOf } from "./rack-pose";
 import { usePull } from "./use-pull";
 
 export interface RackItem {
@@ -44,8 +45,7 @@ export const PullRack = ({
         {items.map(({ id, node }, index) => (
           <li
             className={cn("group/item", classNames.item)}
-            data-active={index === active || undefined}
-            data-open={index === open || undefined}
+            {...rackPoseData(rackPoseOf(index, active, open))}
             key={id}
           >
             {node}

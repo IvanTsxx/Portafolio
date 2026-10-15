@@ -140,7 +140,7 @@ export const CassetteTower = ({
   return (
     <PullRack
       classNames={{
-        item: "ease-out-quart transition-transform duration-300 data-active:translate-x-3 data-open:translate-x-6 motion-reduce:transition-none",
+        item: "ease-out-quart transition-transform duration-300 data-nudged:translate-x-1 data-peeking:translate-x-3 data-open:translate-x-6 motion-reduce:transition-none",
         list: "border-ink mr-6 flex flex-col gap-1 border-x-4 border-b-4 p-1 lg:w-88 lg:shrink-0",
         reveal: "min-w-0 lg:flex-1",
         root: "flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8",
