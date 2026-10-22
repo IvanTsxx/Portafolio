@@ -77,7 +77,7 @@ const VegetaPreview = () => {
     <ExperimentStage
       activity={activity}
       before={vegetaImage}
-      className="[&>p]:z-40 [&>span]:z-40"
+      className="[&>span]:z-40"
       controls={
         <>
           <ActionControl

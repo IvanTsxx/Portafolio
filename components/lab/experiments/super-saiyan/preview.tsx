@@ -276,7 +276,7 @@ const SuperSaiyanPreview = () => {
     <ExperimentStage
       activity={activity}
       before={superSaiyanImage}
-      className="[&>p]:z-40 [&>span]:z-40"
+      className="[&>span]:z-40"
       controls={
         <ControlTabs
           label="Control groups"

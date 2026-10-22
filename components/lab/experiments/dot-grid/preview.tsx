@@ -62,7 +62,7 @@ const DotGridPreview = () => {
     <ExperimentStage
       activity={activity}
       before={sourceImages[settings.source]}
-      className="[&>p]:z-40 [&>span]:z-40"
+      className="[&>span]:z-40"
       controls={
         <>
           <ToggleControl

@@ -54,31 +54,34 @@ export const ExperimentStage = ({
         </figure>
         <OriginalImage image={before} />
         <CornerMarks />
-        <p className="label bg-paper/90 text-graphite border-rule-strong pointer-events-none absolute top-4 left-5 flex items-center gap-2 border px-2 py-1 backdrop-blur-sm">
-          <span
-            aria-hidden
-            className={cn("border-ink size-1.5 border", status.tone)}
-          />
-          {status.label}
-        </p>
+      </div>
+      <div className="border-rule-strong bg-popover flex flex-col border border-t-0">
+        <div className="border-rule-strong flex flex-wrap items-baseline justify-between gap-3 border-b px-5 py-3">
+          {controls ? (
+            <h2 className="label flex items-baseline gap-3">
+              <span className="text-mist tabular-nums">[ CTL ]</span>
+              <span className="text-ink font-normal">Controls</span>
+            </h2>
+          ) : null}
+          <p className="label text-graphite ml-auto flex items-center gap-2">
+            <span
+              aria-hidden
+              className={cn("border-ink size-1.5 border", status.tone)}
+            />
+            {status.label}
+          </p>
+        </div>
         {activity === "reduced" ? (
-          <p className="bg-paper/90 text-graphite border-rule-strong pointer-events-none absolute top-14 left-5 z-40 max-w-sm border px-3 py-2 text-xs/relaxed backdrop-blur-sm">
+          <p className="border-rule-strong text-graphite border-b px-5 py-3 text-xs/relaxed text-pretty">
             {reducedNote}
           </p>
         ) : null}
+        {controls ? (
+          <section aria-label="Controls" className={controlGridClassName}>
+            {controls}
+          </section>
+        ) : null}
       </div>
-      {controls ? (
-        <section
-          aria-label="Controls"
-          className="border-rule-strong bg-popover flex flex-col border border-t-0"
-        >
-          <h2 className="label border-rule-strong flex items-baseline gap-3 border-b px-5 py-3">
-            <span className="text-mist tabular-nums">[ CTL ]</span>
-            <span className="text-ink font-normal">Controls</span>
-          </h2>
-          <div className={controlGridClassName}>{controls}</div>
-        </section>
-      ) : null}
     </div>
   );
 };
