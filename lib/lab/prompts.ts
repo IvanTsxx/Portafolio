@@ -67,4 +67,11 @@ export const experimentPrompts = {
     "An aura springs to the pointer and gathers on the brightest silhouette. A click shakes the frame by whole cells and sends a ring that bends the image as it expands.",
     "Keep strikes at least three seconds apart. Expose dither type, rain amount, strike rate and aura radius.",
   ]),
+  vegeta: promptOf("Final Explosion", [
+    "Print the image in ink through an 8×8 Bayer or 64×64 blue noise ordered dither at 3 px cells. Sharpen each cell against a blurrier mip and run a contrast curve first.",
+    "A ki aura springs to the pointer (stiffness 120, damping 16). Inside a radius of 24% of the height, with a flame-noise edge, print in negative: swap ink and paper. Dither the edge so it stays soft and add a thin dark rim.",
+    "Pulse the forehead mark every 1.4 s: inside a small ellipse, lower the tone where a blurrier mip reads dark, so the strokes thicken.",
+    "On click, a ring with a ragged ink front expands from the click point over 0.6 s and bleaches everything it passes to paper.",
+    "Then each cell reprints in hashed order over 1.1 s, in a 12-color ordered dither median-cut from the image. Hold the color 0.8 s, then crossfade back to ink cell by cell. A new explosion waits until the reprint ends. Expose dither type, cell size, aura radius and a Detonate button.",
+  ]),
 } as const satisfies Record<ExperimentSlug, string>;

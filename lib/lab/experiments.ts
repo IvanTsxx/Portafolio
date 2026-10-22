@@ -14,6 +14,8 @@ import { SpeedSmearLive } from "@/components/lab/experiments/speed-smear/live";
 import { SpeedSmearPoster } from "@/components/lab/experiments/speed-smear/poster";
 import { SuperSaiyanLive } from "@/components/lab/experiments/super-saiyan/live";
 import { SuperSaiyanPoster } from "@/components/lab/experiments/super-saiyan/poster";
+import { VegetaLive } from "@/components/lab/experiments/vegeta/live";
+import { VegetaPoster } from "@/components/lab/experiments/vegeta/poster";
 import { labTopics } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
 
@@ -24,7 +26,8 @@ export type ExperimentSlug =
   | "super-saiyan"
   | "speed-smear"
   | "signal-tear"
-  | "cloud-stipple";
+  | "cloud-stipple"
+  | "vegeta";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -53,7 +56,7 @@ const experimentsBySlug = {
       "A fragment shader picks each cell's glyph from the source tone and samples it from the atlas.",
       "Inside the scanner the grid halves its cell size or prints in negative.",
     ],
-    index: "LAB-02",
+    index: "LAB-04",
     related: ["dot-grid", "engraving"],
     slug: "ascii",
     summary: "A picture typed in mono glyphs, read through a pointer scanner.",
@@ -76,7 +79,7 @@ const experimentsBySlug = {
       "A dot lands in the cell when the picture is bright enough, jittered inside the cell so no grid shows.",
       "Boil reseeds the tile offset a few times a second. The pointer lifts the light under it.",
     ],
-    index: "LAB-07",
+    index: "LAB-08",
     related: ["dot-grid", "signal-tear"],
     slug: "cloud-stipple",
     summary: "Clouds stippled in blue noise dots, after Joanie Lemercier.",
@@ -99,7 +102,7 @@ const experimentsBySlug = {
       "Value noise or a picture sets each dot's radius. The lens springs toward the pointer in useFrame and pushes dots outward.",
       "With a picture, the lens also acts as the light, so tones shift as it moves.",
     ],
-    index: "LAB-01",
+    index: "LAB-03",
     related: ["cloud-stipple", "ascii"],
     slug: "dot-grid",
     summary: "A halftone dot grid of a picture that swells around the pointer.",
@@ -121,7 +124,7 @@ const experimentsBySlug = {
       "A relief height shifts that field, so the lines bend over the form like a burin following it.",
       "Line width follows tone. Past 62% ink a second set crosses at 60°.",
     ],
-    index: "LAB-03",
+    index: "LAB-05",
     related: ["ascii", "speed-smear"],
     slug: "engraving",
     summary: "Banknote line engraving of a picture, bent over its relief.",
@@ -149,7 +152,7 @@ const experimentsBySlug = {
       "Torn bands shift sideways. Rows near the pointer tear more often, and a fast pointer tears them all.",
       "Light drags to the right as a ghost trail, then a vignette and two octaves of grain finish the frame.",
     ],
-    index: "LAB-06",
+    index: "LAB-07",
     related: ["speed-smear", "cloud-stipple"],
     slug: "signal-tear",
     summary:
@@ -173,7 +176,7 @@ const experimentsBySlug = {
       "Each streak of rows gets its own length, so the blur breaks into anime speed lines.",
       "Pointer speed adds to the smear and fades out, then an ordered dither prints the result.",
     ],
-    index: "LAB-05",
+    index: "LAB-06",
     related: ["signal-tear", "super-saiyan"],
     slug: "speed-smear",
     summary:
@@ -198,8 +201,8 @@ const experimentsBySlug = {
       "A strike lifts the sky, draws a forked bolt in paper behind Goku and crossfades, cell by cell, to a color ordered dither in twelve inks taken from the image.",
       "The aura springs to the pointer and gathers on the hair silhouette. A click shakes the frame by whole cells and sends a burst ring that bends the image.",
     ],
-    index: "LAB-04",
-    related: ["speed-smear", "signal-tear"],
+    index: "LAB-01",
+    related: ["vegeta", "speed-smear"],
     slug: "super-saiyan",
     summary:
       "Goku in a storm, dithered live in ink. Lightning prints him in color.",
@@ -217,6 +220,37 @@ const experimentsBySlug = {
       "Median cut",
     ],
     title: "Super Saiyan",
+    topics: ["Shader", "WebGL", "Image"],
+    year: 2026,
+  },
+  vegeta: {
+    Poster: VegetaPoster,
+    Preview: VegetaLive,
+    hasControls: true,
+    implementation: [
+      "The Super Saiyan print: each cell samples a mip matched to its size, sharpened against a blurrier mip, through Bayer or blue noise.",
+      "A ki aura springs to the pointer and prints in negative inside a flame-noise edge, dithered so the rim stays soft.",
+      "The Majin mark pulses: its strokes thicken where a blurrier mip of the forehead reads dark.",
+      "A click sends a ring that bleaches the frame to paper. Cells reprint in hashed order, in twelve inks cut from the image, then fade back to ink.",
+    ],
+    index: "LAB-02",
+    related: ["super-saiyan", "speed-smear"],
+    slug: "vegeta",
+    summary:
+      "Majin Vegeta in ink. Final Explosion bleaches him and reprints him in color.",
+    technicalNotes: [
+      "Print, tone curve, blue noise and median cut are shared with Super Saiyan, so both frames dither the same way.",
+      "A new explosion waits until the last one has reprinted. Reduced motion draws one still frame and never detonates.",
+      "Everything is one draw call. The render loop stops offscreen and nothing animates through React state.",
+    ],
+    technologies: [
+      "React Three Fiber",
+      "GLSL",
+      "Bayer",
+      "Blue noise",
+      "Median cut",
+    ],
+    title: "Final Explosion",
     topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
