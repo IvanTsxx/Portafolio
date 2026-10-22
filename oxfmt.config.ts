@@ -8,5 +8,6 @@ export default defineConfig({
     "public/r/**",
     "docs/design.md",
     ".claude/**",
+    "skills/**",
   ],
 });
