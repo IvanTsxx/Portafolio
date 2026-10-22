@@ -1,8 +1,7 @@
 import type { ReactNode, Ref } from "react";
 
-import { BeforeAfter } from "@/components/lab/before-after";
 import { controlGridClassName } from "@/components/lab/lab-controls";
-import type { StageReveal } from "@/components/lab/source/stage-reveal";
+import { OriginalImage } from "@/components/lab/original-view";
 import type { StageImage } from "@/components/lab/source/tone-chunk";
 import type { StageActivity } from "@/components/lab/use-stage-activity";
 import { CornerMarks } from "@/components/site/corner-marks";
@@ -22,7 +21,6 @@ export const CornerMarkers = () => <CornerMarks />;
 interface ExperimentStageProps {
   activity: StageActivity;
   before: StageImage;
-  onReveal: (reveal: StageReveal) => void;
   children: ReactNode;
   controls?: ReactNode;
   reducedNote: string;
@@ -34,7 +32,6 @@ interface ExperimentStageProps {
 export const ExperimentStage = ({
   activity,
   before,
-  onReveal,
   children,
   controls,
   reducedNote,
@@ -55,7 +52,7 @@ export const ExperimentStage = ({
         <figure aria-label={stageLabel} className="m-0 size-full">
           {children}
         </figure>
-        <BeforeAfter image={before} onReveal={onReveal} />
+        <OriginalImage image={before} />
         <CornerMarks />
         <p className="label bg-paper/90 text-graphite border-rule-strong pointer-events-none absolute top-4 left-5 flex items-center gap-2 border px-2 py-1 backdrop-blur-sm">
           <span

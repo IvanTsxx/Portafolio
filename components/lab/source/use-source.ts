@@ -12,8 +12,7 @@ import {
 } from "three";
 import type { Texture, Vector2, WebGLRenderer } from "three";
 
-import { syncReveal } from "@/components/lab/source/stage-reveal";
-import type { StageReveal } from "@/components/lab/source/stage-reveal";
+import { originalUniform } from "@/components/lab/source/stage-reveal";
 import { sourceImages } from "@/components/lab/source/tone-chunk";
 import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import { requestSceneFrame } from "@/components/scene/view-registry";
@@ -184,7 +183,7 @@ export const usePointerSpeed = (
 };
 
 export interface SourceUniformTarget {
-  uReveal: Vector4;
+  uOriginal: number;
   uAspect: number;
   uHasPortrait: number;
   uLight: Vector2;
@@ -203,11 +202,10 @@ export const syncSourceUniforms = (
   renderer: WebGLRenderer,
   light: { x: number; y: number },
   portrait: PortraitTexture | null,
-  source: SourceImage,
-  reveal: StageReveal
+  source: SourceImage
 ) => {
   renderer.getCurrentViewport(viewport);
-  syncReveal(shader.uReveal, reveal, viewport.z, renderer.getPixelRatio());
+  shader.uOriginal = originalUniform();
   const aspect = viewport.z / Math.max(viewport.w, 1);
   shader.uOrigin.set(viewport.x, viewport.y);
   shader.uResolution.set(viewport.z, viewport.w);

@@ -1,49 +1,44 @@
 "use client";
 
-import { useCallback, useRef } from "react";
-import type { Vector4 } from "three";
+import { useSyncExternalStore } from "react";
 
-export interface StageReveal {
-  split: number;
-  handleWidth: number;
-  handleHeight: number;
-}
+import { requestSceneFrame } from "@/components/scene/view-registry";
 
 export const revealChunk = `
-  uniform vec4 uReveal;
+  uniform float uOriginal;
 
   void revealBefore() {
-    vec2 pixel = gl_FragCoord.xy - uOrigin;
-    if (pixel.x < uReveal.x) {
-      discard;
-    }
-    vec2 fromHandle = abs(pixel - vec2(uReveal.x, uResolution.y * 0.5));
-    if (fromHandle.x < uReveal.z && fromHandle.y < uReveal.w) {
+    if (uOriginal > 0.5) {
       discard;
     }
   }
 `;
 
-const hiddenReveal: StageReveal = { handleHeight: 0, handleWidth: 0, split: 0 };
+let showsOriginal = false;
+const listeners = new Set<() => void>();
 
-export const useStageReveal = () => {
-  const reveal = useRef<StageReveal>(hiddenReveal);
-  const onReveal = useCallback((next: StageReveal) => {
-    reveal.current = next;
-  }, []);
-  return { onReveal, reveal };
+export const setShowsOriginal = (next: boolean) => {
+  if (next === showsOriginal) {
+    return;
+  }
+  showsOriginal = next;
+  for (const listener of listeners) {
+    listener();
+  }
+  requestSceneFrame();
 };
 
-export const syncReveal = (
-  target: Vector4,
-  reveal: StageReveal,
-  stageWidth: number,
-  pixelRatio: number
-) => {
-  target.set(
-    reveal.split * stageWidth,
-    0,
-    (reveal.handleWidth / 2) * pixelRatio,
-    (reveal.handleHeight / 2) * pixelRatio
-  );
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 };
+
+const readShowsOriginal = () => showsOriginal;
+const readServerShowsOriginal = () => false;
+
+export const useShowsOriginal = () =>
+  useSyncExternalStore(subscribe, readShowsOriginal, readServerShowsOriginal);
+
+export const originalUniform = () => (showsOriginal ? 1 : 0);

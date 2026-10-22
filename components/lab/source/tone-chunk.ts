@@ -1,4 +1,4 @@
-import { Color, Vector2, Vector4 } from "three";
+import { Color, Vector2 } from "three";
 import type { Texture } from "three";
 
 import { revealChunk } from "@/components/lab/source/stage-reveal";
@@ -70,7 +70,7 @@ interface SourceUniforms {
   uPortraitFocus: Vector2;
   uPortraitSize: number;
   uResolution: Vector2;
-  uReveal: Vector4;
+  uOriginal: number;
 }
 
 export const createSourceUniforms = (): SourceUniforms => ({
@@ -79,13 +79,13 @@ export const createSourceUniforms = (): SourceUniforms => ({
   uInk: new Color("#141414"),
   uLight: new Vector2(-0.38, 0.3),
   uOrigin: new Vector2(0, 0),
+  uOriginal: 0,
   uPaper: new Color("#ededeb"),
   uPortrait: null,
   uPortraitAspect: 1,
   uPortraitFocus: new Vector2(0.5, 0.5),
   uPortraitSize: 1,
   uResolution: new Vector2(1, 1),
-  uReveal: new Vector4(0, 0, 0, 0),
 });
 
 export interface StageImage {

@@ -5,7 +5,6 @@ import { useId, useRef, useState } from "react";
 
 import { ExperimentStage } from "@/components/lab/experiment-stage";
 import { SliderControl, ToggleControl } from "@/components/lab/lab-controls";
-import { useStageReveal } from "@/components/lab/source/stage-reveal";
 import {
   imageSourceOptions,
   sourceImages,
@@ -37,7 +36,6 @@ const trackPointer = (
 
 const DotGridPreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
-  const { onReveal, reveal } = useStageReveal();
   const [settings, setSettings] = useState<DotSettings>({
     cell: 12,
     lensRadius: 120,
@@ -57,18 +55,12 @@ const DotGridPreview = () => {
   useViewSlot(
     slotId,
     field,
-    <DotView
-      reveal={reveal}
-      animate={animate}
-      pointer={pointer}
-      settings={settings}
-    />
+    <DotView animate={animate} pointer={pointer} settings={settings} />
   );
 
   return (
     <ExperimentStage
       activity={activity}
-      onReveal={onReveal}
       before={sourceImages[settings.source]}
       className="[&>p]:z-40 [&>span]:z-40"
       controls={

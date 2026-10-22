@@ -8,7 +8,6 @@ import {
   SwitchControl,
   ToggleControl,
 } from "@/components/lab/lab-controls";
-import { useStageReveal } from "@/components/lab/source/stage-reveal";
 import {
   imageSourceOptions,
   sourceImages,
@@ -26,7 +25,6 @@ import type { SmearSettings } from "./smear-view";
 
 const SpeedSmearPreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
-  const { onReveal, reveal } = useStageReveal();
   const [settings, setSettings] = useState<SmearSettings>({
     angle: 0,
     dither: true,
@@ -47,7 +45,6 @@ const SpeedSmearPreview = () => {
     slotId,
     field,
     <SmearView
-      reveal={reveal}
       animate={activity === "running"}
       pointer={pointer}
       settings={settings}
@@ -57,7 +54,6 @@ const SpeedSmearPreview = () => {
   return (
     <ExperimentStage
       activity={activity}
-      onReveal={onReveal}
       before={sourceImages[settings.source]}
       className="[&>p]:z-40 [&>span]:z-40"
       controls={

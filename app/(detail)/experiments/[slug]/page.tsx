@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ExperimentCard } from "@/components/lab/experiment-card";
+import { OriginalToggle } from "@/components/lab/original-view";
 import { CopyButton } from "@/components/site/copy-button";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
@@ -60,6 +61,7 @@ const ExperimentPage = async ({ params }: PageProps<"/experiments/[slug]">) => {
         />
       </DocumentHero>
       <DocumentSection
+        aside={<OriginalToggle />}
         id="preview"
         index={`${experiment.index}.1`}
         label="Preview"

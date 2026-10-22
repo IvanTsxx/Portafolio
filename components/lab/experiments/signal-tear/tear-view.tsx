@@ -7,7 +7,6 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry } from "three";
 
-import type { StageReveal } from "@/components/lab/source/stage-reveal";
 import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
@@ -32,13 +31,12 @@ export interface TearSettings {
 }
 
 interface TearViewProps {
-  reveal: RefObject<StageReveal>;
   settings: TearSettings;
   animate: boolean;
   pointer: RefObject<StagePointer>;
 }
 
-const TearView = ({ settings, animate, pointer, reveal }: TearViewProps) => {
+const TearView = ({ settings, animate, pointer }: TearViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof TearMaterial>>(null);
   const focus = useDampedPointer(pointer, animate);
@@ -60,8 +58,7 @@ const TearView = ({ settings, animate, pointer, reveal }: TearViewProps) => {
         renderer,
         focus.current,
         portrait,
-        settings.source,
-        reveal.current
+        settings.source
       );
       shader.uPixelRatio = renderer.getPixelRatio();
       shader.uGhost = settings.ghost / 100;
@@ -69,7 +66,6 @@ const TearView = ({ settings, animate, pointer, reveal }: TearViewProps) => {
       shader.uTear = settings.tear / 100;
     };
   }, [
-    reveal,
     focus,
     portrait,
     settings.ghost,

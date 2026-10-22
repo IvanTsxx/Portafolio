@@ -8,7 +8,6 @@ import {
   TextControl,
   ToggleControl,
 } from "@/components/lab/lab-controls";
-import { useStageReveal } from "@/components/lab/source/stage-reveal";
 import {
   imageSourceOptions,
   sourceImages,
@@ -53,7 +52,6 @@ const rampFor = ({ glyphSet, custom }: AsciiControls) =>
 
 const AsciiPreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
-  const { onReveal, reveal } = useStageReveal();
   const [controls, setControls] = useState<AsciiControls>({
     cell: 12,
     custom: ".:ivo/",
@@ -74,7 +72,6 @@ const AsciiPreview = () => {
     slotId,
     field,
     <AsciiView
-      reveal={reveal}
       animate={activity === "running"}
       pointer={pointer}
       settings={{
@@ -89,7 +86,6 @@ const AsciiPreview = () => {
   return (
     <ExperimentStage
       activity={activity}
-      onReveal={onReveal}
       before={sourceImages[controls.source]}
       className="[&>p]:z-40 [&>span]:z-40"
       controls={

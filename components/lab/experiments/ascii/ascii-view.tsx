@@ -7,7 +7,6 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry } from "three";
 
-import type { StageReveal } from "@/components/lab/source/stage-reveal";
 import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
@@ -36,7 +35,6 @@ export interface AsciiSettings {
 }
 
 export interface AsciiViewProps {
-  reveal: RefObject<StageReveal>;
   settings: AsciiSettings;
   animate: boolean;
   pointer: RefObject<StagePointer>;
@@ -68,7 +66,7 @@ const useGlyphAtlas = (ramp: string) => {
   return atlas;
 };
 
-const AsciiView = ({ settings, animate, pointer, reveal }: AsciiViewProps) => {
+const AsciiView = ({ settings, animate, pointer }: AsciiViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof AsciiMaterial>>(null);
   const light = useDampedPointer(pointer, animate);
@@ -90,8 +88,7 @@ const AsciiView = ({ settings, animate, pointer, reveal }: AsciiViewProps) => {
         renderer,
         light.current,
         portrait,
-        settings.source,
-        reveal.current
+        settings.source
       );
       const ratio = renderer.getPixelRatio();
       const { x: width, y: height } = shader.uResolution;
@@ -111,7 +108,6 @@ const AsciiView = ({ settings, animate, pointer, reveal }: AsciiViewProps) => {
       shader.uScanMode = settings.scanMode === "invert" ? 1 : 0;
     };
   }, [
-    reveal,
     atlas,
     light,
     portrait,

@@ -8,7 +8,6 @@ import {
   SwitchControl,
   ToggleControl,
 } from "@/components/lab/lab-controls";
-import { useStageReveal } from "@/components/lab/source/stage-reveal";
 import {
   imageSourceOptions,
   sourceImages,
@@ -26,7 +25,6 @@ import type { StippleSettings } from "./stipple-view";
 
 const CloudStipplePreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
-  const { onReveal, reveal } = useStageReveal();
   const [settings, setSettings] = useState<StippleSettings>({
     boil: 6,
     contrast: 130,
@@ -47,7 +45,6 @@ const CloudStipplePreview = () => {
     slotId,
     field,
     <StippleView
-      reveal={reveal}
       animate={activity === "running"}
       pointer={pointer}
       settings={settings}
@@ -57,7 +54,6 @@ const CloudStipplePreview = () => {
   return (
     <ExperimentStage
       activity={activity}
-      onReveal={onReveal}
       before={sourceImages[settings.source]}
       className="[&>p]:z-40 [&>span]:z-40"
       controls={

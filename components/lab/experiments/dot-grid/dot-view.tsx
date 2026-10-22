@@ -7,7 +7,6 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry, Vector4 } from "three";
 
-import type { StageReveal } from "@/components/lab/source/stage-reveal";
 import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
@@ -39,7 +38,6 @@ export interface DotPointer {
 }
 
 export interface DotViewProps {
-  reveal: RefObject<StageReveal>;
   settings: DotSettings;
   animate: boolean;
   pointer: RefObject<DotPointer>;
@@ -67,7 +65,7 @@ const settleSpring = (spring: Spring, target: number) => {
   spring.velocity = 0;
 };
 
-const DotView = ({ settings, animate, pointer, reveal }: DotViewProps) => {
+const DotView = ({ settings, animate, pointer }: DotViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof DotMaterial>>(null);
   const wander = useRef(0);
@@ -94,8 +92,7 @@ const DotView = ({ settings, animate, pointer, reveal }: DotViewProps) => {
         renderer,
         { x: x.value, y: y.value },
         portrait,
-        settings.source,
-        reveal.current
+        settings.source
       );
       renderer.getCurrentViewport(viewport);
       const ratio = renderer.getPixelRatio();
@@ -104,7 +101,7 @@ const DotView = ({ settings, animate, pointer, reveal }: DotViewProps) => {
       shader.uCell = settings.cell * ratio;
       shader.uLensRadius = settings.lensRadius * ratio;
     };
-  }, [reveal, portrait, settings.cell, settings.lensRadius, settings.source]);
+  }, [portrait, settings.cell, settings.lensRadius, settings.source]);
 
   useFrame((_, delta) => {
     const shader = material.current;

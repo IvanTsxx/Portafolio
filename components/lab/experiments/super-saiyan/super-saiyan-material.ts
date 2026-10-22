@@ -1,5 +1,5 @@
 import { shaderMaterial } from "@react-three/drei";
-import { Vector2, Vector3, Vector4 } from "three";
+import { Vector2, Vector3 } from "three";
 import type { Texture } from "three";
 
 import { revealChunk } from "@/components/lab/source/stage-reveal";
@@ -312,13 +312,13 @@ const uniforms = {
   uInvert: 0,
   uNoiseSize: 64,
   uOrigin: new Vector2(0, 0),
+  uOriginal: 0,
   uPalette: retroPalette.map(toVector),
   uPaper: toVector(paperRgb),
   uRain: 1,
   uRainSlant: 0.16,
   uRainSpeed: 1,
   uResolution: new Vector2(1, 1),
-  uReveal: new Vector4(0, 0, 0, 0),
   uShake: new Vector2(0, 0),
   uStrikeSeed: 0,
   uThreshold: 0,
