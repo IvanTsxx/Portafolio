@@ -24,5 +24,6 @@
   "/registry/agent": "2026-10-12",
   "/registry/agent-stage": "2026-10-09",
   "/registry/dither-image": "2026-10-13",
-  "/skills/frontend-care": "2026-10-22"
+  "/skills/frontend-care": "2026-10-22",
+  "/skills/shared-canvas": "2026-10-22"
 }
