@@ -413,7 +413,7 @@ const CompanionContent = ({
     }
 
     const { scrollY } = window;
-    const section = activeSpokenSection(scrollY, viewport.height);
+    const section = activeSpokenSection(scrollY);
     const restGoal = dockGoal(dock, {
       railShare:
         rail && dock.kind === "rail"

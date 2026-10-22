@@ -14,7 +14,7 @@ import type { RailLayout } from "@/components/scene/companion-rail-math";
 import {
   railLayout,
   railShare,
-  sectionLandingOffset,
+  readingOffset,
 } from "@/components/scene/companion-rail-math";
 import { focusRingClassName } from "@/components/site/styles";
 import { notchNumber, sectionsForRoute } from "@/lib/site/page-sections";
@@ -44,10 +44,10 @@ const measureLayout = (
     const element = document.querySelector(`[id="${CSS.escape(section.id)}"]`);
     return element
       ? element.getBoundingClientRect().top + scrollY
-      : maxScroll + sectionLandingOffset;
+      : maxScroll + readingOffset(window.innerHeight);
   });
   return railLayout({
-    landingOffset: sectionLandingOffset,
+    landingOffset: readingOffset(window.innerHeight),
     maxScroll,
     minGap: stripLength > 0 ? notchGapPixels / stripLength : 0,
     sectionTops,
@@ -105,8 +105,7 @@ export const ThumbIndex = ({
       const share = railShare(window.scrollY, layout.anchors);
       edgeFill.current?.style.setProperty("transform", `scaleY(${share})`);
       progressFill.current?.style.setProperty("transform", `scaleX(${share})`);
-      const activeId =
-        activeSpokenSection(window.scrollY, window.innerHeight)?.id ?? null;
+      const activeId = activeSpokenSection(window.scrollY)?.id ?? null;
       setActiveIndex(sections.findIndex((section) => section.id === activeId));
     };
 

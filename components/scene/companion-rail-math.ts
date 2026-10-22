@@ -11,7 +11,10 @@ export interface RailLayout {
 
 const activeTolerance = 8;
 export const sectionLandingOffset = 80;
-export const activeLeadShare = 0.3;
+const readingLineShare = 0.5;
+
+export const readingOffset = (viewportHeight: number) =>
+  sectionLandingOffset + viewportHeight * readingLineShare;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -126,9 +129,3 @@ export const activeStopIndex = (
   }
   return active;
 };
-
-export const activeSectionIndex = (
-  scrollY: number,
-  viewportHeight: number,
-  stops: readonly number[]
-) => activeStopIndex(scrollY + viewportHeight * activeLeadShare, stops);

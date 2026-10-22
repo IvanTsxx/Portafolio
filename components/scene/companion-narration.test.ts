@@ -9,9 +9,10 @@ import {
 import type { Narration, NarratedSection } from "./companion-narration";
 import { railMarkFor } from "./companion-rail";
 import {
-  activeSectionIndex,
+  activeStopIndex,
   railLayout,
-  sectionLandingOffset,
+  railShare,
+  readingOffset,
 } from "./companion-rail-math";
 
 const viewportHeight = 900;
@@ -28,10 +29,11 @@ const page = [
 
 const notched = page.slice(1);
 
-const stops = page.map(({ top }) => Math.max(0, top - sectionLandingOffset));
+const reading = readingOffset(viewportHeight);
+const stops = page.map(({ top }) => Math.max(0, top - reading));
 
 const sectionAt = (scrollY: number): NarratedSection<string> | null => {
-  const entry = page[activeSectionIndex(scrollY, viewportHeight, stops)];
+  const entry = page[activeStopIndex(scrollY, stops)];
   return entry ? { key: entry.id, lines: entry.lines } : null;
 };
 
@@ -77,7 +79,7 @@ describe("companion narration", () => {
   });
 
   test("the line swaps on the same scroll position where the next section becomes active", () => {
-    const handover = (stops[2] ?? 0) - viewportHeight * 0.3;
+    const handover = stops[2] ?? 0;
     expect(
       play([{ scrollY: handover - 20 }, { scrollY: handover + 20 }])
     ).toEqual(["Laying out roles.", "Stacking tapes."]);
@@ -123,10 +125,8 @@ describe("companion narration", () => {
   });
 
   test("nothing is said before the first section is reached", () => {
-    const late = page.map((entry) =>
-      Math.max(0, entry.top + 2000 - sectionLandingOffset)
-    );
-    const section = activeSectionIndex(0, viewportHeight, late);
+    const late = page.map((entry) => Math.max(0, entry.top + 2000 - reading));
+    const section = activeStopIndex(0, late);
     expect(section).toBe(-1);
     expect(
       narrate(silence<string>(), {
@@ -149,7 +149,7 @@ describe("companion narration", () => {
 
   test("the companion stands on the active notch's mark and moves in step with it", () => {
     const layout = railLayout({
-      landingOffset: sectionLandingOffset,
+      landingOffset: reading,
       maxScroll,
       minGap: 0.05,
       sectionTops: notched.map(({ top }) => top),
@@ -158,7 +158,7 @@ describe("companion narration", () => {
     const rail = { ids, marks: layout.marks };
     for (let scrollY = 0; scrollY <= maxScroll; scrollY += 50) {
       const active = sectionAt(scrollY)?.key ?? null;
-      const notch = activeSectionIndex(scrollY, viewportHeight, layout.stops);
+      const notch = activeStopIndex(scrollY, layout.stops);
       expect(rail.ids[notch] ?? (active === "intro" ? "intro" : null)).toBe(
         active
       );
@@ -166,5 +166,34 @@ describe("companion narration", () => {
         notch === -1 ? 0 : (layout.marks[notch] ?? -1)
       );
     }
+  });
+
+  test("the progress fill reaches a notch on the same scroll where its section, line and companion take over", () => {
+    const layout = railLayout({
+      landingOffset: reading,
+      maxScroll,
+      minGap: 0.05,
+      sectionTops: notched.map(({ top }) => top),
+    });
+    for (const [index, stop] of layout.stops.entries()) {
+      if (stop >= maxScroll) {
+        continue;
+      }
+      expect(activeStopIndex(stop, layout.stops)).toBe(index);
+      expect(activeStopIndex(stop - 20, layout.stops)).toBe(index - 1);
+      expect(railShare(stop, layout.anchors)).toBeCloseTo(
+        layout.marks[index] ?? -1
+      );
+    }
+  });
+
+  test("a section takes over once its heading crosses the middle of the screen", () => {
+    const [, experience] = page;
+    const headingAt = (scrollY: number) => experience.top - scrollY;
+    const handover = stops[1] ?? 0;
+    expect(headingAt(handover)).toBe(reading);
+    expect(reading).toBeGreaterThan(viewportHeight / 2);
+    expect(sectionAt(handover - 20)?.key).toBe("intro");
+    expect(sectionAt(handover)?.key).toBe("experience");
   });
 });

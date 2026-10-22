@@ -1,6 +1,6 @@
 import {
-  activeSectionIndex,
-  sectionLandingOffset,
+  activeStopIndex,
+  readingOffset,
   sectionStops,
 } from "./companion-rail-math";
 import { requestSceneFrame } from "./view-registry";
@@ -46,7 +46,7 @@ const measure = () => {
   ordered = placed.map(({ section }) => section);
   stops = sectionStops(
     placed.map(({ top }) => top),
-    sectionLandingOffset,
+    readingOffset(window.innerHeight),
     maxScroll
   );
   notify();
@@ -106,19 +106,12 @@ export const registerSpokenSection = (section: SpokenSection) => {
   };
 };
 
-export const activeSpokenSection = (
-  scrollY: number,
-  viewportHeight: number
-): SpokenSection | null => {
+export const activeSpokenSection = (scrollY: number): SpokenSection | null => {
   const pinned =
     pinnedId === null
       ? undefined
       : ordered.find((section) => section.id === pinnedId);
-  return (
-    pinned ??
-    ordered[activeSectionIndex(scrollY, viewportHeight, stops)] ??
-    null
-  );
+  return pinned ?? ordered[activeStopIndex(scrollY, stops)] ?? null;
 };
 
 export const pinActiveSection = (id: string) => {
