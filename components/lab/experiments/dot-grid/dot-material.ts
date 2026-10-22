@@ -1,5 +1,10 @@
 import { shaderMaterial } from "@react-three/drei";
-import { Color, Vector2 } from "three";
+import { Vector2 } from "three";
+
+import {
+  createSourceUniforms,
+  sourceToneChunk,
+} from "@/components/lab/source/tone-chunk";
 
 const vertexShader = `
   varying vec2 vUv;
@@ -16,12 +21,10 @@ const fragmentShader = `
   uniform float uLensStrength;
   uniform float uSquare;
   uniform float uPixelRatio;
-  uniform vec2 uResolution;
-  uniform vec2 uOrigin;
   uniform vec2 uLens;
-  uniform vec3 uInk;
-  uniform vec3 uPaper;
   varying vec2 vUv;
+
+  ${sourceToneChunk}
 
   float hash(vec2 point) {
     return fract(sin(dot(point, vec2(127.1, 311.7))) * 43758.5453);
@@ -39,6 +42,10 @@ const fragmentShader = `
   }
 
   float toneAt(vec2 center) {
+    if (uSource > 0.5 && uHasPortrait > 0.5) {
+      vec2 point = (center - uResolution * 0.5) / uResolution.y;
+      return smoothstep(0.05, 0.95, sourceInk(point, sourceLod(uCell, uResolution)));
+    }
     vec2 field = center / uResolution.y;
     float drift = uTime * 0.06;
     float tone = valueNoise(field * 2.2 + vec2(drift, -drift * 0.7)) * 0.65;
@@ -80,15 +87,12 @@ const fragmentShader = `
 
 export const DotMaterial = shaderMaterial(
   {
+    ...createSourceUniforms(),
     uCell: 12,
-    uInk: new Color("#141414"),
     uLens: new Vector2(0, 0),
     uLensRadius: 120,
     uLensStrength: 0,
-    uOrigin: new Vector2(0, 0),
-    uPaper: new Color("#ededeb"),
     uPixelRatio: 1,
-    uResolution: new Vector2(1, 1),
     uSquare: 0,
     uTime: 0,
   },

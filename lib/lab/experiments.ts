@@ -2,59 +2,32 @@ import type { ComponentType } from "react";
 
 import { AsciiLive } from "@/components/lab/experiments/ascii/live";
 import { AsciiPoster } from "@/components/lab/experiments/ascii/poster";
-import { ContourMapLive } from "@/components/lab/experiments/contour-map/live";
-import { ContourMapPoster } from "@/components/lab/experiments/contour-map/poster";
-import { CrtLive } from "@/components/lab/experiments/crt/live";
-import { CrtPoster } from "@/components/lab/experiments/crt/poster";
-import { DitherFieldLive } from "@/components/lab/experiments/dither-field/live";
-import { DitherFieldPoster } from "@/components/lab/experiments/dither-field/poster";
+import { CloudStippleLive } from "@/components/lab/experiments/cloud-stipple/live";
+import { CloudStipplePoster } from "@/components/lab/experiments/cloud-stipple/poster";
 import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
 import { DotGridPoster } from "@/components/lab/experiments/dot-grid/poster";
 import { EngravingLive } from "@/components/lab/experiments/engraving/live";
 import { EngravingPoster } from "@/components/lab/experiments/engraving/poster";
-import { ErrorDiffusionLive } from "@/components/lab/experiments/error-diffusion/live";
-import { ErrorDiffusionPoster } from "@/components/lab/experiments/error-diffusion/poster";
-import { HalftoneLive } from "@/components/lab/experiments/halftone/live";
-import { HalftonePoster } from "@/components/lab/experiments/halftone/poster";
 import { MatrixRainLive } from "@/components/lab/experiments/matrix-rain/live";
 import { MatrixRainPoster } from "@/components/lab/experiments/matrix-rain/poster";
-import { MisregistrationLive } from "@/components/lab/experiments/misregistration/live";
-import { MisregistrationPoster } from "@/components/lab/experiments/misregistration/poster";
-import { PaperFoldLive } from "@/components/lab/experiments/paper-fold/live";
-import { PaperFoldPoster } from "@/components/lab/experiments/paper-fold/poster";
-import { PlotterHatchingLive } from "@/components/lab/experiments/plotter-hatching/live";
-import { PlotterHatchingPoster } from "@/components/lab/experiments/plotter-hatching/poster";
-import { SignalTypeLive } from "@/components/lab/experiments/signal-type/live";
-import { SignalTypePoster } from "@/components/lab/experiments/signal-type/poster";
-import { StampTypeLive } from "@/components/lab/experiments/stamp-type/live";
-import { StampTypePoster } from "@/components/lab/experiments/stamp-type/poster";
-import { StippleLive } from "@/components/lab/experiments/stipple/live";
-import { StipplePoster } from "@/components/lab/experiments/stipple/poster";
+import { SignalTearLive } from "@/components/lab/experiments/signal-tear/live";
+import { SignalTearPoster } from "@/components/lab/experiments/signal-tear/poster";
+import { SpeedSmearLive } from "@/components/lab/experiments/speed-smear/live";
+import { SpeedSmearPoster } from "@/components/lab/experiments/speed-smear/poster";
 import { SuperSaiyanLive } from "@/components/lab/experiments/super-saiyan/live";
 import { SuperSaiyanPoster } from "@/components/lab/experiments/super-saiyan/poster";
-import { ThresholdCutLive } from "@/components/lab/experiments/threshold-cut/live";
-import { ThresholdCutPoster } from "@/components/lab/experiments/threshold-cut/poster";
 import { labTopics } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
 
 export type ExperimentSlug =
-  | "dither-field"
   | "dot-grid"
-  | "signal-type"
   | "matrix-rain"
-  | "error-diffusion"
-  | "halftone"
   | "ascii"
-  | "misregistration"
-  | "crt"
-  | "threshold-cut"
   | "engraving"
-  | "plotter-hatching"
-  | "stipple"
-  | "paper-fold"
-  | "contour-map"
-  | "stamp-type"
-  | "super-saiyan";
+  | "super-saiyan"
+  | "speed-smear"
+  | "signal-tear"
+  | "cloud-stipple";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -83,10 +56,10 @@ const experimentsBySlug = {
       "A fragment shader picks each cell's glyph from the source tone and samples it from the atlas.",
       "Inside the scanner the grid halves its cell size or prints in negative.",
     ],
-    index: "LAB-07",
-    related: ["halftone", "signal-type"],
+    index: "LAB-03",
+    related: ["matrix-rain", "engraving"],
     slug: "ascii",
-    summary: "A lit form typed in mono glyphs, read through a pointer scanner.",
+    summary: "A picture typed in mono glyphs, read through a pointer scanner.",
     technicalNotes: [
       "The whole grid is one draw call. A new glyph set rebuilds only the atlas.",
       "Custom sets accept twelve characters. A space is always the lightest step.",
@@ -97,73 +70,27 @@ const experimentsBySlug = {
     topics: ["Shader", "Typography", "WebGL"],
     year: 2026,
   },
-  "contour-map": {
-    Poster: ContourMapPoster,
-    Preview: ContourMapLive,
+  "cloud-stipple": {
+    Poster: CloudStipplePoster,
+    Preview: CloudStippleLive,
     hasControls: true,
     implementation: [
-      "One full-viewport plane. The fragment shader reads the source brightness as height and adds a Gaussian hill at the pointer.",
-      "Lines come from fract(height × levels) divided by its screen-space derivative, so every line stays the same pixel width.",
-      "A click reads the ground height on the CPU from the same function and drops a benchmark with its elevation.",
+      "One full-viewport plane. Each cell reads a 64 px blue noise tile as its threshold.",
+      "A dot lands in the cell when the picture is bright enough, jittered inside the cell so no grid shows.",
+      "Boil reseeds the tile offset a few times a second. The pointer lifts the light under it.",
     ],
-    index: "LAB-15",
-    related: ["halftone", "dot-grid"],
-    slug: "contour-map",
-    summary:
-      "A lit form surveyed as contour lines around a hill the pointer raises.",
+    index: "LAB-08",
+    related: ["dot-grid", "signal-tear"],
+    slug: "cloud-stipple",
+    summary: "Clouds stippled in blue noise dots, after Joanie Lemercier.",
     technicalNotes: [
-      "Every fifth line is an index contour. The poster runs marching squares on the server.",
-      "The portrait is read at a coarse mip, so its contours stay smooth.",
-      "The render loop stops offscreen. Reduced motion renders a single frame.",
+      "Blue noise keeps the dots evenly spaced at every tone, with no clumps and no pattern.",
+      "The poster thresholds the same image against the same tile on the server.",
+      "The render loop stops offscreen. Reduced motion holds one set of dots.",
     ],
-    technologies: ["React Three Fiber", "GLSL", "fwidth", "Marching squares"],
-    title: "Contour map",
+    technologies: ["React Three Fiber", "GLSL", "Blue noise", "Stippling"],
+    title: "Cloud stipple",
     topics: ["Shader", "WebGL", "Image"],
-    year: 2026,
-  },
-  crt: {
-    Poster: CrtPoster,
-    Preview: CrtLive,
-    hasControls: true,
-    implementation: [
-      "One full-viewport plane. Each pixel is bent through a barrel warp, then finds its slot in a staggered phosphor mask.",
-      "The slot reads the source tone at its center and grows taller with it, so the scanline gaps stay open.",
-      "A refresh band rolls up the screen, lifting the tone and tearing the slots sideways as it passes.",
-      "Pointer speed charges a decaying wobble. A ripple around the pointer bends the warp like a degauss.",
-    ],
-    index: "LAB-12",
-    related: ["halftone", "ascii"],
-    slug: "crt",
-    summary: "A lit form on an old monitor, printed in ink scanlines.",
-    technicalNotes: [
-      "Warp, mask, band and wobble share one pass and one source lookup per slot.",
-      "Slot height follows the square root of the tone, so dark areas fill the row without closing it.",
-      "The render loop stops offscreen. Reduced motion renders a single frame with the band at rest.",
-    ],
-    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
-    title: "CRT print",
-    topics: ["Shader", "WebGL", "Motion"],
-    year: 2026,
-  },
-  "dither-field": {
-    Poster: DitherFieldPoster,
-    Preview: DitherFieldLive,
-    hasControls: true,
-    implementation: [
-      "One full-viewport plane with a ShaderMaterial. The fragment shader compares value noise against a recursive Bayer threshold.",
-      "The pointer damps toward its target in useFrame and writes straight to a uniform.",
-    ],
-    index: "LAB-01",
-    related: ["dot-grid", "signal-type"],
-    slug: "dither-field",
-    summary: "Bayer dithering over a noise field that reacts to the pointer.",
-    technicalNotes: [
-      "The render loop goes on-demand when the canvas leaves the viewport.",
-      "Reduced motion renders a single frame.",
-    ],
-    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
-    title: "Dither field",
-    topics: ["Shader", "WebGL"],
     year: 2026,
   },
   "dot-grid": {
@@ -172,12 +99,13 @@ const experimentsBySlug = {
     hasControls: true,
     implementation: [
       "One full-viewport plane with a ShaderMaterial. Each pixel tests the dots of its own cell and the eight around it.",
-      "Value noise sets each dot's radius. The lens springs toward the pointer in useFrame and pushes dots outward.",
+      "Value noise or a picture sets each dot's radius. The lens springs toward the pointer in useFrame and pushes dots outward.",
+      "With a picture, the lens also acts as the light, so tones shift as it moves.",
     ],
-    index: "LAB-03",
-    related: ["dither-field", "signal-type"],
+    index: "LAB-01",
+    related: ["matrix-rain", "cloud-stipple"],
     slug: "dot-grid",
-    summary: "A halftone dot grid that swells and parts around the pointer.",
+    summary: "A halftone dot grid of a picture that swells around the pointer.",
     technicalNotes: [
       "It shares the site canvas, so the grid costs one draw call and no second WebGL context.",
       "The render loop stops offscreen. Reduced motion renders a single frame.",
@@ -196,14 +124,14 @@ const experimentsBySlug = {
       "A relief height shifts that field, so the lines bend over the form like a burin following it.",
       "Line width follows tone. Past 62% ink a second set crosses at 60°.",
     ],
-    index: "LAB-08",
-    related: ["halftone", "plotter-hatching"],
+    index: "LAB-04",
+    related: ["ascii", "speed-smear"],
     slug: "engraving",
     summary:
       "Banknote line engraving that swells in shadow and bends over the form.",
     technicalNotes: [
       "Edges are antialiased with fwidth, so any pitch stays crisp without supersampling.",
-      "The portrait relief is a blurred mip of its own luminance.",
+      "A picture's relief is a blurred mip of its own luminance.",
       "The render loop stops offscreen. Reduced motion renders a single frame.",
     ],
     technologies: [
@@ -216,51 +144,6 @@ const experimentsBySlug = {
     topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
-  "error-diffusion": {
-    Poster: ErrorDiffusionPoster,
-    Preview: ErrorDiffusionLive,
-    hasControls: true,
-    implementation: [
-      "The source is downsampled to luminance on a 2D canvas. Contrast and threshold reshape it once per change.",
-      "Each kernel is a table of offsets and weights. One loop spreads the error forward, mirrored on odd rows when serpentine.",
-      "Both results paint into stacked canvases. The split is a clip-path, so dragging it never re-dithers.",
-    ],
-    index: "LAB-05",
-    related: ["dither-field", "dot-grid"],
-    slug: "error-diffusion",
-    summary: "Error diffusion against ordered Bayer, split down the middle.",
-    technicalNotes: [
-      "Diffusion is sequential, so it runs on the CPU at a capped 160k pixels. The stage shows its time.",
-      "It only reruns on a control change or resize, and not while offscreen. Nothing animates.",
-    ],
-    technologies: ["Canvas 2D", "TypedArrays", "Floyd–Steinberg", "Atkinson"],
-    title: "Error diffusion",
-    topics: ["Image"],
-    year: 2026,
-  },
-  halftone: {
-    Poster: HalftonePoster,
-    Preview: HalftoneLive,
-    hasControls: true,
-    implementation: [
-      "One full-viewport plane. The fragment shader rotates each pixel into screen space and tests the four nearest cells.",
-      "Each cell reads the source tone at its center and sizes its mark so the inked area matches that tone.",
-      "The source is a shaded sphere or the portrait relit from its own luminance slope. The pointer is the light.",
-    ],
-    index: "LAB-06",
-    related: ["ascii", "dot-grid"],
-    slug: "halftone",
-    summary: "An amplitude-modulated print screen, relit by the pointer.",
-    technicalNotes: [
-      "Round, line and square marks share one loop. Only the coverage-to-size curve changes.",
-      "The portrait is sampled at a mip level matched to the cell, so each mark averages its own area.",
-      "The render loop stops offscreen. Reduced motion renders a single frame.",
-    ],
-    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
-    title: "Halftone",
-    topics: ["Shader", "WebGL"],
-    year: 2026,
-  },
   "matrix-rain": {
     Poster: MatrixRainPoster,
     Preview: MatrixRainLive,
@@ -269,12 +152,12 @@ const experimentsBySlug = {
       "One full-viewport plane with a ShaderMaterial. Each pixel finds its dot, then the glyph cell and column above it.",
       "Glyphs are box-filtered into a 6×8 texel atlas, one texel per dot. A Bayer threshold thins the trails.",
       "The pointer pushes columns sideways with a Gaussian falloff, so the rain parts around it.",
+      "With a picture, its dark areas hold glyphs lit between drops, so the rain falls through the image.",
     ],
-    index: "LAB-04",
-    related: ["dot-grid", "dither-field"],
+    index: "LAB-02",
+    related: ["dot-grid", "ascii"],
     slug: "matrix-rain",
-    summary:
-      "Digital rain printed as dot-matrix glyphs that part around the pointer.",
+    summary: "Digital rain in dot-matrix glyphs, falling through a picture.",
     technicalNotes: [
       "It shares the site canvas: one draw call, one texture lookup per pixel, no second WebGL context.",
       "The render loop stops offscreen. Reduced motion renders a single frame.",
@@ -284,144 +167,52 @@ const experimentsBySlug = {
     topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
-  misregistration: {
-    Poster: MisregistrationPoster,
-    Preview: MisregistrationLive,
+  "signal-tear": {
+    Poster: SignalTearPoster,
+    Preview: SignalTearLive,
     hasControls: true,
     implementation: [
-      "Ink, graphite and mist plates each run their own halftone screen at 45°, 15° and 75°.",
-      "Each plate shifts along its own heading. The shift fades out in a Gaussian field around the pointer.",
-      "A spring with light overshoot drives that field, so the plates snap into register and drift back on leave.",
-      "Plates overprint by multiplying against the paper, like ink laid on ink.",
+      "One full-viewport plane. Rows are grouped into bands of random height that reshuffle three times a second.",
+      "Torn bands shift sideways. Rows near the pointer tear more often, and a fast pointer tears them all.",
+      "Light drags to the right as a ghost trail, then a vignette and two octaves of grain finish the frame.",
     ],
-    index: "LAB-11",
-    related: ["halftone", "dot-grid"],
-    slug: "misregistration",
+    index: "LAB-07",
+    related: ["speed-smear", "matrix-rain"],
+    slug: "signal-tear",
     summary:
-      "Halftone ink plates out of register that align under the pointer.",
+      "A grainy frame whose rows tear and smear light, like a bad VHS still.",
     technicalNotes: [
-      "Two or three plates share one pass. Each plate tests its four nearest cells.",
-      "Ink prints only the shadows. Graphite and mist carry the midtones at lower coverage.",
-      "The render loop stops offscreen. Reduced motion renders a single frame.",
+      "Grain changes twelve times a second, so it reads as film rather than static.",
+      "The ghost keeps the brightest decayed sample, so dark shapes never smear into light.",
+      "The render loop stops offscreen. Reduced motion holds one torn frame.",
     ],
-    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
-    title: "Misregistration",
+    technologies: ["React Three Fiber", "GLSL", "ShaderMaterial"],
+    title: "Signal tear",
     topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
-  "paper-fold": {
-    Poster: PaperFoldPoster,
-    Preview: PaperFoldLive,
+  "speed-smear": {
+    Poster: SpeedSmearPoster,
+    Preview: SpeedSmearLive,
     hasControls: true,
     implementation: [
-      "Each panel is one quad on a hinge group. A damped spring drives fold progress, and each hinge maps it to an angle.",
-      "The fragment shader prints a halftone, rules and text bars in page space, so the print travels with its panel.",
-      "Light comes from a fixed world direction. Each facet shades by its own normal, and the back shows a faint show-through.",
+      "One full-viewport plane. An oval around the pointer averages 32 samples along the smear angle.",
+      "Each streak of rows gets its own length, so the blur breaks into anime speed lines.",
+      "Pointer speed adds to the smear and fades out, then an ordered dither prints the result.",
     ],
-    index: "LAB-14",
-    related: ["halftone", "dot-grid"],
-    slug: "paper-fold",
-    summary: "A printed dossier page that folds along its creases on a spring.",
-    technicalNotes: [
-      "Three quads and one shader program. No lights, shadows or textures.",
-      "Dragging sets the spring target. Release snaps to open or shut, carrying the drag's velocity.",
-      "The spring stops offscreen. Reduced motion jumps between states.",
-    ],
-    technologies: ["React Three Fiber", "Three.js", "GLSL", "Springs"],
-    title: "Paper fold",
-    topics: ["WebGL", "Shader", "Motion"],
-    year: 2026,
-  },
-  "plotter-hatching": {
-    Poster: PlotterHatchingPoster,
-    Preview: PlotterHatchingLive,
-    hasControls: true,
-    implementation: [
-      "The lit form is sampled to ink on a coarse grid. Each hatch layer has its own tone threshold and pen angle.",
-      "Each scan line keeps the runs above its threshold as straight strokes, in serpentine order like a plotter.",
-      "Playback walks a timeline of pen length. Pen-up travel counts at a quarter of drawing time.",
-    ],
-    index: "LAB-09",
-    related: ["engraving", "stipple"],
-    slug: "plotter-hatching",
-    summary: "A lit form plotted stroke by stroke in up to three hatch layers.",
-    technicalNotes: [
-      "Planning runs in 4 ms slices per frame, so the pen starts before the plan is done.",
-      "Playing forward draws only the new pieces. Scrubbing back clears and redraws once.",
-      "Playback pauses offscreen. Reduced motion draws the finished plot in one frame.",
-    ],
-    technologies: ["Canvas 2D", "TypedArrays", "requestAnimationFrame"],
-    title: "Plotter hatching",
-    topics: ["Image", "Motion"],
-    year: 2026,
-  },
-  "signal-type": {
-    Poster: SignalTypePoster,
-    Preview: SignalTypeLive,
-    hasControls: true,
-    implementation: [
-      "GSAP quickTo writes two custom properties per letter, so pointer moves need no React render.",
-      "Wave mode is one repeating staggered timeline, paused whenever the stage is offscreen.",
-    ],
-    index: "LAB-02",
-    related: ["dither-field", "dot-grid"],
-    slug: "signal-type",
-    summary: "Variable-font width and weight driven by the pointer.",
-    technicalNotes: [
-      "The width axis changes layout, so the stage holds one short word.",
-      "Reduced motion renders a fixed width ramp. Wave mode is off.",
-    ],
-    technologies: ["GSAP", "useGSAP", "Variable fonts", "Archivo"],
-    title: "Signal type",
-    topics: ["Typography", "GSAP", "Motion"],
-    year: 2026,
-  },
-  "stamp-type": {
-    Poster: StampTypePoster,
-    Preview: StampTypeLive,
-    hasControls: true,
-    implementation: [
-      "Each press draws its text in Geist Mono into its own row of a canvas atlas, so older prints keep their words.",
-      "One full-viewport shader loops over twelve impressions. Noise sets ink pressure, rubber chips and the paper's tooth.",
-      "The pad loses ink on every press. Prints fade until it is re-inked.",
-    ],
-    index: "LAB-16",
-    related: ["ascii", "signal-type"],
-    slug: "stamp-type",
+    index: "LAB-06",
+    related: ["signal-tear", "super-saiyan"],
+    slug: "speed-smear",
     summary:
-      "Mono type pressed like a rubber stamp, fading as the pad runs dry.",
+      "A face smeared sideways by speed, the way anime draws a fast turn.",
     technicalNotes: [
-      "Twelve impressions in one draw call. The thirteenth reuses the oldest slot.",
-      "Ink pools at the rubber's edges, read from a blurred mip of the same glyph.",
-      "Reduced motion prints each press at once, with no bloom.",
+      "Longer smears sample a coarser mip, so 32 taps stay smooth.",
+      "Each picture carries a focal point, so the crop keeps the face on any stage shape.",
+      "The render loop stops offscreen. Reduced motion holds the smear still.",
     ],
-    technologies: ["React Three Fiber", "GLSL", "Canvas 2D", "Geist Mono"],
-    title: "Stamp type",
-    topics: ["Typography", "Shader", "WebGL"],
-    year: 2026,
-  },
-  stipple: {
-    Poster: StipplePoster,
-    Preview: StippleLive,
-    hasControls: true,
-    implementation: [
-      "Dots start from rejection sampling on the ink, then Lloyd relaxation moves each to the weighted centroid of its Voronoi cell.",
-      "Cells are found on a grid with a spatial hash, searched ring by ring until no closer dot can exist.",
-      "The pointer pushes and swirls nearby dots. Relaxation pulls them back into place.",
-    ],
-    index: "LAB-10",
-    related: ["error-diffusion", "plotter-hatching"],
-    slug: "stipple",
-    summary:
-      "Stipple dots that relax into a portrait and resettle when stirred.",
-    technicalNotes: [
-      "Each pass is split by rows into 4 ms slices. The stage prints its time.",
-      "The loop stops once the dots settle and only wakes on a stir.",
-      "Reduced motion settles out of sight and draws one frame.",
-    ],
-    technologies: ["Canvas 2D", "Lloyd relaxation", "Voronoi", "TypedArrays"],
-    title: "Stipple",
-    topics: ["Image", "Motion"],
+    technologies: ["React Three Fiber", "GLSL", "Bayer", "Motion blur"],
+    title: "Speed smear",
+    topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
   "super-saiyan": {
@@ -434,8 +225,8 @@ const experimentsBySlug = {
       "A strike lifts the sky, draws a forked bolt in paper behind Goku and crossfades, cell by cell, to a color ordered dither in twelve inks taken from the image.",
       "The aura springs to the pointer and gathers on the hair silhouette. A click shakes the frame by whole cells and sends a burst ring that bends the image.",
     ],
-    index: "LAB-17",
-    related: ["error-diffusion", "dither-field"],
+    index: "LAB-05",
+    related: ["speed-smear", "signal-tear"],
     slug: "super-saiyan",
     summary:
       "Goku in a storm, dithered live in ink. Lightning prints him in color.",
@@ -453,29 +244,6 @@ const experimentsBySlug = {
       "Median cut",
     ],
     title: "Super Saiyan",
-    topics: ["Shader", "WebGL", "Image"],
-    year: 2026,
-  },
-  "threshold-cut": {
-    Poster: ThresholdCutPoster,
-    Preview: ThresholdCutLive,
-    hasControls: true,
-    implementation: [
-      "One full-viewport plane. Each pixel compares the source tone, plus chip and gouge noise, against a threshold.",
-      "The threshold carries a slow diagonal sine sweep. The pointer lowers it in a Gaussian, so ink spreads under it.",
-      "The cut is antialiased with fwidth. Small unprinted specks open inside the ink as roughness rises.",
-    ],
-    index: "LAB-13",
-    related: ["error-diffusion", "halftone"],
-    slug: "threshold-cut",
-    summary: "A two-tone stamp cut of a lit form, with a sweeping threshold.",
-    technicalNotes: [
-      "Noise lives in stage units, so the cut keeps its grain at any pixel ratio.",
-      "The portrait is read a few mip levels down, so the edge follows shapes rather than pores.",
-      "The render loop stops offscreen. Reduced motion renders a single frame.",
-    ],
-    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
-    title: "Threshold cut",
     topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },

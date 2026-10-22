@@ -11,7 +11,7 @@ import type { SourceKind } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
   useDampedPointer,
-  usePortraitTexture,
+  useSourceTexture,
 } from "@/components/lab/source/use-source";
 import type { StagePointer } from "@/components/lab/source/use-source";
 
@@ -38,7 +38,7 @@ const EngravingView = ({ settings, animate, pointer }: EngravingViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof EngravingMaterial>>(null);
   const light = useDampedPointer(pointer, animate);
-  const portrait = usePortraitTexture(settings.source === "portrait");
+  const portrait = useSourceTexture(settings.source);
 
   useEffect(() => {
     const plane = mesh.current;

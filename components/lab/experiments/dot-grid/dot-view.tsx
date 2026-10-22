@@ -7,6 +7,12 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry, Vector4 } from "three";
 
+import type { SourceKind } from "@/components/lab/source/tone-chunk";
+import {
+  syncSourceUniforms,
+  useSourceTexture,
+} from "@/components/lab/source/use-source";
+
 import { DotMaterial } from "./dot-material";
 
 const DotMaterialElement = extend(DotMaterial);
@@ -23,6 +29,7 @@ export interface DotSettings {
   lensRadius: number;
   noiseSpeed: number;
   mark: "round" | "square";
+  source: SourceKind;
 }
 
 export interface DotPointer {
@@ -67,6 +74,7 @@ const DotView = ({ settings, animate, pointer }: DotViewProps) => {
     x: { value: 0.5, velocity: 0 },
     y: { value: 0.5, velocity: 0 },
   });
+  const portrait = useSourceTexture(settings.source);
 
   useEffect(() => {
     const plane = mesh.current;
@@ -78,17 +86,22 @@ const DotView = ({ settings, animate, pointer }: DotViewProps) => {
       if (!shader) {
         return;
       }
+      const { x, y } = lens.current;
+      syncSourceUniforms(
+        shader,
+        renderer,
+        { x: x.value, y: y.value },
+        portrait,
+        settings.source
+      );
       renderer.getCurrentViewport(viewport);
       const ratio = renderer.getPixelRatio();
-      const { x, y } = lens.current;
-      shader.uOrigin.set(viewport.x, viewport.y);
-      shader.uResolution.set(viewport.z, viewport.w);
       shader.uLens.set(x.value * viewport.z, y.value * viewport.w);
       shader.uPixelRatio = ratio;
       shader.uCell = settings.cell * ratio;
       shader.uLensRadius = settings.lensRadius * ratio;
     };
-  }, [settings.cell, settings.lensRadius]);
+  }, [portrait, settings.cell, settings.lensRadius, settings.source]);
 
   useFrame((_, delta) => {
     const shader = material.current;

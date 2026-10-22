@@ -1,5 +1,10 @@
 import { shaderMaterial } from "@react-three/drei";
-import { Color, Texture, Vector2 } from "three";
+import { Texture, Vector2 } from "three";
+
+import {
+  createSourceUniforms,
+  sourceToneChunk,
+} from "@/components/lab/source/tone-chunk";
 
 import { atlasColumns, atlasTexels, glyphDots } from "./glyph-atlas";
 
@@ -23,13 +28,11 @@ const fragmentShader = `
   uniform float uAtlasColumns;
   uniform vec2 uAtlasTexels;
   uniform vec2 uGlyphDots;
-  uniform vec2 uResolution;
-  uniform vec2 uOrigin;
   uniform vec2 uLens;
   uniform sampler2D uAtlas;
-  uniform vec3 uInk;
-  uniform vec3 uPaper;
   varying vec2 vUv;
+
+  ${sourceToneChunk}
 
   float hash(float seed) {
     return fract(sin(seed * 91.3458) * 47453.5453);
@@ -82,6 +85,12 @@ const fragmentShader = `
       vec2 inCell = min(floor(fract(fromTop / cellSize) * uGlyphDots), uGlyphDots - 1.0);
       float rows = ceil(uResolution.y / cellSize.y);
       float intensity = max(drop(cell, rows, 0.0), drop(cell, rows, 1.0));
+      if (uSource > 0.5 && uHasPortrait > 0.5) {
+        vec2 cellCenter = (cell + 0.5) * cellSize;
+        vec2 point = vec2(cellCenter.x - uResolution.x * 0.5, uResolution.y * 0.5 - cellCenter.y) / uResolution.y;
+        float picture = smoothstep(0.08, 0.92, sourceInk(point, sourceLod(cellSize.y, uResolution)));
+        intensity = max(intensity * (0.25 + 0.75 * picture), picture * 0.62);
+      }
 
       if (intensity > 0.0) {
         float flicker = floor(uTime * mix(1.5, 7.0, hash(cell.x + 41.0)) + hash(cell) * 9.0);
@@ -105,21 +114,18 @@ const fragmentShader = `
 
 export const RainMaterial = shaderMaterial(
   {
+    ...createSourceUniforms(),
     uAtlas: new Texture(),
     uAtlasColumns: atlasColumns,
     uAtlasTexels: new Vector2(atlasTexels.width, atlasTexels.height),
     uGlyphCount: 2,
     uGlyphDots: new Vector2(glyphDots.columns, glyphDots.rows),
     uGlyphStart: 0,
-    uInk: new Color("#141414"),
     uLens: new Vector2(0, 0),
     uLensRadius: 110,
     uLensStrength: 0,
-    uOrigin: new Vector2(0, 0),
-    uPaper: new Color("#ededeb"),
     uPitch: 3,
     uPixelRatio: 1,
-    uResolution: new Vector2(1, 1),
     uTime: 0,
     uTrail: 12,
   },

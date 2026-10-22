@@ -25,8 +25,7 @@ const fragmentShader = `
 
   float reliefAt(vec2 point, float lod) {
     if (uSource > 0.5 && uHasPortrait > 0.5) {
-      vec2 uv = point / max(uAspect, 1.0) + 0.5;
-      return portraitLuma(uv, lod + 3.0);
+      return portraitLuma(portraitUv(point), lod + 3.0);
     }
     vec2 offset = point - formCenter;
     return max(1.0 - dot(offset, offset) / (formRadius * formRadius), 0.0);

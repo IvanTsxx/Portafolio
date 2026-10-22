@@ -11,7 +11,7 @@ import type { SourceKind } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
   useDampedPointer,
-  usePortraitTexture,
+  useSourceTexture,
 } from "@/components/lab/source/use-source";
 import type { StagePointer } from "@/components/lab/source/use-source";
 import { requestSceneFrame } from "@/components/scene/view-registry";
@@ -70,7 +70,7 @@ const AsciiView = ({ settings, animate, pointer }: AsciiViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof AsciiMaterial>>(null);
   const light = useDampedPointer(pointer, animate);
-  const portrait = usePortraitTexture(settings.source === "portrait");
+  const portrait = useSourceTexture(settings.source);
   const atlas = useGlyphAtlas(settings.ramp);
 
   useEffect(() => {

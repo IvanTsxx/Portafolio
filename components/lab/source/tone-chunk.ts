@@ -10,6 +10,8 @@ export const sourceToneChunk = `
   uniform float uHasPortrait;
   uniform sampler2D uPortrait;
   uniform float uPortraitSize;
+  uniform float uPortraitAspect;
+  uniform vec2 uPortraitFocus;
   uniform float uAspect;
   uniform vec2 uLight;
 
@@ -40,8 +42,20 @@ export const sourceToneChunk = `
     return dot(textureLod(uPortrait, uv, lod).rgb, vec3(0.2126, 0.7152, 0.0722));
   }
 
+  vec2 portraitSpan() {
+    float cover = max(uAspect, uPortraitAspect);
+    return vec2(cover, cover / uPortraitAspect);
+  }
+
+  vec2 portraitUv(vec2 point) {
+    vec2 span = portraitSpan();
+    vec2 visible = vec2(uAspect, 1.0) / span;
+    vec2 center = clamp(uPortraitFocus, visible * 0.5, 1.0 - visible * 0.5);
+    return point / span + center;
+  }
+
   float portraitInk(vec2 point, float lod) {
-    vec2 uv = point / max(uAspect, 1.0) + 0.5;
+    vec2 uv = portraitUv(point);
     float texel = exp2(lod) / uPortraitSize;
     float luma = portraitLuma(uv, lod);
     float slopeX = portraitLuma(uv + vec2(texel, 0.0), lod) - luma;
@@ -55,7 +69,7 @@ export const sourceToneChunk = `
   }
 
   float sourceLod(float footprint, vec2 resolution) {
-    float texels = footprint * uPortraitSize / (resolution.y * max(uAspect, 1.0));
+    float texels = footprint * uPortraitSize / (resolution.y * portraitSpan().y);
     return log2(max(texels, 1.0));
   }
 
@@ -75,6 +89,8 @@ interface SourceUniforms {
   uOrigin: Vector2;
   uPaper: Color;
   uPortrait: Texture | null;
+  uPortraitAspect: number;
+  uPortraitFocus: Vector2;
   uPortraitSize: number;
   uResolution: Vector2;
   uSource: number;
@@ -88,14 +104,43 @@ export const createSourceUniforms = (): SourceUniforms => ({
   uOrigin: new Vector2(0, 0),
   uPaper: new Color("#ededeb"),
   uPortrait: null,
+  uPortraitAspect: 1,
+  uPortraitFocus: new Vector2(0.5, 0.5),
   uPortraitSize: 1,
   uResolution: new Vector2(1, 1),
   uSource: 0,
 });
 
-export type SourceKind = "form" | "portrait";
+export const sourceImages = {
+  clouds: {
+    focus: { x: 0.5, y: 0.5 },
+    path: "/experiments/sources/clouds.jpg",
+  },
+  ippo: { focus: { x: 0.5, y: 0.3 }, path: "/experiments/sources/ippo.jpg" },
+  messi: {
+    focus: { x: 0.55, y: 0.35 },
+    path: "/experiments/sources/messi.jpg",
+  },
+  rocky: { focus: { x: 0.55, y: 0.3 }, path: "/experiments/sources/rocky.jpg" },
+  vegeta: {
+    focus: { x: 0.45, y: 0.42 },
+    path: "/experiments/sources/vegeta.jpg",
+  },
+} as const;
+
+export type SourceImage = keyof typeof sourceImages;
+
+export type SourceKind = "form" | SourceImage;
+
+export const imageSourceOptions = [
+  { label: "Ippo", value: "ippo" },
+  { label: "Vegeta", value: "vegeta" },
+  { label: "Messi", value: "messi" },
+  { label: "Rocky", value: "rocky" },
+  { label: "Clouds", value: "clouds" },
+] as const satisfies readonly { label: string; value: SourceImage }[];
 
 export const sourceOptions = [
   { label: "Form", value: "form" },
-  { label: "Portrait", value: "portrait" },
+  ...imageSourceOptions,
 ] as const satisfies readonly { label: string; value: SourceKind }[];

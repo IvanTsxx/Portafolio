@@ -5,6 +5,7 @@ import { useId, useRef, useState } from "react";
 
 import { ExperimentStage } from "@/components/lab/experiment-stage";
 import { SliderControl, ToggleControl } from "@/components/lab/lab-controls";
+import { imageSourceOptions } from "@/components/lab/source/tone-chunk";
 import { useStageActivity } from "@/components/lab/use-stage-activity";
 import {
   requestSceneFrame,
@@ -13,6 +14,11 @@ import {
 
 import DotView from "./dot-view";
 import type { DotPointer, DotSettings } from "./dot-view";
+
+const sourceOptions = [
+  { label: "Noise", value: "form" },
+  ...imageSourceOptions,
+] as const;
 
 const markOptions = [
   { label: "Round", value: "round" },
@@ -37,6 +43,7 @@ const DotGridPreview = () => {
     lensRadius: 120,
     mark: "round",
     noiseSpeed: 1,
+    source: "messi",
   });
 
   const animate = activity === "running";
@@ -60,6 +67,14 @@ const DotGridPreview = () => {
       className="[&>p]:z-40 [&>span]:z-40"
       controls={
         <>
+          <ToggleControl
+            label="Source"
+            onChange={(source) =>
+              setSettings((current) => ({ ...current, source }))
+            }
+            options={sourceOptions}
+            value={settings.source}
+          />
           <SliderControl
             format={(value) => `${value}px`}
             label="Density"
@@ -103,7 +118,7 @@ const DotGridPreview = () => {
         </>
       }
       reducedNote="Reduced motion is on. The grid holds a single frame. The lens jumps to the pointer without springing."
-      stageLabel="Halftone dot grid that swells around the pointer"
+      stageLabel="Halftone dot grid of a picture that swells around the pointer"
       stageRef={ref}
     >
       <div

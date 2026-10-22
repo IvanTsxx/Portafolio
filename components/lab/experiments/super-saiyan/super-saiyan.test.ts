@@ -3,12 +3,13 @@ import path from "node:path";
 
 import sharp from "sharp";
 
+import { encodeInkPng } from "@/components/lab/source/poster-png";
 import { parseOklch, oklchToSrgb } from "@/lib/design-system/color";
 
 import { blueNoiseRanks } from "./blue-noise";
 import { extractPalette, paletteSample, retroPaletteSize } from "./palette";
 import { posterBitmap } from "./poster-bitmap";
-import { ditherPoster, encodeInkPng, posterGrid } from "./poster-raster";
+import { ditherPoster, posterGrid } from "./poster-raster";
 import { retroPalette } from "./retro-palette";
 import { duotoneOptions } from "./settings";
 import {

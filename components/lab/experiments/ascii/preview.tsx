@@ -54,7 +54,7 @@ const AsciiPreview = () => {
     custom: ".:ivo/",
     glyphSet: "classic",
     scanMode: "sharpen",
-    source: "form",
+    source: "rocky",
   });
 
   const field = useRef<HTMLDivElement>(null);

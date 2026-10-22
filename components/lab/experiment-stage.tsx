@@ -1,5 +1,6 @@
 import type { ReactNode, Ref } from "react";
 
+import { controlGridClassName } from "@/components/lab/lab-controls";
 import type { StageActivity } from "@/components/lab/use-stage-activity";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { cn } from "@/lib/utils";
@@ -36,11 +37,10 @@ export const ExperimentStage = ({
 }: ExperimentStageProps) => {
   const status = activityCopy[activity];
   return (
-    <div className="grid gap-px lg:grid-cols-12 lg:gap-0">
+    <div className="flex flex-col">
       <div
         className={cn(
-          "border-rule-strong bg-popover relative aspect-4/5 overflow-hidden border sm:aspect-video lg:col-span-8",
-          !controls && "lg:col-span-12",
+          "border-rule-strong bg-popover relative aspect-4/5 overflow-hidden border sm:aspect-4/3 lg:aspect-16/10",
           className
         )}
         ref={stageRef}
@@ -65,13 +65,13 @@ export const ExperimentStage = ({
       {controls ? (
         <section
           aria-label="Controls"
-          className="border-rule-strong bg-popover flex flex-col border lg:col-span-4 lg:border-l-0"
+          className="border-rule-strong bg-popover flex flex-col border border-t-0"
         >
           <h2 className="label border-rule-strong flex items-baseline gap-3 border-b px-5 py-3">
             <span className="text-mist tabular-nums">[ CTL ]</span>
             <span className="text-ink font-normal">Controls</span>
           </h2>
-          <div className="divide-rule flex flex-col divide-y">{controls}</div>
+          <div className={controlGridClassName}>{controls}</div>
         </section>
       ) : null}
     </div>

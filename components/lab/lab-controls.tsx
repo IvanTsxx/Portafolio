@@ -14,6 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
+export const controlGridClassName =
+  "grid overflow-hidden sm:grid-cols-2 lg:grid-cols-3 *:-mr-px *:-mb-px *:border-r *:border-b *:border-rule";
+
 interface ControlRowProps {
   labelId: string;
   label: string;
@@ -184,7 +187,7 @@ export const ToggleControl = <Value extends string>({
     <ControlRow hint={hint} label={label} labelId={labelId}>
       <ToggleGroup
         aria-labelledby={labelId}
-        className="w-full"
+        className={cn("w-full", options.length > 3 && "grid grid-cols-3")}
         disabled={disabled}
         onValueChange={(next) => {
           const selected = options.find((option) => option.value === next[0]);
@@ -248,7 +251,7 @@ interface ControlTabsProps {
 }
 
 export const ControlTabs = ({ label, tabs }: ControlTabsProps) => (
-  <Tabs className="gap-0" defaultValue={tabs[0]?.value}>
+  <Tabs className="col-span-full gap-0" defaultValue={tabs[0]?.value}>
     <TabsList
       aria-label={label}
       className="border-rule h-auto w-full gap-0 border-b p-0"
@@ -266,7 +269,7 @@ export const ControlTabs = ({ label, tabs }: ControlTabsProps) => (
     </TabsList>
     {tabs.map((tab) => (
       <TabsContent
-        className="divide-rule flex flex-col divide-y"
+        className={controlGridClassName}
         key={tab.value}
         value={tab.value}
       >

@@ -86,7 +86,7 @@ describe("content entries", () => {
   test("an experiment links to its experiment page and searches its technologies", () => {
     const entry = experimentEntry({
       index: "LAB-01",
-      slug: "dither-field",
+      slug: "dot-grid",
       summary: "Bayer dithering.",
       technologies: ["GLSL"],
       title: "Dither field",
@@ -95,7 +95,7 @@ describe("content entries", () => {
     });
 
     expect(entry).toMatchObject({
-      action: { href: "/experiments/dither-field", type: "route" },
+      action: { href: "/experiments/dot-grid", type: "route" },
       code: "LAB-01",
       detail: "Shader, WebGL",
       group: "experiments",

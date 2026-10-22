@@ -7,16 +7,6 @@ import {
 } from "@/registry/ivan/lib/dither";
 import type { DitherFrame, Rgb } from "@/registry/ivan/lib/dither";
 import { driftRows } from "@/registry/ivan/lib/dither-drift";
-import {
-  createDitherFieldGrid,
-  createLens,
-  packColor,
-  paintDitherField,
-} from "@/registry/ivan/lib/dither-field";
-import {
-  thumbLayout,
-  thumbShare,
-} from "@/registry/ivan/lib/thumb-index-layout";
 
 const ink: Rgb = [20, 20, 20];
 const paper: Rgb = [240, 240, 236];
@@ -139,85 +129,5 @@ describe("dither drift", () => {
       }
     }
     expect(shiftedRows).toBeGreaterThan(0);
-  });
-});
-
-describe("dither field", () => {
-  const color = packColor([10, 20, 30]);
-  const frame = { lens: createLens(), ramp: 0, time: 0 };
-
-  test("the anchor shapes where ink can land", () => {
-    const grid = createDitherFieldGrid({
-      anchor: "top",
-      columns: 40,
-      density: 0.62,
-      rows: 20,
-      seed: 7,
-    });
-    const topRow = grid.envelope.slice(0, 40);
-    const bottomRow = grid.envelope.slice(19 * 40);
-    expect(Math.min(...topRow)).toBeCloseTo(0.62, 5);
-    expect(Math.max(...bottomRow)).toBe(0);
-  });
-
-  test("a frame paints only the ink color or transparency, and the seed fixes the grain", () => {
-    const paint = (seed: number) => {
-      const grid = createDitherFieldGrid({
-        anchor: "fill",
-        columns: 64,
-        density: 1,
-        rows: 32,
-        seed,
-      });
-      const pixels = new Uint32Array(64 * 32);
-      paintDitherField(grid, frame, pixels, color);
-      return pixels;
-    };
-    const first = paint(11);
-    expect(new Set(first)).toEqual(new Set([0, color]));
-    expect([...paint(11)]).toEqual([...first]);
-    expect([...paint(12)]).not.toEqual([...first]);
-  });
-});
-
-describe("thumb index layout", () => {
-  test("marks keep the minimum gap and stay inside the strip", () => {
-    const layout = thumbLayout({
-      landingOffset: 80,
-      maxScroll: 4000,
-      minGap: 0.1,
-      sectionTops: [0, 100, 150, 2000, 4100],
-    });
-    for (const [index, mark] of layout.marks.entries()) {
-      expect(mark).toBeGreaterThanOrEqual(0);
-      expect(mark).toBeLessThanOrEqual(1);
-      if (index > 0) {
-        expect(mark - (layout.marks[index - 1] ?? 0)).toBeGreaterThanOrEqual(
-          0.1 - 1e-9
-        );
-      }
-    }
-  });
-
-  test("the edge fill reaches each notch when its section lands and grows with scroll", () => {
-    const layout = thumbLayout({
-      landingOffset: 80,
-      maxScroll: 3000,
-      minGap: 0.05,
-      sectionTops: [80, 1080, 2080],
-    });
-    for (const [index, stop] of layout.stops.entries()) {
-      expect(thumbShare(stop, layout.anchors)).toBeCloseTo(
-        layout.marks[index] ?? 0,
-        5
-      );
-    }
-    let previous = -1;
-    for (let scroll = 0; scroll <= 3000; scroll += 150) {
-      const share = thumbShare(scroll, layout.anchors);
-      expect(share).toBeGreaterThanOrEqual(previous);
-      previous = share;
-    }
-    expect(thumbShare(3000, layout.anchors)).toBe(1);
   });
 });

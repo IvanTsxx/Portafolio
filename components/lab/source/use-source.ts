@@ -3,10 +3,20 @@
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import type { PointerEvent, RefObject } from "react";
-import { LinearMipmapLinearFilter, TextureLoader, Vector4 } from "three";
+import {
+  LinearMipmapLinearFilter,
+  NearestFilter,
+  RepeatWrapping,
+  TextureLoader,
+  Vector4,
+} from "three";
 import type { Texture, Vector2, WebGLRenderer } from "three";
 
-import type { SourceKind } from "@/components/lab/source/tone-chunk";
+import { sourceImages } from "@/components/lab/source/tone-chunk";
+import type {
+  SourceImage,
+  SourceKind,
+} from "@/components/lab/source/tone-chunk";
 import { requestSceneFrame } from "@/components/scene/view-registry";
 
 export interface StagePointer {
@@ -64,37 +74,41 @@ export const useDampedPointer = (
 
 type PortraitTexture = Texture<HTMLImageElement>;
 
-let portraitRequest: Promise<PortraitTexture> | null = null;
+const textureRequests = new Map<SourceImage, Promise<PortraitTexture>>();
 
-const requestPortrait = async () => {
-  const texture = await new TextureLoader().loadAsync("/avatar");
+const requestTexture = async (image: SourceImage) => {
+  const texture = await new TextureLoader().loadAsync(sourceImages[image].path);
   texture.minFilter = LinearMipmapLinearFilter;
   texture.generateMipmaps = true;
   return texture;
 };
 
-const loadPortrait = async () => {
-  portraitRequest ??= requestPortrait();
+const loadTexture = async (image: SourceImage) => {
+  const pending = textureRequests.get(image) ?? requestTexture(image);
+  textureRequests.set(image, pending);
   try {
-    return await portraitRequest;
+    return await pending;
   } catch {
-    portraitRequest = null;
+    textureRequests.delete(image);
     return null;
   }
 };
 
-export const usePortraitTexture = (isWanted: boolean) => {
-  const [portrait, setPortrait] = useState<PortraitTexture | null>(null);
+export const useSourceTexture = (source: SourceKind) => {
+  const [loaded, setLoaded] = useState<{
+    image: SourceImage;
+    texture: PortraitTexture;
+  } | null>(null);
 
   useEffect(() => {
-    if (!isWanted || portrait) {
+    if (source === "form") {
       return;
     }
     let isCurrent = true;
     const resolve = async () => {
-      const texture = await loadPortrait();
+      const texture = await loadTexture(source);
       if (isCurrent && texture) {
-        setPortrait(texture);
+        setLoaded({ image: source, texture });
         requestSceneFrame();
       }
     };
@@ -102,9 +116,75 @@ export const usePortraitTexture = (isWanted: boolean) => {
     return () => {
       isCurrent = false;
     };
-  }, [isWanted, portrait]);
+  }, [source]);
 
-  return portrait;
+  return loaded && loaded.image === source ? loaded.texture : null;
+};
+
+let noiseRequest: Promise<Texture> | null = null;
+
+const requestNoise = async () => {
+  const texture = await new TextureLoader().loadAsync(
+    "/experiments/blue-noise-64.png"
+  );
+  texture.generateMipmaps = false;
+  texture.magFilter = NearestFilter;
+  texture.minFilter = NearestFilter;
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  return texture;
+};
+
+const loadNoise = async () => {
+  noiseRequest ??= requestNoise();
+  try {
+    return await noiseRequest;
+  } catch {
+    noiseRequest = null;
+    return null;
+  }
+};
+
+export const useBlueNoiseTexture = () => {
+  const [noise, setNoise] = useState<Texture | null>(null);
+
+  useEffect(() => {
+    let isCurrent = true;
+    const resolve = async () => {
+      const texture = await loadNoise();
+      if (isCurrent && texture) {
+        setNoise(texture);
+        requestSceneFrame();
+      }
+    };
+    void resolve();
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
+  return noise;
+};
+
+export const usePointerSpeed = (
+  light: RefObject<{ x: number; y: number }>,
+  animate: boolean
+) => {
+  const speed = useRef({ kick: 0, x: 0, y: 0 });
+
+  useFrame((_, delta) => {
+    const state = speed.current;
+    const step = Math.max(Math.min(delta, 0.05), 0.001);
+    const { x, y } = light.current;
+    const velocity = Math.hypot(x - state.x, y - state.y) / step;
+    state.x = x;
+    state.y = y;
+    const target = animate ? Math.min(velocity / 2.5, 1) : 0;
+    const rate = target > state.kick ? 14 : 3;
+    state.kick += (target - state.kick) * (1 - Math.exp(-rate * step));
+  });
+
+  return speed;
 };
 
 export interface SourceUniformTarget {
@@ -113,6 +193,8 @@ export interface SourceUniformTarget {
   uLight: Vector2;
   uOrigin: Vector2;
   uPortrait: Texture | null;
+  uPortraitAspect: number;
+  uPortraitFocus: Vector2;
   uPortraitSize: number;
   uResolution: Vector2;
   uSource: number;
@@ -133,8 +215,13 @@ export const syncSourceUniforms = (
   shader.uResolution.set(viewport.z, viewport.w);
   shader.uAspect = aspect;
   shader.uLight.set((light.x - 0.5) * aspect, light.y - 0.5);
-  shader.uSource = source === "portrait" ? 1 : 0;
+  shader.uSource = source === "form" ? 0 : 1;
   shader.uHasPortrait = portrait ? 1 : 0;
   shader.uPortrait = portrait;
   shader.uPortraitSize = portrait?.image.naturalHeight ?? 1;
+  const focus = source === "form" ? null : sourceImages[source].focus;
+  shader.uPortraitFocus.set(focus?.x ?? 0.5, 1 - (focus?.y ?? 0.5));
+  shader.uPortraitAspect = portrait
+    ? portrait.image.naturalWidth / Math.max(portrait.image.naturalHeight, 1)
+    : 1;
 };

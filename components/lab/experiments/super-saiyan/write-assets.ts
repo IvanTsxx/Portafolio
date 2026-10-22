@@ -3,14 +3,14 @@ import path from "node:path";
 
 import sharp from "sharp";
 
-import { blueNoiseBytes } from "./blue-noise";
-import { extractPalette, paletteSample } from "./palette";
 import {
-  ditherPoster,
   encodeInkPng,
   encodeLevelPng,
-  posterGrid,
-} from "./poster-raster";
+} from "@/components/lab/source/poster-png";
+
+import { blueNoiseBytes } from "./blue-noise";
+import { extractPalette, paletteSample } from "./palette";
+import { ditherPoster, posterGrid } from "./poster-raster";
 
 const folder = import.meta.dir;
 const publicFolder = path.join(folder, "../../../../public/experiments");

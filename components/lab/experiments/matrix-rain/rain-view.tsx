@@ -7,6 +7,11 @@ import type { RefObject } from "react";
 import type { Mesh, Texture, WebGLRenderer } from "three";
 import { PlaneGeometry, Vector4 } from "three";
 
+import type { SourceKind } from "@/components/lab/source/tone-chunk";
+import {
+  syncSourceUniforms,
+  useSourceTexture,
+} from "@/components/lab/source/use-source";
 import { requestSceneFrame } from "@/components/scene/view-registry";
 
 import { buildGlyphAtlas, glyphRangeOf } from "./glyph-atlas";
@@ -29,6 +34,7 @@ export interface RainSettings {
   speed: number;
   trail: number;
   glyphs: GlyphSetName;
+  source: SourceKind;
 }
 
 export interface RainPointer {
@@ -51,6 +57,7 @@ const RainView = ({ settings, animate, pointer }: RainViewProps) => {
   const material = useRef<InstanceType<typeof RainMaterial>>(null);
   const wander = useRef(reducedTime);
   const lens = useRef({ strength: idleStrength, x: 0.5, y: 0.5 });
+  const portrait = useSourceTexture(settings.source);
 
   useEffect(() => {
     let isCurrent = true;
@@ -81,10 +88,15 @@ const RainView = ({ settings, animate, pointer }: RainViewProps) => {
       if (!shader) {
         return;
       }
+      syncSourceUniforms(
+        shader,
+        renderer,
+        lens.current,
+        portrait,
+        settings.source
+      );
       renderer.getCurrentViewport(viewport);
       const ratio = renderer.getPixelRatio();
-      shader.uOrigin.set(viewport.x, viewport.y);
-      shader.uResolution.set(viewport.z, viewport.w);
       shader.uLens.set(
         lens.current.x * viewport.z,
         lens.current.y * viewport.w
@@ -93,7 +105,7 @@ const RainView = ({ settings, animate, pointer }: RainViewProps) => {
       shader.uPitch = settings.pitch * ratio;
       shader.uLensRadius = lensRadius * ratio;
     };
-  }, [settings.pitch]);
+  }, [portrait, settings.pitch, settings.source]);
 
   useFrame((_, delta) => {
     const shader = material.current;

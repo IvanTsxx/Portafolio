@@ -1,4 +1,4 @@
-import { seededRandom } from "@/components/lab/experiments/stipple/stipple-field";
+import { seededRandom } from "@/components/profile/repositories/seeded-random";
 
 export const COVER_CELLS = 32;
 
