@@ -79,7 +79,7 @@ export const FiledSheet = ({
 }: {
   edge: "letter" | "sheet" | "ticket";
   entry: FiledFacts;
-  onReturn: () => void;
+  onReturn?: () => void;
   returnLabel: string;
 }) => (
   <article
@@ -111,9 +111,17 @@ export const FiledSheet = ({
       <SheetField label="Length" value={entry.length} />
     </span>
     <span className="border-rule flex justify-between border-t">
-      <button className={sheetActionClassName} onClick={onReturn} type="button">
-        {returnLabel}
-      </button>
+      {onReturn ? (
+        <button
+          className={sheetActionClassName}
+          onClick={onReturn}
+          type="button"
+        >
+          {returnLabel}
+        </button>
+      ) : (
+        <span />
+      )}
       <OpenFile className={sheetActionClassName} file={entry.file}>
         Open file ↗
       </OpenFile>

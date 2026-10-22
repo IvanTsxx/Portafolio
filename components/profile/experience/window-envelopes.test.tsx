@@ -85,18 +85,16 @@ describe("window envelopes", () => {
     expect(letterTagOf(markup, "basement-studio")).toContain(
       'aria-hidden="false"'
     );
-    expect(envelopeTagOf(markup, "basement-studio")).toContain(
-      'aria-expanded="true"'
-    );
+    expect(envelopeTagOf(markup, "basement-studio")).toBeUndefined();
     expect(letterTagOf(markup, "doctor-qali")).toContain('inert=""');
     expect(envelopeTagOf(markup, "doctor-qali")).toContain(
       'aria-expanded="false"'
     );
   });
 
-  test("puts the open envelope in the tab order and keeps the rest out", () => {
-    expect(envelopeTagOf(markup, "basement-studio")).toContain('tabindex="0"');
-    expect(envelopeTagOf(markup, "doctor-qali")).toContain('tabindex="-1"');
+  test("leaves the current job out of the envelopes and puts the first one in the tab order", () => {
+    expect(markup.match(/aria-controls="envelope-letter-/gu)).toHaveLength(1);
+    expect(envelopeTagOf(markup, "doctor-qali")).toContain('tabindex="0"');
   });
 
   test("files every letter away when no job is current", () => {

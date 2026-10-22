@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { FiledSheet, RoomPlaceholder, sheetRoomClassName } from "./filed-sheet";
 import { openingEntryOf } from "./ledger";
 import type { FiledFacts } from "./ledger";
-import { letterOrigin, pullPose } from "./poses";
+import { deskOrigin, envelopeColumns, letterOrigin, pullPose } from "./poses";
 import type { PullPose } from "./poses";
 import { usePull } from "./use-pull";
 
@@ -50,6 +50,17 @@ const letterVariants = cva(
   }
 );
 
+const wideColumnVariants = cva("", {
+  variants: {
+    columns: {
+      1: "sm:grid-cols-1",
+      2: "sm:grid-cols-2",
+      3: "sm:grid-cols-3",
+      4: "sm:grid-cols-4",
+    },
+  },
+});
+
 const Envelope = ({ entry, pose }: { entry: FiledFacts; pose: PullPose }) => (
   <>
     <span aria-hidden className={peekVariants({ pose })} />
@@ -76,19 +87,23 @@ export const WindowEnvelopes = ({
 }: {
   entries: readonly FiledFacts[];
 }) => {
-  const { fileBack, itemProps, pull, pulled } = usePull(
-    entries.length,
-    openingEntryOf(entries)
-  );
+  const opening = openingEntryOf(entries);
+  const current = opening === null ? null : entries[opening];
+  const envelopes = entries.filter((entry) => entry !== current);
+  const columns = envelopeColumns(envelopes.length);
+  const { fileBack, itemProps, pull, pulled } = usePull(envelopes.length, null);
 
   return (
     <div className="flex flex-col gap-3" data-build-block>
       <div className="flex flex-col">
         <ul
           aria-label="Employment letters in window envelopes"
-          className="order-2 grid grid-cols-2 gap-x-2 gap-y-4 pt-4 sm:grid-cols-4 sm:gap-x-3"
+          className={cn(
+            "order-2 grid grid-cols-2 gap-x-2 gap-y-4 pt-4 sm:gap-x-3",
+            wideColumnVariants({ columns })
+          )}
         >
-          {entries.map((entry, index) => {
+          {envelopes.map((entry, index) => {
             const pose = pullPose(index, pulled);
             return (
               <li key={entry.id}>
@@ -113,7 +128,20 @@ export const WindowEnvelopes = ({
           <RoomPlaceholder className="mx-2 mt-3 border-b-0 sm:mx-4">
             No letter out
           </RoomPlaceholder>
-          {entries.map((entry, index) => {
+          {current ? (
+            <div
+              aria-hidden={pulled !== null}
+              className={letterVariants({
+                pose: pulled === null ? "pulled" : "resting",
+              })}
+              id={`envelope-letter-${current.id}`}
+              inert={pulled !== null}
+              style={deskOrigin}
+            >
+              <FiledSheet edge="letter" entry={current} returnLabel="" />
+            </div>
+          ) : null}
+          {envelopes.map((entry, index) => {
             const pose = pullPose(index, pulled);
             return (
               <div
@@ -122,7 +150,7 @@ export const WindowEnvelopes = ({
                 id={`envelope-letter-${entry.id}`}
                 inert={pose !== "pulled"}
                 key={entry.id}
-                style={letterOrigin(index)}
+                style={letterOrigin(index, columns)}
               >
                 <FiledSheet
                   edge="letter"
@@ -137,7 +165,7 @@ export const WindowEnvelopes = ({
       </div>
       <p className="label text-mist flex justify-between gap-4">
         <span>
-          {entries.length} envelopes · {entries.at(-1)?.year} → now
+          {envelopes.length} envelopes · {entries.at(-1)?.year} → now
         </span>
         <span>Open an envelope · Esc folds it back</span>
       </p>

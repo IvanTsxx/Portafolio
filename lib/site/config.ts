@@ -46,16 +46,16 @@ export const primaryRoutes = [
 
 export const homeSections = [
   { id: "experience", index: "GH-02", label: "Experience" },
-  { id: "repos", index: "GH-03", label: "Repos" },
   {
     id: "matrix",
-    index: "GH-04",
+    index: "GH-03",
     label: "Contribution matrix",
   },
+  { id: "experiments", index: "GH-04", label: "Experiments" },
   { id: "how-i-work", index: "GH-05", label: "How I work" },
-  { id: "workshop", index: "GH-06", label: "Workshop" },
-  { id: "experiments", index: "GH-07", label: "Experiments" },
-  { id: "registry", index: "GH-08", label: "Registry" },
+  { id: "repos", index: "GH-06", label: "Repos" },
+  { id: "registry", index: "GH-07", label: "Registry" },
+  { id: "workshop", index: "GH-08", label: "Workshop" },
   { id: "contact", index: "GH-09", label: "Contact" },
 ] as const;
 

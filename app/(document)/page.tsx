@@ -22,12 +22,12 @@ const HomePage = async () => {
       <JsonLd data={homeJsonLd()} />
       <ProfileIntro identity={profile.identity} />
       <ExperienceSection />
-      <ReposSection repositories={profile.pinned} />
       <MatrixSection calendars={profile.calendars} />
-      <HowIWork />
-      <AgentWorkshop />
       <ExperimentsSection />
+      <HowIWork />
+      <ReposSection repositories={profile.pinned} />
       <RegistrySection />
+      <AgentWorkshop />
       <ContactRow />
     </>
   );
