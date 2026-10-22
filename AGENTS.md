@@ -19,7 +19,7 @@ Read before any change:
 
 ## Stack
 
-Next.js 16.4 App Router with Cache Components and Partial Prefetching, React 19, Tailwind v4, base-ui, cva + `cn`, GSAP through `lib/motion/gsap.ts`, React Three Fiber on one shared canvas, MDX content, shadcn registry, Bun for scripts and tests.
+Next.js 16.4 App Router with Cache Components and Partial Prefetching, React 19, Tailwind v4, base-ui, cva + `cn`, GSAP through `lib/motion/gsap.ts`, React Three Fiber on one shared canvas, MDX content, shadcn registry, Agent Skills in `skills/`, Bun for scripts and tests.
 
 ## Hard rules
 
@@ -53,7 +53,7 @@ bun run build
 bun run seo:check
 ```
 
-`seo:check` reads the build output, so it runs after `bun run build`. Commit with a short imperative English message. Do not push unless asked. After any commit that adds or changes a note, experiment or registry item, run `bun run seo:dates` and commit `lib/site/route-dates.json`.
+`seo:check` reads the build output, so it runs after `bun run build`. Commit with a short imperative English message. Do not push unless asked. After any commit that adds or changes a note, experiment, registry item or skill, run `bun run seo:dates` and commit `lib/site/route-dates.json`.
 
 ## Routine tasks
 
@@ -78,6 +78,15 @@ bun run seo:check
 3. Removing an item: delete its source, entry, demo, examples and `public/r/<name>.json`.
 4. Commit, then run `bun run seo:dates` and commit the dates.
 
+### Add or update a skill
+
+1. Add `skills/<name>/SKILL.md`. Frontmatter needs `name` (equal to the folder name, kebab case) and `description`. `license` and `metadata.author`/`metadata.version` are optional; quote the version (`"1.0"`).
+2. Supporting files go in `references/` and `assets/` inside the folder. Private notes go in `*.local.md`: git-ignored, never read by the site.
+3. `lib/skills/skills.ts` reads the folder at build time and throws on missing or invalid frontmatter. `/skills`, `/skills/<name>`, `/skills/<name>.md`, search, the sitemap and `llms.txt` update with no other edits.
+4. Visitors install with `npx skills add IvanTsxx/Portafolio --skill <name>`. Check discovery with `npx skills add ./ --list`.
+5. The formatter skips `skills/**`, so the Markdown stays as written.
+6. Commit, then run `bun run seo:dates` and commit the dates.
+
 ### Add or reorder a home section
 
 1. Add it to `homeSections` in `lib/site/config.ts`. That list drives the heading code, the thumb-index notch and its order.
@@ -97,12 +106,13 @@ Profile data comes from `lib/github/`. `lib/github/snapshot.json` is the offline
 
 ## Map
 
-- `app/(document)`: index pages (`/`, `/notes`, `/experiments`, `/registry`, `/design-system`).
-- `app/(detail)`: detail pages for notes, experiments and registry items.
-- `app/markdown`, `app/llms.txt`, `app/llms-full.txt`: plain Markdown for agents. `next.config.ts` rewrites `/notes/<slug>.md`, `/experiments/<slug>.md` and `/registry/<slug>.md` to `app/markdown`. `components/site/open-in-menu.tsx` copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
+- `app/(document)`: index pages (`/`, `/notes`, `/experiments`, `/registry`, `/skills`, `/design-system`).
+- `app/(detail)`: detail pages for notes, experiments, registry items and skills.
+- `app/markdown`, `app/llms.txt`, `app/llms-full.txt`: plain Markdown for agents. `next.config.ts` rewrites `/notes/<slug>.md`, `/experiments/<slug>.md`, `/registry/<slug>.md` and `/skills/<slug>.md` to `app/markdown`. `components/site/open-in-menu.tsx` copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
 - `components/site`: dossier chrome (one 60rem sheet, the bound edge in `dossier-edge.tsx`), route tabs, thumb index, hero field, headings, section build.
 - `components/scene`: shared canvas, companion, stages, narration, active section. `companion-placement.ts` docks the companion. On phones it peeks from the bottom right corner.
 - `components/profile`: home sections in `homeSections` order. Experience is window envelopes that open on the current job (`experience/`). Repos is a cassette tower that opens on the most-starred repo, with one tape out at a time (`repositories/`). Contribution matrix is a compact contribution graph (`matrix/`).
 - `components/lab`: experiments. `lib/lab`: their registry.
+- `skills/`: Agent Skills, one folder each. `lib/skills`: loader and install commands. `components/skills`: list, install block, rendered body, file list.
 - `lib/site`: config, section list, narration, SEO, structured data, route dates.
 - `lib/design-system`: design tokens and the `docs/design.md` generator.

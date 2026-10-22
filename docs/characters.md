@@ -8,7 +8,7 @@ Blender is not installed, so a GLB pipeline would have meant hand-authoring mesh
 
 - Fidelity. The references are rounded boxes, cylinders, domes and rings. `RoundedBoxGeometry` from three addons reproduces the clay bevels exactly. Organic shapes such as the feather in the scribe reference would need a GLB.
 - Rigging. The rig is a group hierarchy (body, two arm pivots, four leg pivots, eye group), so procedural animation mutates transforms directly. A GLB would need skinning or the same hierarchy rebuilt by name.
-- Performance. Geometry is cached by dimensions and materials are module singletons, so seven agents share geometries, textures and shader programs. With shadow maps gone, an agent costs about 35 draw calls (the seven-agent lineup measured 242 calls at 1440 by 900).
+- Performance. Geometry is cached by dimensions and materials are module singletons, so the companion and every stage share geometries, textures and shader programs. With shadow maps gone, an agent costs about 35 draw calls (measured on the removed seven-agent lineup, 242 calls at 1440 by 900).
 - Bundle. No model files, no loader, no Draco decoder. The only addition is the three addon for rounded boxes, which ships with the installed three package.
 - Maintainability. Proportions live in `components/agents/rig.ts`. Changing the body width moves every anchor and accessory with it.
 - Adding roles. Add the role to `lib/agents/roles.ts` and give it a preset in `outfit.ts`. The `Record<AgentRole, Outfit>` type fails the build until the preset exists.
@@ -60,7 +60,7 @@ Kits can read the live action through `useAgentLive` and re-aim props with `useH
 
 ## Known gaps
 
-- Accessories are separate meshes, so draw calls scale with kit detail (roughly 40 per agent with shadows). Merging static kit parts per material would cut that if a scene needs dozens of agents.
+- Accessories are separate meshes, so draw calls scale with kit detail (about 35 per agent). Merging static kit parts per material would cut that if a scene needs dozens of agents.
 - The scribe kit (beret with feather) from the references is not a role yet.
 - Poses without a `facing` entry still follow the arm, so actions other than each prop's signature can show it at an awkward angle.
 - Speech lines come from `CompanionLines` markers (`components/scene/companion-lines.tsx`) that `DocumentSection` renders from its script. The section crossing the middle of the viewport speaks.
