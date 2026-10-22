@@ -3,6 +3,7 @@
   "/notes": "2026-10-22",
   "/experiments": "2026-10-22",
   "/registry": "2026-10-22",
+  "/skills": "2026-10-22",
   "/design-system": "2026-10-22",
   "/notes/redesigning-this-portfolio-with-parallel-agents": "2026-10-13",
   "/notes/dithering-from-bayer-to-error-diffusion": "2026-10-13",
@@ -22,5 +23,6 @@
   "/registry/magnetic-button": "2026-10-15",
   "/registry/agent": "2026-10-12",
   "/registry/agent-stage": "2026-10-09",
-  "/registry/dither-image": "2026-10-13"
+  "/registry/dither-image": "2026-10-13",
+  "/skills/frontend-care": "2026-10-22"
 }
