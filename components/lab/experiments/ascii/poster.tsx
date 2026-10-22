@@ -1,16 +1,16 @@
-import { formInkAt } from "@/components/lab/source/form-tone";
+import { posterInkAt } from "@/components/lab/source/poster-tone";
 
 import { glyphRamps } from "./ramps";
 
-const columns = 72;
-const rows = 24;
+const columns = 96;
+const rows = 32;
 const glyphWidth = 0.6;
 const width = columns * glyphWidth;
 const ramp = [...glyphRamps.classic];
 
 const glyphAt = (column: number, row: number) => {
   const x = (column + 0.5) * glyphWidth;
-  const ink = formInkAt((x - width / 2) / rows, (rows / 2 - row - 0.5) / rows);
+  const ink = posterInkAt("messi", x / width, (row + 0.5) / rows);
   return ramp[Math.min(Math.floor(ink * ramp.length), ramp.length - 1)] ?? " ";
 };
 

@@ -15,7 +15,6 @@ const vertexShader = `
 `;
 
 const fragmentShader = `
-  uniform float uTime;
   uniform float uCell;
   uniform float uLensRadius;
   uniform float uLensStrength;
@@ -26,31 +25,9 @@ const fragmentShader = `
 
   ${sourceToneChunk}
 
-  float hash(vec2 point) {
-    return fract(sin(dot(point, vec2(127.1, 311.7))) * 43758.5453);
-  }
-
-  float valueNoise(vec2 point) {
-    vec2 base = floor(point);
-    vec2 offset = fract(point);
-    vec2 blend = offset * offset * (3.0 - 2.0 * offset);
-    float a = hash(base);
-    float b = hash(base + vec2(1.0, 0.0));
-    float c = hash(base + vec2(0.0, 1.0));
-    float d = hash(base + vec2(1.0, 1.0));
-    return mix(mix(a, b, blend.x), mix(c, d, blend.x), blend.y);
-  }
-
   float toneAt(vec2 center) {
-    if (uSource > 0.5 && uHasPortrait > 0.5) {
-      vec2 point = (center - uResolution * 0.5) / uResolution.y;
-      return smoothstep(0.05, 0.95, sourceInk(point, sourceLod(uCell, uResolution)));
-    }
-    vec2 field = center / uResolution.y;
-    float drift = uTime * 0.06;
-    float tone = valueNoise(field * 2.2 + vec2(drift, -drift * 0.7)) * 0.65;
-    tone += valueNoise(field * 4.6 - vec2(drift * 0.8, drift)) * 0.35;
-    return smoothstep(0.22, 0.78, tone);
+    vec2 point = (center - uResolution * 0.5) / uResolution.y;
+    return smoothstep(0.05, 0.95, sourceInk(point, sourceLod(uCell, uResolution)));
   }
 
   float coverage(vec2 pixel, vec2 cell) {
@@ -94,7 +71,6 @@ export const DotMaterial = shaderMaterial(
     uLensStrength: 0,
     uPixelRatio: 1,
     uSquare: 0,
-    uTime: 0,
   },
   vertexShader,
   fragmentShader

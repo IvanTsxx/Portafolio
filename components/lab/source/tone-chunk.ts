@@ -6,7 +6,6 @@ export const sourceToneChunk = `
   uniform vec2 uResolution;
   uniform vec3 uInk;
   uniform vec3 uPaper;
-  uniform float uSource;
   uniform float uHasPortrait;
   uniform sampler2D uPortrait;
   uniform float uPortraitSize;
@@ -14,29 +13,6 @@ export const sourceToneChunk = `
   uniform vec2 uPortraitFocus;
   uniform float uAspect;
   uniform vec2 uLight;
-
-  const vec2 formCenter = vec2(0.0, 0.04);
-  const float formRadius = 0.34;
-  const float groundLine = -0.37;
-
-  float formInk(vec2 point) {
-    vec2 offset = point - formCenter;
-    float reach = dot(offset, offset);
-    if (reach < formRadius * formRadius) {
-      float depth = sqrt(formRadius * formRadius - reach);
-      vec3 normal = vec3(offset, depth) / formRadius;
-      vec3 toLight = normalize(vec3(uLight - point, 0.75 - depth));
-      float diffuse = max(dot(normal, toLight), 0.0);
-      float specular = pow(max(dot(reflect(-toLight, normal), vec3(0.0, 0.0, 1.0)), 0.0), 28.0);
-      return clamp(0.94 - 0.74 * diffuse - 0.55 * specular, 0.0, 1.0);
-    }
-    vec2 shadowCenter = vec2(formCenter.x - (uLight.x - formCenter.x) * 0.45, groundLine);
-    vec2 shadowScale = vec2(formRadius + abs(uLight.x) * 0.12, 0.07);
-    float shadow = 1.0 - smoothstep(0.55, 1.15, length((point - shadowCenter) / shadowScale));
-    shadow *= smoothstep(-0.4, 0.1, uLight.y);
-    float falloff = smoothstep(0.15, 1.3, length(uLight - point));
-    return clamp(0.02 + 0.2 * falloff + 0.55 * shadow, 0.0, 1.0);
-  }
 
   float portraitLuma(vec2 uv, float lod) {
     return dot(textureLod(uPortrait, uv, lod).rgb, vec3(0.2126, 0.7152, 0.0722));
@@ -74,10 +50,7 @@ export const sourceToneChunk = `
   }
 
   float sourceInk(vec2 point, float lod) {
-    if (uSource > 0.5 && uHasPortrait > 0.5) {
-      return portraitInk(point, lod);
-    }
-    return formInk(point);
+    return uHasPortrait > 0.5 ? portraitInk(point, lod) : 0.0;
   }
 `;
 
@@ -93,7 +66,6 @@ interface SourceUniforms {
   uPortraitFocus: Vector2;
   uPortraitSize: number;
   uResolution: Vector2;
-  uSource: number;
 }
 
 export const createSourceUniforms = (): SourceUniforms => ({
@@ -108,7 +80,6 @@ export const createSourceUniforms = (): SourceUniforms => ({
   uPortraitFocus: new Vector2(0.5, 0.5),
   uPortraitSize: 1,
   uResolution: new Vector2(1, 1),
-  uSource: 0,
 });
 
 export const sourceImages = {
@@ -130,8 +101,6 @@ export const sourceImages = {
 
 export type SourceImage = keyof typeof sourceImages;
 
-export type SourceKind = "form" | SourceImage;
-
 export const imageSourceOptions = [
   { label: "Ippo", value: "ippo" },
   { label: "Vegeta", value: "vegeta" },
@@ -139,8 +108,3 @@ export const imageSourceOptions = [
   { label: "Rocky", value: "rocky" },
   { label: "Clouds", value: "clouds" },
 ] as const satisfies readonly { label: string; value: SourceImage }[];
-
-export const sourceOptions = [
-  { label: "Form", value: "form" },
-  ...imageSourceOptions,
-] as const satisfies readonly { label: string; value: SourceKind }[];

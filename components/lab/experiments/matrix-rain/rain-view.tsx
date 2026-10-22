@@ -7,7 +7,7 @@ import type { RefObject } from "react";
 import type { Mesh, Texture, WebGLRenderer } from "three";
 import { PlaneGeometry, Vector4 } from "three";
 
-import type { SourceKind } from "@/components/lab/source/tone-chunk";
+import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
   useSourceTexture,
@@ -34,7 +34,7 @@ export interface RainSettings {
   speed: number;
   trail: number;
   glyphs: GlyphSetName;
-  source: SourceKind;
+  source: SourceImage;
 }
 
 export interface RainPointer {

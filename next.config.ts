@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   partialPrefetching: true,
   reactCompiler: true,
+  redirects: () =>
+    Promise.resolve([
+      { destination: "/experiments", permanent: true, source: "/lab" },
+      {
+        destination: "/experiments/:slug",
+        permanent: true,
+        source: "/lab/:slug",
+      },
+    ]),
   rewrites: () =>
     Promise.resolve([
       { destination: "/markdown/notes/:slug", source: "/notes/:slug.md" },

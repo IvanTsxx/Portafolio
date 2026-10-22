@@ -128,7 +128,7 @@ const experimentsBySlug = {
     related: ["ascii", "speed-smear"],
     slug: "engraving",
     summary:
-      "Banknote line engraving that swells in shadow and bends over the form.",
+      "Banknote line engraving of a picture that swells in shadow and bends over its relief.",
     technicalNotes: [
       "Edges are antialiased with fwidth, so any pitch stays crisp without supersampling.",
       "A picture's relief is a blurred mip of its own luminance.",

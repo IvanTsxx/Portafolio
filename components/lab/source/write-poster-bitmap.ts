@@ -7,12 +7,21 @@ import { encodeInkPng } from "@/components/lab/source/poster-png";
 import { sourceImages } from "@/components/lab/source/tone-chunk";
 import type { SourceImage } from "@/components/lab/source/tone-chunk";
 
-export const posterGrid = { columns: 240, rows: 150 } as const;
+export interface PosterGrid {
+  columns: number;
+  rows: number;
+}
+
+export const posterGrid: PosterGrid = { columns: 240, rows: 150 };
+
+export const detailPosterGrid: PosterGrid = { columns: 480, rows: 300 };
 
 const publicFolder = path.join(import.meta.dir, "../../../public");
 
-export const readSourceLuma = async (image: SourceImage) => {
-  const { columns, rows } = posterGrid;
+export const readSourceLuma = async (
+  image: SourceImage,
+  { columns, rows }: PosterGrid = posterGrid
+) => {
   const { focus, path: imagePath } = sourceImages[image];
   const source = sharp(path.join(publicFolder, imagePath));
   const { width = columns, height = rows } = await source.metadata();
@@ -45,8 +54,11 @@ export const readSourceLuma = async (image: SourceImage) => {
   return luma;
 };
 
-export const writePosterBitmap = async (folder: string, ink: Uint8Array) => {
-  const { columns, rows } = posterGrid;
+export const writePosterBitmap = async (
+  folder: string,
+  ink: Uint8Array,
+  { columns, rows }: PosterGrid = posterGrid
+) => {
   const png = encodeInkPng(ink, columns, rows);
   await writeFile(
     path.join(folder, "poster-bitmap.ts"),

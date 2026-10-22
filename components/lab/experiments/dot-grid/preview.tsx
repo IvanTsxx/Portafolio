@@ -15,11 +15,6 @@ import {
 import DotView from "./dot-view";
 import type { DotPointer, DotSettings } from "./dot-view";
 
-const sourceOptions = [
-  { label: "Noise", value: "form" },
-  ...imageSourceOptions,
-] as const;
-
 const markOptions = [
   { label: "Round", value: "round" },
   { label: "Square", value: "square" },
@@ -42,8 +37,7 @@ const DotGridPreview = () => {
     cell: 12,
     lensRadius: 120,
     mark: "round",
-    noiseSpeed: 1,
-    source: "messi",
+    source: "rocky",
   });
 
   const animate = activity === "running";
@@ -72,7 +66,7 @@ const DotGridPreview = () => {
             onChange={(source) =>
               setSettings((current) => ({ ...current, source }))
             }
-            options={sourceOptions}
+            options={imageSourceOptions}
             value={settings.source}
           />
           <SliderControl
@@ -95,17 +89,6 @@ const DotGridPreview = () => {
             }
             step={10}
             value={settings.lensRadius}
-          />
-          <SliderControl
-            format={(value) => `${value.toFixed(1)}×`}
-            label="Noise speed"
-            max={3}
-            min={0}
-            onChange={(noiseSpeed) =>
-              setSettings((current) => ({ ...current, noiseSpeed }))
-            }
-            step={0.1}
-            value={settings.noiseSpeed}
           />
           <ToggleControl
             label="Mark"

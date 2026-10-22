@@ -7,7 +7,7 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry, Vector4 } from "three";
 
-import type { SourceKind } from "@/components/lab/source/tone-chunk";
+import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
   useSourceTexture,
@@ -27,9 +27,8 @@ const idleStrength = 0.55;
 export interface DotSettings {
   cell: number;
   lensRadius: number;
-  noiseSpeed: number;
   mark: "round" | "square";
-  source: SourceKind;
+  source: SourceImage;
 }
 
 export interface DotPointer {
@@ -69,6 +68,7 @@ const settleSpring = (spring: Spring, target: number) => {
 const DotView = ({ settings, animate, pointer }: DotViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof DotMaterial>>(null);
+  const wander = useRef(0);
   const lens = useRef({
     strength: { value: idleStrength, velocity: 0 },
     x: { value: 0.5, velocity: 0 },
@@ -110,9 +110,9 @@ const DotView = ({ settings, animate, pointer }: DotViewProps) => {
     }
     const step = Math.min(delta, 0.05);
     if (animate) {
-      shader.uTime += step * settings.noiseSpeed;
+      wander.current += step;
     }
-    const time = shader.uTime;
+    const time = wander.current;
     const { current: hover } = pointer;
     const target = hover.isHovering
       ? { strength: 1, x: hover.x, y: hover.y }

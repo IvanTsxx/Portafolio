@@ -7,7 +7,7 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry } from "three";
 
-import type { SourceKind } from "@/components/lab/source/tone-chunk";
+import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
   useDampedPointer,
@@ -31,7 +31,7 @@ export interface AsciiSettings {
   cell: number;
   ramp: string;
   scanMode: ScanMode;
-  source: SourceKind;
+  source: SourceImage;
 }
 
 export interface AsciiViewProps {

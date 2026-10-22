@@ -13,10 +13,7 @@ import {
 import type { Texture, Vector2, WebGLRenderer } from "three";
 
 import { sourceImages } from "@/components/lab/source/tone-chunk";
-import type {
-  SourceImage,
-  SourceKind,
-} from "@/components/lab/source/tone-chunk";
+import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import { requestSceneFrame } from "@/components/scene/view-registry";
 
 export interface StagePointer {
@@ -94,16 +91,13 @@ const loadTexture = async (image: SourceImage) => {
   }
 };
 
-export const useSourceTexture = (source: SourceKind) => {
+export const useSourceTexture = (source: SourceImage) => {
   const [loaded, setLoaded] = useState<{
     image: SourceImage;
     texture: PortraitTexture;
   } | null>(null);
 
   useEffect(() => {
-    if (source === "form") {
-      return;
-    }
     let isCurrent = true;
     const resolve = async () => {
       const texture = await loadTexture(source);
@@ -197,7 +191,6 @@ export interface SourceUniformTarget {
   uPortraitFocus: Vector2;
   uPortraitSize: number;
   uResolution: Vector2;
-  uSource: number;
 }
 
 const viewport = new Vector4();
@@ -207,7 +200,7 @@ export const syncSourceUniforms = (
   renderer: WebGLRenderer,
   light: { x: number; y: number },
   portrait: PortraitTexture | null,
-  source: SourceKind
+  source: SourceImage
 ) => {
   renderer.getCurrentViewport(viewport);
   const aspect = viewport.z / Math.max(viewport.w, 1);
@@ -215,12 +208,11 @@ export const syncSourceUniforms = (
   shader.uResolution.set(viewport.z, viewport.w);
   shader.uAspect = aspect;
   shader.uLight.set((light.x - 0.5) * aspect, light.y - 0.5);
-  shader.uSource = source === "form" ? 0 : 1;
   shader.uHasPortrait = portrait ? 1 : 0;
   shader.uPortrait = portrait;
   shader.uPortraitSize = portrait?.image.naturalHeight ?? 1;
-  const focus = source === "form" ? null : sourceImages[source].focus;
-  shader.uPortraitFocus.set(focus?.x ?? 0.5, 1 - (focus?.y ?? 0.5));
+  const { focus } = sourceImages[source];
+  shader.uPortraitFocus.set(focus.x, 1 - focus.y);
   shader.uPortraitAspect = portrait
     ? portrait.image.naturalWidth / Math.max(portrait.image.naturalHeight, 1)
     : 1;

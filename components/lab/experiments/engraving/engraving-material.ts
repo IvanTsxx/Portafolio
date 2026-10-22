@@ -24,11 +24,7 @@ const fragmentShader = `
   const float bulge = 0.14;
 
   float reliefAt(vec2 point, float lod) {
-    if (uSource > 0.5 && uHasPortrait > 0.5) {
-      return portraitLuma(portraitUv(point), lod + 3.0);
-    }
-    vec2 offset = point - formCenter;
-    return max(1.0 - dot(offset, offset) / (formRadius * formRadius), 0.0);
+    return uHasPortrait > 0.5 ? portraitLuma(portraitUv(point), lod + 3.0) : 0.0;
   }
 
   float lineInk(vec2 pixel, float angle, float shift, float lineWidth) {

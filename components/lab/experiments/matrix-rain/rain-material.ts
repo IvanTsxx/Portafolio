@@ -85,11 +85,10 @@ const fragmentShader = `
       vec2 inCell = min(floor(fract(fromTop / cellSize) * uGlyphDots), uGlyphDots - 1.0);
       float rows = ceil(uResolution.y / cellSize.y);
       float intensity = max(drop(cell, rows, 0.0), drop(cell, rows, 1.0));
-      if (uSource > 0.5 && uHasPortrait > 0.5) {
-        vec2 cellCenter = (cell + 0.5) * cellSize;
-        vec2 point = vec2(cellCenter.x - uResolution.x * 0.5, uResolution.y * 0.5 - cellCenter.y) / uResolution.y;
-        float picture = smoothstep(0.08, 0.92, sourceInk(point, sourceLod(cellSize.y, uResolution)));
-        intensity = max(intensity * (0.25 + 0.75 * picture), picture * 0.62);
+      if (uHasPortrait > 0.5) {
+        vec2 point = (center - uResolution * 0.5) / uResolution.y;
+        float picture = smoothstep(0.2, 0.8, sourceInk(point, sourceLod(uPitch, uResolution)));
+        intensity = max(intensity * (0.2 + 0.8 * picture), picture * 0.8);
       }
 
       if (intensity > 0.0) {

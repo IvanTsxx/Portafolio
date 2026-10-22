@@ -26,7 +26,9 @@ const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
 const companionStayMilliseconds = 1200;
 const builderInset = 28;
 const builderYaw = -0.6;
-const easeEnter = "power3.out";
+const easeEnter = "expo.out";
+const blockStartScale = 0.985;
+const revealMargin = "0px 0px -6% 0px";
 
 const builtSections = new Set<string>();
 let buildSites = 0;
@@ -119,6 +121,7 @@ export const SectionBuild = ({
       let state: Construction = idleConstruction;
       let dismissCompanion: (() => void) | null = null;
       const timers: number[] = [];
+      const observers: IntersectionObserver[] = [];
 
       const dispatch = (event: ConstructionEvent) => {
         state = advanceConstruction(state, event);
@@ -137,24 +140,75 @@ export const SectionBuild = ({
           gsap.set(blocksRoot, { clearProps: "opacity" });
           return;
         }
-        gsap.set(blocks, { opacity: 0, y: blockRisePixels });
-        gsap.set(blocksRoot, { clearProps: "opacity" });
-        const timeline = gsap.timeline({
-          onComplete: () => dispatch({ type: "finish" }),
-        });
-        timeline.to(blocks, {
+        const enter = {
           clearProps: "opacity,transform",
           duration: blockBuildSeconds,
           ease: easeEnter,
           opacity: 1,
-          stagger: buildStagger(blocks.length),
+          scale: 1,
           y: 0,
+        };
+        gsap.set(blocks, {
+          opacity: 0,
+          scale: blockStartScale,
+          transformOrigin: "50% 0%",
+          y: blockRisePixels,
         });
+        gsap.set(blocksRoot, { clearProps: "opacity" });
+        const fold = window.innerHeight;
+        const inView: HTMLElement[] = [];
+        const below: HTMLElement[] = [];
+        for (const block of blocks) {
+          (block.getBoundingClientRect().top < fold ? inView : below).push(
+            block
+          );
+        }
+        const timeline = gsap.timeline({
+          onComplete: () => dispatch({ type: "finish" }),
+        });
+        timeline.to(inView, {
+          ...enter,
+          stagger: buildStagger(inView.length),
+        });
+        if (below.length > 0) {
+          const pending = new Map<Element, HTMLElement>(
+            below.map((block) => [block, block])
+          );
+          const reveal = new IntersectionObserver(
+            contextSafe((entries: IntersectionObserverEntry[]) => {
+              const entering: HTMLElement[] = [];
+              for (const { isIntersecting, target } of entries) {
+                const block = pending.get(target);
+                if (isIntersecting && block) {
+                  entering.push(block);
+                }
+              }
+              for (const block of entering) {
+                pending.delete(block);
+                reveal.unobserve(block);
+              }
+              if (entering.length > 0) {
+                gsap.to(inReadingOrder(entering), {
+                  ...enter,
+                  stagger: buildStagger(entering.length),
+                });
+              }
+              if (pending.size === 0) {
+                reveal.disconnect();
+              }
+            }),
+            { rootMargin: revealMargin }
+          );
+          for (const block of below) {
+            reveal.observe(block);
+          }
+          observers.push(reveal);
+        }
         dismissCompanion = callCompanion(first);
         timers.push(
           window.setTimeout(
             () => timeline.progress(1),
-            buildDeadlineSeconds(blocks.length) * 1000
+            buildDeadlineSeconds(inView.length) * 1000
           ),
           window.setTimeout(() => {
             dismissCompanion?.();
@@ -175,12 +229,15 @@ export const SectionBuild = ({
           view.disconnect();
           begin();
         }),
-        { rootMargin: "0px 0px -15% 0px" }
+        { rootMargin: revealMargin }
       );
       view.observe(root);
+      observers.push(view);
 
       return () => {
-        view.disconnect();
+        for (const observer of observers) {
+          observer.disconnect();
+        }
         for (const timer of timers) {
           window.clearTimeout(timer);
         }

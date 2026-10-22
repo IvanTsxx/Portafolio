@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CornerMarks } from "@/components/site/corner-marks";
 import { focusRingClassName } from "@/components/site/styles";
 import type { Experiment } from "@/lib/lab/experiments";
+import { experimentPath } from "@/lib/site/seo";
 import { cn } from "@/lib/utils";
 
 export const ExperimentCard = ({ experiment }: { experiment: Experiment }) => {
@@ -14,7 +15,7 @@ export const ExperimentCard = ({ experiment }: { experiment: Experiment }) => {
         "group/marks hover:bg-paper-deep/60 ease-mechanical relative flex h-full flex-col transition-colors duration-100 focus-visible:ring-inset lg:h-128",
         focusRingClassName
       )}
-      href={`/lab/${experiment.slug}`}
+      href={experimentPath(experiment.slug)}
     >
       <CornerMarks reveal="hover" />
       <div className="border-graphite/30 bg-popover relative aspect-video overflow-hidden border-b lg:aspect-auto lg:min-h-0 lg:flex-1">

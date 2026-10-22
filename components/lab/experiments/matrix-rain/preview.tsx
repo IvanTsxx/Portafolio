@@ -15,11 +15,6 @@ import {
 import RainView from "./rain-view";
 import type { RainPointer, RainSettings } from "./rain-view";
 
-const sourceOptions = [
-  { label: "Rain", value: "form" },
-  ...imageSourceOptions,
-] as const;
-
 const glyphOptions = [
   { label: "Binary", value: "binary" },
   { label: "Hex", value: "hex" },
@@ -73,7 +68,7 @@ const MatrixRainPreview = () => {
             onChange={(source) =>
               setSettings((current) => ({ ...current, source }))
             }
-            options={sourceOptions}
+            options={imageSourceOptions}
             value={settings.source}
           />
           <SliderControl

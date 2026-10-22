@@ -8,8 +8,8 @@ import {
   TextControl,
   ToggleControl,
 } from "@/components/lab/lab-controls";
-import { sourceOptions } from "@/components/lab/source/tone-chunk";
-import type { SourceKind } from "@/components/lab/source/tone-chunk";
+import { imageSourceOptions } from "@/components/lab/source/tone-chunk";
+import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   releaseStagePointer,
   trackStagePointer,
@@ -41,7 +41,7 @@ interface AsciiControls {
   custom: string;
   glyphSet: GlyphSet;
   scanMode: ScanMode;
-  source: SourceKind;
+  source: SourceImage;
 }
 
 const rampFor = ({ glyphSet, custom }: AsciiControls) =>
@@ -54,7 +54,7 @@ const AsciiPreview = () => {
     custom: ".:ivo/",
     glyphSet: "classic",
     scanMode: "sharpen",
-    source: "rocky",
+    source: "messi",
   });
 
   const field = useRef<HTMLDivElement>(null);
@@ -91,7 +91,7 @@ const AsciiPreview = () => {
             onChange={(source) =>
               setControls((current) => ({ ...current, source }))
             }
-            options={sourceOptions}
+            options={imageSourceOptions}
             value={controls.source}
           />
           <ToggleControl

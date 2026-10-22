@@ -7,7 +7,7 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry } from "three";
 
-import type { SourceKind } from "@/components/lab/source/tone-chunk";
+import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
   useDampedPointer,
@@ -25,7 +25,7 @@ export interface EngravingSettings {
   angle: number;
   follow: number;
   pitch: number;
-  source: SourceKind;
+  source: SourceImage;
 }
 
 interface EngravingViewProps {

@@ -4,7 +4,7 @@ import { useId, useRef, useState } from "react";
 
 import { ExperimentStage } from "@/components/lab/experiment-stage";
 import { SliderControl, ToggleControl } from "@/components/lab/lab-controls";
-import { sourceOptions } from "@/components/lab/source/tone-chunk";
+import { imageSourceOptions } from "@/components/lab/source/tone-chunk";
 import {
   releaseStagePointer,
   trackStagePointer,
@@ -54,7 +54,7 @@ const EngravingPreview = () => {
             onChange={(source) =>
               setSettings((current) => ({ ...current, source }))
             }
-            options={sourceOptions}
+            options={imageSourceOptions}
             value={settings.source}
           />
           <SliderControl
