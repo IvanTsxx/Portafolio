@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { tokenRgb } from "@/components/profile/dither";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
@@ -281,8 +281,8 @@ const startHeroField = ({
 };
 
 export const HeroField = ({ seed }: { seed: string }) => {
-  const base = useMemo(() => heroFieldBase(seed), [seed]);
-  const path = useMemo(() => heroFieldDotPath(heroFieldCells(base)), [base]);
+  const base = heroFieldBase(seed);
+  const path = heroFieldDotPath(heroFieldCells(base));
   const fieldRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isReduced = useReducedMotion();

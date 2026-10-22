@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, use, useEffect, useMemo, useState } from "react";
+import { createContext, use, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
 import { CommandPalette } from "@/components/command/command-palette";
@@ -40,7 +40,7 @@ export const CommandPaletteProvider = ({
   entries: readonly SearchEntry[];
 }) => {
   const [open, setOpen] = useState(false);
-  const controls = useMemo(() => ({ openPalette: () => setOpen(true) }), []);
+  const controls = { openPalette: () => setOpen(true) };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

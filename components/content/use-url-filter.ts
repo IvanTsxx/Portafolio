@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 const filterChangeEvent = "content-filter-change";
 
@@ -16,30 +16,25 @@ const subscribe = (notify: () => void) => {
 const readServerValue = () => "";
 
 export const useUrlFilter = (param: string) => {
-  const readValue = useCallback(
-    () => new URLSearchParams(window.location.search).get(param) ?? "",
-    [param]
-  );
+  const readValue = () =>
+    new URLSearchParams(window.location.search).get(param) ?? "";
   const value = useSyncExternalStore(subscribe, readValue, readServerValue);
 
-  const setValue = useCallback(
-    (next: string) => {
-      const params = new URLSearchParams(window.location.search);
-      if (next) {
-        params.set(param, next);
-      } else {
-        params.delete(param);
-      }
-      const query = params.size > 0 ? `?${params}` : "";
-      window.history.replaceState(
-        null,
-        "",
-        `${window.location.pathname}${query}`
-      );
-      window.dispatchEvent(new Event(filterChangeEvent));
-    },
-    [param]
-  );
+  const setValue = (next: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (next) {
+      params.set(param, next);
+    } else {
+      params.delete(param);
+    }
+    const query = params.size > 0 ? `?${params}` : "";
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${query}`
+    );
+    window.dispatchEvent(new Event(filterChangeEvent));
+  };
 
   return [value, setValue] as const;
 };

@@ -2,7 +2,7 @@
 
 import { PerspectiveCamera } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type {
   InstancedMesh,
   PerspectiveCamera as PerspectiveCameraImpl,
@@ -87,10 +87,10 @@ export const StageProps = ({
   const instances = useRef<InstancedMesh>(null);
   const fittedAspect = useRef(0);
   const timeAt = useStageClock(spec.loopSeconds, spec.keyTime);
-  const still = useMemo(() => mergeStill(spec.still), [spec]);
-  const shadows = useMemo(() => mergeShadows(spec.shadows), [spec]);
-  const layout = useMemo(() => layoutRigs(spec.rigs), [spec]);
-  const poses = useMemo<RigPose[]>(() => spec.rigs.map(restPose), [spec]);
+  const still = mergeStill(spec.still);
+  const shadows = mergeShadows(spec.shadows);
+  const layout = layoutRigs(spec.rigs);
+  const poses: RigPose[] = spec.rigs.map(restPose);
 
   useEffect(
     () => () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo } from "react";
+import { useId } from "react";
 import type { ReactNode } from "react";
 
 import {
@@ -83,45 +83,40 @@ const LitHoleLayer = () => (
   </PatternLayer>
 );
 
-const useDots = () =>
-  useMemo(() => {
-    const cells = edgeDitherCells(boundTile);
-    return {
-      height: boundTile.rows * EDGE_DITHER_CELL,
-      rest: edgeDitherDotsPath(cells, 2),
-      swollen: edgeDitherDotsPath(cells, 3.5),
-    };
-  }, []);
+const edgeCells = edgeDitherCells(boundTile);
+const dotsHeight = boundTile.rows * EDGE_DITHER_CELL;
+const restDotsPath = edgeDitherDotsPath(edgeCells, 2);
+const swollenDotsPath = edgeDitherDotsPath(edgeCells, 3.5);
 
-const RestDots = ({ dots }: { dots: ReturnType<typeof useDots> }) => (
-  <PatternLayer height={dots.height}>
-    <path className="fill-ink/45 [shape-rendering:crispEdges]" d={dots.rest} />
-  </PatternLayer>
-);
-
-const SwollenDots = ({ dots }: { dots: ReturnType<typeof useDots> }) => (
-  <PatternLayer height={dots.height}>
-    <path className="fill-ink" d={dots.swollen} />
-  </PatternLayer>
-);
-
-export const DossierEdge = () => {
-  const dots = useDots();
-  return (
-    <EdgeStrip
-      base={
-        <>
-          <RestDots dots={dots} />
-          <HoleLayer />
-        </>
-      }
-      lit={
-        <>
-          <SwollenDots dots={dots} />
-          <LitHoleLayer />
-        </>
-      }
-      onPress={punchAndRipple}
+const RestDots = () => (
+  <PatternLayer height={dotsHeight}>
+    <path
+      className="fill-ink/45 [shape-rendering:crispEdges]"
+      d={restDotsPath}
     />
-  );
-};
+  </PatternLayer>
+);
+
+const SwollenDots = () => (
+  <PatternLayer height={dotsHeight}>
+    <path className="fill-ink" d={swollenDotsPath} />
+  </PatternLayer>
+);
+
+export const DossierEdge = () => (
+  <EdgeStrip
+    base={
+      <>
+        <RestDots />
+        <HoleLayer />
+      </>
+    }
+    lit={
+      <>
+        <SwollenDots />
+        <LitHoleLayer />
+      </>
+    }
+    onPress={punchAndRipple}
+  />
+);

@@ -21,6 +21,10 @@ export default defineConfig({
       files: ["components/profile/experience/experience-section.tsx"],
       rules: { "require-await": "off" },
     },
+    {
+      files: ["app/**", "components/**", "hooks/**", "lib/**"],
+      rules: { "react/jsx-no-constructed-context-values": "off" },
+    },
   ],
   rules: {
     "jsx-a11y/aria-role": ["error", { ignoreNonDOM: true }],

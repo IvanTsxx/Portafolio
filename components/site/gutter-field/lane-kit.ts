@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Color } from "three";
 
 import { printColors } from "@/lib/site/print-colors";
@@ -78,7 +78,7 @@ export const isInsideRect = (rect: LaneRect, x: number, y: number) =>
 export const useLaneSize = (): LaneSize => {
   const width = useThree((state) => state.size.width);
   const height = useThree((state) => state.size.height);
-  return useMemo(() => ({ height, width }), [height, width]);
+  return { height, width };
 };
 
 const advanceLane = <Target>(

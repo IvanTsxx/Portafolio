@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
@@ -73,7 +73,7 @@ export const useDitherDrift = (config: DriftConfig) => {
   const requestRef = useRef<number | null>(null);
   const reducedMotion = useReducedMotion();
 
-  const run = useCallback(() => {
+  const run = () => {
     if (requestRef.current !== null) {
       return;
     }
@@ -118,7 +118,7 @@ export const useDitherDrift = (config: DriftConfig) => {
       requestRef.current = requestAnimationFrame(step);
     };
     requestRef.current = requestAnimationFrame(step);
-  }, [config]);
+  };
 
   useEffect(
     () => () => {
@@ -129,38 +129,35 @@ export const useDitherDrift = (config: DriftConfig) => {
     []
   );
 
-  const onRender = useCallback((frame: DitherFrame) => {
+  const onRender = (frame: DitherFrame) => {
     frameRef.current = frame;
-  }, []);
+  };
 
-  const onPointerMove = useCallback(
-    (event: DriftPointerEvent) => {
-      const frame = frameRef.current;
-      const canvas = canvasRef.current;
-      if (event.pointerType !== "mouse" || reducedMotion || !frame || !canvas) {
-        return;
-      }
-      const bounds = canvas.getBoundingClientRect();
-      const scale = Math.max(
-        bounds.width / frame.width,
-        bounds.height / frame.height
-      );
-      const offsetX = (bounds.width - frame.width * scale) * config.anchor.x;
-      const offsetY = (bounds.height - frame.height * scale) * config.anchor.y;
-      pointerRef.current = {
-        inside: true,
-        x: (event.clientX - bounds.left - offsetX) / scale,
-        y: (event.clientY - bounds.top - offsetY) / scale,
-      };
-      run();
-    },
-    [config, reducedMotion, run]
-  );
+  const onPointerMove = (event: DriftPointerEvent) => {
+    const frame = frameRef.current;
+    const canvas = canvasRef.current;
+    if (event.pointerType !== "mouse" || reducedMotion || !frame || !canvas) {
+      return;
+    }
+    const bounds = canvas.getBoundingClientRect();
+    const scale = Math.max(
+      bounds.width / frame.width,
+      bounds.height / frame.height
+    );
+    const offsetX = (bounds.width - frame.width * scale) * config.anchor.x;
+    const offsetY = (bounds.height - frame.height * scale) * config.anchor.y;
+    pointerRef.current = {
+      inside: true,
+      x: (event.clientX - bounds.left - offsetX) / scale,
+      y: (event.clientY - bounds.top - offsetY) / scale,
+    };
+    run();
+  };
 
-  const onPointerLeave = useCallback(() => {
+  const onPointerLeave = () => {
     pointerRef.current = { ...pointerRef.current, inside: false };
     run();
-  }, [run]);
+  };
 
   return { canvasRef, onPointerLeave, onPointerMove, onRender };
 };

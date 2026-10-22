@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useImperativeHandle, useLayoutEffect, useMemo, useRef } from "react";
+import { useImperativeHandle, useLayoutEffect, useRef } from "react";
 import type { Ref } from "react";
 import type { Group, InstancedMesh } from "three";
 import {
@@ -62,7 +62,7 @@ const spread = (range: number) => (Math.random() * 2 - 1) * range;
 
 export const PaperPoof = ({ ref }: { ref: Ref<BurstHandle> }) => {
   const mesh = useRef<InstancedMesh>(null);
-  const pieces = useMemo(() => createPieces(), []);
+  const pieces = createPieces();
   const pieceScale = useRef(1);
   const isActive = useRef(false);
 

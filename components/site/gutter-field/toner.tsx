@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import {
   PlaneGeometry,
@@ -228,7 +228,7 @@ const createToner = (
 const Toner = ({ animate, pointer, sense }: LaneSceneProps) => {
   const size = useLaneSize();
   const mesh = useRef<Mesh>(null);
-  const engine = useMemo(() => createToner(pointer), [pointer]);
+  const engine = createToner(pointer);
 
   useEffect(() => {
     const plane = mesh.current;

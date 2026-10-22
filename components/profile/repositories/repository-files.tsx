@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 
 import type { DossierFile } from "@/components/profile/dossier-file";
@@ -22,7 +22,7 @@ export const RepositoryFiles = ({
   files: readonly DossierFile[];
 }) => {
   const root = useRef<HTMLDivElement>(null);
-  const handle = useMemo(() => Dialog.createHandle<DossierFile>(), []);
+  const handle = Dialog.createHandle<DossierFile>();
 
   useEffect(() => {
     const element = root.current;

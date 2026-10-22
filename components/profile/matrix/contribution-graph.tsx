@@ -1,7 +1,7 @@
 "use client";
 
 import { cva } from "class-variance-authority";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type {
   FocusEvent,
   KeyboardEvent,
@@ -176,7 +176,7 @@ export const ContributionGraph = ({
   label,
   sources,
 }: ContributionGraphProps) => {
-  const years = useMemo(() => sources.map(graphYearOf), [sources]);
+  const years = sources.map(graphYearOf);
   const [shown, setShown] = useState(initial);
   const year = years[shown] ?? years[0];
   const [active, setActive] = useState<GraphDay | null>(null);

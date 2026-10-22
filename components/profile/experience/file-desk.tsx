@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog } from "@base-ui/react/dialog";
-import { createContext, use, useMemo } from "react";
+import { createContext, use } from "react";
 import type { ReactNode } from "react";
 
 import type { DossierFile } from "@/components/profile/dossier-file";
@@ -11,7 +11,7 @@ import type { FileModalHandle } from "@/components/profile/file-modal";
 const DeskHandle = createContext<FileModalHandle | undefined>(undefined);
 
 export const FileDesk = ({ children }: { children: ReactNode }) => {
-  const handle = useMemo(() => Dialog.createHandle<DossierFile>(), []);
+  const handle = Dialog.createHandle<DossierFile>();
   return (
     <DeskHandle value={handle}>
       {children}
