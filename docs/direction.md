@@ -9,7 +9,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - The home intro holds the identity dossier: portrait, name, nickname kana, bio, GitHub readouts and links. The surname appears only there.
 - How I work and stack copy come from `lib/site/practice.ts`. Identity comes from `lib/site/config.ts`.
 - Never invent clients, metrics or achievements. Label placeholder content as sample.
-- Clay belongs to the companion. The two exceptions are the contribution graph hover and the Super Saiyan color print.
+- Clay belongs to the companion. The two exceptions are the contribution graph hover and the color print in the Super Saiyan and Vegeta experiments.
 
 ## Chrome
 
