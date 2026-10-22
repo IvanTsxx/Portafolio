@@ -320,7 +320,9 @@ export const ContributionGraph = ({
         <figcaption className="sr-only">{caption}</figcaption>
       </figure>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <YearKeys onPick={pickYear} shown={shown} years={years} />
+        {years.length > 1 ? (
+          <YearKeys onPick={pickYear} shown={shown} years={years} />
+        ) : null}
         <Legend />
       </div>
       <p aria-live="polite" className="sr-only">

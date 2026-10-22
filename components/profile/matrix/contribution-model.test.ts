@@ -136,6 +136,39 @@ describe("week layout", () => {
     ]);
     expect(sources.map((source) => source.year)).toEqual([2023, 2025]);
   });
+
+  test("shows only years from the first shown year, each starting on January 1", () => {
+    const sources = graphSourcesOf(
+      [
+        { ...calendar, year: 2025 },
+        {
+          range: "last-year",
+          total: 7,
+          weeks: [
+            [
+              { count: 5, date: "2025-12-30", level: 3 },
+              { count: 0, date: "2025-12-31", level: 0 },
+              { count: 2, date: "2026-01-01", level: 1 },
+              null,
+              null,
+              null,
+              null,
+            ],
+          ],
+          year: 2026,
+        },
+      ],
+      2026
+    );
+    expect(sources.map((source) => source.year)).toEqual([2026]);
+    const [current] = sources;
+    expect(current?.total).toBe(2);
+    expect(current?.range).toBe("calendar-year");
+    const days = current ? graphYearOf(current).weeks.flat() : [];
+    expect(days.flatMap((day) => (day ? [day.date] : []))).toEqual([
+      "2026-01-01",
+    ]);
+  });
 });
 
 describe("stepCell", () => {

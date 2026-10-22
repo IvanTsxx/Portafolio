@@ -152,8 +152,36 @@ export const graphSourceOf = (calendar: ContributionCalendar): GraphSource => {
   };
 };
 
-export const graphSourcesOf = (calendars: readonly ContributionCalendar[]) =>
-  calendars.toSorted((a, b) => a.year - b.year).map(graphSourceOf);
+const calendarFrom = (
+  calendar: ContributionCalendar,
+  firstDay: string
+): ContributionCalendar => {
+  const weeks: ContributionCalendar["weeks"] = [];
+  let total = 0;
+  for (const days of calendar.weeks) {
+    const kept = days.map((day) => (day && day.date >= firstDay ? day : null));
+    if (kept.some((day) => day !== null)) {
+      weeks.push(kept);
+      total += kept.reduce((sum, day) => sum + (day?.count ?? 0), 0);
+    }
+  }
+  return { range: "calendar-year", total, weeks, year: calendar.year };
+};
+
+export const graphSourcesOf = (
+  calendars: readonly ContributionCalendar[],
+  firstYear = Number.NEGATIVE_INFINITY
+) =>
+  calendars
+    .filter((calendar) => calendar.year >= firstYear)
+    .toSorted((a, b) => a.year - b.year)
+    .map((calendar) =>
+      graphSourceOf(
+        calendar.range === "last-year"
+          ? calendarFrom(calendar, `${calendar.year}-01-01`)
+          : calendar
+      )
+    );
 
 export const graphYearOf = (source: GraphSource): GraphYear => {
   const origin = timeOf(source.start).getTime();

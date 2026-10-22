@@ -7,6 +7,8 @@ import { ContributionGraph } from "./contribution-graph";
 import { contributionsText, graphSourcesOf } from "./contribution-model";
 import type { GraphSource } from "./contribution-model";
 
+const firstShownYear = 2026;
+
 const captionOf = (latest: GraphSource) =>
   `A grid of days by week, darker where there were more contributions. ${contributionsText(latest.total)} ${
     latest.range === "last-year" ? "in the last year" : `in ${latest.year}`
@@ -17,7 +19,7 @@ export const MatrixSection = ({
 }: {
   calendars: readonly ContributionCalendar[];
 }) => {
-  const [head, ...rest] = graphSourcesOf(calendars);
+  const [head, ...rest] = graphSourcesOf(calendars, firstShownYear);
   if (!head) {
     return null;
   }
