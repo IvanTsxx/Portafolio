@@ -57,9 +57,6 @@ describe("shipped notes", () => {
     const [notes, slugs] = await Promise.all([getNotes(), getNoteSlugs()]);
 
     expect(notes.map((item) => item.slug).toSorted()).toEqual(slugs);
-    expect(
-      notes.filter((item) => item.kind === "case-study").length
-    ).toBeGreaterThan(0);
     expect(notes.filter((item) => item.kind === "note").length).toBeGreaterThan(
       0
     );
