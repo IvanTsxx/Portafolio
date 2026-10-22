@@ -21,6 +21,17 @@ const RIPPLE_WAVELENGTH = 0.55;
 const RIPPLE_SPEED = 3.2;
 const SMEAR_LIMIT = 60;
 const SETTLED = 0.002;
+const RING_SPEED = 30;
+const RING_WIDTH = 1.6;
+const RING_SWELL = 0.3;
+const TWINKLE_RATE = 0.8;
+const TWINKLE_CHANCE = 0.008;
+const CLAY_SHARE = 0.5;
+const CLAY_BASE = 0.04;
+const CLAY_LENS = 0.4;
+const CLAY_RING = 0.35;
+const CLAY_RATE = 0.6;
+export const RING_LIFE = 1;
 
 const bloomLayers = [
   { scale: 1 / 34, weight: 0.6, x: 0.045, y: 0.018 },
@@ -46,9 +57,23 @@ export interface HeroLens {
   y: Spring;
 }
 
+export interface HeroRing {
+  age: number;
+  x: number;
+  y: number;
+}
+
+export interface HeroPalette {
+  clay: number;
+  ink: number;
+  spark: number;
+}
+
 export interface HeroFieldFrame {
+  clear?: Uint8Array;
   lens: HeroLens;
   ramp: number;
+  rings?: readonly HeroRing[];
   time: number;
 }
 
@@ -152,15 +177,64 @@ const sampleAt = (field: Float32Array, x: number, y: number) => {
   return upper + (lower - upper) * blendY;
 };
 
+const cellNoise = (index: number, salt: number) => {
+  const wave = Math.sin(index * 12.9898 + salt * 78.233) * 43_758.5453;
+  return wave - Math.floor(wave);
+};
+
+const ringSwell = (rings: readonly HeroRing[], column: number, row: number) => {
+  let total = 0;
+  for (const ring of rings) {
+    const front =
+      (Math.hypot(column - ring.x, row - ring.y) - ring.age * RING_SPEED) /
+      RING_WIDTH;
+    total += Math.exp(-front * front) * (1 - ring.age / RING_LIFE);
+  }
+  return total;
+};
+
+const twinkleAt = (index: number, time: number, ramp: number) => {
+  const slot = Math.floor(time * TWINKLE_RATE + cellNoise(index, 3.1) * 8);
+  if (cellNoise(index, slot + 0.5) >= TWINKLE_CHANCE * ramp) {
+    return null;
+  }
+  return cellNoise(index, slot + 9.7) < CLAY_SHARE ? "clay" : "spark";
+};
+
+const shadeCell = (
+  index: number,
+  {
+    canInk,
+    heat,
+    isInked,
+  }: { canInk: boolean; heat: number; isInked: boolean },
+  { ramp, time }: Pick<HeroFieldFrame, "ramp" | "time">,
+  palette: HeroPalette
+) => {
+  const twinkle = canInk ? twinkleAt(index, time, ramp) : null;
+  if (twinkle) {
+    return palette[twinkle];
+  }
+  if (!isInked) {
+    return 0;
+  }
+  const slot = Math.floor(time * CLAY_RATE + cellNoise(index, 5.3) * 4);
+  return cellNoise(index, slot + 21.3) < CLAY_BASE * ramp + heat
+    ? palette.clay
+    : palette.ink;
+};
+
 const clampSmear = (velocity: number) =>
   Math.min(SMEAR_LIMIT, Math.max(-SMEAR_LIMIT, velocity)) * LENS_SMEAR;
 
 export const paintHeroField = (
   motion: HeroFieldMotion,
-  { lens, ramp, time }: HeroFieldFrame,
+  { clear, lens, ramp, rings = [], time }: HeroFieldFrame,
   pixels: Uint32Array,
-  ink: number
+  ink: number,
+  palette?: HeroPalette
 ) => {
+  const colors = palette ?? { clay: ink, ink, spark: ink };
   const { bloom, envelope, relief, thresholds } = motion;
   const strength = lens.strength.value;
   const isLensOn = Math.abs(strength) >= SETTLED;
@@ -174,7 +248,7 @@ export const paintHeroField = (
     const isRowInLens = isLensOn && Math.abs(offsetY) < LENS_REACH;
     for (let column = 0; column < HERO_FIELD_COLUMNS; column += 1) {
       const index = row * HERO_FIELD_COLUMNS + column;
-      const cellEnvelope = envelope[index] ?? 0;
+      const cellEnvelope = clear?.[index] ? 0 : (envelope[index] ?? 0);
       if (cellEnvelope === 0) {
         pixels[index] = 0;
         continue;
@@ -183,6 +257,7 @@ export const paintHeroField = (
         ramp === 0 ? 1 : 1 + (bloomGain(bloom, column, row, time) - 1) * ramp;
       let tone = Math.min(1, (relief[index] ?? 0) * gain) * cellEnvelope;
       const offsetX = column - lensX;
+      let lensHeat = 0;
       if (isRowInLens && Math.abs(offsetX) < LENS_REACH) {
         const distanceSquared = offsetX * offsetX + offsetY * offsetY;
         const falloff =
@@ -194,21 +269,39 @@ export const paintHeroField = (
           Math.sqrt(distanceSquared) * RIPPLE_WAVELENGTH - ripplePhase
         );
         const swell = falloff * (LENS_SWELL + LENS_RIPPLE * ripple);
+        lensHeat = falloff;
         tone =
           Math.min(1, sampleAt(relief, sampleX, sampleY) * gain + swell) *
           Math.min(cellEnvelope, sampleAt(envelope, sampleX, sampleY));
       }
-      pixels[index] = tone > (thresholds[index] ?? 1) ? ink : 0;
+      const ring = rings.length > 0 ? ringSwell(rings, column, row) : 0;
+      if (ring > 0) {
+        tone = Math.min(cellEnvelope, tone + ring * RING_SWELL);
+      }
+      const threshold = thresholds[index] ?? 1;
+      pixels[index] = shadeCell(
+        index,
+        {
+          canInk: threshold < cellEnvelope,
+          heat: lensHeat * CLAY_LENS + ring * CLAY_RING,
+          isInked: tone > threshold,
+        },
+        { ramp, time },
+        colors
+      );
     }
   }
 };
 
 const OPAQUE = 0xff_00_00_00;
 
-export const packInk = ([red, green, blue]: readonly [
-  number,
-  number,
-  number,
-]) => OPAQUE + blue * 0x1_00_00 + green * 0x1_00 + red;
+export const packInk = (
+  [red, green, blue]: readonly [number, number, number],
+  alpha = 1
+) =>
+  (alpha >= 1 ? OPAQUE : Math.round(alpha * 255) * 0x1_00_00_00) +
+  blue * 0x1_00_00 +
+  green * 0x1_00 +
+  red;
 
 export const heroFieldPixels = () => new Uint32Array(HERO_FIELD_CELLS);

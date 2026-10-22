@@ -34,7 +34,7 @@ export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
             src={portraitSrc}
           />
         </div>
-        <div className="flex min-w-0 flex-col gap-3">
+        <div className="flex min-w-0 flex-col gap-3" data-hero-clear="">
           <p className="label text-mist tabular-nums">Dossier</p>
           <h1
             className="display text-ink text-6xl sm:text-7xl"
@@ -51,7 +51,10 @@ export const ProfileIntro = ({ identity }: { identity: GithubIdentity }) => {
         </div>
       </div>
 
-      <p className="text-ink max-w-column text-xl leading-snug font-light text-pretty sm:text-2xl">
+      <p
+        className="text-ink max-w-column text-xl leading-snug font-light text-pretty sm:text-2xl"
+        data-hero-clear=""
+      >
         {siteConfig.role} in {siteConfig.location}.
       </p>
 

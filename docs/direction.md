@@ -9,7 +9,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - The home intro holds the identity dossier: portrait, name, nickname kana, bio, GitHub readouts and links. The surname appears only there.
 - How I work and stack copy come from `lib/site/practice.ts`. Identity comes from `lib/site/config.ts`.
 - Never invent clients, metrics or achievements. Label placeholder content as sample.
-- Clay belongs to the companion. The three exceptions are the contribution graph hover, the color print in the Super Saiyan and Vegeta experiments, and the sparse clay toner dots of the gutter field.
+- Clay belongs to the companion. The three exceptions are the contribution graph hover, the color print in the Super Saiyan and Vegeta experiments, and the sparse clay toner dots of the gutter field and the hero field.
 
 ## Chrome
 
@@ -18,7 +18,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - Route tabs use English labels with a tiny vertical kana on desktop. Japanese appears only there, in index page heroes and in the nickname kana.
 - The thumb index (`thumb-index.tsx`) shows one notch per section from `lib/site/page-sections.ts`. Notch numbers come from the section heading codes, and section components read their code from the same list.
 - `components/scene/active-section.ts` decides the active section for the notches, the companion's rail position and its line.
-- From `xl`, a gutter field of dithered toner surrounds the sheet on the shared canvas (`components/site/gutter-field/`). Sparse specks and a toner line hug the sheet edges, a few dots light up in clay. Hover outside the sheet opens a faint dither lens, a click prints a fading ring. The sheet and route tabs are its obstacle (`data-dossier-sheet`).
+- From `xl`, a gutter field of dithered toner surrounds the sheet on the shared canvas (`components/site/gutter-field/`). Sparse specks and a toner line hug the sheet edges, random dots twinkle in clay and ink. Hover outside the sheet opens a faint dither lens with clay sparks, a click prints a fading ring. Hero fields share the behavior: twinkles at rest, clay sparks in the lens, a ring on click. The sheet and route tabs are its obstacle (`data-dossier-sheet`).
 - The top line holds the wordmark, ⌘K search and the GitHub star count. The back cover is the colophon.
 - Notes, experiments, registry items and skills also serve Markdown at `<path>.md`. A skill serves its raw `SKILL.md`. `/llms.txt` and `/llms-full.txt` index it. The Open in menu copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
 

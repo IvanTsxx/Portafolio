@@ -109,7 +109,9 @@ const fragmentShader = `
     }
 
     float density = clamp(bleed + drift * 0.6 + lens * 0.3 + rings * 0.32, 0.0, 1.0);
-    if (density <= bayer4(cell) + 0.03125) {
+    float slot = floor(uTime * 0.8 + hash(cell + 3.1) * 8.0);
+    bool isTwinkling = hash(cell + vec2(slot, 0.5)) < 0.002;
+    if (!isTwinkling && density <= bayer4(cell) + 0.03125) {
       discard;
     }
 
@@ -119,7 +121,9 @@ const fragmentShader = `
     }
     float spark = hash(cell + vec2(17.0, floor(uTime * 0.6 + hash(cell) * 4.0)));
     float clayChance = 0.05 + lens * 0.35 + rings * 0.3;
-    gl_FragColor = spark < clayChance ? vec4(uClay, 0.7) : vec4(uInk, 0.38);
+    vec4 twinkle = hash(cell + vec2(slot, 9.7)) < 0.5 ? vec4(uClay, 0.75) : vec4(uInk, 0.55);
+    vec4 settled = spark < clayChance ? vec4(uClay, 0.7) : vec4(uInk, 0.38);
+    gl_FragColor = isTwinkling ? twinkle : settled;
   }
 `;
 

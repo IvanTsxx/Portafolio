@@ -90,31 +90,14 @@ export const heroFieldCells = ({
   return cells;
 };
 
-export const cellsPath = (cells: Uint8Array, columns: number, rows: number) => {
+export const heroFieldDotPath = (cells: Uint8Array) => {
   const commands: string[] = [];
-  for (let row = 0; row < rows; row += 1) {
-    let rowStart: number | null = null;
-    let column = 0;
-    while (column < columns) {
-      if (!cells[row * columns + column]) {
-        column += 1;
-        continue;
-      }
-      const runStart = column;
-      while (column < columns && cells[row * columns + column]) {
-        column += 1;
-      }
-      const length = column - runStart;
-      commands.push(
-        rowStart === null
-          ? `M${runStart} ${row}h${length}v1h-${length}z`
-          : `m${runStart - rowStart} 0h${length}v1h-${length}z`
-      );
-      rowStart = runStart;
+  for (const [index, cell] of cells.entries()) {
+    if (cell) {
+      const column = index % HERO_FIELD_COLUMNS;
+      const row = Math.floor(index / HERO_FIELD_COLUMNS);
+      commands.push(`M${column + 0.25} ${row + 0.25}h0.5v0.5h-0.5z`);
     }
   }
   return commands.join("");
 };
-
-export const heroFieldPath = (cells: Uint8Array) =>
-  cellsPath(cells, HERO_FIELD_COLUMNS, HERO_FIELD_ROWS);
