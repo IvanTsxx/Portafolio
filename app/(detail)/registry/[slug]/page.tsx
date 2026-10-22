@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { DependenciesPanel } from "@/components/registry-docs/dependencies-panel";
@@ -13,12 +12,11 @@ import { InstallSection } from "@/components/registry-docs/install-section";
 import { ItemStyles } from "@/components/registry-docs/item-styles";
 import { loadDemoModule } from "@/components/registry-docs/load-demo";
 import { PreviewCodeTabs } from "@/components/registry-docs/preview-code-tabs";
-import { CornerMarks } from "@/components/site/corner-marks";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { JsonLd } from "@/components/site/json-ld";
+import { NeighborNav } from "@/components/site/neighbor-link";
 import { OpenInMenu } from "@/components/site/open-in-menu";
-import { focusRingClassName } from "@/components/site/styles";
 import { markdownPathOf } from "@/lib/markdown/paths";
 import { highlightCode } from "@/lib/registry/highlight";
 import {
@@ -44,7 +42,6 @@ import {
   registryItemSeo,
 } from "@/lib/site/seo";
 import { registryItemJsonLd } from "@/lib/site/structured-data";
-import { cn } from "@/lib/utils";
 
 export const generateStaticParams = () =>
   registryItems.map((item) => ({ slug: item.name }));
@@ -60,32 +57,11 @@ export const generateMetadata = async ({
   return buildPageMetadata(registryItemSeo(item));
 };
 
-const NeighborLink = ({
-  direction,
-  name,
-}: {
-  direction: "Next" | "Previous";
-  name: string | undefined;
-}) => {
-  const item = name ? getRegistryItem(name) : undefined;
-  if (!item) {
-    return <span />;
-  }
-  return (
-    <Link
-      className={cn(
-        "group/marks border-rule-strong ease-mechanical hover:bg-paper-deep/60 relative flex min-h-11 flex-col gap-1 border px-4 py-3 transition-colors duration-100",
-        focusRingClassName
-      )}
-      href={`/registry/${item.name}`}
-    >
-      <CornerMarks reveal="hover" />
-      <span className="label text-mist group-hover/marks:text-ink transition-colors">
-        {direction}
-      </span>
-      <span className="text-ink text-sm font-medium">{item.title}</span>
-    </Link>
-  );
+const registryNeighbor = (position: number) => {
+  const item = registryItems[position];
+  return item
+    ? { href: `/registry/${item.name}`, title: item.title }
+    : undefined;
 };
 
 const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
@@ -177,19 +153,11 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
       <DocumentSection {...sectionProps("dependencies")}>
         <DependenciesPanel item={item} />
       </DocumentSection>
-      <nav
-        aria-label="More registry items"
-        className="border-rule-strong grid gap-4 border-t pt-8 sm:grid-cols-2"
-      >
-        <NeighborLink
-          direction="Previous"
-          name={registryItems[position - 1]?.name}
-        />
-        <NeighborLink
-          direction="Next"
-          name={registryItems[position + 1]?.name}
-        />
-      </nav>
+      <NeighborNav
+        label="More registry items"
+        next={registryNeighbor(position + 1)}
+        previous={registryNeighbor(position - 1)}
+      />
     </>
   );
 };
