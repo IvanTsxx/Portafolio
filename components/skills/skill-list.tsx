@@ -11,7 +11,13 @@ import { cn } from "@/lib/utils";
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
-const SkillRow = ({ position, skill }: { position: number; skill: Skill }) => (
+export const SkillRow = ({
+  position,
+  skill,
+}: {
+  position: number;
+  skill: Skill;
+}) => (
   <li
     className={cn(
       "group/marks border-graphite/30 relative grid gap-3 border-b px-4 py-5 md:grid-cols-12 md:gap-6 md:px-5",

@@ -58,6 +58,7 @@ export const sectionScripts = {
   homeMatrix: builds(["I wrote most of these commits."]),
   homeRegistry: builds(["Stocking parts you can install."]),
   homeRepos: builds(["Stacking the tapes Ivo is proud of."]),
+  homeSkills: builds(["The playbooks I hand my agents."]),
   homeWorkshop: builds([
     "My fitting room. Dress me up.",
     "The link keeps the look.",

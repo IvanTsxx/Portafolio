@@ -111,7 +111,7 @@ Profile data comes from `lib/github/`. `lib/github/snapshot.json` is the offline
 - `app/markdown`, `app/llms.txt`, `app/llms-full.txt`: plain Markdown for agents. `next.config.ts` rewrites `/notes/<slug>.md`, `/experiments/<slug>.md`, `/registry/<slug>.md` and `/skills/<slug>.md` to `app/markdown`. `components/site/open-in-menu.tsx` copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
 - `components/site`: dossier chrome (one 60rem sheet, the bound edge in `dossier-edge.tsx`), route tabs, thumb index, hero field, headings, section build.
 - `components/scene`: shared canvas, companion, stages, narration, active section. `companion-placement.ts` docks the companion. On phones it peeks from the bottom right corner.
-- `components/profile`: home sections in `homeSections` order. Experience is window envelopes that open on the current job (`experience/`). Repos is a cassette tower that opens on the most-starred repo, with one tape out at a time (`repositories/`). Contribution matrix is a compact contribution graph (`matrix/`).
+- `components/profile`: home sections in `homeSections` order. Experience is window envelopes that open on the current job (`experience/`). Repos is a cassette tower that opens on the most-starred repo, with one tape out at a time (`repositories/`). Contribution matrix is a compact contribution graph (`matrix/`). Skills lists `skills/` with the install command (`skills-section.tsx`).
 - `components/lab`: experiments. `lib/lab`: their registry.
 - `skills/`: Agent Skills, one folder each. `lib/skills`: loader and install commands. `components/skills`: list, install block, rendered body, file list.
 - `lib/site`: config, section list, narration, SEO, structured data, route dates.

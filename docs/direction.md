@@ -26,6 +26,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 - Experience: window envelopes. The current job opens first.
 - Repos: a cassette tower. The most-starred repo opens first. One tape is out at a time. Hovering another tape nudges it 4px.
 - Contribution matrix: a compact contribution graph. Its cells turn clay on hover and focus.
+- Skills: the install command, one row per skill in `skills/`, and a link to `/skills`.
 - Python repositories read as TypeScript (`lib/github/language.ts`).
 
 ## 3D contract
