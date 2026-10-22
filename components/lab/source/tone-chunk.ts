@@ -1,5 +1,7 @@
-import { Color, Vector2 } from "three";
+import { Color, Vector2, Vector4 } from "three";
 import type { Texture } from "three";
+
+import { revealChunk } from "@/components/lab/source/stage-reveal";
 
 export const sourceToneChunk = `
   uniform vec2 uOrigin;
@@ -13,6 +15,8 @@ export const sourceToneChunk = `
   uniform vec2 uPortraitFocus;
   uniform float uAspect;
   uniform vec2 uLight;
+
+  ${revealChunk}
 
   float portraitLuma(vec2 uv, float lod) {
     return dot(textureLod(uPortrait, uv, lod).rgb, vec3(0.2126, 0.7152, 0.0722));
@@ -66,6 +70,7 @@ interface SourceUniforms {
   uPortraitFocus: Vector2;
   uPortraitSize: number;
   uResolution: Vector2;
+  uReveal: Vector4;
 }
 
 export const createSourceUniforms = (): SourceUniforms => ({
@@ -80,24 +85,48 @@ export const createSourceUniforms = (): SourceUniforms => ({
   uPortraitFocus: new Vector2(0.5, 0.5),
   uPortraitSize: 1,
   uResolution: new Vector2(1, 1),
+  uReveal: new Vector4(0, 0, 0, 0),
 });
+
+export interface StageImage {
+  focus: { x: number; y: number };
+  height: number;
+  path: string;
+  width: number;
+}
 
 export const sourceImages = {
   clouds: {
     focus: { x: 0.5, y: 0.5 },
+    height: 650,
     path: "/experiments/sources/clouds.jpg",
+    width: 488,
   },
-  ippo: { focus: { x: 0.5, y: 0.3 }, path: "/experiments/sources/ippo.jpg" },
+  ippo: {
+    focus: { x: 0.5, y: 0.3 },
+    height: 736,
+    path: "/experiments/sources/ippo.jpg",
+    width: 736,
+  },
   messi: {
     focus: { x: 0.55, y: 0.35 },
+    height: 640,
     path: "/experiments/sources/messi.jpg",
+    width: 640,
   },
-  rocky: { focus: { x: 0.55, y: 0.3 }, path: "/experiments/sources/rocky.jpg" },
+  rocky: {
+    focus: { x: 0.55, y: 0.3 },
+    height: 1024,
+    path: "/experiments/sources/rocky.jpg",
+    width: 576,
+  },
   vegeta: {
     focus: { x: 0.45, y: 0.42 },
+    height: 1024,
     path: "/experiments/sources/vegeta.jpg",
+    width: 991,
   },
-} as const;
+} as const satisfies Record<string, StageImage>;
 
 export type SourceImage = keyof typeof sourceImages;
 

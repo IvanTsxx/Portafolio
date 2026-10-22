@@ -3,7 +3,6 @@ import {
   ArrowUpRightIcon,
   EnvelopeSimpleIcon,
   GithubLogoIcon,
-  LinkedinLogoIcon,
   XLogoIcon,
 } from "@phosphor-icons/react/ssr";
 import { cva } from "class-variance-authority";
@@ -17,7 +16,6 @@ import { cn } from "@/lib/utils";
 const socialIcons = {
   email: EnvelopeSimpleIcon,
   github: GithubLogoIcon,
-  linkedin: LinkedinLogoIcon,
   x: XLogoIcon,
 } as const satisfies Record<SocialId, Icon>;
 

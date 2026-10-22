@@ -27,6 +27,7 @@ const fragmentShader = `
   ${sourceToneChunk}
 
   void main() {
+    revealBefore();
     vec2 pixel = gl_FragCoord.xy - uOrigin;
     vec2 grid = vec2(pixel.x, uResolution.y - pixel.y);
     vec2 coarseSize = vec2(uCell * ${glyphAspect.toFixed(2)}, uCell);

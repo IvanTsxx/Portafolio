@@ -33,7 +33,6 @@ const DETAIL_SEPARATOR = " · ";
 const socialCodes = {
   email: "MAIL",
   github: "GH",
-  linkedin: "IN",
   x: "X",
 } as const satisfies Record<SocialId, string>;
 

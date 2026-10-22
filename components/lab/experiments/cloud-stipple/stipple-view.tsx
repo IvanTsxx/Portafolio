@@ -7,6 +7,7 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry } from "three";
 
+import type { StageReveal } from "@/components/lab/source/stage-reveal";
 import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
@@ -32,12 +33,18 @@ export interface StippleSettings {
 }
 
 interface StippleViewProps {
+  reveal: RefObject<StageReveal>;
   settings: StippleSettings;
   animate: boolean;
   pointer: RefObject<StagePointer>;
 }
 
-const StippleView = ({ settings, animate, pointer }: StippleViewProps) => {
+const StippleView = ({
+  settings,
+  animate,
+  pointer,
+  reveal,
+}: StippleViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof StippleMaterial>>(null);
   const light = useDampedPointer(pointer, animate);
@@ -60,7 +67,8 @@ const StippleView = ({ settings, animate, pointer }: StippleViewProps) => {
         renderer,
         light.current,
         portrait,
-        settings.source
+        settings.source,
+        reveal.current
       );
       const ratio = renderer.getPixelRatio();
       shader.uPixelRatio = ratio;
@@ -71,6 +79,7 @@ const StippleView = ({ settings, animate, pointer }: StippleViewProps) => {
       shader.uHasNoise = noise ? 1 : 0;
     };
   }, [
+    reveal,
     light,
     noise,
     portrait,

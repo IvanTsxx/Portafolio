@@ -27,12 +27,6 @@ export const siteConfig = {
       label: "X",
     },
     {
-      handle: "bongiovanni-ivan45",
-      href: "https://www.linkedin.com/in/bongiovanni-ivan45",
-      id: "linkedin",
-      label: "LinkedIn",
-    },
-    {
       handle: email,
       href: `mailto:${email}`,
       id: "email",

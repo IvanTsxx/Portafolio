@@ -7,6 +7,7 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry } from "three";
 
+import type { StageReveal } from "@/components/lab/source/stage-reveal";
 import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
@@ -31,12 +32,13 @@ export interface SmearSettings {
 }
 
 interface SmearViewProps {
+  reveal: RefObject<StageReveal>;
   settings: SmearSettings;
   animate: boolean;
   pointer: RefObject<StagePointer>;
 }
 
-const SmearView = ({ settings, animate, pointer }: SmearViewProps) => {
+const SmearView = ({ settings, animate, pointer, reveal }: SmearViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof SmearMaterial>>(null);
   const focus = useDampedPointer(pointer, animate);
@@ -58,7 +60,8 @@ const SmearView = ({ settings, animate, pointer }: SmearViewProps) => {
         renderer,
         focus.current,
         portrait,
-        settings.source
+        settings.source,
+        reveal.current
       );
       const ratio = renderer.getPixelRatio();
       shader.uAngle = (settings.angle * Math.PI) / 180;
@@ -68,6 +71,7 @@ const SmearView = ({ settings, animate, pointer }: SmearViewProps) => {
       shader.uSmear = settings.smear / 100;
     };
   }, [
+    reveal,
     focus,
     portrait,
     settings.angle,

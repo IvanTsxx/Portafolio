@@ -90,7 +90,10 @@ export const FiledSheet = ({
     {edge === "ticket" ? <TornEdge /> : null}
     <span className="label text-mist flex items-start justify-between gap-4 px-4 pt-4 tabular-nums sm:px-6">
       <span>{entry.file.code}</span>
-      <TypeStamp type={entry.type} />
+      <span className="flex flex-col items-end gap-2">
+        <TypeStamp type={entry.type} />
+        {entry.isCurrent ? <TypeStamp type="Current" /> : null}
+      </span>
     </span>
     <span className="flex flex-1 items-center gap-4 px-4 py-3 sm:gap-6 sm:px-6">
       <DitherLogo className="size-14 shrink-0 sm:size-20" src={entry.logo} />

@@ -7,6 +7,7 @@ import type { RefObject } from "react";
 import type { Mesh, WebGLRenderer } from "three";
 import { PlaneGeometry } from "three";
 
+import type { StageReveal } from "@/components/lab/source/stage-reveal";
 import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import {
   syncSourceUniforms,
@@ -29,12 +30,18 @@ export interface EngravingSettings {
 }
 
 interface EngravingViewProps {
+  reveal: RefObject<StageReveal>;
   settings: EngravingSettings;
   animate: boolean;
   pointer: RefObject<StagePointer>;
 }
 
-const EngravingView = ({ settings, animate, pointer }: EngravingViewProps) => {
+const EngravingView = ({
+  settings,
+  animate,
+  pointer,
+  reveal,
+}: EngravingViewProps) => {
   const mesh = useRef<Mesh>(null);
   const material = useRef<InstanceType<typeof EngravingMaterial>>(null);
   const light = useDampedPointer(pointer, animate);
@@ -55,13 +62,15 @@ const EngravingView = ({ settings, animate, pointer }: EngravingViewProps) => {
         renderer,
         light.current,
         portrait,
-        settings.source
+        settings.source,
+        reveal.current
       );
       shader.uPitch = settings.pitch * renderer.getPixelRatio();
       shader.uAngle = (settings.angle * Math.PI) / 180;
       shader.uFollow = settings.follow / 100;
     };
   }, [
+    reveal,
     light,
     portrait,
     settings.angle,

@@ -11,6 +11,8 @@ import {
   SwitchControl,
   ToggleControl,
 } from "@/components/lab/lab-controls";
+import { useStageReveal } from "@/components/lab/source/stage-reveal";
+import type { StageImage } from "@/components/lab/source/tone-chunk";
 import {
   releaseStagePointer,
   trackStagePointer,
@@ -44,8 +46,16 @@ const times = (value: number) => `${value.toFixed(2)}×`;
 const formatHold = (value: number) =>
   value >= colorHoldForever ? "Hold" : `${value.toFixed(1)}s`;
 
+const superSaiyanImage: StageImage = {
+  focus: { x: 0.6, y: 0.4 },
+  height: 490,
+  path: "/experiments/super-saiyan.jpg",
+  width: 735,
+};
+
 const SuperSaiyanPreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
+  const { onReveal, reveal } = useStageReveal();
   const [settings, setSettings] =
     useState<SuperSaiyanSettings>(defaultSettings);
 
@@ -70,6 +80,7 @@ const SuperSaiyanPreview = () => {
     slotId,
     field,
     <SuperSaiyanView
+      reveal={reveal}
       animate={activity === "running"}
       pointer={pointer}
       settings={settings}
@@ -267,6 +278,8 @@ const SuperSaiyanPreview = () => {
   return (
     <ExperimentStage
       activity={activity}
+      onReveal={onReveal}
+      before={superSaiyanImage}
       className="[&>p]:z-40 [&>span]:z-40"
       controls={
         <ControlTabs

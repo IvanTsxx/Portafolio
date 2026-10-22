@@ -34,10 +34,6 @@ const buttonVariants = cva("inline-flex items-center", {
 });
 ```
 
-## Page builders use a registry
-
-Each block is one self-contained module that registers itself in a single registry. The renderer looks blocks up by type. No switch statements over block types, so adding a block never edits existing code.
-
 ## The code carries no extras
 
 - Never add code comments. Names explain the code.

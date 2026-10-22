@@ -30,6 +30,7 @@ const fragmentShader = `
   }
 
   void main() {
+    revealBefore();
     vec2 pixel = gl_FragCoord.xy - uOrigin;
     vec2 point = (pixel - uResolution * 0.5) / uResolution.y;
     if (uHasPortrait < 0.5) {

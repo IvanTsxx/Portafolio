@@ -6,6 +6,7 @@ import type { ContentDocument } from "@/lib/content/collection";
 import { noteKinds, notePath } from "@/lib/content/note-domain";
 import type { NoteMeta } from "@/lib/content/schema";
 import type { Experiment } from "@/lib/lab/experiments";
+import { experimentPrompts } from "@/lib/lab/prompts";
 import {
   getInstallCommand,
   getNamespacedInstallCommand,
@@ -121,6 +122,8 @@ export const experimentMarkdown = (experiment: Experiment) => {
     [
       heading(1, experiment.title),
       textParagraph(experiment.summary),
+      heading(2, "Prompt"),
+      code(experimentPrompts[experiment.slug], "text"),
       heading(2, "Implementation"),
       orderedList(experiment.implementation),
       heading(2, "Technical notes"),

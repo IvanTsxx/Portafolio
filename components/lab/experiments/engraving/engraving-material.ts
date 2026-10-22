@@ -36,6 +36,7 @@ const fragmentShader = `
   }
 
   void main() {
+    revealBefore();
     vec2 pixel = gl_FragCoord.xy - uOrigin - uResolution * 0.5;
     vec2 point = pixel / uResolution.y;
     float lod = sourceLod(uPitch, uResolution);

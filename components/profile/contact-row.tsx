@@ -16,7 +16,7 @@ export const ContactRow = () => {
     >
       <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2">
         <CopyEmail email={siteConfig.email} />
-        <SocialLinks ids={["github", "x", "linkedin"]} />
+        <SocialLinks ids={["github", "x"]} />
       </div>
     </DocumentSection>
   );

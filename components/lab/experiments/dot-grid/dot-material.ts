@@ -49,6 +49,7 @@ const fragmentShader = `
   }
 
   void main() {
+    revealBefore();
     vec2 pixel = gl_FragCoord.xy - uOrigin;
     vec2 cell = floor(pixel / uCell);
     float ink = 0.0;

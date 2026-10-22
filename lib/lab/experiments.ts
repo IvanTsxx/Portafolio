@@ -8,8 +8,6 @@ import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
 import { DotGridPoster } from "@/components/lab/experiments/dot-grid/poster";
 import { EngravingLive } from "@/components/lab/experiments/engraving/live";
 import { EngravingPoster } from "@/components/lab/experiments/engraving/poster";
-import { MatrixRainLive } from "@/components/lab/experiments/matrix-rain/live";
-import { MatrixRainPoster } from "@/components/lab/experiments/matrix-rain/poster";
 import { SignalTearLive } from "@/components/lab/experiments/signal-tear/live";
 import { SignalTearPoster } from "@/components/lab/experiments/signal-tear/poster";
 import { SpeedSmearLive } from "@/components/lab/experiments/speed-smear/live";
@@ -21,7 +19,6 @@ import type { LabTopic } from "@/lib/lab/topics";
 
 export type ExperimentSlug =
   | "dot-grid"
-  | "matrix-rain"
   | "ascii"
   | "engraving"
   | "super-saiyan"
@@ -56,8 +53,8 @@ const experimentsBySlug = {
       "A fragment shader picks each cell's glyph from the source tone and samples it from the atlas.",
       "Inside the scanner the grid halves its cell size or prints in negative.",
     ],
-    index: "LAB-03",
-    related: ["matrix-rain", "engraving"],
+    index: "LAB-02",
+    related: ["dot-grid", "engraving"],
     slug: "ascii",
     summary: "A picture typed in mono glyphs, read through a pointer scanner.",
     technicalNotes: [
@@ -79,7 +76,7 @@ const experimentsBySlug = {
       "A dot lands in the cell when the picture is bright enough, jittered inside the cell so no grid shows.",
       "Boil reseeds the tile offset a few times a second. The pointer lifts the light under it.",
     ],
-    index: "LAB-08",
+    index: "LAB-07",
     related: ["dot-grid", "signal-tear"],
     slug: "cloud-stipple",
     summary: "Clouds stippled in blue noise dots, after Joanie Lemercier.",
@@ -103,7 +100,7 @@ const experimentsBySlug = {
       "With a picture, the lens also acts as the light, so tones shift as it moves.",
     ],
     index: "LAB-01",
-    related: ["matrix-rain", "cloud-stipple"],
+    related: ["cloud-stipple", "ascii"],
     slug: "dot-grid",
     summary: "A halftone dot grid of a picture that swells around the pointer.",
     technicalNotes: [
@@ -124,11 +121,10 @@ const experimentsBySlug = {
       "A relief height shifts that field, so the lines bend over the form like a burin following it.",
       "Line width follows tone. Past 62% ink a second set crosses at 60°.",
     ],
-    index: "LAB-04",
+    index: "LAB-03",
     related: ["ascii", "speed-smear"],
     slug: "engraving",
-    summary:
-      "Banknote line engraving of a picture that swells in shadow and bends over its relief.",
+    summary: "Banknote line engraving of a picture, bent over its relief.",
     technicalNotes: [
       "Edges are antialiased with fwidth, so any pitch stays crisp without supersampling.",
       "A picture's relief is a blurred mip of its own luminance.",
@@ -144,29 +140,6 @@ const experimentsBySlug = {
     topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
-  "matrix-rain": {
-    Poster: MatrixRainPoster,
-    Preview: MatrixRainLive,
-    hasControls: true,
-    implementation: [
-      "One full-viewport plane with a ShaderMaterial. Each pixel finds its dot, then the glyph cell and column above it.",
-      "Glyphs are box-filtered into a 6×8 texel atlas, one texel per dot. A Bayer threshold thins the trails.",
-      "The pointer pushes columns sideways with a Gaussian falloff, so the rain parts around it.",
-      "With a picture, its dark areas hold glyphs lit between drops, so the rain falls through the image.",
-    ],
-    index: "LAB-02",
-    related: ["dot-grid", "ascii"],
-    slug: "matrix-rain",
-    summary: "Digital rain in dot-matrix glyphs, falling through a picture.",
-    technicalNotes: [
-      "It shares the site canvas: one draw call, one texture lookup per pixel, no second WebGL context.",
-      "The render loop stops offscreen. Reduced motion renders a single frame.",
-    ],
-    technologies: ["React Three Fiber", "Three.js", "GLSL", "DataTexture"],
-    title: "Matrix rain",
-    topics: ["Shader", "WebGL", "Motion"],
-    year: 2026,
-  },
   "signal-tear": {
     Poster: SignalTearPoster,
     Preview: SignalTearLive,
@@ -176,8 +149,8 @@ const experimentsBySlug = {
       "Torn bands shift sideways. Rows near the pointer tear more often, and a fast pointer tears them all.",
       "Light drags to the right as a ghost trail, then a vignette and two octaves of grain finish the frame.",
     ],
-    index: "LAB-07",
-    related: ["speed-smear", "matrix-rain"],
+    index: "LAB-06",
+    related: ["speed-smear", "cloud-stipple"],
     slug: "signal-tear",
     summary:
       "A grainy frame whose rows tear and smear light, like a bad VHS still.",
@@ -200,7 +173,7 @@ const experimentsBySlug = {
       "Each streak of rows gets its own length, so the blur breaks into anime speed lines.",
       "Pointer speed adds to the smear and fades out, then an ordered dither prints the result.",
     ],
-    index: "LAB-06",
+    index: "LAB-05",
     related: ["signal-tear", "super-saiyan"],
     slug: "speed-smear",
     summary:
@@ -225,7 +198,7 @@ const experimentsBySlug = {
       "A strike lifts the sky, draws a forked bolt in paper behind Goku and crossfades, cell by cell, to a color ordered dither in twelve inks taken from the image.",
       "The aura springs to the pointer and gathers on the hair silhouette. A click shakes the frame by whole cells and sends a burst ring that bends the image.",
     ],
-    index: "LAB-05",
+    index: "LAB-04",
     related: ["speed-smear", "signal-tear"],
     slug: "super-saiyan",
     summary:

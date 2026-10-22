@@ -19,6 +19,8 @@ import {
   driveSpring,
   frameStep,
 } from "@/components/lab/source/spring";
+import { syncReveal } from "@/components/lab/source/stage-reveal";
+import type { StageReveal } from "@/components/lab/source/stage-reveal";
 import type { StagePointer } from "@/components/lab/source/use-source";
 import { requestSceneFrame } from "@/components/scene/view-registry";
 
@@ -49,6 +51,7 @@ export interface KiPointer extends StagePointer {
 }
 
 export interface SuperSaiyanViewProps {
+  reveal: RefObject<StageReveal>;
   settings: SuperSaiyanSettings;
   animate: boolean;
   pointer: RefObject<KiPointer>;
@@ -112,6 +115,7 @@ const stormModeFor = (animate: boolean, isPaused: boolean): StormMode => {
 };
 
 const SuperSaiyanView = ({
+  reveal,
   settings,
   animate,
   pointer,
@@ -216,6 +220,12 @@ const SuperSaiyanView = ({
       const ink = inkFor(current);
       shader.uOrigin.set(viewport.x, viewport.y);
       shader.uResolution.set(viewport.z, viewport.w);
+      syncReveal(
+        shader.uReveal,
+        reveal.current,
+        viewport.z,
+        renderer.getPixelRatio()
+      );
       shader.uCell = cell;
       shader.uThreshold = current.threshold;
       shader.uContrast = current.contrast;
@@ -237,7 +247,7 @@ const SuperSaiyanView = ({
       shader.uBurst.set(burst.x * viewport.z, burst.y * viewport.w);
       shader.uBurstAge = Number.isFinite(burst.age) ? burst.age : 10;
     };
-  }, []);
+  }, [reveal]);
 
   return (
     <>

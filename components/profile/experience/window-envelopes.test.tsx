@@ -72,6 +72,10 @@ describe("window envelopes", () => {
     expect(markup).not.toContain("HealthTech");
   });
 
+  test("stamps only the open job as current", () => {
+    expect(markup.match(/>Current</gu)).toHaveLength(1);
+  });
+
   test("marks itself as a buildable block", () => {
     expect(markup).toContain("data-build-block");
   });

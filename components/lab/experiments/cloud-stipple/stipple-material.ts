@@ -27,6 +27,7 @@ const fragmentShader = `
   ${printChunk}
 
   void main() {
+    revealBefore();
     vec2 pixel = gl_FragCoord.xy - uOrigin;
     vec3 ground = mix(uPaper, uInk, uInvert);
     vec3 mark = mix(uInk, uPaper, uInvert);

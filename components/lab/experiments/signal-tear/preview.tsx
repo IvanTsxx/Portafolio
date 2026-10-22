@@ -4,7 +4,11 @@ import { useId, useRef, useState } from "react";
 
 import { ExperimentStage } from "@/components/lab/experiment-stage";
 import { SliderControl, ToggleControl } from "@/components/lab/lab-controls";
-import { imageSourceOptions } from "@/components/lab/source/tone-chunk";
+import { useStageReveal } from "@/components/lab/source/stage-reveal";
+import {
+  imageSourceOptions,
+  sourceImages,
+} from "@/components/lab/source/tone-chunk";
 import {
   releaseStagePointer,
   trackStagePointer,
@@ -20,6 +24,7 @@ const percent = (value: number) => `${value}%`;
 
 const SignalTearPreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
+  const { onReveal, reveal } = useStageReveal();
   const [settings, setSettings] = useState<TearSettings>({
     ghost: 60,
     grain: 60,
@@ -39,6 +44,7 @@ const SignalTearPreview = () => {
     slotId,
     field,
     <TearView
+      reveal={reveal}
       animate={activity === "running"}
       pointer={pointer}
       settings={settings}
@@ -48,6 +54,8 @@ const SignalTearPreview = () => {
   return (
     <ExperimentStage
       activity={activity}
+      onReveal={onReveal}
+      before={sourceImages[settings.source]}
       className="[&>p]:z-40 [&>span]:z-40"
       controls={
         <>

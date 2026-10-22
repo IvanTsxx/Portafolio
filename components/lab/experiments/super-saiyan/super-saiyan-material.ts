@@ -1,6 +1,8 @@
 import { shaderMaterial } from "@react-three/drei";
-import { Vector2, Vector3 } from "three";
+import { Vector2, Vector3, Vector4 } from "three";
 import type { Texture } from "three";
+
+import { revealChunk } from "@/components/lab/source/stage-reveal";
 
 import { retroPalette } from "./retro-palette";
 import { inkRgb, paperRgb } from "./settings";
@@ -180,7 +182,10 @@ const fragmentShader = `
     return best;
   }
 
+  ${revealChunk}
+
   void main() {
+    revealBefore();
     if (uHasImage < 0.5) {
       discard;
     }
@@ -313,6 +318,7 @@ const uniforms = {
   uRainSlant: 0.16,
   uRainSpeed: 1,
   uResolution: new Vector2(1, 1),
+  uReveal: new Vector4(0, 0, 0, 0),
   uShake: new Vector2(0, 0),
   uStrikeSeed: 0,
   uThreshold: 0,
