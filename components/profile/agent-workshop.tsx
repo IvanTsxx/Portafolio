@@ -218,6 +218,7 @@ const useFittingBooth = (state: WorkshopState) => {
     return registerCompanionStage({
       figure,
       id: "workshop-booth",
+      isFeatured: true,
       spot: () => {
         const box = figure.getBoundingClientRect();
         const ground = line.getBoundingClientRect();

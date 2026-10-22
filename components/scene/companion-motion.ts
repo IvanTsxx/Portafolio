@@ -34,6 +34,7 @@ export interface CompanionPose {
 
 export interface CompanionInput {
   goal: DockGoal;
+  isAnchored: boolean;
   isReduced: boolean;
   pinned: OperatorPose | null;
   restAction: AgentAction;
@@ -44,7 +45,6 @@ export interface CompanionInput {
 }
 
 export const swapSeconds = 0.7;
-export const tuckSpeed = 160;
 const swapApex = 0.4;
 const swapHopPixels = 34;
 const followRate = 5;
@@ -136,7 +136,9 @@ const stepFollow = (
   input: CompanionInput
 ): CompanionPose => {
   const { goal, step } = input;
-  const drag = clamp(-state.scrollVelocity * dragPerSpeed, dragLimit);
+  const drag = input.isAnchored
+    ? 0
+    : clamp(-state.scrollVelocity * dragPerSpeed, dragLimit);
   state.x = damp(state.x, goal.x, followRate, step);
   state.y = damp(state.y, goal.y + drag, followRate, step);
   state.yaw = damp(state.yaw, goal.yaw, yawRate, step);
@@ -147,7 +149,9 @@ const stepFollow = (
     action: isWalking ? "walk" : input.restAction,
     cue: noCue,
     lean: 0,
-    lift: Math.abs(Math.sin(state.stride * Math.PI)) * strideHop,
+    lift: input.isAnchored
+      ? 0
+      : Math.abs(Math.sin(state.stride * Math.PI)) * strideHop,
     spin: 0,
     squash: 1,
   };
@@ -211,9 +215,10 @@ export const stepCompanion = (
   const follow = input.pinned
     ? stepPinned(state, input, input.pinned)
     : stepFollow(state, input);
-  const lean = input.pinned
-    ? input.pinned.lean
+  const scrollLean = input.isAnchored
+    ? 0
     : clamp(-state.scrollVelocity * leanPerSpeed, leanLimit);
+  const lean = input.pinned ? input.pinned.lean : scrollLean;
 
   const progress = (input.time - state.swapStart) / swapSeconds;
   const isSwapping = progress >= 0 && progress < 1;

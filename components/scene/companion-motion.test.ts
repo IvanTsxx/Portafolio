@@ -12,6 +12,7 @@ const rest = { scale: 1, x: 1200, y: 640, yaw: -0.32 };
 
 const input = (overrides: Partial<CompanionInput>): CompanionInput => ({
   goal: rest,
+  isAnchored: false,
   isReduced: false,
   pinned: null,
   restAction: "wave",

@@ -50,6 +50,7 @@ export const StageScene = ({
     const release = registerCompanionStage({
       figure,
       id: cueId,
+      isFeatured: true,
       spot: () => {
         const cue = readStageCue(cueId);
         if (!cue) {

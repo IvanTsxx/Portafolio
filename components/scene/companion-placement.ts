@@ -53,7 +53,6 @@ export type CompanionDock =
       frame: CompanionFrame;
       kind: "corner";
       restY: number;
-      tuckY: number;
       x: number;
     };
 
@@ -164,7 +163,6 @@ export const companionDock = (
       restY:
         viewport.height +
         cornerFrame.agentHeight * companionBodyShare * cornerHiddenBodyShare,
-      tuckY: viewport.height + cornerFrame.agentHeight,
       x: viewport.width - edgeInset - cornerFrame.agentWidth / 2,
     };
   }
@@ -195,13 +193,13 @@ export const bubbleSide = (headY: number): BubbleSide =>
 
 export const dockGoal = (
   dock: CompanionDock,
-  { isTucked, railShare = 0 }: { isTucked: boolean; railShare?: number }
+  { railShare = 0 }: { railShare?: number } = {}
 ): DockGoal => {
   if (dock.kind === "corner") {
     return {
-      scale: isTucked ? 0 : 1,
+      scale: 1,
       x: dock.x,
-      y: isTucked ? dock.tuckY : dock.restY,
+      y: dock.restY,
       yaw: restYaw,
     };
   }

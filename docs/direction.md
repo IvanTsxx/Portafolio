@@ -31,7 +31,7 @@ Ivo's portfolio (Ivan Bongiovanni). The site is a technical dossier on paper wit
 ## 3D contract
 
 - One shared Canvas, mounted once in `app/layout.tsx`, renders into DOM-tracked views. Never add a second Canvas.
-- One agent on screen, the companion, 48×56 on the rail. On phones it peeks from the bottom right corner with about two thirds of its body above the edge. The route picks its role. It narrates one first-person line per section while that section is active and stays quiet during fast scrolls.
+- One agent on screen, the companion, 48×56 on the rail. On phones it peeks from the bottom right corner with about two thirds of its body above the edge. There it holds still while the page scrolls and only leaves the corner for the How I work stages, the 404 stage and the Workshop. The route picks its role. It narrates one first-person line per section while that section is active and stays quiet during fast scrolls.
 - Section builds are light. Blocks fade and rise 8px in 300ms, at most 40ms apart, within 500ms per section. The companion plays its build action at the first block, and content never waits for its walk. Sections on screen at load and reduced motion skip the build.
 - Section builds, figure stations, the contribution graph, the How I work stages, the 404 stage and the Workshop register a spot in `components/scene/companion-stages.ts`. The companion walks there and performs the spot's action.
 - `<StageScene>` renders props only, never an agent.

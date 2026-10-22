@@ -113,13 +113,15 @@ describe("companion dock", () => {
 describe("dock goal", () => {
   test("in the gutter the companion rests at full scale", () => {
     const dock = companionDock(viewportOf(1440, 900), centeredColumn(1440));
-    expect(dockGoal(dock, { isTucked: false }).scale).toBe(1);
+    expect(dockGoal(dock).scale).toBe(1);
   });
 
-  test("in the corner the companion disappears while scrolling", () => {
+  test("in the corner the companion holds its peek while scrolling", () => {
     const dock = companionDock(viewportOf(390, 844), { left: 16, right: 374 });
-    expect(dockGoal(dock, { isTucked: false }).scale).toBe(1);
-    expect(dockGoal(dock, { isTucked: true }).scale).toBe(0);
+    if (dock.kind !== "corner") {
+      throw new Error("expected a corner dock");
+    }
+    expect(dockGoal(dock)).toMatchObject({ scale: 1, y: dock.restY });
   });
 });
 
@@ -159,10 +161,8 @@ describe("rail dock", () => {
       throw new Error("expected a rail dock");
     }
     const half = dock.frame.agentHeight / 2;
-    expect(dockGoal(dock, { isTucked: false, railShare: 0 }).y - half).toBe(96);
-    expect(dockGoal(dock, { isTucked: false, railShare: 1 }).y - half).toBe(
-      852
-    );
+    expect(dockGoal(dock, { railShare: 0 }).y - half).toBe(96);
+    expect(dockGoal(dock, { railShare: 1 }).y - half).toBe(852);
   });
 
   test("a lane too narrow for the smallest companion falls back to the plain gutter dock", () => {

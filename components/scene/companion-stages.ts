@@ -38,6 +38,7 @@ export const forgetStageCue = (id: string) => {
 export interface CompanionStage {
   figure: Element;
   id: string;
+  isFeatured?: boolean;
   spot: () => StageSpot | null;
 }
 

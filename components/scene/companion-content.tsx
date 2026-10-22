@@ -21,11 +21,7 @@ import { activeSpokenSection } from "./active-section";
 import type { BurstHandle, HatToss, TossHandle } from "./companion-effects";
 import { FlyingHat, PaperPoof } from "./companion-effects";
 import type { CompanionCue, CompanionMotion } from "./companion-motion";
-import {
-  createCompanionMotion,
-  stepCompanion,
-  tuckSpeed,
-} from "./companion-motion";
+import { createCompanionMotion, stepCompanion } from "./companion-motion";
 import type { Narration, NarrationStep } from "./companion-narration";
 import { isFastScroll, narrate, silence } from "./companion-narration";
 import type {
@@ -202,6 +198,9 @@ const stationCandidates = (): Candidate[] =>
 const stageCandidates = (dock: CompanionDock): Candidate[] => {
   const candidates: Candidate[] = [];
   for (const stage of getCompanionStages()) {
+    if (dock.kind === "corner" && !stage.isFeatured) {
+      continue;
+    }
     const spot = stage.spot();
     if (!spot) {
       continue;
@@ -416,7 +415,6 @@ const CompanionContent = ({
     const { scrollY } = window;
     const section = activeSpokenSection(scrollY, viewport.height);
     const restGoal = dockGoal(dock, {
-      isTucked: !isReduced && state.scrollVelocity > tuckSpeed,
       railShare:
         rail && dock.kind === "rail"
           ? railMarkFor(rail, section?.id ?? null)
@@ -431,6 +429,7 @@ const CompanionContent = ({
     });
     const pose = stepCompanion(state, {
       goal,
+      isAnchored: dock.kind === "corner" && pinned === null,
       isReduced,
       pinned,
       restAction: cast.action,
