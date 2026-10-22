@@ -56,7 +56,6 @@ export const homeSections = [
   { id: "repos", index: "GH-06", label: "Repos" },
   { id: "registry", index: "GH-07", label: "Registry" },
   { id: "workshop", index: "GH-08", label: "Workshop" },
-  { id: "contact", index: "GH-09", label: "Contact" },
 ] as const;
 
 export type Social = (typeof siteConfig.socials)[number];

@@ -14,6 +14,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 import { outfitPieceIds, outfitSlots } from "@/components/agents/outfit";
 import type { OutfitPieceId, OutfitSlot } from "@/components/agents/outfit";
+import { standingLift } from "@/components/scene/companion-placement";
 import { registerCompanionStage } from "@/components/scene/companion-stages";
 import { dressCompanion } from "@/components/scene/companion-wardrobe";
 import { useWebGLSupport } from "@/components/scene/webgl-support";
@@ -220,11 +221,12 @@ const useFittingBooth = (state: WorkshopState) => {
       spot: () => {
         const box = figure.getBoundingClientRect();
         const ground = line.getBoundingClientRect();
+        const height = box.height * boothActorShare;
         return {
           action: action.current,
-          height: box.height * boothActorShare,
+          height,
           x: (ground.left + ground.right) / 2,
-          y: ground.top,
+          y: ground.top - standingLift(height),
           yaw: boothYaw,
         };
       },

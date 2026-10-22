@@ -82,6 +82,13 @@ export const bubbleMaxWidth = 224;
 export const companionModelHeight = 2.2;
 export const companionBodyShare =
   (bodyBase + bodySize.height) / companionModelHeight;
+const headwearRoom = 0.42;
+export const companionHeadShare =
+  (bodyBase + bodySize.height + headwearRoom) / companionModelHeight;
+export const companionTilt = 0.16;
+const shadowReach = 0.82;
+export const standingLift = (agentHeight: number) =>
+  (shadowReach * Math.sin(companionTilt) * agentHeight) / companionModelHeight;
 const cornerHiddenBodyShare = 0.35;
 const restYaw = -0.32;
 export const watchYaw = -0.75;

@@ -53,7 +53,9 @@ import type {
 import {
   bubbleSide,
   companionDock,
+  companionHeadShare,
   companionModelHeight,
+  companionTilt,
   dockGoal,
   headBubbleSlot,
   headerClearance,
@@ -102,7 +104,6 @@ interface Candidate {
   view: StationView;
 }
 
-const baseTilt = 0.16;
 const depthClearPriority = 2.5;
 const operatorSpeechSeconds = 3.2;
 const speechGap = 10;
@@ -163,7 +164,8 @@ const placeBubble = ({
     bubble.dataset.shown = "false";
     return;
   }
-  const head = state.y - dock.frame.agentHeight * state.scale - lift;
+  const head =
+    state.y - dock.frame.agentHeight * companionHeadShare * state.scale - lift;
   const side = bubbleSide(head);
   const top = side === "above" ? head - speechGap : state.y + speechGap;
   const tail = state.x - slot.left;
@@ -442,7 +444,7 @@ const CompanionContent = ({
     const size = Math.max(0.0001, state.scale);
     const spread = size / Math.sqrt(pose.squash);
     spinner.scale.set(spread, size * pose.squash, spread);
-    spinner.rotation.set(baseTilt, state.yaw + pose.spin, pose.lean);
+    spinner.rotation.set(companionTilt, state.yaw + pose.spin, pose.lean);
     group.position.set(
       (state.x - viewport.width / 2) / zoom,
       (viewport.height / 2 - state.y + pose.lift) / zoom,

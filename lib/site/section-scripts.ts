@@ -46,7 +46,6 @@ export const sectionScripts = {
   designSpacing: builds(),
   designTypography: builds(),
   designUtilities: builds(),
-  homeContact: speaks(["Last page. This is how to reach Ivo."]),
   homeExperience: builds([
     `Laying out ${spelled(experience.length)} roles since ${firstYear}.`,
   ]),

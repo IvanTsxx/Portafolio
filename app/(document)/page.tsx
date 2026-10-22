@@ -1,5 +1,4 @@
 import { AgentWorkshop } from "@/components/profile/agent-workshop";
-import { ContactRow } from "@/components/profile/contact-row";
 import { ExperienceSection } from "@/components/profile/experience/experience-section";
 import { ExperimentsSection } from "@/components/profile/experiments-section";
 import { HowIWork } from "@/components/profile/how-i-work/how-i-work-section";
@@ -28,7 +27,6 @@ const HomePage = async () => {
       <ReposSection repositories={profile.pinned} />
       <RegistrySection />
       <AgentWorkshop />
-      <ContactRow />
     </>
   );
 };
