@@ -3,14 +3,15 @@ import path from "node:path";
 
 import sharp from "sharp";
 
+import { blueNoiseBytes } from "@/components/lab/source/blue-noise";
+import { extractPalette } from "@/components/lab/source/palette";
 import {
   encodeInkPng,
   encodeLevelPng,
 } from "@/components/lab/source/poster-png";
+import { ditherPrint, rgbLuma } from "@/components/lab/source/print-tone";
 
-import { blueNoiseBytes } from "./blue-noise";
-import { extractPalette, paletteSample } from "./palette";
-import { ditherPoster, posterGrid } from "./poster-raster";
+import { paletteSample, posterGrid } from "./poster-raster";
 
 const folder = import.meta.dir;
 const publicFolder = path.join(folder, "../../../../public/experiments");
@@ -24,7 +25,7 @@ const rgb = await sharp(imagePath)
   .raw()
   .toBuffer();
 
-const ink = ditherPoster(new Uint8Array(rgb), columns, rows);
+const ink = ditherPrint(rgbLuma(new Uint8Array(rgb)), columns, rows);
 const png = encodeInkPng(ink, columns, rows);
 
 await writeFile(
@@ -43,7 +44,7 @@ const paletteRows = palette
   .join("\n");
 await writeFile(
   path.join(folder, "retro-palette.ts"),
-  `import type { Rgb } from "./palette";\n\nexport const retroPalette: readonly Rgb[] = [\n${paletteRows}\n];\n`
+  `import type { Rgb } from "@/components/lab/source/palette";\n\nexport const retroPalette: readonly Rgb[] = [\n${paletteRows}\n];\n`
 );
 
 const noisePng = encodeLevelPng(blueNoiseBytes(noiseSide), noiseSide);

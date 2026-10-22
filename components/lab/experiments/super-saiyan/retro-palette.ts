@@ -1,4 +1,4 @@
-import type { Rgb } from "./palette";
+import type { Rgb } from "@/components/lab/source/palette";
 
 export const retroPalette: readonly Rgb[] = [
   [0, 20, 31],

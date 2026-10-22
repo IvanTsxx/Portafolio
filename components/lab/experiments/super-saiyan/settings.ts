@@ -1,10 +1,11 @@
-import type { Rgb } from "./palette";
+import {
+  inkRgb,
+  orderedDitherOptions,
+} from "@/components/lab/source/ordered-print";
+import type { Rgb } from "@/components/lab/source/palette";
 
 export const ditherOptions = [
-  { label: "2×2", value: "bayer-2" },
-  { label: "4×4", value: "bayer-4" },
-  { label: "8×8", value: "bayer-8" },
-  { label: "Blue", value: "blue-noise" },
+  ...orderedDitherOptions,
   { label: "Dots", value: "halftone" },
 ] as const;
 
@@ -20,9 +21,6 @@ export const printOptions = [
 ] as const;
 
 export type PrintMode = (typeof printOptions)[number]["value"];
-
-export const inkRgb: Rgb = [0x14, 0x14, 0x14];
-export const paperRgb: Rgb = [0xed, 0xed, 0xeb];
 
 export const duotoneOptions = [
   {

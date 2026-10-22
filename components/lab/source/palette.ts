@@ -1,7 +1,6 @@
 export type Rgb = readonly [number, number, number];
 
-export const retroPaletteSize = 12;
-export const paletteSample = { columns: 147, rows: 98 } as const;
+export const paletteSize = 12;
 
 interface Box {
   pixels: Rgb[];
@@ -70,7 +69,7 @@ const printInk = (color: Rgb): Rgb => {
   ];
 };
 
-export const extractPalette = (rgb: Uint8Array, size = retroPaletteSize) => {
+export const extractPalette = (rgb: Uint8Array, size = paletteSize) => {
   const pixels: Rgb[] = [];
   for (let offset = 0; offset + 2 < rgb.length; offset += 3) {
     const pixel: Rgb = [

@@ -1,4 +1,4 @@
-import { blueNoiseBytes } from "@/components/lab/experiments/super-saiyan/blue-noise";
+import { blueNoiseBytes } from "@/components/lab/source/blue-noise";
 import {
   readSourceLuma,
   writePosterBitmap,

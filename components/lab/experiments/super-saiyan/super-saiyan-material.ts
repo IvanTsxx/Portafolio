@@ -1,12 +1,18 @@
 import { shaderMaterial } from "@react-three/drei";
-import { Vector2, Vector3 } from "three";
+import { Vector2 } from "three";
 import type { Texture } from "three";
 
+import {
+  inkRgb,
+  nearestInkChunk,
+  orderedPrintChunk,
+  paperRgb,
+  rgbVector,
+} from "@/components/lab/source/ordered-print";
+import { toneChunk } from "@/components/lab/source/print-tone";
 import { revealChunk } from "@/components/lab/source/stage-reveal";
 
 import { retroPalette } from "./retro-palette";
-import { inkRgb, paperRgb } from "./settings";
-import { toneChunk } from "./tone";
 
 const vertexShader = `
   void main() {
@@ -21,13 +27,9 @@ const fragmentShader = `
   uniform vec2 uResolution;
   uniform vec3 uInk;
   uniform vec3 uPaper;
-  uniform vec3 uPalette[${paletteSize}];
   uniform sampler2D uImage;
   uniform vec2 uImageSize;
   uniform float uHasImage;
-  uniform sampler2D uBlueNoise;
-  uniform float uNoiseSize;
-  uniform float uDither;
   uniform float uCell;
   uniform float uThreshold;
   uniform float uContrast;
@@ -48,56 +50,15 @@ const fragmentShader = `
   uniform float uBurstAge;
 
   const vec2 focus = vec2(0.6, 0.6);
-  const vec3 lumaWeights = vec3(0.2126, 0.7152, 0.0722);
   const float burstLength = 1.1;
   const float dotPeriod = 3.0;
   const float colorSpread = 0.3;
 
   ${toneChunk}
 
-  float hash(vec2 point) {
-    return fract(sin(dot(point, vec2(127.1, 311.7))) * 43758.5453);
-  }
+  ${orderedPrintChunk}
 
-  float valueNoise(vec2 point) {
-    vec2 whole = floor(point);
-    vec2 part = fract(point);
-    vec2 blend = part * part * (3.0 - 2.0 * part);
-    return mix(
-      mix(hash(whole), hash(whole + vec2(1.0, 0.0)), blend.x),
-      mix(hash(whole + vec2(0.0, 1.0)), hash(whole + vec2(1.0, 1.0)), blend.x),
-      blend.y
-    );
-  }
-
-  float bayer2(vec2 cell) {
-    cell = floor(cell);
-    return fract(cell.x / 2.0 + cell.y * cell.y * 0.75);
-  }
-
-  float bayer4(vec2 cell) {
-    return bayer2(0.5 * cell) * 0.25 + bayer2(cell);
-  }
-
-  float bayer8(vec2 cell) {
-    return bayer4(0.5 * cell) * 0.25 + bayer2(cell) + 0.5 / 64.0;
-  }
-
-  vec3 toLinear(vec3 color) {
-    return mix(
-      color / 12.92,
-      pow((color + 0.055) / 1.055, vec3(2.4)),
-      step(vec3(0.04045), color)
-    );
-  }
-
-  vec2 imageSpan() {
-    float stageAspect = uResolution.x / uResolution.y;
-    float imageAspect = uImageSize.x / uImageSize.y;
-    return stageAspect > imageAspect
-      ? vec2(1.0, imageAspect / stageAspect)
-      : vec2(stageAspect / imageAspect, 1.0);
-  }
+  ${nearestInkChunk(paletteSize)}
 
   float rainAt(vec2 cell, float height) {
     float streak = 0.0;
@@ -155,33 +116,6 @@ const fragmentShader = `
     return clamp(1.0 - 3.1416 * dot(offset, offset), 0.0, 1.0);
   }
 
-  float orderedLevel(vec2 cell) {
-    if (uDither < 0.5) {
-      return bayer2(cell) + 0.125;
-    }
-    if (uDither < 1.5) {
-      return bayer4(cell) + 0.5 / 16.0;
-    }
-    if (uDither < 2.5) {
-      return bayer8(cell);
-    }
-    return texture(uBlueNoise, (cell + 0.5) / uNoiseSize).r;
-  }
-
-  vec3 nearestInk(vec3 color) {
-    vec3 best = uPalette[0];
-    float bestGap = 1e9;
-    for (int index = 0; index < ${paletteSize}; index++) {
-      vec3 difference = (color - uPalette[index]) * vec3(0.9, 1.2, 0.7);
-      float gap = dot(difference, difference);
-      if (gap < bestGap) {
-        bestGap = gap;
-        best = uPalette[index];
-      }
-    }
-    return best;
-  }
-
   ${revealChunk}
 
   void main() {
@@ -208,7 +142,7 @@ const fragmentShader = `
     float wake = exp(-wakeOffset * wakeOffset);
     vec2 shimmer = burstAway / max(burstDistance, 0.001) * (front - wake * 0.5) * fade * 0.018 * uResolution.y;
 
-    vec2 span = imageSpan();
+    vec2 span = imageSpan(uResolution, uImageSize);
     vec2 start = clamp(focus - span * 0.5, vec2(0.0), vec2(1.0) - span);
     vec2 uv = start + (center + uShake + shimmer) / uResolution * span;
     float pixelsPerUv = uResolution.y / span.y;
@@ -289,9 +223,6 @@ const fragmentShader = `
 
 const noTexture = (): Texture | null => null;
 
-const toVector = ([red, green, blue]: readonly [number, number, number]) =>
-  new Vector3(red / 255, green / 255, blue / 255);
-
 const uniforms = {
   uAura: new Vector2(0, 0),
   uAuraReach: 11,
@@ -308,13 +239,13 @@ const uniforms = {
   uHasImage: 0,
   uImage: noTexture(),
   uImageSize: new Vector2(735, 490),
-  uInk: toVector(inkRgb),
+  uInk: rgbVector(inkRgb),
   uInvert: 0,
   uNoiseSize: 64,
   uOrigin: new Vector2(0, 0),
   uOriginal: 0,
-  uPalette: retroPalette.map(toVector),
-  uPaper: toVector(paperRgb),
+  uPalette: retroPalette.map(rgbVector),
+  uPaper: rgbVector(paperRgb),
   uRain: 1,
   uRainSlant: 0.16,
   uRainSpeed: 1,
