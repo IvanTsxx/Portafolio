@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { BackCover } from "@/components/site/back-cover";
 import { DossierEdge } from "@/components/site/dossier-edge";
+import { GutterField } from "@/components/site/gutter-field/gutter-field";
 import { RouteTabs } from "@/components/site/route-tabs";
 import { RouteThumbIndex } from "@/components/site/thumb-index";
 
@@ -10,7 +11,8 @@ const backingSheetClassName =
 
 export const Dossier = ({ children }: { children: ReactNode }) => (
   <div className="flex w-full flex-1 flex-col px-3 pt-6 md:px-8 lg:px-12 lg:pt-12">
-    <div className="max-w-sheet relative mx-auto w-full">
+    <GutterField />
+    <div className="max-w-sheet relative mx-auto w-full" data-dossier-sheet="">
       <RouteTabs />
       <div className="relative">
         <span

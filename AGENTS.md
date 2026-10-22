@@ -26,7 +26,7 @@ Next.js 16.4 App Router with Cache Components and Partial Prefetching, React 19,
 - No code comments.
 - Ivo is the only author and contributor. Never attribute anything in git or GitHub to an AI tool: no `Co-Authored-By` trailers, no "Generated with" lines, no bot authors, in commits, PR titles, PR bodies, comments or tags. Claude, v0, Cursor, Copilot and every other agent stay out of the contributor list. `.githooks/commit-msg` rejects these trailers and `.claude/settings.json` turns off Claude Code attribution; never bypass them with `--no-verify`.
 - No Playwright and no browser automation. Verify with tests, the build and the checks below.
-- Paper and ink tokens only. Clay orange belongs to the companion, plus two owner-approved exceptions: the hover accent of the contribution graph and the color print inside the Super Saiyan and Vegeta experiments. Radius 0, no shadows, no arbitrary Tailwind values unless they are a theme token.
+- Paper and ink tokens only. Clay orange belongs to the companion, plus three owner-approved exceptions: the hover accent of the contribution graph, the color print inside the Super Saiyan and Vegeta experiments, and the sparse clay toner dots of the gutter field around the sheet (`components/site/gutter-field/`). Radius 0, no shadows, no arbitrary Tailwind values unless they are a theme token.
 - Labels and short lines, not paragraphs.
 - One shared WebGL canvas (`components/scene/shared-canvas.tsx`). Render 3D or shaders through `useViewSlot`. Never add a second `Canvas`.
 - One agent on screen: the companion. `components/scene/one-agent.test.ts` enforces it.

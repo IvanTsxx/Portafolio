@@ -30,6 +30,7 @@ export const RouteTabs = () => {
     <nav
       aria-label="Primary"
       className="relative z-20 lg:absolute lg:top-0 lg:right-full lg:bottom-0"
+      data-dossier-sheet=""
     >
       <ol className="no-scrollbar -mb-px flex overflow-x-auto pb-px lg:sticky lg:top-24 lg:mb-0 lg:flex-col lg:overflow-visible lg:pb-0">
         {primaryRoutes.map((route) => {

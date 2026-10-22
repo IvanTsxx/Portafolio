@@ -1,4 +1,5 @@
 export const printColors = {
+  clay: "#db703b",
   graphite: "#3d3d3b",
   ink: "#121212",
   mist: "#646361",
