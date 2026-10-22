@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
@@ -44,6 +45,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => (
       <Companion />
       <CompanionGame />
       <Analytics />
+      <SpeedInsights />
     </body>
   </html>
 );
