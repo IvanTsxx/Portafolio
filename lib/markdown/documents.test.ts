@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 import { getNote, getNotes, getNoteSlugs } from "@/lib/content/notes";
 import { experiments } from "@/lib/lab/experiments";
 import { getRegistryItem, registryItems } from "@/lib/registry/registry";
+import { skills } from "@/lib/skills/skills";
 
 import {
   experimentMarkdown,
@@ -120,10 +121,10 @@ const notes = await getNotes();
 
 describe("llms.txt", () => {
   const llms = buildLlmsTxt(
-    llmsSections({ experiments, notes, registryItems })
+    llmsSections({ experiments, notes, registryItems, skills })
   );
 
-  test("links every indexable note, experiment and registry item as .md", () => {
+  test("links every indexable note, experiment, registry item and skill as .md", () => {
     const expected = [
       ...notes.flatMap((note) =>
         note.sample ? [] : [`https://bongi.dev/notes/${note.slug}.md`]
@@ -134,6 +135,7 @@ describe("llms.txt", () => {
       ...registryItems.map(
         (item) => `https://bongi.dev/registry/${item.name}.md`
       ),
+      ...skills.map((skill) => `https://bongi.dev/skills/${skill.name}.md`),
     ];
     for (const url of expected) {
       expect(llms).toContain(`](${url}): `);

@@ -9,6 +9,7 @@ import {
 import { buildLlmsFullTxt } from "@/lib/markdown/llms";
 import { plainTextResponse } from "@/lib/markdown/response";
 import { registryItems } from "@/lib/registry/registry";
+import { readSkillSource, skills } from "@/lib/skills/skills";
 
 const indexableNoteMarkdown = async () => {
   const allNotes = await getNotes();
@@ -26,6 +27,7 @@ export const GET = async () => {
       ...notes,
       ...experiments.map(experimentMarkdown),
       ...registryItems.map(registryItemMarkdown),
+      ...skills.map(readSkillSource),
     ])
   );
 };

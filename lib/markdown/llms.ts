@@ -9,7 +9,9 @@ import {
   experimentPath,
   pageSeo,
   registryItemPath,
+  skillPath,
 } from "@/lib/site/seo";
+import type { Skill } from "@/lib/skills/skills";
 
 import { markdownPathOf } from "./paths";
 
@@ -28,12 +30,14 @@ export interface LlmsSources {
   experiments: readonly Experiment[];
   notes: readonly Note[];
   registryItems: readonly RegistryItem[];
+  skills: readonly Skill[];
 }
 
 export const llmsSections = ({
   experiments,
   notes,
   registryItems,
+  skills,
 }: LlmsSources): LlmsSection[] => [
   {
     entries: notes.flatMap((note) =>
@@ -64,6 +68,14 @@ export const llmsSections = ({
       title: item.title,
     })),
     title: pageSeo.registry.title,
+  },
+  {
+    entries: skills.map((skill) => ({
+      description: skill.description,
+      markdownPath: markdownPathOf(skillPath(skill.name)),
+      title: skill.name,
+    })),
+    title: pageSeo.skills.title,
   },
 ];
 

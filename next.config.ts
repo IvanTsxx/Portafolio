@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
         destination: "/markdown/registry/:slug",
         source: "/registry/:slug.md",
       },
+      { destination: "/markdown/skills/:slug", source: "/skills/:slug.md" },
     ]),
 };
 
