@@ -4,6 +4,7 @@ export const searchGroupOrder = [
   "notes",
   "experiments",
   "registry",
+  "skills",
   "channels",
 ] as const;
 
@@ -16,6 +17,7 @@ export const searchGroups = {
   pages: { label: "Pages" },
   registry: { label: "Registry" },
   sections: { label: "Sections" },
+  skills: { label: "Skills" },
 } as const satisfies Record<SearchGroupId, { label: string }>;
 
 export type SearchAction =

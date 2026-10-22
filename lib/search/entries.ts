@@ -9,6 +9,8 @@ import { formatRegistryIndex } from "@/lib/registry/registry";
 import type { RegistryItem } from "@/lib/registry/schema";
 import { homeSections, primaryRoutes, siteConfig } from "@/lib/site/config";
 import type { Social, SocialId } from "@/lib/site/config";
+import { formatSkillIndex } from "@/lib/skills/skills";
+import type { Skill } from "@/lib/skills/skills";
 
 import type { SearchEntry } from "./types";
 
@@ -108,6 +110,16 @@ export const registryEntry = (
   id: `registry:${item.name}`,
   keywords: [item.description, item.name],
   title: item.title,
+});
+
+export const skillEntry = (skill: Skill, position: number): SearchEntry => ({
+  action: { href: `/skills/${skill.name}`, type: "route" },
+  code: formatSkillIndex(position),
+  detail: "Agent skill",
+  group: "skills",
+  id: `skill:${skill.name}`,
+  keywords: [skill.description],
+  title: skill.name,
 });
 
 const socialEntry = (social: Social): SearchEntry => ({

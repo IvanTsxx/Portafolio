@@ -5,6 +5,7 @@ import path from "node:path";
 import type { FieldNote } from "@/lib/content/note-domain";
 import { registryItems } from "@/lib/registry/registry";
 import { homeSections, siteConfig } from "@/lib/site/config";
+import { skills } from "@/lib/skills/skills";
 
 import {
   channelEntries,
@@ -14,6 +15,7 @@ import {
   pageEntries,
   registryEntry,
   sectionEntries,
+  skillEntry,
 } from "./entries";
 import type { SearchEntry } from "./types";
 
@@ -115,6 +117,22 @@ describe("content entries", () => {
       detail: item.categories.join(", "),
       group: "registry",
       title: item.title,
+    });
+  });
+});
+
+describe("skill entries", () => {
+  test("a skill links to its page under the skills group", () => {
+    const [skill] = skills;
+    if (!skill) {
+      throw new Error("skills/ has no skills");
+    }
+
+    expect(skillEntry(skill, 0)).toMatchObject({
+      action: { href: `/skills/${skill.name}`, type: "route" },
+      code: "S-01",
+      group: "skills",
+      title: skill.name,
     });
   });
 });
