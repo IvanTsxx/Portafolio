@@ -62,6 +62,7 @@ describe("site naming", () => {
       "experiments/[slug]",
       "notes/[slug]",
       "registry/[slug]",
+      "skills/[slug]",
     ]);
     expect(
       routePages("document").filter((route) => route.includes("["))

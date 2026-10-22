@@ -11,6 +11,7 @@ describe("companion cast per route", () => {
     expect(companionCastFor("/notes").role).toBe("researcher");
     expect(companionCastFor("/experiments").role).toBe("builder");
     expect(companionCastFor("/registry").role).toBe("inspector");
+    expect(companionCastFor("/skills").role).toBe("analyst");
     expect(companionCastFor("/design-system").role).toBe("architect");
   });
 

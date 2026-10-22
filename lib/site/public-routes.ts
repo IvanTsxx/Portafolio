@@ -3,11 +3,12 @@ import { notePath, noteSource } from "@/lib/content/note-domain";
 import { getNotes } from "@/lib/content/notes";
 import { experiments } from "@/lib/lab/experiments";
 import { registryItems } from "@/lib/registry/registry";
+import { skills } from "@/lib/skills/skills";
 
 import { primaryRoutes } from "./config";
 import type { PrimaryRoute } from "./config";
 import routeDates from "./route-dates.json";
-import { experimentPath, registryItemPath } from "./seo";
+import { experimentPath, registryItemPath, skillPath } from "./seo";
 
 export interface PublicRoute {
   path: `/${string}`;
@@ -34,6 +35,7 @@ const primarySources: Record<PrimaryRoute["href"], readonly string[]> = {
     "components/registry-docs",
     "registry.json",
   ],
+  "/skills": ["app/(document)/skills", "components/skills", "skills"],
 };
 
 export const getPublicRoutes = async (): Promise<PublicRoute[]> => {
@@ -58,6 +60,10 @@ export const getPublicRoutes = async (): Promise<PublicRoute[]> => {
     ...registryItems.map((item) => ({
       path: registryItemPath(item.name),
       sources: item.files.map((file) => file.path),
+    })),
+    ...skills.map((skill) => ({
+      path: skillPath(skill.name),
+      sources: [`skills/${skill.name}`],
     })),
   ];
 };

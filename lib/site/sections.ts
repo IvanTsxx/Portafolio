@@ -14,6 +14,14 @@ export const registrySections = [
 
 export type RegistrySectionId = (typeof registrySections)[number]["id"];
 
+export const skillSections = [
+  { id: "installation", label: "Installation" },
+  { id: "instructions", label: "Instructions" },
+  { id: "files", label: "Files" },
+] as const satisfies readonly { id: string; label: string }[];
+
+export type SkillSectionId = (typeof skillSections)[number]["id"];
+
 export const relatedExperimentsOf = (experiment: Experiment) =>
   experiment.related
     .map((relatedSlug) => getExperiment(relatedSlug))

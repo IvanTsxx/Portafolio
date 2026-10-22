@@ -7,11 +7,13 @@ import type { Metadata } from "next";
 import * as experimentItemPage from "@/app/(detail)/experiments/[slug]/page";
 import * as noteItemPage from "@/app/(detail)/notes/[slug]/page";
 import * as registryItemPage from "@/app/(detail)/registry/[slug]/page";
+import * as skillItemPage from "@/app/(detail)/skills/[slug]/page";
 import * as designSystemPage from "@/app/(document)/design-system/page";
 import * as experimentsPage from "@/app/(document)/experiments/page";
 import * as notesPage from "@/app/(document)/notes/page";
 import * as homePage from "@/app/(document)/page";
 import * as registryPage from "@/app/(document)/registry/page";
+import * as skillsPage from "@/app/(document)/skills/page";
 import { metadata as rootMetadata } from "@/app/layout";
 import { metadata as notFoundMetadata } from "@/app/not-found";
 import sitemap from "@/app/sitemap";
@@ -29,7 +31,8 @@ interface GeneratedPage {
   generateMetadata: (
     props: PageProps<"/experiments/[slug]"> &
       PageProps<"/notes/[slug]"> &
-      PageProps<"/registry/[slug]">
+      PageProps<"/registry/[slug]"> &
+      PageProps<"/skills/[slug]">
   ) => Promise<Metadata>;
   generateStaticParams: () =>
     | readonly { slug: string }[]
@@ -50,6 +53,11 @@ const staticCases: RouteCase[] = [
     path: "/registry",
   },
   {
+    dir: "app/(document)/skills",
+    metadata: skillsPage.metadata,
+    path: "/skills",
+  },
+  {
     dir: "app/(document)/design-system",
     metadata: designSystemPage.metadata,
     path: "/design-system",
@@ -67,6 +75,11 @@ const generatedPages: { base: string; dir: string; page: GeneratedPage }[] = [
     base: "/registry",
     dir: "app/(detail)/registry/[slug]",
     page: registryItemPage,
+  },
+  {
+    base: "/skills",
+    dir: "app/(detail)/skills/[slug]",
+    page: skillItemPage,
   },
 ];
 

@@ -4,6 +4,7 @@ import type { Note } from "@/lib/content/note-domain";
 import type { Experiment } from "@/lib/lab/experiments";
 import { markdownPathOf } from "@/lib/markdown/paths";
 import type { RegistryItem } from "@/lib/registry/schema";
+import type { Skill } from "@/lib/skills/skills";
 
 import { siteConfig } from "./config";
 import { experience } from "./experience";
@@ -13,6 +14,7 @@ import {
   pageSeo,
   registryItemPath,
   siteTitle,
+  skillPath,
 } from "./seo";
 import type { PageSeo } from "./seo";
 
@@ -158,6 +160,14 @@ export const registryIndexJsonLd = (items: readonly RegistryItem[]) =>
     )
   );
 
+export const skillsIndexJsonLd = (skills: readonly Skill[]) =>
+  toGraph(
+    collectionPage(
+      pageSeo.skills,
+      skills.map((skill) => ({ name: skill.name, path: skillPath(skill.name) }))
+    )
+  );
+
 export const designSystemJsonLd = () =>
   toGraph(
     {
@@ -261,6 +271,28 @@ export const registryItemJsonLd = (item: RegistryItem) => {
     breadcrumbNode([
       { name: pageSeo.registry.title, path: pageSeo.registry.path },
       { name: item.title, path },
+    ])
+  );
+};
+
+export const skillJsonLd = (skill: Skill) => {
+  const path = skillPath(skill.name);
+  return toGraph(
+    {
+      "@type": "SoftwareSourceCode",
+      author: personRef,
+      codeRepository: `https://github.com/${siteConfig.repository}`,
+      description: skill.description,
+      encoding: markdownEncoding(path),
+      license: skill.license,
+      name: skill.name,
+      programmingLanguage: "Markdown",
+      softwareVersion: skill.metadata?.version,
+      url: absoluteUrl(path),
+    },
+    breadcrumbNode([
+      { name: pageSeo.skills.title, path: pageSeo.skills.path },
+      { name: skill.name, path },
     ])
   );
 };

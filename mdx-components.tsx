@@ -29,7 +29,7 @@ import {
 import { Step, Steps } from "@/components/content/steps";
 import { Video } from "@/components/content/video";
 
-const components = {
+export const mdxComponents = {
   Callout,
   Demo,
   Diagram,
@@ -60,4 +60,4 @@ const components = {
   ul: ProseUnorderedList,
 } satisfies MDXComponents;
 
-export const useMDXComponents = (): MDXComponents => components;
+export const useMDXComponents = (): MDXComponents => mdxComponents;

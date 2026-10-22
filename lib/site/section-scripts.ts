@@ -72,4 +72,6 @@ export const sectionScripts = {
     `Every piece installs from ${siteConfig.registryNamespace}.`,
   ]),
   registryPreview: speaks(),
+  skillInstructions: speaks(["I follow these steps when this skill loads."]),
+  skillsCatalog: builds(["Shelving the skills I load on the job."]),
 } as const satisfies Record<string, SectionScript>;

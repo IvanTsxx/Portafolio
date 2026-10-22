@@ -117,7 +117,7 @@ const socialProblems = (html: string, routePath: string) => [
   ...jsonLdProblems(html),
 ];
 
-const detailPathPattern = /^\/(?:experiments|notes|registry)\/[^/]+$/u;
+const detailPathPattern = /^\/(?:experiments|notes|registry|skills)\/[^/]+$/u;
 
 const markdownBodyOf = (routePath: string) =>
   path.join(builtAppDir, "markdown", `${routePath.slice(1)}.body`);

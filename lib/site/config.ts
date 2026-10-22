@@ -41,7 +41,8 @@ export const primaryRoutes = [
   { href: "/notes", index: "01", jp: "手記", label: "Notes" },
   { href: "/experiments", index: "02", jp: "実験", label: "Experiments" },
   { href: "/registry", index: "03", jp: "登録簿", label: "Registry" },
-  { href: "/design-system", index: "04", jp: "設計", label: "Design system" },
+  { href: "/skills", index: "04", jp: "スキル", label: "Skills" },
+  { href: "/design-system", index: "05", jp: "設計", label: "Design system" },
 ] as const;
 
 export const homeSections = [

@@ -15,6 +15,7 @@ const routeCasts: readonly RouteCast[] = [
   { action: "read", role: "researcher", section: "notes" },
   { action: "type", role: "builder", section: "experiments" },
   { action: "inspect", role: "inspector", section: "registry" },
+  { action: "point", role: "analyst", section: "skills" },
   { action: "measure", role: "architect", section: "design-system" },
 ];
 

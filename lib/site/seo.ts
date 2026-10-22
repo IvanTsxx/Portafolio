@@ -4,6 +4,7 @@ import type { Experiment } from "@/lib/lab/experiments";
 import { markdownPathOf } from "@/lib/markdown/paths";
 import { registryUrlTemplate } from "@/lib/registry/install";
 import type { RegistryItem } from "@/lib/registry/schema";
+import type { Skill } from "@/lib/skills/skills";
 
 import { siteConfig } from "./config";
 
@@ -97,11 +98,28 @@ export const pageSeo = {
     path: "/registry",
     title: "Registry",
   },
+  skills: {
+    description: `Agent Skills by Ivo for Claude Code, Codex and other coding agents. Install any of them with npx skills add ${siteConfig.repository}.`,
+    path: "/skills",
+    title: "Skills",
+  },
 } as const satisfies Record<string, PageSeo>;
 
 export const experimentPath = (slug: string) => `/experiments/${slug}` as const;
 
 export const registryItemPath = (name: string) => `/registry/${name}` as const;
+
+export const skillPath = (name: string) => `/skills/${name}` as const;
+
+const maxDescriptionLength = 170;
+
+const fitDescription = (description: string) => {
+  if (description.length <= maxDescriptionLength) {
+    return description;
+  }
+  const cut = description.slice(0, maxDescriptionLength - 1);
+  return `${cut.slice(0, cut.lastIndexOf(" "))}…`;
+};
 
 export const experimentSeo = (experiment: Experiment): PageSeo => ({
   description: `${experiment.summary} An interactive ${experiment.topics.join(", ")} experiment with a live preview and implementation notes.`,
@@ -117,4 +135,12 @@ export const registryItemSeo = (item: RegistryItem): PageSeo => ({
   markdownPath: markdownPathOf(registryItemPath(item.name)),
   path: registryItemPath(item.name),
   title: `${item.title} · Registry`,
+});
+
+export const skillSeo = (skill: Skill): PageSeo => ({
+  description: fitDescription(skill.description),
+  keywords: ["Agent Skills", "SKILL.md", "Claude Code", skill.name],
+  markdownPath: markdownPathOf(skillPath(skill.name)),
+  path: skillPath(skill.name),
+  title: `${skill.name} · Skills`,
 });
