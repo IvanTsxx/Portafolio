@@ -15,7 +15,8 @@
     "registry:sync-agent": "bun lib/registry/sync-agent.ts",
     "design:md": "bun lib/design-system/write-design-md.ts",
     "seo:dates": "bun lib/site/write-route-dates.ts",
-    "seo:check": "bun lib/site/check-built-seo.ts"
+    "seo:check": "bun lib/site/check-built-seo.ts",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -1,0 +1,5 @@
+#!/bin/sh
+if grep -iqE '^co-authored-by:|generated (with|by)|made with|noreply@anthropic\.com|\[bot\]' "$1"; then
+  echo "commit-msg: AI attribution is not allowed in this repo. Remove Co-Authored-By trailers and tool credits." >&2
+  exit 1
+fi
