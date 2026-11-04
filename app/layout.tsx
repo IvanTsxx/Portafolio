@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 
 import "./globals.css";
 import { SceneLayer } from "@/components/scene/scene-layer";
+import { GuideGlow } from "@/components/site/guide-glow";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { ThemeProvider } from "@/components/site/theme-provider";
@@ -63,6 +64,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => (
           {children}
           <SiteFooter />
           <SceneLayer />
+          <GuideGlow />
         </PagePeel>
       </ThemeProvider>
       <Analytics />

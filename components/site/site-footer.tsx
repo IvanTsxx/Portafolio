@@ -1,3 +1,4 @@
+import { ArrowUpRightIcon } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 
 import { DetailControl } from "@/components/site/detail-control";
@@ -29,12 +30,11 @@ export const SiteFooter = () => (
           href={`mailto:${siteConfig.email}`}
         >
           <span className="ink-underline">Write to me</span>
-          <span
+          <ArrowUpRightIcon
             aria-hidden
-            className="text-muted-foreground ease-out-expo ml-3 inline-block transition-transform duration-500 group-hover/mail:translate-x-2 group-hover/mail:-translate-y-2"
-          >
-            ↗
-          </span>
+            className="text-muted-foreground ease-out-expo ml-3 inline-block size-7 align-baseline md:size-9 transition-transform duration-500 group-hover/mail:translate-x-2 group-hover/mail:-translate-y-2"
+            weight="thin"
+          />
         </a>
         <p className="text-muted-foreground max-w-sm text-sm">
           {siteConfig.email}

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { DocumentSection } from "@/components/site/document-section";
 import type { DesignSystem } from "@/lib/design-system/model";
@@ -21,6 +21,12 @@ const radiusClassNames = {
   sm: "rounded-sm",
 } as const satisfies Record<RadiusStepName, string>;
 
+const guidePreviewPointer: CSSProperties = {
+  "--guide-near": 1,
+  "--guide-x": "0px",
+  "--guide-y": "24px",
+};
+
 const markPreviews = {
   "blueprint-dots": (
     <span className="blueprint-dots border-border-strong block h-12 w-32 border" />
@@ -28,6 +34,14 @@ const markPreviews = {
   grain: (
     <span className="bg-muted-foreground relative block h-8 w-32">
       <span className="grain absolute inset-0 block" />
+    </span>
+  ),
+  "guide-glow": (
+    <span
+      className="border-border relative block h-12 w-32 border-x"
+      style={guidePreviewPointer}
+    >
+      <span className="guide-glow absolute -inset-x-px inset-y-0 block" />
     </span>
   ),
   "hairline-x": <span className="hairline-x block h-px w-32" />,

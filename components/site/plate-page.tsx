@@ -8,17 +8,24 @@ const guideClassName =
 const columnLabelClassName =
   "label text-faint measure:opacity-100 absolute top-4 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-500";
 
+const glowClassName =
+  "guide-glow guides:block pointer-events-none absolute inset-y-0 -inset-x-px hidden";
+
 export const PlateGuides = () => (
   <div
     aria-hidden
     className="pointer-events-none absolute inset-x-0 -inset-y-16 hidden grid-cols-12 gap-8 lg:grid"
   >
     <span className="relative col-span-4">
-      <span className={cn(guideClassName, "wait-0")} />
+      <span className={cn(guideClassName, "wait-0")} data-guide="">
+        <span className={glowClassName} />
+      </span>
       <span className={columnLabelClassName}>4 / 12</span>
     </span>
     <span className="relative col-span-8">
-      <span className={cn(guideClassName, "wait-200")} />
+      <span className={cn(guideClassName, "wait-200")} data-guide="">
+        <span className={glowClassName} />
+      </span>
       <span className={columnLabelClassName}>8 / 12</span>
     </span>
   </div>

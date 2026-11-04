@@ -146,7 +146,7 @@ Three families, no more. The serif is set through `display` and also answers to 
 
 ## Shapes
 
-Radius derives from `--radius` (0.25rem): `rounded-sm` 2px, `rounded-md` 3px, `rounded-lg` 4px, `rounded-pill` 999px. Frames are 1px hairlines in `border` and `border-strong`. No shadows. Depth comes from contrast, scale and light, plus the marks `hairline-x`, `grain`, `hatch`, `blueprint-dots`, `hazard-stripe`.
+Radius derives from `--radius` (0.25rem): `rounded-sm` 2px, `rounded-md` 3px, `rounded-lg` 4px, `rounded-pill` 999px. Frames are 1px hairlines in `border` and `border-strong`. No shadows. Depth comes from contrast, scale and light, plus the marks `hairline-x`, `grain`, `guide-glow`, `hatch`, `blueprint-dots`, `hazard-stripe`.
 
 ## Components
 

@@ -505,3 +505,18 @@
   animation: equalizer 900ms ease-in-out infinite;
   animation-delay: var(--delay, 0ms);
 }
+
+@utility guide-glow {
+  opacity: var(--guide-near, 0);
+  background-image: radial-gradient(
+    circle 12rem at var(--guide-x, -100rem) var(--guide-y, -100rem),
+    color-mix(in oklch, var(--foreground) 70%, transparent),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    black 0 1px,
+    transparent 1px calc(100% - 1px),
+    black calc(100% - 1px)
+  );
+}

@@ -356,6 +356,13 @@ export const utilitySpecs = [
     variable: "--delay",
   },
   {
+    group: "mark",
+    name: "guide-glow",
+    summary:
+      "Brightens a guide's two rules in a 12rem radius around the pointer, from the Guides level up. Off under reduced motion.",
+    variable: "--guide-x · --guide-y · --guide-near",
+  },
+  {
     group: "motion",
     name: "signature-write",
     summary: "The signature writes left to right as it scrolls into view.",

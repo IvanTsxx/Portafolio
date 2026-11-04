@@ -31,6 +31,7 @@ Ivo's portfolio (Ivan Bongiovanni). Brand idea: Code, Design, Explore. Underlyin
 
 - The footer control (`components/site/detail-control.tsx`) sets how much of the working drawing shows: Plain (no drawing marks), Guides (the two column rules of the plate layout, the default) and Measure (the rules plus the column labels, 4 / 12 and 8 / 12). The marks show from the `lg` breakpoint up. Key D cycles the levels unless focus is in a field or a modifier is held.
 - The level is `data-detail` on `<html>`, stored in `localStorage` under `detail-level`. Styles read it through the `guides:` and `measure:` variants in `app/globals.css`. Content never depends on the level; it only adds or removes drawing marks.
+- From Guides up, the rules brighten softly near a mouse (`components/site/guide-glow.tsx` writes `--guide-x`, `--guide-y` and `--guide-near` on each `[data-guide]`, read by the `guide-glow` utility). One rAF per pointer move, no re-render. Off under reduced motion and on touch.
 
 ## Page peel
 
