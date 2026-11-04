@@ -22,7 +22,7 @@ interface IndicatorBox {
 
 type TocVariant = "plate" | "sheet";
 
-const readingBand = "0px 0px -70% 0px";
+const readingLineRatio = 0.3;
 
 const footerClearance = "0px 0px -20% 0px";
 
@@ -45,32 +45,38 @@ const useActiveSection = (ids: readonly string[]) => {
   const idsKey = ids.join(" ");
 
   useEffect(() => {
-    const order = idsKey.split(" ").filter(Boolean);
-    const reached = new Set<string>();
-    const observer = new IntersectionObserver(
-      (records) => {
-        for (const record of records) {
-          const bandTop = record.rootBounds?.top ?? 0;
-          if (
-            record.isIntersecting ||
-            record.boundingClientRect.top < bandTop
-          ) {
-            reached.add(record.target.id);
-          } else {
-            reached.delete(record.target.id);
-          }
-        }
-        setActiveId(order.findLast((id) => reached.has(id)) ?? null);
-      },
-      { rootMargin: readingBand }
-    );
-    for (const id of order) {
-      const element = document.querySelector(`#${CSS.escape(id)}`);
-      if (element) {
-        observer.observe(element);
+    const headings = idsKey
+      .split(" ")
+      .filter(Boolean)
+      .map((id) => document.querySelector<HTMLElement>(`#${CSS.escape(id)}`))
+      .filter((heading) => heading !== null);
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const readingLine = window.innerHeight * readingLineRatio;
+      const isAtBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2;
+      const current = isAtBottom
+        ? headings.at(-1)
+        : headings.findLast(
+            (heading) => heading.getBoundingClientRect().top <= readingLine
+          );
+      setActiveId(current?.id ?? null);
+    };
+    const schedule = () => {
+      if (frame === 0) {
+        frame = window.requestAnimationFrame(update);
       }
-    }
-    return () => observer.disconnect();
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
   }, [idsKey]);
 
   return [activeId, setActiveId] as const;
