@@ -201,20 +201,96 @@ Once activated it stays mounted, so navigating between pages keeps the context a
 
 import { PerformanceMonitor, View } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 import { setSceneFrameRequester, useNearViewSlots } from "./view-registry";
+import type { ViewSlot } from "./view-registry";
 
 const maxDpr = 1.75;
 const minDpr = 1;
+const antialiasDprLimit = 1.5;
+const scrollEpsilon = 0.5;
+
+type CanvasAnchor = "page" | "viewport";
 
 const FrameClear = () => {
   useFrame(({ gl }) => {
     gl.info.reset();
     gl.setScissorTest(false);
     gl.clear(true, true, false);
+  }, 1);
+  return null;
+};
+
+const movesWithPage = (shift: number, scrollShift: number) =>
+  Math.abs(shift + scrollShift) < Math.abs(shift);
+
+const readAnchor = (
+  slots: readonly ViewSlot[],
+  previousTops: Map<string, number>,
+  scrollShift: number
+) => {
+  const tops = new Map<string, number>();
+  let pageViews = 0;
+  let viewportViews = 0;
+  for (const slot of slots) {
+    const rect = slot.track.current?.getBoundingClientRect();
+    if (!rect) {
+      continue;
+    }
+    tops.set(slot.id, rect.top);
+    const previousTop = previousTops.get(slot.id);
+    const isOnScreen = rect.bottom > 0 && rect.top < window.innerHeight;
+    if (previousTop === undefined || !isOnScreen || Math.abs(scrollShift) < scrollEpsilon) {
+      continue;
+    }
+    if (movesWithPage(rect.top - previousTop, scrollShift)) {
+      pageViews += 1;
+    } else {
+      viewportViews += 1;
+    }
+  }
+  if (pageViews > 0) {
+    return { anchor: "page" as const, tops };
+  }
+  return { anchor: viewportViews > 0 ? ("viewport" as const) : null, tops };
+};
+
+const placeCanvas = (element: HTMLElement, anchor: CanvasAnchor) => {
+  if (anchor === "viewport") {
+    element.style.removeProperty("position");
+    element.style.removeProperty("transform");
+    return;
+  }
+  const offset = -(element.parentElement?.getBoundingClientRect().top ?? 0);
+  element.style.position = "absolute";
+  element.style.transform = `translate3d(0, ${offset}px, 0)`;
+};
+
+const CanvasAnchorSync = ({ holder }: { holder: RefObject<HTMLDivElement | null> }) => {
+  const slots = useNearViewSlots();
+  const lastScroll = useRef(0);
+  const lastTops = useRef(new Map<string, number>());
+  const anchor = useRef<CanvasAnchor>("page");
+
+  useFrame((state) => {
+    const element = holder.current;
+    if (!element) {
+      return;
+    }
+    const scroll = window.scrollY;
+    const reading = readAnchor(slots, lastTops.current, scroll - lastScroll.current);
+    lastScroll.current = scroll;
+    lastTops.current = reading.tops;
+    anchor.current = reading.anchor ?? anchor.current;
+    placeCanvas(element, anchor.current);
+    const { size } = state;
+    if (size.top !== 0 || size.left !== 0) {
+      state.setSize(size.width, size.height, 0, 0);
+    }
   }, 1);
   return null;
 };
@@ -253,37 +329,51 @@ const TrackedViews = () => {
 const SharedCanvas = () => {
   const slots = useNearViewSlots();
   const isReduced = useReducedMotion();
-  const [dpr, setDpr] = useState(maxDpr);
+  const holder = useRef<HTMLDivElement>(null);
+  const [dprCeiling, setDprCeiling] = useState(maxDpr);
   const isLive = slots.length > 0 && !isReduced;
 
   return (
-    <Canvas
-      aria-hidden
-      dpr={dpr}
-      eventPrefix="client"
-      eventSource={document.body}
-      frameloop={isLive ? "always" : "demand"}
-      onCreated={({ gl }) => {
-        gl.info.autoReset = false;
-      }}
-      gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
-      style={{ inset: 0, pointerEvents: "none", position: "fixed", zIndex: 30 }}
-    >
-      <PerformanceMonitor
-        flipflops={3}
-        onDecline={() => setDpr(minDpr)}
-        onIncline={() => setDpr(maxDpr)}
-      >
-        <FrameClear />
-        <WakeOnScroll />
-        <TrackedViews />
-      </PerformanceMonitor>
-    </Canvas>
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-30 overflow-clip">
+      <div className="fixed top-0 left-0 h-lvh w-full" ref={holder}>
+        <Canvas
+          dpr={[minDpr, dprCeiling]}
+          eventPrefix="client"
+          eventSource={document.body}
+          frameloop={isLive ? "always" : "demand"}
+          onCreated={({ gl }) => {
+            gl.info.autoReset = false;
+          }}
+          gl={{
+            alpha: true,
+            antialias: window.devicePixelRatio < antialiasDprLimit,
+            powerPreference: "high-performance",
+          }}
+          resize={{ scroll: false }}
+          style={{ inset: 0, pointerEvents: "none", position: "absolute" }}
+        >
+          <PerformanceMonitor
+            flipflops={3}
+            onDecline={() => setDprCeiling(minDpr)}
+            onIncline={() => setDprCeiling(maxDpr)}
+          >
+            <CanvasAnchorSync holder={holder} />
+            <FrameClear />
+            <WakeOnScroll />
+            <TrackedViews />
+          </PerformanceMonitor>
+        </Canvas>
+      </div>
+    </div>
   );
 };
 
 export default SharedCanvas;
 ```
+
+Mount `<SceneLayer />` inside an element that spans the whole page and is positioned (`relative`), such as the root layout's page wrapper. The outer `absolute inset-0 overflow-clip` div needs that box: it must be as tall as the document, so the translated canvas never adds scroll height.
+
+Why the anchor exists: the browser scrolls the DOM on the compositor thread, and the canvas only changes when the main thread draws. A canvas that is simply `position: fixed` shows flow views one or more frames behind their boxes while scrolling. When the views move with the page, the holder becomes `absolute` and is translated to the scroll offset, so the compositor scrolls the canvas together with the content. When the views hold still (sticky or fixed), it stays `fixed`. Only the frame where a sticky element pins or unpins can still be off.
 
 `gl.info.autoReset = false` plus the reset in `FrameClear` makes `gl.info.render.calls` count the whole frame across every view, not just the last one.
 

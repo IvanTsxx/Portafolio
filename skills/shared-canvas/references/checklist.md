@@ -10,5 +10,6 @@
 - [ ] `useFrame` mutates refs only. No `setState` per frame.
 - [ ] Input handlers call `requestSceneFrame()` instead of switching the loop on.
 - [ ] Heavy resources (environment, textures, geometry) are shared, not rebuilt per view.
-- [ ] DPR is capped and `PerformanceMonitor` can lower it.
+- [ ] DPR is a range (`[1, 1.75]`) and `PerformanceMonitor` can lower it.
+- [ ] Scrolling fast past a view in normal flow and a view in a sticky container never shows the scene sliding off its box. Record the scroll and step through the frames.
 - [ ] Draw calls, triangles and programs in the stats attribute stay flat after scrolling the page twice (no leaks).

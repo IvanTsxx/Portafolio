@@ -18,13 +18,19 @@ const trackGuides = () => {
   let pointerY = 0;
   let isPresent = false;
   let frame = 0;
+  let isLit = false;
+  const shownNearness = new WeakMap<HTMLElement, number>();
 
   const paint = () => {
     frame = 0;
-    for (const guide of document.querySelectorAll<HTMLElement>(
-      "[data-guide]"
-    )) {
-      const rect = guide.getBoundingClientRect();
+    if (!(isPresent || isLit)) {
+      return;
+    }
+    const guides = [
+      ...document.querySelectorAll<HTMLElement>("[data-guide]"),
+    ].map((guide) => ({ guide, rect: guide.getBoundingClientRect() }));
+    isLit = false;
+    for (const { guide, rect } of guides) {
       const edgeGap = Math.min(
         Math.abs(pointerX - rect.left),
         Math.abs(pointerX - rect.right)
@@ -32,6 +38,11 @@ const trackGuides = () => {
       const isAlongside = pointerY >= rect.top && pointerY <= rect.bottom;
       const nearness =
         isPresent && isAlongside ? Math.max(0, 1 - edgeGap / guideReach) : 0;
+      isLit ||= nearness > 0;
+      if (nearness === 0 && shownNearness.get(guide) === 0) {
+        continue;
+      }
+      shownNearness.set(guide, nearness);
       guide.style.setProperty("--guide-x", `${pointerX - rect.left}px`);
       guide.style.setProperty("--guide-y", `${pointerY - rect.top}px`);
       guide.style.setProperty("--guide-near", nearness.toFixed(3));

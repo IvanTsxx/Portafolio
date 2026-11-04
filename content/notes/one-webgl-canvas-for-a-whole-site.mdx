@@ -3,7 +3,7 @@ export const meta = {
   title: "One WebGL canvas for a whole site",
   date: "2026-10-09",
   summary:
-    "Every 3D scene here renders through one fixed canvas into DOM-tracked views, with one exception.",
+    "Every 3D scene here renders through one shared canvas into DOM-tracked views, with one exception.",
   tags: ["WebGL", "React Three Fiber", "Performance", "3D"],
 };
 
@@ -17,7 +17,7 @@ Almost all of it renders through one `<Canvas>`. The exception is at the end.
 
 ## One canvas, many views
 
-The root layout mounts `components/scene/shared-canvas.tsx` once. The canvas is fixed, covers the viewport and sits at z-30. A component that wants 3D does not create a canvas. It registers a slot with `useViewSlot`, passing a ref to a DOM element and the scene to draw there:
+The root layout mounts `components/scene/shared-canvas.tsx` once. The canvas covers the viewport and sits at z-30. A component that wants 3D does not create a canvas. It registers a slot with `useViewSlot`, passing a ref to a DOM element and the scene to draw there:
 
 ```tsx
 useViewSlot("stage", stageRef, <Stage />);
@@ -41,6 +41,17 @@ A WebGL scene here never creates its own `Canvas`.
 - With no views near the viewport, the canvas renders on demand.
 - Reduced motion pauses the loops.
 - Without WebGL, a static fallback takes the place of the view.
+
+## Scrolling: the canvas has to move with the views
+
+A fixed canvas lagged behind the page. The browser scrolls the page on the compositor thread, but the canvas only gets new pixels when the main thread draws a frame. Until that frame lands, the DOM has already moved and the scene is still drawn at the old spot. Recording a scroll showed the dust portrait sliding a frame behind its box, with the photo under it showing through. On an experiment page the scene was drawn over the controls below it.
+
+A faster loop does not fix this. The canvas has to sit in the same scroll space as the views it draws. Each frame, the canvas checks how its on-screen views moved since the last frame:
+
+- If they moved with the page, the canvas switches to `position: absolute` inside a page-sized wrapper with `overflow: clip`, and is translated to the current scroll offset. The compositor then scrolls the canvas together with the content.
+- If they stayed put, the canvas stays `position: fixed`. This covers sticky elements, like the home plate while it is pinned.
+
+The wrapper's `overflow: clip` keeps the translated canvas from making the page taller. R3F's scroll measuring is off (`resize={{ scroll: false }}`), and the size origin is pinned to `0, 0`, so a measurement taken mid-scroll can't shift the scissor rects. The one frame left out of sync is the frame where a sticky element pins or unpins.
 
 ## When I did not use it
 

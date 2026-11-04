@@ -56,7 +56,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => (
           className="grain pointer-events-none fixed inset-0 z-60"
         />
         <PagePeel
-          className="flex flex-1 flex-col"
+          className="relative flex flex-1 flex-col"
           underside={<Underside />}
           undersideLabel="Working drawing of this site"
         >

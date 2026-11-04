@@ -1,10 +1,10 @@
 ---
 name: shared-canvas
-description: "Trigger: adding 3D, shaders or WebGL to a page with React Three Fiber, or a page with several canvases. One fixed Canvas renders every scene through DOM-tracked views: one WebGL context, offscreen views unmounted, demand frames when idle."
+description: "Trigger: adding 3D, shaders or WebGL to a page with React Three Fiber, or a page with several canvases, or a WebGL view that lags behind its box while scrolling. One shared Canvas renders every scene through DOM-tracked views: one WebGL context, offscreen views unmounted, demand frames when idle, canvas anchored to the scroll space of its views."
 license: Apache-2.0
 metadata:
   author: "ivantsxx"
-  version: "1.0"
+  version: "1.1"
 ---
 
 # shared-canvas
@@ -22,7 +22,9 @@ Load before adding any 3D scene, shader, or WebGL effect to a React Three Fiber 
 ## Hard Rules
 
 - One `<Canvas>` for the whole app, mounted once in the root layout. Never add a second one.
-- The canvas is `position: fixed`, `inset: 0`, `pointer-events: none`, `aria-hidden`. Events come from `document.body` with `eventPrefix="client"`.
+- The canvas covers the viewport, `pointer-events: none`, `aria-hidden`. Events come from `document.body` with `eventPrefix="client"`.
+- Anchor the canvas to the scroll space of its views. The browser scrolls the DOM on the compositor thread, but the canvas only changes when the main thread draws. A plain `position: fixed` canvas therefore draws flow views one or more frames behind their boxes while scrolling. A faster loop does not fix it. Each frame, compare how the on-screen views moved against the scroll delta. If they moved with the page, set the canvas holder to `position: absolute` with `translate3d(0, scrollOffset, 0)` inside a page-sized wrapper with `overflow: clip`. If they held still (sticky or fixed elements), keep it `position: fixed`.
+- With the anchored canvas, pass `resize={{ scroll: false }}` to `<Canvas>` and pin `state.size` top/left to `0`. Otherwise R3F measures mid-scroll and offsets every scissor rect.
 - Scenes render through drei `<View track={ref}>`, never as direct children. The DOM element owns layout; the view only paints inside its rect.
 - Only views near the viewport mount. An `IntersectionObserver` with a margin (about `12% 0px`) decides; offscreen views unmount and stop costing frames.
 - `frameloop="always"` only while a view is near and motion is allowed. Otherwise `"demand"`, waking on scroll, resize, pointer input and prop changes through `invalidate()`.
@@ -30,7 +32,8 @@ Load before adding any 3D scene, shader, or WebGL effect to a React Three Fiber 
 - Detect WebGL once and cache it. Without it, each view renders a static DOM fallback in its own slot.
 - Clear once per frame before views draw (`setScissorTest(false)` + `clear`), so views never inherit each other's pixels.
 - Share heavy resources per renderer: environment maps, geometries, textures. Cache in a `WeakMap<WebGLRenderer, T>` or module scope; never rebuild them per view.
-- Cap DPR (`[1, 1.75]`) and let `<PerformanceMonitor>` drop to 1 when frames decline.
+- Cap DPR as a range (`dpr={[1, 1.75]}`), never a bare number: `dpr={1.75}` forces 1.75 on 1x screens too. Let `<PerformanceMonitor>` drop the ceiling to 1 when frames decline.
+- Turn MSAA off at high DPR (`antialias: devicePixelRatio < 1.5`). A full-viewport canvas otherwise resolves a multisampled buffer every frame.
 - Reduced motion: hold one frame and render on demand. Every view still draws, nothing loops.
 
 ## Decision Gates
@@ -58,7 +61,7 @@ Load before adding any 3D scene, shader, or WebGL effect to a React Three Fiber 
 ## Output Contract
 
 - Building: zero new `<Canvas>` elements; the scene registers a slot, has a fallback, a reduced-motion frame and stops looping offscreen.
-- Reviewing: flag a second `<Canvas>`, `frameloop="always"` without a near view, per-frame `setState`, per-view environment or texture rebuilds, and scenes with no fallback.
+- Reviewing: flag a second `<Canvas>`, `frameloop="always"` without a near view, per-frame `setState`, per-view environment or texture rebuilds, scenes with no fallback, a bare-number `dpr`, and a `position: fixed` canvas with no scroll anchoring.
 
 ## References
 

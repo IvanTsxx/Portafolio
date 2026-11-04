@@ -32,7 +32,7 @@ export const SiteFooter = () => (
           <span className="ink-underline">Write to me</span>
           <ArrowUpRightIcon
             aria-hidden
-            className="text-muted-foreground ease-out-expo ml-3 inline-block size-7 align-baseline md:size-9 transition-transform duration-500 group-hover/mail:translate-x-2 group-hover/mail:-translate-y-2"
+            className="text-muted-foreground ease-out-expo ml-3 inline-block size-7 align-baseline transition-transform duration-500 group-hover/mail:translate-x-2 group-hover/mail:-translate-y-2 md:size-9"
             weight="thin"
           />
         </a>
