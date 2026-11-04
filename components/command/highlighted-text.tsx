@@ -13,11 +13,11 @@ export const HighlightedText = ({
   }
   return segmentText(text, ranges).map((segment) =>
     segment.matched ? (
-      <mark className="bg-ink/15 text-ink" key={segment.start}>
+      <mark className="bg-foreground/15 text-foreground" key={segment.start}>
         {segment.text}
       </mark>
     ) : (
-      <span className="text-graphite" key={segment.start}>
+      <span className="text-muted-foreground" key={segment.start}>
         {segment.text}
       </span>
     )

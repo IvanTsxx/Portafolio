@@ -1,63 +1,70 @@
-import { CodeBlock } from "@/components/registry-docs/code-block";
 import { DocumentSection } from "@/components/site/document-section";
-import { LeaderList, LeaderRow } from "@/components/site/leader-list";
-import { padCount } from "@/lib/design-system/format";
+import { formatTiming } from "@/lib/design-system/model";
 import type { DesignSystem } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
-import {
-  agentMotionSpecs,
-  componentMotionSpecs,
-} from "@/lib/design-system/specs";
-import { highlightCode } from "@/lib/registry/highlight";
-import { sectionScripts } from "@/lib/site/section-scripts";
 
-import { MotionLab } from "./motion-lab";
-import { SubHeading } from "./spec-frame";
+import { SpecList, SpecRow, SubHeading } from "./spec-list";
 
-export const MotionSection = async ({ system }: { system: DesignSystem }) => {
+export const MotionSection = ({ system }: { system: DesignSystem }) => {
   const section = sectionById("motion");
-  const reducedMotionLines = await highlightCode(
-    system.reducedMotionCss,
-    "css"
+  const animations = system.utilities.filter(
+    (utility) => utility.group === "motion"
   );
   return (
     <DocumentSection
-      aside={`${padCount(system.easings.length)} easings`}
+      aside="transform and opacity"
       id={section.id}
       index={section.index}
       label={section.label}
-      script={sectionScripts.designMotion}
     >
       <div className="flex flex-col gap-3">
-        <SubHeading label="Easings and durations" />
-        <MotionLab durations={system.durations} easings={system.easings} />
-      </div>
-      <div className="flex flex-col gap-3">
-        <SubHeading label="Reduced motion" aside="globals.css" />
-        <div className="border-rule-strong bg-popover border">
-          <CodeBlock lines={reducedMotionLines} />
-        </div>
-      </div>
-      <div className="flex flex-col gap-3">
-        <SubHeading label="Agent motion" />
-        <LeaderList>
-          {agentMotionSpecs.map((spec) => (
-            <LeaderRow key={spec.label} label={spec.label}>
-              {spec.value}
-            </LeaderRow>
+        <SubHeading label="Easings" />
+        <SpecList>
+          {system.easings.map((easing) => (
+            <SpecRow
+              aside={easing.curve}
+              key={easing.name}
+              name={easing.className}
+            >
+              {easing.use}
+            </SpecRow>
           ))}
-        </LeaderList>
+        </SpecList>
       </div>
       <div className="flex flex-col gap-3">
-        <SubHeading label="Component motion" />
-        <LeaderList>
-          {componentMotionSpecs.map((spec) => (
-            <LeaderRow key={spec.label} label={spec.label}>
-              {spec.value}
-            </LeaderRow>
+        <SubHeading label="Durations" />
+        <SpecList>
+          {system.durations.map((duration) => (
+            <SpecRow
+              aside={`${duration.ms}ms`}
+              key={duration.className}
+              name={duration.className}
+            >
+              {duration.use}
+            </SpecRow>
           ))}
-        </LeaderList>
+        </SpecList>
       </div>
+      <div className="flex flex-col gap-3">
+        <SubHeading label="Animation" />
+        <SpecList>
+          {animations.map((utility) => (
+            <SpecRow
+              aside={[formatTiming(utility.timing), utility.variable]
+                .filter(Boolean)
+                .join(" · ")}
+              key={utility.name}
+              name={utility.name}
+            >
+              {utility.summary}
+            </SpecRow>
+          ))}
+        </SpecList>
+      </div>
+      <p className="label text-faint normal-case">
+        Under prefers-reduced-motion every animation and transition snaps in
+        0.01ms.
+      </p>
     </DocumentSection>
   );
 };

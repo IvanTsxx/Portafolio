@@ -1,82 +1,79 @@
 import { DocumentSection } from "@/components/site/document-section";
 import { padCount } from "@/lib/design-system/format";
-import type { FontFamily } from "@/lib/design-system/model";
+import type { FontFamily, TypeStep } from "@/lib/design-system/model";
 import { sectionById } from "@/lib/design-system/sections";
-import { typeScaleSpecs } from "@/lib/design-system/specs";
 import type { FontClassName } from "@/lib/design-system/specs";
-import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
-import { ClassTag, SpecCell, SpecGrid, SubHeading } from "./spec-frame";
+import { ClassTag, SpecList, SubHeading } from "./spec-list";
 
 const familySampleClassNames = {
-  "font-jp": "jp text-3xl font-light",
-  "font-mono": "font-mono text-2xl font-light tracking-tight",
-  "font-sans": "font-sans text-3xl font-light tracking-tight",
-  "font-wordmark": "font-wordmark text-4xl italic",
+  "font-mono": "font-mono text-2xl tracking-tight",
+  "font-sans": "font-sans text-2xl tracking-tight text-balance",
+  "font-serif": "display text-5xl",
+  "font-signature": "font-signature text-signal text-6xl leading-none",
 } as const satisfies Record<FontClassName, string>;
+
+const FamilyRow = ({ font }: { font: FontFamily }) => (
+  <li className="border-border flex flex-col gap-3 border-b py-4">
+    <p className="label flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <span className="text-foreground normal-case">{font.name}</span>
+      <span className="text-faint normal-case">{font.role}</span>
+    </p>
+    <p
+      className={cn("text-foreground", familySampleClassNames[font.className])}
+    >
+      {font.sample}
+    </p>
+    <ClassTag className="self-start">{font.className}</ClassTag>
+  </li>
+);
+
+const ScaleRow = ({ step }: { step: TypeStep }) => (
+  <li className="border-border flex flex-col gap-3 border-b py-4">
+    <p className="label flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <span className="text-muted-foreground break-words normal-case">
+        {step.className}
+      </span>
+      <span className="text-faint normal-case tabular-nums">
+        {step.size}px · {step.use}
+        {step.detail ? ` · ${step.detail}` : ""}
+      </span>
+    </p>
+    <p className={cn("text-foreground", step.className)}>{step.sample}</p>
+  </li>
+);
 
 export const TypographySection = ({
   fonts,
+  typeScale,
 }: {
   fonts: readonly FontFamily[];
+  typeScale: readonly TypeStep[];
 }) => {
-  const section = sectionById("typography");
+  const section = sectionById("type");
   return (
     <DocumentSection
       aside={`${padCount(fonts.length)} families`}
       id={section.id}
       index={section.index}
       label={section.label}
-      script={sectionScripts.designTypography}
     >
       <div className="flex flex-col gap-3">
         <SubHeading label="Families" />
-        <SpecGrid className="grid-cols-1 @2xl:grid-cols-2">
-          {fonts.map((font, index) => (
-            <SpecCell
-              code={`F-${padCount(index + 1)}`}
-              key={font.className}
-              name={font.name}
-            >
-              <p
-                className={cn(
-                  "text-ink",
-                  familySampleClassNames[font.className]
-                )}
-              >
-                {font.sample}
-              </p>
-              <div className="flex flex-col gap-2">
-                <ClassTag className="self-start">{font.className}</ClassTag>
-                <p className="label text-mist normal-case">
-                  {font.weights} · {font.role}
-                </p>
-              </div>
-            </SpecCell>
+        <SpecList>
+          {fonts.map((font) => (
+            <FamilyRow font={font} key={font.className} />
           ))}
-        </SpecGrid>
+        </SpecList>
       </div>
       <div className="flex flex-col gap-3">
-        <SubHeading label="Scale" aside="px" />
-        <ol className="border-rule border-t">
-          {typeScaleSpecs.map((step) => (
-            <li
-              className="border-rule flex flex-col gap-2 border-b py-4"
-              key={`${step.className}-${step.use}`}
-            >
-              <p className="label flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <span className="text-graphite break-words normal-case">
-                  {step.className}
-                </span>
-                <span className="text-mist normal-case tabular-nums">
-                  {step.size} · {step.use}
-                </span>
-              </p>
-              <p className={cn("text-ink", step.className)}>{step.sample}</p>
-            </li>
+        <SubHeading label="Scale" />
+        <SpecList>
+          {typeScale.map((step) => (
+            <ScaleRow key={step.className} step={step} />
           ))}
-        </ol>
+        </SpecList>
       </div>
     </DocumentSection>
   );

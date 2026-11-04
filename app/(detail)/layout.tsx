@@ -1,7 +1,7 @@
-import { Dossier } from "@/components/site/dossier";
+import { PageFrame } from "@/components/site/page-frame";
 
-const DetailGroupLayout = ({ children }: LayoutProps<"/">) => (
-  <Dossier>{children}</Dossier>
+const GroupLayout = ({ children }: LayoutProps<"/">) => (
+  <PageFrame>{children}</PageFrame>
 );
 
-export default DetailGroupLayout;
+export default GroupLayout;

@@ -1,7 +1,12 @@
 import { notFound } from "next/navigation";
 
 import { renderOgImage } from "@/lib/content/og-image";
-import { getSkill, skills } from "@/lib/skills/skills";
+import {
+  formatSkillIndex,
+  getSkill,
+  getSkillIndex,
+  skills,
+} from "@/lib/skills/skills";
 
 export const alt = "Agent skill";
 export { contentType, size } from "@/lib/content/og-image";
@@ -20,10 +25,12 @@ const SkillOpenGraphImage = async ({
     notFound();
   }
   return renderOgImage({
-    eyebrow: skill.metadata?.version
-      ? `Skills · Agent skill · v${skill.metadata.version}`
-      : "Skills · Agent skill",
-    title: skill.name,
+    label: {
+      code: formatSkillIndex(getSkillIndex(skill.name)),
+      meta: "Agent skill",
+    },
+    summary: skill.description,
+    title: { text: skill.name },
   });
 };
 

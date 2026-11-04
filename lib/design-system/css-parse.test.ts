@@ -1,28 +1,26 @@
 import { describe, expect, test } from "bun:test";
 
-import {
-  dedent,
-  findRules,
-  parseCss,
-  parseGlobalsCss,
-  ruleToCss,
-} from "./css-parse";
+import { findRules, parseCss, parseGlobalsCss } from "./css-parse";
 
 const fixture = `
 @import "tailwindcss";
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* palette */
 @theme inline {
-  --color-paper: var(--paper);
+  --color-background: var(--background);
   --font-sans:
-    var(--font-zen-kaku), "Hiragino Sans",
+    var(--font-geist-sans), ui-sans-serif,
     sans-serif;
 }
 
 :root {
-  --paper: oklch(0.94 0.003 106);
+  --background: #f7f6f2;
   --grain: url("data:image/svg+xml,%3Csvg width='160'; height='160'%3E");
+}
+
+.dark {
+  --background: #0b0b0c;
 }
 
 @utility label {
@@ -33,7 +31,7 @@ const fixture = `
 @layer base {
   html {
     @apply bg-background;
-    scrollbar-color: var(--rule-strong) transparent;
+    scrollbar-color: var(--border-strong) transparent;
   }
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -51,6 +49,7 @@ describe("parseCss", () => {
     expect(rules.map((rule) => rule.header)).toEqual([
       "@theme inline",
       ":root",
+      ".dark",
       "@utility label",
       "@layer base",
     ]);
@@ -59,7 +58,7 @@ describe("parseCss", () => {
   test("keeps semicolons and colons that sit inside quotes", () => {
     const root = rules.find((rule) => rule.header === ":root");
     expect(root?.declarations.map((declaration) => declaration.name)).toEqual([
-      "--paper",
+      "--background",
       "--grain",
     ]);
     expect(root?.declarations[1]?.value).toContain("width='160'; height='160'");
@@ -68,7 +67,7 @@ describe("parseCss", () => {
   test("collapses multi-line values onto one line", () => {
     const theme = rules.find((rule) => rule.header === "@theme inline");
     expect(theme?.declarations[1]?.value).toBe(
-      'var(--font-zen-kaku), "Hiragino Sans", sans-serif'
+      "var(--font-geist-sans), ui-sans-serif, sans-serif"
     );
   });
 
@@ -80,7 +79,7 @@ describe("parseCss", () => {
     expect(reduced?.rules[0]?.declarations[0]?.name).toBe("animation-duration");
     const [html] = findRules(rules, (rule) => rule.header === "html");
     expect(html?.declarations).toEqual([
-      { name: "scrollbar-color", value: "var(--rule-strong) transparent" },
+      { name: "scrollbar-color", value: "var(--border-strong) transparent" },
     ]);
   });
 
@@ -92,23 +91,10 @@ describe("parseCss", () => {
 describe("parseGlobalsCss", () => {
   const globals = parseGlobalsCss(fixture);
 
-  test("indexes root, theme and utilities", () => {
-    expect(globals.root.get("--paper")).toBe("oklch(0.94 0.003 106)");
-    expect(globals.theme.get("--color-paper")).toBe("var(--paper)");
+  test("indexes root, dark, theme and utilities", () => {
+    expect(globals.root.get("--background")).toBe("#f7f6f2");
+    expect(globals.dark.get("--background")).toBe("#0b0b0c");
+    expect(globals.theme.get("--color-background")).toBe("var(--background)");
     expect([...globals.utilities.keys()]).toEqual(["label"]);
-  });
-});
-
-describe("ruleToCss", () => {
-  test("round-trips a utility body", () => {
-    const globals = parseGlobalsCss(fixture);
-    const label = globals.utilities.get("label");
-    expect(label ? ruleToCss(label) : "").toBe(
-      "@utility label {\n  font-size: 0.625rem;\n  text-transform: uppercase;\n}"
-    );
-  });
-
-  test("dedent trims blank edges and shared indentation", () => {
-    expect(dedent("\n    a\n      b\n\n")).toBe("a\n  b");
   });
 });

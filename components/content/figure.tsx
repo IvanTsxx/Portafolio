@@ -16,7 +16,7 @@ export const Figure = ({
   ...image
 }: FigureProps) => (
   <figure className={cn("my-10", className)}>
-    <div className="border-rule-strong bg-popover relative border p-2">
+    <div className="border-border-strong bg-popover relative border p-2">
       <CornerMarks />
       <Image
         className="h-auto w-full"
@@ -25,7 +25,7 @@ export const Figure = ({
       />
     </div>
     {caption ? (
-      <figcaption className="label text-graphite mt-3 normal-case">
+      <figcaption className="label text-muted-foreground mt-3 normal-case">
         {caption}
       </figcaption>
     ) : null}

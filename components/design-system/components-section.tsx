@@ -1,9 +1,9 @@
 import { DocumentSection } from "@/components/site/document-section";
-import { LeaderList, LeaderRow } from "@/components/site/leader-list";
 import { padCount } from "@/lib/design-system/format";
 import { sectionById } from "@/lib/design-system/sections";
 import { componentSpecs } from "@/lib/design-system/specs";
-import { sectionScripts } from "@/lib/site/section-scripts";
+
+import { SpecList, SpecRow } from "./spec-list";
 
 export const ComponentsSection = () => {
   const section = sectionById("components");
@@ -13,15 +13,14 @@ export const ComponentsSection = () => {
       id={section.id}
       index={section.index}
       label={section.label}
-      script={sectionScripts.designComponents}
     >
-      <LeaderList>
+      <SpecList>
         {componentSpecs.map((spec) => (
-          <LeaderRow key={spec.name} label={spec.name}>
+          <SpecRow aside={spec.file} key={spec.name} name={spec.name}>
             {spec.summary}
-          </LeaderRow>
+          </SpecRow>
         ))}
-      </LeaderList>
+      </SpecList>
     </DocumentSection>
   );
 };

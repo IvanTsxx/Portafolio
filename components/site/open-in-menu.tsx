@@ -43,7 +43,7 @@ const targetIcons = {
 } as const satisfies Record<OpenInTargetId, Icon>;
 
 const itemClassName =
-  "label text-ink data-highlighted:bg-ink data-highlighted:text-paper ease-mechanical flex min-h-11 cursor-pointer items-center gap-3 px-3 transition-colors duration-100 outline-none select-none";
+  "label text-foreground data-highlighted:bg-surface ease-mechanical flex min-h-11 rounded-sm cursor-pointer items-center gap-3 px-3 transition-colors duration-100 outline-none select-none";
 
 const readMarkdown = async (markdownPath: string) => {
   const response = await fetch(markdownPath);
@@ -97,7 +97,7 @@ export const OpenInMenu = ({
       <Menu.Trigger
         className={cn(
           technicalButtonVariants({ tone: "outline" }),
-          "data-popup-open:bg-ink data-popup-open:text-paper min-w-36"
+          "data-popup-open:bg-surface min-w-36 rounded-md!"
         )}
         data-status={status}
       >
@@ -109,7 +109,7 @@ export const OpenInMenu = ({
       </output>
       <Menu.Portal>
         <Menu.Positioner align="start" className="z-50" sideOffset={4}>
-          <Menu.Popup className="border-ink bg-paper ease-mechanical min-w-64 border py-1 transition-[opacity,translate] duration-150 outline-none data-ending-style:opacity-0 data-starting-style:opacity-0 motion-safe:data-ending-style:-translate-y-1 motion-safe:data-starting-style:-translate-y-1">
+          <Menu.Popup className="border-border-strong bg-popover ease-mechanical min-w-64 rounded-md border p-1 transition-[opacity,translate] duration-200 outline-none data-ending-style:opacity-0 data-starting-style:opacity-0 motion-safe:data-ending-style:-translate-y-1 motion-safe:data-starting-style:-translate-y-1">
             <Menu.Item className={itemClassName} onClick={copy}>
               <CopyIcon aria-hidden className="size-4 shrink-0" />
               Copy page as Markdown
@@ -123,7 +123,7 @@ export const OpenInMenu = ({
               <MarkdownLogoIcon aria-hidden className="size-4 shrink-0" />
               View as Markdown
             </Menu.LinkItem>
-            <Menu.Separator className="border-rule my-1 border-t" />
+            <Menu.Separator className="border-border -mx-1 my-1 border-t" />
             {openInTargets(markdownPath).map((target) => {
               const TargetIcon = targetIcons[target.id];
               return (
@@ -138,7 +138,7 @@ export const OpenInMenu = ({
                   <span className="grow">Open in {target.label}</span>
                   <ArrowUpRightIcon
                     aria-hidden
-                    className="text-mist size-3.5 shrink-0"
+                    className="text-faint size-3.5 shrink-0"
                   />
                 </Menu.LinkItem>
               );

@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 
 import { renderOgImage } from "@/lib/content/og-image";
 import {
+  formatRegistryIndex,
   getRegistryItem,
+  getRegistryItemIndex,
   registryItems,
   toCategoryLabel,
 } from "@/lib/registry/registry";
@@ -24,8 +26,12 @@ const RegistryItemOpenGraphImage = async ({
     notFound();
   }
   return renderOgImage({
-    eyebrow: `Registry · ${item.categories.map(toCategoryLabel).join(" / ")}`,
-    title: item.title,
+    label: {
+      code: formatRegistryIndex(getRegistryItemIndex(item.name)),
+      meta: item.categories.map(toCategoryLabel).join(" / "),
+    },
+    summary: item.description,
+    title: { text: item.title },
   });
 };
 

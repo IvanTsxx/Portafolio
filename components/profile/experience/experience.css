@@ -1,9 +1,0 @@
-.exp-letter {
-  transform-origin: var(--from-narrow) 100%;
-}
-
-@media (width >= 40rem) {
-  .exp-letter {
-    transform-origin: var(--from-wide) 100%;
-  }
-}

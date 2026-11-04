@@ -48,15 +48,12 @@ const standardTokens = new Set([
 ]);
 
 const siteOnlyColorTokens = [
-  "clay",
-  "clay-deep",
+  "border-strong",
   "faint",
-  "graphite",
-  "rule",
-  "rule-strong",
-  "signal-moss",
-  "signal-rust",
-  "signal-steel",
+  "focus",
+  "signal",
+  "surface",
+  "surface-elevated",
 ];
 
 const colorUtilityPrefix =

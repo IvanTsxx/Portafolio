@@ -7,9 +7,8 @@ import type { ReactNode } from "react";
 
 import { FilterBar } from "@/components/content/filter-bar";
 import { useUrlFilter } from "@/components/content/use-url-filter";
-import { CornerMarks } from "@/components/site/corner-marks";
 import { DocumentSection } from "@/components/site/document-section";
-import { chipClassName, hoverRowClassName } from "@/components/site/styles";
+import { chipClassName, focusRingClassName } from "@/components/site/styles";
 import {
   Empty,
   EmptyDescription,
@@ -17,7 +16,6 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
-import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 export interface RegistryEntry {
@@ -64,36 +62,35 @@ const useRegistryFilter = (categories: readonly RegistryFilterCategory[]) => {
 };
 
 const RegistryCard = ({ entry }: { entry: RegistryEntry }) => (
-  <li
-    className={cn(
-      "group/marks border-graphite/30 relative flex flex-col border-r border-b",
-      hoverRowClassName
-    )}
-  >
-    <CornerMarks reveal="hover" />
+  <li className="group/card reveal-on-view relative flex flex-col gap-4">
     <div
       aria-hidden="true"
-      className="border-graphite/30 bg-popover blueprint-dots relative aspect-4/3 overflow-hidden border-b [--clay:var(--clay-deep)] [--grid-size:16px]"
+      className="bg-surface relative grid aspect-4/3 place-items-center overflow-hidden rounded-sm grayscale"
       inert
     >
-      {entry.thumbnail}
+      <div className="ease-out-expo grid size-full place-items-center transition-transform duration-500 pointer-fine:group-hover/card:scale-103">
+        {entry.thumbnail}
+      </div>
     </div>
-    <div className="flex flex-1 flex-col gap-3 p-4 md:p-5">
+    <div className="flex flex-1 flex-col gap-2">
       <div className="label flex items-center justify-between gap-4">
-        <span className="text-mist tabular-nums">{entry.index}</span>
-        <span className="text-graphite truncate">
+        <span className="text-faint tabular-nums">{entry.index}</span>
+        <span className="text-muted-foreground truncate">
           {entry.categories.map((category) => category.label).join(" / ")}
         </span>
       </div>
-      <h3 className="text-ink text-xl font-light tracking-tight">
+      <h3 className="display text-foreground text-xl">
         <Link
-          className="outline-none after:absolute after:inset-0"
+          className={cn(
+            "ink-underline outline-none after:absolute after:inset-0",
+            focusRingClassName
+          )}
           href={`/registry/${entry.name}`}
         >
           {entry.title}
         </Link>
       </h3>
-      <p className="text-graphite line-clamp-2 text-sm text-pretty">
+      <p className="text-muted-foreground line-clamp-2 text-sm text-pretty">
         {entry.description}
       </p>
     </div>
@@ -114,17 +111,17 @@ export const RegistryFilters = ({
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-3">
-        <label className="label text-mist" htmlFor={searchId}>
+        <label className="label text-faint" htmlFor={searchId}>
           Search
         </label>
         <div className="relative w-full">
           <MagnifyingGlassIcon
             aria-hidden="true"
-            className="text-graphite pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+            className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
           />
           <Input
             autoComplete="off"
-            className="border-graphite/60 focus-visible:border-ink focus-visible:ring-ink/50 h-11 pl-9 text-base md:text-sm"
+            className="border-border focus-visible:border-border-strong focus-visible:ring-focus/40 rounded-pill h-10 pl-9 text-base md:text-sm"
             id={searchId}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Grid, button, scramble"
@@ -170,24 +167,23 @@ export const RegistryGrid = ({
     <DocumentSection
       aside={`${pad(visibleEntries.length)} / ${pad(entries.length)}`}
       id="components"
-      index="REG-03"
+      index="01"
       label="Components"
-      script={sectionScripts.registryComponents}
     >
       <output aria-live="polite" className="sr-only">
         {visibleEntries.length} of {entries.length} items
       </output>
       {visibleEntries.length > 0 ? (
-        <ul className="border-graphite/30 grid border-t border-l sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-x-8 gap-y-12 sm:grid-cols-2">
           {visibleEntries.map((entry) => (
             <RegistryCard entry={entry} key={entry.name} />
           ))}
         </ul>
       ) : (
-        <Empty className="border-rule-strong border py-16">
+        <Empty className="border-border-strong border py-16">
           <EmptyHeader>
-            <EmptyTitle className="label text-ink">No match</EmptyTitle>
-            <EmptyDescription className="label text-graphite">
+            <EmptyTitle className="label text-foreground">No match</EmptyTitle>
+            <EmptyDescription className="label text-muted-foreground">
               Nothing fits that search and category.
             </EmptyDescription>
           </EmptyHeader>

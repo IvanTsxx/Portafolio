@@ -1,14 +1,15 @@
-import { siteConfig } from "@/lib/site/config";
-
+import { formatTiming } from "./model";
 import type { ColorToken, DesignSystem } from "./model";
 import { guidance, principles } from "./philosophy";
 import {
-  colorGroupLabels,
-  componentMotionSpecs,
   componentSpecs,
+  documentGridSpec,
+  fontAliasNames,
   spacingSpecs,
+  stepPx,
+  utilitiesIn,
 } from "./specs";
-import type { ColorGroup } from "./specs";
+import type { ColorGroup, UtilityGroup } from "./specs";
 
 const quote = (value: string) => JSON.stringify(value);
 
@@ -22,57 +23,55 @@ const yamlMap = (
 
 const paletteGroups = [
   "surface",
-  "ink",
-  "rule",
-  "agent",
-  "signal",
+  "text",
+  "line",
+  "state",
+  "code",
 ] as const satisfies readonly ColorGroup[];
 
 const paletteGroupSet = new Set<ColorGroup>(paletteGroups);
 
 export const paletteColors = (system: DesignSystem) =>
-  system.colors.filter(
-    (token) => token.alias === null && paletteGroupSet.has(token.group)
-  );
+  system.colors.filter((token) => paletteGroupSet.has(token.group));
 
-const typographyTokens = (system: DesignSystem) => {
-  const fontName = (className: string, fallback: string) =>
-    system.fonts.find((font) => font.className === className)?.name ?? fallback;
-  const sans = fontName("font-sans", "Zen Kaku Gothic New");
-  const mono = fontName("font-mono", "Geist Mono");
-  return [
-    [
-      "display",
-      {
-        fontFamily: sans,
-        fontSize: "6rem",
-        fontWeight: "300",
-        letterSpacing: "-0.05em",
-        lineHeight: "0.88",
-      },
-    ],
-    [
-      "label",
-      {
-        fontFamily: mono,
-        fontSize: "0.625rem",
-        fontWeight: "400",
-        letterSpacing: "0.16em",
-        lineHeight: "0.875rem",
-      },
-    ],
-  ] as const;
-};
+export const aliasColors = (system: DesignSystem) =>
+  system.colors.filter((token) => token.group === "alias");
+
+const serifName = (system: DesignSystem) =>
+  system.fonts.find((font) => font.className === "font-serif")?.name ??
+  "Instrument Serif";
+
+const typographyTokens = (system: DesignSystem) =>
+  system.typeScale.flatMap((step) =>
+    step.token
+      ? [
+          [
+            step.token.name,
+            {
+              fontFamily: serifName(system),
+              fontSize: step.token.fontSize,
+              fontWeight: "400",
+              letterSpacing: step.token.letterSpacing,
+              lineHeight: step.token.lineHeight,
+            },
+          ] as const,
+        ]
+      : []
+  );
 
 const frontMatter = (system: DesignSystem) => [
   "---",
   "version: alpha",
-  `name: ${quote(`${siteConfig.nickname} · Paper and ink`)}`,
-  `description: ${quote("A dossier on paper. Ink type, hairline rules, numbered panels, one orange 3D companion.")}`,
-  ...yamlMap(
-    "colors",
-    paletteColors(system).map((token) => [token.name, token.hex])
-  ),
+  `name: ${quote("Ivo · Observatory")}`,
+  `description: ${quote("A quiet, monochrome observatory: editorial type and measured grids on a charcoal or warm light ground, with the Lab experiments as the expressive artifacts.")}`,
+  ...yamlMap("colors", [
+    ...paletteColors(system).map(
+      (token) => [token.name, token.themes.dark.hex] as const
+    ),
+    ...paletteColors(system).map(
+      (token) => [`${token.name}-light`, token.themes.light.hex] as const
+    ),
+  ]),
   "typography:",
   ...typographyTokens(system).flatMap(([name, style]) => [
     `  ${name}:`,
@@ -80,7 +79,10 @@ const frontMatter = (system: DesignSystem) => [
       ([property, value]) => `    ${property}: ${quote(value)}`
     ),
   ]),
-  ...yamlMap("rounded", [["none", "0px"]]),
+  ...yamlMap(
+    "rounded",
+    system.radius.steps.map((step) => [step.name, `${step.px}px`] as const)
+  ),
   ...yamlMap(
     "spacing",
     spacingSpecs.map((step) => [step.step, `${step.px}px`])
@@ -88,26 +90,55 @@ const frontMatter = (system: DesignSystem) => [
   "---",
 ];
 
-const colorGroupLine = (group: ColorGroup, tokens: readonly ColorToken[]) =>
-  `- ${colorGroupLabels[group].label}: ${tokens
-    .flatMap((token) =>
-      token.group === group && token.alias === null
-        ? [`\`${token.name}\` (${token.role.toLowerCase()})`]
-        : []
-    )
-    .join(", ")}.`;
+const colorRow = (token: ColorToken) =>
+  `| \`${token.name}\` | \`${token.themes.light.hex}\` | \`${token.themes.dark.hex}\` | ${token.role} |`;
 
-const motionLines = (system: DesignSystem) =>
-  system.easings.map(
-    (easing) =>
-      `- \`${easing.className}\`: ${system.durations
-        .flatMap((duration) =>
-          duration.ease === easing.name
-            ? [`${duration.ms}ms ${duration.use.toLowerCase()}`]
-            : []
-        )
-        .join(", ")}.`
+const aliasLine = (token: ColorToken) =>
+  `\`${token.name}\` to \`${token.themes.light.alias?.replace("--", "") ?? ""}\``;
+
+const fontLines = (system: DesignSystem) =>
+  system.fonts.map(
+    (font) => `- ${font.name} (\`${font.className}\`): ${font.role}.`
   );
+
+const typeLines = (system: DesignSystem) =>
+  system.typeScale.map((step) =>
+    step.token
+      ? `- \`${step.className.replace("display ", "")}\`: ${step.size}px fluid, ${step.detail}. ${step.use}.`
+      : `- \`${step.className.replace("text-muted-foreground ", "")}\`: ${step.size}px. ${step.use}.`
+  );
+
+const containerLines = (system: DesignSystem) =>
+  system.containers.map(
+    (container) =>
+      `- \`${container.className}\`: ${container.width}. ${container.use}.`
+  );
+
+const radiusLine = (system: DesignSystem) =>
+  system.radius.steps
+    .map((step) => `\`${step.className}\` ${step.px}px`)
+    .join(", ");
+
+const utilityNames = (group: UtilityGroup) =>
+  utilitiesIn(group)
+    .map((utility) => `\`${utility.name}\``)
+    .join(", ");
+
+const motionLines = (system: DesignSystem) => [
+  ...system.easings.map(
+    (easing) => `- \`${easing.className}\` (${easing.curve}): ${easing.use}.`
+  ),
+  `- Durations: ${system.durations.map((duration) => `\`${duration.className}\` ${duration.use.toLowerCase()}`).join(", ")}.`,
+  ...system.utilities.flatMap((utility) => {
+    if (utility.group !== "motion") {
+      return [];
+    }
+    const timing = formatTiming(utility.timing);
+    return [
+      `- \`${utility.name}\`${timing ? ` (${timing})` : ""}: ${utility.summary}`,
+    ];
+  }),
+];
 
 export const renderDesignMarkdown = (system: DesignSystem) =>
   [
@@ -121,35 +152,46 @@ export const renderDesignMarkdown = (system: DesignSystem) =>
     "",
     "## Colors",
     "",
-    ...paletteGroups.map((group) => colorGroupLine(group, system.colors)),
-    "- shadcn aliases (`background`, `primary`, `muted`, `border` and the rest) resolve to these.",
+    "One set of semantic tokens, two art-directed themes. `:root` is light and `.dark` is dark. The front matter lists dark values by token name and light values with a `-light` suffix.",
+    "",
+    "| Token | Light | Dark | Role |",
+    "| --- | --- | --- | --- |",
+    ...paletteColors(system).map(colorRow),
+    "",
+    `- Aliases for the shadcn primitives in components/ui and the registry: ${aliasColors(system).map(aliasLine).join(", ")}.`,
     "",
     "## Typography",
     "",
-    "Zen Kaku Gothic New, light and tight, for titles (`display`) and body. Geist Mono in the `label` utility for every label, number and button. Noto Sans JP (`jp`) only on route tabs, index page heroes and the nickname kana. Instrument Serif italic only for the wordmark.",
+    ...fontLines(system),
+    "",
+    `Three families, no more. The serif is set through \`display\` and also answers to ${fontAliasNames.map((name) => `\`font-${name}\``).join(", ")}. \`label\` is the mono voice for every index, number and button. \`spaced\` is for eyebrows.`,
+    "",
+    ...typeLines(system),
     "",
     "## Layout",
     "",
-    "- Every page is a paper sheet in a strong hairline frame over two offset `paper-deep` backing sheets. Every route, index or detail, uses the same 60rem sheet (`max-w-sheet`). Sections, grids, figures and heroes take its full width. Paragraphs keep a 44rem measure (`max-w-column`) or `max-w-prose`.",
-    "- The sheet's left edge is a bound strip: punched holes with dithered toner around them. Hover lights a lens that follows the pointer. A press punches the nearest hole and sends a ripple along the strip.",
-    "- Route tabs sit on the sheet's left edge from `lg` and in a row above it on smaller screens. The active tab joins the sheet.",
-    "- Long pages get a thumb index of notches on the sheet's right edge. Below `lg` it becomes a 4px progress strip. From `2xl` the companion rides a rail lane beside it. On phones it peeks from the bottom right corner.",
-    "- The 48px top line holds the wordmark, ⌘K search and GitHub stars. The back cover is a stamped colophon below the sheet.",
-    "- Sections sit 96px apart. Each opens with a panel heading over a strong rule.",
+    `- Page gutters are ${stepPx(documentGridSpec.gutters[0])}px on phones and ${stepPx(documentGridSpec.gutters[1])}px from \`md\`. Sections sit ${stepPx(documentGridSpec.sectionGap)}px apart and each opens with a panel heading.`,
+    ...containerLines(system),
+    `- Reading measure: \`${documentGridSpec.measure.className}\`, ${documentGridSpec.measure.width}.`,
+    `- Spacing follows the 4px scale: ${spacingSpecs.map((step) => step.step).join(", ")}.`,
+    "- Whitespace and type come before containers. Cards stay borderless unless a frame explains something.",
+    `- Layout helpers: ${utilityNames("layout")}.`,
     "",
     "## Shapes",
     "",
-    "Radius 0 everywhere. Frames are 1px hairlines. No shadows. Depth comes from the backing sheets, `hatch` fills and corner marks.",
+    `Radius derives from \`--radius\` (${system.radius.base}): ${radiusLine(system)}. Frames are 1px hairlines in \`border\` and \`border-strong\`. No shadows. Depth comes from contrast, scale and light, plus the marks ${utilityNames("mark")}.`,
     "",
     "## Components",
     "",
-    ...componentSpecs.map((spec) => `- ${spec.name}: ${spec.summary}`),
+    ...componentSpecs.map(
+      (spec) => `- ${spec.name} (\`${spec.file}\`): ${spec.summary}`
+    ),
     "",
     "## Motion",
     "",
+    `Animate transform and opacity only. Transitions run ${system.durations.at(0)?.ms}ms to ${system.durations.at(-1)?.ms}ms. Under \`prefers-reduced-motion\` every animation and transition snaps in 0.01ms.`,
+    "",
     ...motionLines(system),
-    ...componentMotionSpecs.map((spec) => `- ${spec.label}: ${spec.value}.`),
-    "- Reduced motion: CSS snaps, sections show without a build, the companion holds a key pose, the hero field stays on its static frame.",
     "",
     "## Do's and Don'ts",
     "",

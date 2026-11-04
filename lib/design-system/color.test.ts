@@ -1,47 +1,28 @@
 import { describe, expect, test } from "bun:test";
 
-import {
-  compositeOver,
-  contrastRatio,
-  gradeContrast,
-  oklchToSrgb,
-  parseOklch,
-  toHex,
-} from "./color";
+import { contrastRatio, gradeContrast, parseHex, toHex } from "./color";
 
 const black = [0, 0, 0] as const;
 const white = [1, 1, 1] as const;
 
-describe("parseOklch", () => {
-  test("reads lightness, chroma, hue and percent alpha", () => {
-    expect(parseOklch("oklch(0.18 0 0 / 14%)")).toEqual({
-      alpha: 0.14,
-      chroma: 0,
-      hue: 0,
-      lightness: 0.18,
-    });
+describe("parseHex", () => {
+  test("reads six digit hex in either case", () => {
+    expect(parseHex("#ffffff")).toEqual([1, 1, 1]);
+    expect(parseHex(" #0B0B0C ")).toEqual([11 / 255, 11 / 255, 12 / 255]);
   });
 
-  test("accepts percent lightness and rejects other syntaxes", () => {
-    expect(parseOklch("oklch(94% 0.003 106)")?.lightness).toBeCloseTo(0.94);
-    expect(parseOklch("#ededeb")).toBeNull();
-    expect(parseOklch("var(--ink)")).toBeNull();
-  });
-});
-
-describe("oklchToSrgb", () => {
-  test("maps the lightness extremes to black and white", () => {
-    expect(
-      toHex(oklchToSrgb({ alpha: 1, chroma: 0, hue: 0, lightness: 0 }))
-    ).toBe("#000000");
-    expect(
-      toHex(oklchToSrgb({ alpha: 1, chroma: 0, hue: 0, lightness: 1 }))
-    ).toBe("#ffffff");
+  test("rejects shorthand, alpha and other syntaxes", () => {
+    expect(parseHex("#fff")).toBeNull();
+    expect(parseHex("#ffffff80")).toBeNull();
+    expect(parseHex("oklch(0.94 0.003 106)")).toBeNull();
+    expect(parseHex("var(--foreground)")).toBeNull();
   });
 
-  test("converts the paper token to its sRGB hex", () => {
-    const paper = parseOklch("oklch(0.94 0.003 106)");
-    expect(paper ? toHex(oklchToSrgb(paper)) : "").toBe("#ebebe9");
+  test("round-trips through toHex", () => {
+    for (const hex of ["#0b0b0c", "#edece8", "#9aabb9", "#f7f6f2"]) {
+      const rgb = parseHex(hex);
+      expect(rgb ? toHex(rgb) : "").toBe(hex);
+    }
   });
 });
 
@@ -55,18 +36,12 @@ describe("contrastRatio", () => {
     expect(contrastRatio(white, white)).toBe(1);
   });
 
-  test("composites translucent ink over paper before measuring", () => {
-    const ink = oklchToSrgb({ alpha: 1, chroma: 0, hue: 0, lightness: 0.18 });
-    const paper = oklchToSrgb({
-      alpha: 1,
-      chroma: 0.003,
-      hue: 106,
-      lightness: 0.94,
-    });
-    const hairline = contrastRatio(compositeOver(ink, 0.14, paper), paper);
-    const strong = contrastRatio(compositeOver(ink, 0.7, paper), paper);
-    expect(hairline).toBeLessThan(2);
-    expect(strong).toBeGreaterThan(4.5);
+  test("reads the bone on charcoal pair as AAA", () => {
+    const bone = parseHex("#edece8");
+    const charcoal = parseHex("#0b0b0c");
+    expect(
+      bone && charcoal ? contrastRatio(bone, charcoal) : 0
+    ).toBeGreaterThan(15);
   });
 });
 

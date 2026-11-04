@@ -1,5 +1,3 @@
-import { BitmapPoster } from "@/components/lab/source/bitmap-poster";
+import { CapturedPoster } from "@/components/lab/captured-poster";
 
-import { posterBitmap } from "./poster-bitmap";
-
-export const VegetaPoster = () => <BitmapPoster bitmap={posterBitmap} />;
+export const VegetaPoster = () => <CapturedPoster alt="" slug="vegeta" />;

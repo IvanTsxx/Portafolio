@@ -2,72 +2,55 @@ import { ArrowLeftIcon } from "@phosphor-icons/react/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { MoonPoster } from "@/components/home/moon-poster";
 import { MissingRoute } from "@/components/not-found/missing-route";
-import { StageScene } from "@/components/scene/stage-scene";
-import { Dossier } from "@/components/site/dossier";
+import { PageFrame } from "@/components/site/page-frame";
+import { focusRingClassName } from "@/components/site/styles";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   description: "This page does not exist. Head back to Ivo's home page.",
   robots: { follow: true, index: false },
-  title: "404 · Module not found",
+  title: "404 · Off the map",
 };
 
 const NotFound = () => (
-  <Dossier>
+  <PageFrame>
     <section
       aria-labelledby="not-found-title"
-      className="grid w-full content-center gap-10 lg:grid-cols-12 lg:gap-6"
+      className="min-h-hero grid w-full content-center items-center gap-16 lg:grid-cols-12"
     >
-      <div className="flex flex-col gap-8 lg:col-span-5">
-        <p className="label text-graphite flex items-center gap-3">
-          <span className="text-ink">[ ER-404 ]</span>
-          <span>Route trace</span>
-          <span
-            aria-hidden
-            className="border-rule-strong min-w-8 flex-1 border-b border-dotted"
-          />
-          <span className="tabular-nums">01 / 01</span>
+      <div className="flex flex-col gap-8 lg:col-span-6">
+        <p className="label text-faint flex items-center gap-4">
+          <span className="tabular-nums">404</span>
+          <span aria-hidden className="bg-border h-px w-12" />
+          <span>Off the map</span>
         </p>
-        <h1
-          className="display text-6xl md:text-7xl xl:text-8xl"
-          id="not-found-title"
-        >
-          404 — Module not found.
+        <h1 className="display text-hero text-foreground" id="not-found-title">
+          Nothing <em className="text-muted-foreground">out here</em>.
         </h1>
-        <pre className="border-rule-strong overflow-x-auto border-l py-1 pl-4 font-mono text-xs/relaxed whitespace-pre-wrap">
-          <code>
-            <span className="text-ink">ERR_MODULE_NOT_FOUND </span>
-            <MissingRoute />
-            {"\n"}
-            <span className="text-mist">{"  at router.resolve (app/)"}</span>
-            {"\n"}
-            <span className="text-mist">{"  at AG-04 · tracing"}</span>
-          </code>
-        </pre>
+        <p className="label text-muted-foreground">
+          <MissingRoute />
+        </p>
         <Link
-          className="group label bg-ink text-paper hover:bg-clay inline-flex h-11 w-fit items-center gap-3 px-4 transition-colors"
+          className={cn(
+            "group/back border-border-strong hover:border-foreground hover:bg-foreground hover:text-background text-foreground rounded-pill inline-flex min-h-11 w-fit items-center gap-3 border px-5 text-sm transition-colors duration-300",
+            focusRingClassName
+          )}
           href="/"
         >
           <ArrowLeftIcon
             aria-hidden
-            className="ease-out-quart size-3.5 transition-transform group-hover:-translate-x-0.5"
+            className="ease-out-expo size-3.5 transition-transform duration-500 group-hover/back:-translate-x-1"
           />
           Back home
         </Link>
       </div>
-      <div className="border-rule-strong relative border lg:col-span-7">
-        <p className="label text-graphite border-rule flex justify-between gap-4 border-b px-4 py-2">
-          <span>Fig. 404 · Debugging</span>
-          <span>AG-04</span>
-        </p>
-        <StageScene
-          className="aspect-4/3"
-          label="The companion inspects a code panel, catches the bug and fixes the broken line"
-          stage="debug"
-        />
+      <div className="text-faint mx-auto w-full max-w-md lg:col-span-5 lg:col-start-8">
+        <MoonPoster className="size-full opacity-60" />
       </div>
     </section>
-  </Dossier>
+  </PageFrame>
 );
 
 export default NotFound;

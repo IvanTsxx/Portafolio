@@ -4,16 +4,6 @@ import { useSyncExternalStore } from "react";
 
 import { requestSceneFrame } from "@/components/scene/view-registry";
 
-export const revealChunk = `
-  uniform float uOriginal;
-
-  void revealBefore() {
-    if (uOriginal > 0.5) {
-      discard;
-    }
-  }
-`;
-
 let showsOriginal = false;
 const listeners = new Set<() => void>();
 
@@ -40,5 +30,3 @@ const readServerShowsOriginal = () => false;
 
 export const useShowsOriginal = () =>
   useSyncExternalStore(subscribe, readShowsOriginal, readServerShowsOriginal);
-
-export const originalUniform = () => (showsOriginal ? 1 : 0);

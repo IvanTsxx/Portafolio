@@ -11,16 +11,14 @@ const activityCopy = {
   offscreen: { label: "Paused offscreen", tone: "bg-transparent" },
   reduced: {
     label: "Reduced motion",
-    tone: "bg-[repeating-linear-gradient(135deg,var(--ink)_0_1px,transparent_1px_3px)]",
+    tone: "bg-[repeating-linear-gradient(135deg,var(--foreground)_0_1px,transparent_1px_3px)]",
   },
-  running: { label: "Live", tone: "bg-ink motion-safe:animate-pulse" },
+  running: { label: "Live", tone: "bg-foreground motion-safe:animate-pulse" },
 } as const satisfies Record<StageActivity, { label: string; tone: string }>;
-
-export const CornerMarkers = () => <CornerMarks />;
 
 interface ExperimentStageProps {
   activity: StageActivity;
-  before: StageImage;
+  before?: StageImage;
   children: ReactNode;
   controls?: ReactNode;
   reducedNote: string;
@@ -44,35 +42,36 @@ export const ExperimentStage = ({
     <div className="flex flex-col">
       <div
         className={cn(
-          "border-rule-strong bg-popover relative aspect-4/5 overflow-hidden border sm:aspect-4/3 lg:aspect-16/10",
+          "border-border bg-surface relative aspect-4/5 overflow-hidden rounded-sm border sm:aspect-4/3 lg:aspect-16/10",
           className
         )}
+        data-lab-stage=""
         ref={stageRef}
       >
         <figure aria-label={stageLabel} className="m-0 size-full">
           {children}
         </figure>
-        <OriginalImage image={before} />
+        {before ? <OriginalImage image={before} /> : null}
         <CornerMarks />
       </div>
-      <div className="border-rule-strong bg-popover flex flex-col border border-t-0">
-        <div className="border-rule-strong flex flex-wrap items-baseline justify-between gap-3 border-b px-5 py-3">
+      <div className="border-border-strong bg-popover flex flex-col border border-t-0">
+        <div className="border-border-strong flex flex-wrap items-baseline justify-between gap-3 border-b px-5 py-3">
           {controls ? (
             <h2 className="label flex items-baseline gap-3">
-              <span className="text-mist tabular-nums">[ CTL ]</span>
-              <span className="text-ink font-normal">Controls</span>
+              <span className="text-faint tabular-nums">[ CTL ]</span>
+              <span className="text-foreground font-normal">Controls</span>
             </h2>
           ) : null}
-          <p className="label text-graphite ml-auto flex items-center gap-2">
+          <p className="label text-muted-foreground ml-auto flex items-center gap-2">
             <span
               aria-hidden
-              className={cn("border-ink size-1.5 border", status.tone)}
+              className={cn("border-foreground size-1.5 border", status.tone)}
             />
             {status.label}
           </p>
         </div>
         {activity === "reduced" ? (
-          <p className="border-rule-strong text-graphite border-b px-5 py-3 text-xs/relaxed text-pretty">
+          <p className="border-border-strong text-muted-foreground border-b px-5 py-3 text-xs/relaxed text-pretty">
             {reducedNote}
           </p>
         ) : null}

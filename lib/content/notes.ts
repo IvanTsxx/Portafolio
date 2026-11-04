@@ -4,7 +4,6 @@ import { createCollection } from "./collection";
 import type { MdxModule } from "./collection";
 import {
   compareNotes,
-  countNoteFacets,
   findAdjacentNotes,
   findRelationIssues,
   pickRelatedNotes,
@@ -28,8 +27,6 @@ export const getNoteSlugs = collection.slugs;
 export const getNote = collection.getBySlug;
 
 export const getNotes = collection.list;
-
-export const getNoteFacets = async () => countNoteFacets(await getNotes());
 
 export const getRelatedNotes = async (
   note: Note,

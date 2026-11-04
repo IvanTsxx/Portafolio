@@ -1,5 +1,5 @@
-import { BitmapPoster } from "@/components/lab/source/bitmap-poster";
+import { CapturedPoster } from "@/components/lab/captured-poster";
 
-import { posterBitmap } from "./poster-bitmap";
-
-export const SpeedSmearPoster = () => <BitmapPoster bitmap={posterBitmap} />;
+export const SpeedSmearPoster = () => (
+  <CapturedPoster alt="" slug="speed-smear" />
+);

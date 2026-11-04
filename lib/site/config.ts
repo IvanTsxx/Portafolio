@@ -2,17 +2,16 @@ const email = "bongiovannidev@gmail.com";
 
 export const siteConfig = {
   description:
-    "Ivo, frontend engineer. Interfaces, motion, real-time 3D and AI-assisted development with Conductor, git worktrees, agents, skills and MCPs.",
+    "Ivo, frontend developer. Thoughtful interfaces, real-time rendering and a lab of installable creative-code experiments.",
   email,
   github: "IvanTsxx",
   handle: "IvanTsxx",
   location: "Tucumán, Argentina",
   name: "Ivan Bongiovanni",
   nickname: "Ivo",
-  nicknameKana: "イヴォ",
   registryNamespace: "@ivan",
   repository: "IvanTsxx/Portafolio",
-  role: "Frontend engineer",
+  role: "Frontend Developer",
   socials: [
     {
       handle: "IvanTsxx",
@@ -33,31 +32,30 @@ export const siteConfig = {
       label: "Email",
     },
   ],
+  statement: {
+    accent: "learn",
+    closing: ".",
+    lead: "I build interfaces, experiment with the browser, and write about what I",
+  },
   url: "https://bongi.dev",
 } as const;
 
 export const primaryRoutes = [
-  { href: "/", index: "00", jp: "ホーム", label: "Home" },
-  { href: "/notes", index: "01", jp: "手記", label: "Notes" },
-  { href: "/experiments", index: "02", jp: "実験", label: "Experiments" },
-  { href: "/registry", index: "03", jp: "登録簿", label: "Registry" },
-  { href: "/skills", index: "04", jp: "スキル", label: "Skills" },
-  { href: "/design-system", index: "05", jp: "設計", label: "Design system" },
+  { href: "/experiments", index: "01", label: "Lab" },
+  { href: "/skills", index: "02", label: "Skills" },
+  { href: "/notes", index: "03", label: "Writing" },
+  { href: "/design-system", index: "04", label: "System" },
+] as const;
+
+export const secondaryRoutes = [
+  { href: "/registry", label: "Registry" },
 ] as const;
 
 export const homeSections = [
-  { id: "experience", index: "GH-02", label: "Experience" },
-  {
-    id: "matrix",
-    index: "GH-03",
-    label: "Contribution matrix",
-  },
-  { id: "experiments", index: "GH-04", label: "Experiments" },
-  { id: "how-i-work", index: "GH-05", label: "How I work" },
-  { id: "repos", index: "GH-06", label: "Repos" },
-  { id: "registry", index: "GH-07", label: "Registry" },
-  { id: "skills", index: "GH-08", label: "Skills" },
-  { id: "workshop", index: "GH-09", label: "Workshop" },
+  { id: "work", index: "01", label: "Work" },
+  { id: "lab", index: "02", label: "Lab" },
+  { id: "writing", index: "03", label: "Writing" },
+  { id: "skills", index: "04", label: "Skills" },
 ] as const;
 
 export type Social = (typeof siteConfig.socials)[number];

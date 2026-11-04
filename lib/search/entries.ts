@@ -7,7 +7,12 @@ import {
 import type { Note } from "@/lib/content/note-domain";
 import { formatRegistryIndex } from "@/lib/registry/registry";
 import type { RegistryItem } from "@/lib/registry/schema";
-import { homeSections, primaryRoutes, siteConfig } from "@/lib/site/config";
+import {
+  homeSections,
+  primaryRoutes,
+  secondaryRoutes,
+  siteConfig,
+} from "@/lib/site/config";
 import type { Social, SocialId } from "@/lib/site/config";
 import { formatSkillIndex } from "@/lib/skills/skills";
 import type { Skill } from "@/lib/skills/skills";
@@ -44,13 +49,20 @@ const joinDetail = (...parts: readonly (string | undefined)[]) =>
     .join(DETAIL_SEPARATOR);
 
 export const pageEntries = (): SearchEntry[] =>
-  primaryRoutes.map((route) => ({
+  [
+    { href: "/", index: "00", label: "Home" },
+    ...primaryRoutes,
+    ...secondaryRoutes.map((route, position) => ({
+      ...route,
+      index: String(primaryRoutes.length + position + 1).padStart(2, "0"),
+    })),
+  ].map((route) => ({
     action: { href: route.href, type: "route" },
     code: route.index,
     detail: route.href,
     group: "pages",
     id: `page:${route.href}`,
-    keywords: [route.jp],
+    keywords: [],
     title: route.label,
   }));
 

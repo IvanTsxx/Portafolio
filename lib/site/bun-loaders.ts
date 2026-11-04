@@ -6,12 +6,13 @@ import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 
 const googleFontNames = [
-  "Archivo",
   "Geist_Mono",
+  "Herr_Von_Muellerhoff",
   "Instrument_Serif",
-  "Noto_Sans_JP",
-  "Zen_Kaku_Gothic_New",
 ] as const;
+
+const geistFontStub = (exportName: string) =>
+  `export const ${exportName} = { className: '', style: { fontFamily: '' }, variable: '' };`;
 
 const googleFontStub = [
   "const font = () => ({ className: '', style: { fontFamily: '' }, variable: '' });",
@@ -32,6 +33,14 @@ export const registerAppLoaders = () =>
       });
       build.module("next/font/google", () => ({
         contents: googleFontStub,
+        loader: "js",
+      }));
+      build.module("geist/font/sans", () => ({
+        contents: geistFontStub("GeistSans"),
+        loader: "js",
+      }));
+      build.module("geist/font/mono", () => ({
+        contents: geistFontStub("GeistMono"),
         loader: "js",
       }));
     },

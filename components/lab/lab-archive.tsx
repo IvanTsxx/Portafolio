@@ -7,7 +7,6 @@ import { useUrlFilter } from "@/components/content/use-url-filter";
 import { DocumentSection } from "@/components/site/document-section";
 import { parseTopicParam, topicParam } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
-import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 export interface ArchiveItem {
@@ -30,7 +29,7 @@ const spanPattern = [
 
 const spanFor = (itemIndex: number, itemCount: number) =>
   itemCount % 2 === 1 && itemIndex === itemCount - 1
-    ? "lg:col-span-12"
+    ? "md:col-span-2 lg:col-span-12"
     : spanPattern[itemIndex % spanPattern.length];
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -73,18 +72,17 @@ export const LabArchive = ({ items }: { items: readonly ArchiveItem[] }) => {
     <DocumentSection
       aside={`${pad(visible.length)} / ${pad(items.length)}`}
       id="experiments"
-      index="LAB-03"
+      index="02"
       label="Index"
-      script={sectionScripts.labExperiments}
     >
       <output aria-live="polite" className="sr-only">
         Showing {visible.length} of {items.length}
       </output>
-      <ul className="border-graphite/30 grid border-t border-l lg:grid-cols-12">
+      <ul className="grid gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-12">
         {visible.map((item, itemIndex) => (
           <li
             className={cn(
-              "border-graphite/30 min-w-0 border-r border-b",
+              "reveal-on-view min-w-0",
               spanFor(itemIndex, visible.length)
             )}
             key={item.slug}

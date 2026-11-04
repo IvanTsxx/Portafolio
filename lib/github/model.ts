@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-export const contributionLevels = [0, 1, 2, 3, 4] as const;
-
 export const contributionLevelSchema = z.union([
   z.literal(0),
   z.literal(1),

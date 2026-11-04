@@ -19,28 +19,26 @@ Read before any change:
 
 ## Stack
 
-Next.js 16.4 App Router with Cache Components and Partial Prefetching, React 19, Tailwind v4, base-ui, cva + `cn`, GSAP through `lib/motion/gsap.ts`, React Three Fiber on one shared canvas, MDX content, shadcn registry, Agent Skills in `skills/`, Bun for scripts and tests.
+Next.js 16.4 App Router with Cache Components and Partial Prefetching, React 19, Tailwind v4, base-ui, cva + `cn`, next-themes for dark and light, React Three Fiber on one shared canvas (WebGPU for the slime experiment), MDX content, shadcn registry, Agent Skills in `skills/`, Upstash Redis for reactions, the Spotify Web API for the now-playing card, Bun for scripts and tests. There is no animation library: UI motion is CSS, scenes run on the three.js frame loop.
 
 ## Hard rules
 
 - No code comments.
 - Ivo is the only author and contributor. Never attribute anything in git or GitHub to an AI tool: no `Co-Authored-By` trailers, no "Generated with" lines, no bot authors, in commits, PR titles, PR bodies, comments or tags. Claude, v0, Cursor, Copilot and every other agent stay out of the contributor list. `.githooks/commit-msg` rejects these trailers and `.claude/settings.json` turns off Claude Code attribution; never bypass them with `--no-verify`.
-- No Playwright and no browser automation. Verify with tests, the build and the checks below.
-- Paper and ink tokens only. Clay orange belongs to the companion, plus three owner-approved exceptions: the hover accent of the contribution graph, the color print inside the Super Saiyan and Vegeta experiments, and the sparse clay toner dots of the gutter field around the sheet (`components/site/gutter-field/`) and of the hero field (`components/site/hero-field.tsx`). Radius 0, no shadows, no arbitrary Tailwind values unless they are a theme token.
-- Labels and short lines, not paragraphs.
-- One shared WebGL canvas (`components/scene/shared-canvas.tsx`). Render 3D or shaders through `useViewSlot`. Never add a second `Canvas`.
-- One agent on screen: the companion. `components/scene/one-agent.test.ts` enforces it.
+- Verify visual and interactive changes in a real browser with `agent-browser` (dark and light, 1440 and 390 wide), on top of tests, the build and the checks below. No Playwright test suites.
+- Semantic tokens only (`background`, `foreground`, `surface`, `muted-foreground`, `faint`, `border`, `border-strong`, `signal`, `focus`), defined for `:root` (light) and `.dark` in `app/globals.css`. Monochrome first; `signal` is rare. The only color exceptions are the color print inside the Super Saiyan and Vegeta experiments and the green of the Slime experiment. No shadows, no arbitrary Tailwind values unless they are a theme token or utility.
+- Short, concrete copy. Labels in mono, titles in the serif, reading text in the sans.
+- One shared WebGL canvas (`components/scene/shared-canvas.tsx`). Render 3D or shaders through `useViewSlot`. Never add a second `Canvas`. The one exception is a WebGPU experiment, which cannot share a WebGL context: it owns its Canvas through `registry/ivan/components/gpu-stage/gpu-stage.tsx`, mounted only while in view (`slime`).
 - Every animation has a reduced-motion version. Animate transform and opacity only. Stop loops offscreen.
-- Section builds never make content wait: 300ms per block, at most 40ms stagger, 500ms per section. Sections on screen at load and reduced motion skip the build. `lib/site/section-construction.test.ts` enforces the budget.
+- Motion never makes content wait or hides it from no-scroll readers: reveals are CSS (`rise-in`, `mask-up`, `reveal-on-view`) and collapse under reduced motion.
 - Card thumbnails and posters are static markup: no `<a>`, `<button>` or `tabindex`, because the card is already a link. `components/registry-docs/thumbnails.test.tsx` and `components/lab/posters.test.tsx` enforce it.
 - Server Components by default. `"use client"` only where interaction needs it.
-- React Compiler is on. Never write `useMemo`, `useCallback` or `memo` in `app`, `components`, `hooks` or `lib`. `registry/` keeps them, because installers may not run the compiler. `lib/site/react-compiler.test.ts` enforces it.
-- Cache Components is on. Never export `dynamic`, `revalidate`, `fetchCache` or `dynamicParams`. Remote data goes through a `"use cache"` function with `cacheLife`, like `getGithubProfile` and `getRepoStars`. Files from the repo (MDX, `globals.css`, registry source, fonts) are read with sync `node:fs`, so routes stay prerendered. A `"use cache"` function that calls `cacheLife` cannot run under `bun test`; keep the tested logic in a plain function and wrap it.
+- React Compiler is on. Never write `useMemo`, `useCallback` or `memo` in `app`, `components` or `lib`. `registry/` keeps them, because installers may not run the compiler. `lib/site/react-compiler.test.ts` enforces it.
+- Cache Components is on. Never export `dynamic`, `revalidate`, `fetchCache` or `dynamicParams`. Remote data goes through a `"use cache"` function with `cacheLife`, like `getGithubProfile`. The request-time exceptions are the routes under `app/api` (`now-playing`, `reactions`, the dev-only `spotify`), which read the request and set their own `Cache-Control`; no page waits on them. Files from the repo (MDX, `globals.css`, registry source, fonts) are read with sync `node:fs`, so routes stay prerendered. A `"use cache"` function that calls `cacheLife` cannot run under `bun test`; keep the tested logic in a plain function and wrap it.
 - Partial Prefetching is on. Links prefetch the route's shared shell. Every dynamic route lists its params in `generateStaticParams`; unknown slugs call `notFound()`.
 - Basement Studio appears only as employer: name, role, dates, type and link. Never its projects, code, repos or clients. `lib/github/privacy.ts` and the career tests enforce it.
 - Never invent clients, metrics or achievements. Placeholder content carries `sample: true`.
-- The legal surname appears only in the home intro. Titles and metadata use "Ivo". `lib/site/naming.test.ts` enforces it.
-- Japanese text only on route tabs, index page heroes and the nickname kana.
+- The legal name is read only by the home signature (`components/site/signature.tsx`), which prints the first name. Titles and metadata use "Ivo". `lib/site/naming.test.ts` enforces it.
 
 ## Definition of done
 
@@ -68,16 +66,16 @@ bun run seo:check
 
 ### Add an experiment
 
-1. Copy the folder pattern of `components/lab/experiments/dot-grid/`: `poster.tsx` (static server SVG), `live.tsx`, `preview.tsx`, controls from `components/lab/lab-controls.tsx`.
-2. Register it in `lib/lab/experiments.ts`. Keys stay alphabetical. Give it the next free `LAB-NN` index. Topics must exist in `lib/lab/topics.ts`.
-3. It shows up at `/experiments/<slug>`, on `/experiments` and on the home Experiments section with no other edits.
+1. Copy the folder pattern of `components/lab/experiments/lunar-dither/`: `poster.tsx` (a `CapturedPoster` of the slug), `live.tsx` (client-only dynamic loader), `preview.tsx` (the live stage), controls from `components/lab/lab-controls.tsx`. Add the poster pair `public/lab/posters/<slug>-light.webp` and `<slug>-dark.webp`, captured from the live stage in each theme.
+2. Register it in `lib/lab/experiments.ts`. Keys stay alphabetical. Give it an `LAB-NN` index above the highest one in use. Topics must exist in `lib/lab/topics.ts` (`Motion`, `WebGL`, `WebGPU`, `Shader`, `Image`); add a topic there only when an experiment uses it. If it is reusable, make it installable: put the source in `registry/ivan/components/<name>/` with a `<Name>Scene` (no Canvas) and a standalone `<Name>` wrapper, add the registry item, set `registryItem` on the experiment, and render the scene on the site through `useViewSlot`. Follow `lunar-dither`. Verify the install in a clean consumer app.
+3. It shows up at `/experiments/<slug>`, on `/experiments` and on the home Lab section with no other edits.
 4. Commit, then run `bun run seo:dates` and commit the dates.
 
 ### Add or remove a registry component
 
-1. Source goes in `registry/ivan/`, the entry in `registry.json`, and a demo with a thumbnail in `components/registry-docs/demos/<name>.tsx`. Follow an existing item such as `magnetic-button`. The thumbnail renders a static face of the component (`MagneticButtonFace`) or plain spans, never the live component.
+1. Source goes in `registry/ivan/`, the entry in `registry.json`, and a demo with a thumbnail in `components/registry-docs/demos/<name>.tsx`. Follow an existing item such as `magnetic-button`. The thumbnail renders a static face of the component (`MagneticButtonFace`), plain spans or the experiment's captured poster, never the live component. Examples that need the site's shared canvas import a `<name>-view.tsx` shim from the demos folder; add the matching line to `docsShimRewrites` in `lib/registry/installed.ts` so the install tab shows the real import.
 2. Run `bun run registry:build` to refresh `public/r/`.
-3. Removing an item: delete its source, entry, demo, examples and `public/r/<name>.json`.
+3. Removing an item: delete its source in `registry/ivan/components/<name>/` (or `ui/`), its examples in `registry/ivan/examples/<name>/`, its `registry.json` entry (rewrite the JSON with a script, then `bun x oxfmt registry.json`), its demo and `<name>-view.tsx` shim in `components/registry-docs/demos/`, its line in `docsShimRewrites`, `public/r/<name>.json`, and any copy that names it (`lib/site/seo.ts`). Keep shared hooks and libs in `registry/ivan/hooks` and `registry/ivan/lib` that other items still import. Then run `bun run registry:build`.
 4. Commit, then run `bun run seo:dates` and commit the dates.
 
 ### Add or update a skill
@@ -91,30 +89,48 @@ bun run seo:check
 
 ### Add or reorder a home section
 
-1. Add it to `homeSections` in `lib/site/config.ts`. That list drives the heading code, the thumb-index notch and its order.
-2. The section reads its heading through `homeSectionById("<id>")` and renders a `DocumentSection`, so the companion, the notches and the narration pick it up.
-3. Add one narration line in `lib/site/section-scripts.ts`: first person, at most 48 characters, never repeating what is printed on screen.
-4. Mark buildable blocks with `data-build-block`.
+1. Add its data to `getHomeSections` in `lib/site/home-sections.ts` (id, label, facts, rows, moon phase). Sections render in that order through `components/home/layouts/gallery-layout.tsx`, which gives `lab` its poster grid and every other id leader rows.
+2. Add the same id, an index and a label to `homeSections` in `lib/site/config.ts`, so the search palette links to the anchor. `lib/search/entries.test.ts` checks that the id exists in `lib/site/home-sections.ts`.
+3. Keep section content in `components/home/`.
 
 ### Change tokens, utilities or design rules
 
 1. Edit `app/globals.css` and the specs in `lib/design-system/`.
-2. Every `@utility` needs an entry in `lib/design-system/specs.ts` and a preview in `components/design-system/utilities-section.tsx`.
+2. Every token and `@utility` needs an entry in `lib/design-system/specs.ts`, and the site must use it. Remove what nothing uses. `lib/design-system/usage.test.ts` fails on a documented token, utility, component or spacing step that no file under `app`, `components`, `lib`, `hooks`, `content` or `registry` references.
 3. Run `bun run design:md` to regenerate `docs/design.md`.
 
 ### Change GitHub data
 
-Profile data comes from `lib/github/`. `lib/github/snapshot.json` is the offline fallback. Keep `privacy.ts` filtering intact and keep its tests passing. `lib/github/language.ts` shows Python repositories as TypeScript.
+Profile data comes from `lib/github/`, read through `getGithubProfile` in `lib/site/github-profile.ts`. Today the site uses it for the avatar (`app/avatar/route.ts`, with `public/profile/portrait.jpg` as fallback) and the structured-data image. `GITHUB_TOKEN` in `.env.local` enables the live fetch; `lib/github/snapshot.json` is the offline fallback, refreshed with `bun lib/github/write-snapshot.ts`. Keep `privacy.ts` filtering intact and keep its tests passing. `lib/github/language.ts` shows Python repositories as TypeScript.
+
+### Set up Spotify now playing
+
+1. Create a Spotify app with the redirect URI `http://[::1]:3000/api/spotify/callback` and put `SPOTIFY_CLIENT_ID` and `SPOTIFY_CLIENT_SECRET` in `.env.local`.
+2. With the dev server running, open `/api/spotify/login`, approve the scopes (`user-read-currently-playing`, `user-read-recently-played`) and copy the `SPOTIFY_REFRESH_TOKEN` line that `/api/spotify/callback` prints. Both routes answer 404 outside development.
+3. Put the three variables in `.env.local` and in the Vercel project env, then restart the dev server.
+4. Without them `/api/now-playing` answers 503 and `components/home/now-playing.tsx` hides the card. With them it polls every 30 seconds and shows the current track, or the last one played.
+
+### Change reactions
+
+Kinds and labels live in `lib/reactions/kinds.ts`. `lib/reactions/store.ts` picks the store: Upstash Redis when `KV_REST_API_URL` and `KV_REST_API_TOKEN` (or `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`) exist, a JSON file at `.data/reactions.json` (git-ignored) in development, and no store in production without Redis, which makes the API answer 503 and the bar hide itself. The visitor is an httpOnly `lab_visitor` cookie.
 
 ## Map
 
-- `app/(document)`: index pages (`/`, `/notes`, `/experiments`, `/registry`, `/skills`, `/design-system`).
+- `app/(document)`: index pages (`/`, `/notes`, `/experiments`, `/registry`, `/skills`, `/design-system`). `/experiments` is labelled Lab and `/notes` Writing. There is no `/work` page: Work is a home section fed by `lib/site/experience.ts`. `/design-system/design.md` serves `docs/design.md`.
 - `app/(detail)`: detail pages for notes, experiments, registry items and skills.
-- `app/markdown`, `app/llms.txt`, `app/llms-full.txt`: plain Markdown for agents. `next.config.ts` rewrites `/notes/<slug>.md`, `/experiments/<slug>.md`, `/registry/<slug>.md` and `/skills/<slug>.md` to `app/markdown`. `components/site/open-in-menu.tsx` copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
-- `components/site`: dossier chrome (one 60rem sheet, the bound edge in `dossier-edge.tsx`), route tabs, thumb index, hero field, headings, section build.
-- `components/scene`: shared canvas, companion, stages, narration, active section. `companion-placement.ts` docks the companion. On phones it peeks from the bottom right corner.
-- `components/profile`: home sections in `homeSections` order. Experience is window envelopes that open on the current job (`experience/`). Repos is a cassette tower that opens on the most-starred repo, with one tape out at a time (`repositories/`). Contribution matrix is a compact contribution graph (`matrix/`). Skills lists `skills/` with the install command (`skills-section.tsx`).
-- `components/lab`: experiments. `lib/lab`: their registry.
+- `app/api`: `reactions` (`GET /api/reactions`, `GET` and `POST /api/reactions/<slug>`), `now-playing` (Spotify), and the development-only OAuth helpers `spotify/login` and `spotify/callback`. `app/avatar/route.ts` serves the GitHub avatar with a local fallback.
+- `app/markdown`, `app/llms.txt`, `app/llms-full.txt`: plain Markdown for agents. `next.config.ts` rewrites `/notes/<slug>.md`, `/experiments/<slug>.md`, `/registry/<slug>.md` and `/skills/<slug>.md` to `app/markdown`, and redirects `/lab` to `/experiments`. `components/site/open-in-menu.tsx` copies the Markdown or opens it in ChatGPT, Claude or Perplexity.
+- `app/layout.tsx`: wraps the site in `PagePeel` (`registry/ivan/components/page-peel/`), whose underside is `components/underside/underside.tsx`, a working drawing of the site with tonight's moon, Tucumán time and the recent commits from `lib/site/revision.ts` (`next.config.ts` injects `NEXT_PUBLIC_GIT_SHA` and `NEXT_PUBLIC_GIT_LOG`). The footer carries a keyboard trigger, "View the underside".
+- `components/site`: chrome. `site-header.tsx` (monogram, `site-nav.tsx` primary nav, search, theme toggle, mobile menu), `site-footer.tsx`, `detail-control.tsx` (the Plain, Guides and Measure detail levels, key D), `plate-page.tsx` (the 4/12 plate and 8/12 column with its guides), `social-links.tsx`, `signature.tsx`, `page-frame.tsx`, `document-hero.tsx`, `document-section.tsx`, `monogram.tsx`, `theme-provider.tsx`.
+- `components/home`: home sections. `layouts/gallery-layout.tsx` (the home), `home-figures.tsx` (portrait plate, statement), `rows.tsx` (section marks and leader rows), `sky-caption.tsx` with `local-time.tsx` and `moon-readout.tsx` (`useMoonReading`), `now-playing.tsx` (Spotify card), `moon-poster.tsx`. Home data comes from `lib/site/home-sections.ts`.
+- `components/scene`: shared canvas, view registry, WebGL support.
+- `components/lab`: experiments. `lib/lab`: their registry (`experiments.ts`), topics (`topics.ts`) and the copy-paste agent prompts (`prompts.ts`). The experiments are `dust-portrait`, `lunar-dither`, `orbit-dust`, `signal-tear`, `slime` (WebGPU), `speed-smear`, `super-saiyan` and `vegeta`. Posters are captured images in `public/lab/posters/`.
+- `registry/ivan`: installable registry source. Never imports portfolio code. Items: `magnetic-button`, `dither-image`, `page-peel`, `lunar-dither`, `orbit-dust`, `signal-tear`, `speed-smear`, `storm-print`, `blast-print`, `dust-portrait`, `slime`. `components/registry-docs` renders their docs and demos, `lib/registry` loads them.
+- `lib/reactions`, `app/api/reactions`, `components/reactions`: anonymous experiment reactions.
+- `lib/spotify`: `now-playing.ts` (token refresh, current and last played track) and `auth.ts` (redirect URI, scopes and authorize URL for the development OAuth helpers).
+- `lib/sky`: moon phase math. `lib/site/capabilities.ts`: skills data. `lib/site/experience.ts`: work rows.
+- `lib/search`, `components/command`: the search palette (`Cmd+K`, `Ctrl+K`, `/`).
 - `skills/`: Agent Skills, one folder each. `lib/skills`: loader and install commands. `components/skills`: list, install block, rendered body, file list.
-- `lib/site`: config, section list, narration, SEO, structured data, route dates.
+- `lib/site`: config, SEO, structured data, route dates, revision.
+- Brand and icons: the monogram is `components/site/monogram.tsx` over the geometry in `lib/site/monogram.ts`. `app/icon.svg` (adapts to the browser's light or dark scheme), `app/favicon.ico` (regenerate with `bun run brand:favicon`), `app/apple-icon.tsx` and `app/pwa-icon/[size]` (manifest icons) are drawn from it by `lib/site/icon-mark.tsx`. Social images are `opengraph-image.tsx` files that call `renderOgImage` in `lib/content/og-image.tsx`. `lib/site/print-colors.ts` mirrors the dark tokens for the icons and manifest, and `print-colors.test.ts` keeps them in sync. Its `nightColors` export maps the dark tokens onto the OG palette, so OG images render in the dark theme.
 - `lib/design-system`: design tokens and the `docs/design.md` generator.

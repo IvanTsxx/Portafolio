@@ -3,12 +3,13 @@
 import type { ReactNode, RefObject } from "react";
 import { useEffect, useLayoutEffect, useSyncExternalStore } from "react";
 
-import { useBuildHeld } from "./build-hold";
-
 export const viewPriority = { overlay: 3, scene: 2 } as const;
+
+export type ViewLoop = "always" | "demand";
 
 export interface ViewSlot {
   id: string;
+  loop: ViewLoop;
   node: ReactNode;
   priority: number;
   track: RefObject<HTMLElement>;
@@ -41,9 +42,9 @@ const notify = () => {
 
 const rebuildSnapshot = () => {
   const near: ViewSlot[] = [];
-  for (const { id, isNear, node, priority, track } of slots.values()) {
+  for (const { id, isNear, loop, node, priority, track } of slots.values()) {
     if (isNear) {
-      near.push({ id, node, priority, track });
+      near.push({ id, loop, node, priority, track });
     }
   }
   nearSnapshot = near.toSorted((a, b) => a.priority - b.priority);
@@ -84,11 +85,13 @@ const registerSlot = (
   id: string,
   element: HTMLElement,
   node: ReactNode,
-  priority: number
+  priority: number,
+  loop: ViewLoop
 ) => {
   slots.set(id, {
     id,
     isNear: false,
+    loop,
     node,
     priority,
     track: { current: element },
@@ -121,7 +124,8 @@ const subscribe = (listener: () => void) => {
 };
 
 const getNearSnapshot = () => nearSnapshot;
-const getServerNearSnapshot = (): readonly ViewSlot[] => [];
+const noSlots: readonly ViewSlot[] = [];
+const getServerNearSnapshot = () => noSlots;
 const getHasSlots = () => slots.size > 0;
 const getServerHasSlots = () => false;
 export const useNearViewSlots = () =>
@@ -135,17 +139,17 @@ export const useViewSlot = (
   track: RefObject<HTMLElement | null>,
   node: ReactNode,
   enabled = true,
-  priority: number = viewPriority.scene
+  priority: number = viewPriority.scene,
+  loop: ViewLoop = "always"
 ) => {
-  const isHeld = useBuildHeld(track);
-  const isShown = enabled && !isHeld;
+  const isShown = enabled;
   useLayoutEffect(() => {
     const element = track.current;
     if (!(element && isShown)) {
       return;
     }
-    return registerSlot(id, element, null, priority);
-  }, [isShown, id, priority, track]);
+    return registerSlot(id, element, null, priority, loop);
+  }, [isShown, id, loop, priority, track]);
 
   useEffect(() => {
     updateSlot(id, node);

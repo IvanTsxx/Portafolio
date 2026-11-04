@@ -27,11 +27,11 @@ export const ExampleBlock = async ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h3 className="text-ink text-base font-medium tracking-tight">
+        <h3 className="text-foreground text-base font-medium tracking-tight">
           {example.title}
         </h3>
         {example.description ? (
-          <p className="text-graphite max-w-prose text-sm text-pretty">
+          <p className="text-muted-foreground max-w-prose text-sm text-pretty">
             {example.description}
           </p>
         ) : null}

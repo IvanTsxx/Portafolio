@@ -13,12 +13,32 @@ const installedImportRewrites = [
 
 export const docsShimRewrites = [
   [
-    '"@/components/registry-docs/demos/agent-canvas-view"',
-    '"@react-three/fiber"',
+    '"@/components/registry-docs/demos/orbit-dust-view"',
+    '"@/components/orbit-dust/orbit-dust"',
   ],
   [
-    '"@/components/registry-docs/demos/agent-stage-view"',
-    '"@/components/agent-stage/agent-stage"',
+    '"@/components/registry-docs/demos/lunar-dither-view"',
+    '"@/components/lunar-dither/lunar-dither"',
+  ],
+  [
+    '"@/components/registry-docs/demos/dust-portrait-view"',
+    '"@/components/dust-portrait/dust-portrait"',
+  ],
+  [
+    '"@/components/registry-docs/demos/blast-print-view"',
+    '"@/components/blast-print/blast-print"',
+  ],
+  [
+    '"@/components/registry-docs/demos/signal-tear-view"',
+    '"@/components/signal-tear/signal-tear"',
+  ],
+  [
+    '"@/components/registry-docs/demos/speed-smear-view"',
+    '"@/components/speed-smear/speed-smear"',
+  ],
+  [
+    '"@/components/registry-docs/demos/storm-print-view"',
+    '"@/components/storm-print/storm-print"',
   ],
 ] as const;
 

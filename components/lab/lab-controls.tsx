@@ -15,7 +15,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
 export const controlGridClassName =
-  "grid overflow-hidden sm:grid-cols-2 lg:grid-cols-3 *:-mr-px *:-mb-px *:border-r *:border-b *:border-rule";
+  "grid overflow-hidden sm:grid-cols-2 lg:grid-cols-3 *:-mr-px *:-mb-px *:border-r *:border-b *:border-border";
 
 interface ControlRowProps {
   labelId: string;
@@ -34,15 +34,17 @@ const ControlRow = ({
 }: ControlRowProps) => (
   <div className="flex flex-col gap-3 px-5 py-4">
     <div className="flex items-baseline justify-between gap-4">
-      <span className="label text-ink" id={labelId}>
+      <span className="label text-foreground" id={labelId}>
         {label}
       </span>
       {readout === undefined ? null : (
-        <span className="label text-graphite tabular-nums">{readout}</span>
+        <span className="label text-muted-foreground tabular-nums">
+          {readout}
+        </span>
       )}
     </div>
     {children}
-    {hint ? <p className="text-mist text-xs/relaxed">{hint}</p> : null}
+    {hint ? <p className="text-faint text-xs/relaxed">{hint}</p> : null}
   </div>
 );
 
@@ -150,7 +152,7 @@ export const SwitchControl = ({
   return (
     <div className="flex flex-col gap-2 px-5 py-4">
       <div className="flex items-center justify-between gap-4">
-        <span className="label text-ink" id={labelId}>
+        <span className="label text-foreground" id={labelId}>
           {label}
         </span>
         <Switch
@@ -160,7 +162,7 @@ export const SwitchControl = ({
           onCheckedChange={onChange}
         />
       </div>
-      {hint ? <p className="text-mist text-xs/relaxed">{hint}</p> : null}
+      {hint ? <p className="text-faint text-xs/relaxed">{hint}</p> : null}
     </div>
   );
 };
@@ -227,7 +229,7 @@ export const ActionControl = ({
   onAction,
 }: ActionControlProps) => (
   <div className="flex items-center justify-between gap-4 px-5 py-4">
-    <span className="label text-ink">{label}</span>
+    <span className="label text-foreground">{label}</span>
     <button
       className={technicalButtonVariants({ size: "sm" })}
       disabled={disabled}
@@ -254,7 +256,7 @@ export const ControlTabs = ({ label, tabs }: ControlTabsProps) => (
   <Tabs className="col-span-full gap-0" defaultValue={tabs[0]?.value}>
     <TabsList
       aria-label={label}
-      className="border-rule h-auto w-full gap-0 border-b p-0"
+      className="border-border h-auto w-full gap-0 border-b p-0"
       variant="line"
     >
       {tabs.map((tab) => (

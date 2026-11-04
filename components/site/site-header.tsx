@@ -2,37 +2,39 @@ import Link from "next/link";
 
 import { CommandPaletteProvider } from "@/components/command/command-palette-provider";
 import { CommandPaletteTrigger } from "@/components/command/command-palette-trigger";
-import { GithubStars } from "@/components/site/github-stars";
+import { Monogram } from "@/components/site/monogram";
+import { MobileMenu, SiteNav } from "@/components/site/site-nav";
 import { focusRingClassName } from "@/components/site/styles";
+import { ThemeToggle } from "@/components/site/theme-toggle";
 import { buildSearchIndex } from "@/lib/search/build-index";
 import { siteConfig } from "@/lib/site/config";
-import { getRepoStars } from "@/lib/site/github-repo";
 import { cn } from "@/lib/utils";
 
 export const SiteHeader = async () => {
-  const [searchEntries, stars] = await Promise.all([
-    buildSearchIndex(),
-    getRepoStars(),
-  ]);
+  const searchEntries = await buildSearchIndex();
   return (
     <CommandPaletteProvider entries={searchEntries}>
-      <header className="border-rule bg-paper/90 text-ink sticky top-0 z-50 border-b backdrop-blur-md">
-        <div className="flex h-12 items-center justify-between gap-4 px-3 md:px-8 lg:px-12">
+      <header className="bg-background/75 text-foreground sticky top-0 z-40 backdrop-blur-md">
+        <div className="max-w-frame mx-auto grid h-14 grid-cols-2 items-center gap-4 px-5 md:grid-cols-3 md:px-8">
           <Link
             aria-label={`${siteConfig.nickname}, home`}
             className={cn(
-              "font-wordmark -mx-1 inline-flex min-h-11 items-center px-1 text-xl leading-none italic",
+              "group/home -mx-1 flex min-h-11 w-fit items-center gap-3 px-1",
               focusRingClassName
             )}
             href="/"
           >
-            {siteConfig.nickname}
+            <Monogram className="ease-out-expo size-7 transition-transform duration-500 group-hover/home:-rotate-6" />
+            <span className="spaced hidden sm:inline">Ivan</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <SiteNav />
+          <div className="flex items-center gap-1 justify-self-end">
             <CommandPaletteTrigger />
-            <GithubStars count={stars} />
+            <ThemeToggle />
+            <MobileMenu />
           </div>
         </div>
+        <div aria-hidden className="hairline-x max-w-frame mx-auto h-px" />
       </header>
     </CommandPaletteProvider>
   );

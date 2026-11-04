@@ -44,7 +44,7 @@ export const CommandPaletteTrigger = ({
     >
       <MagnifyingGlassIcon aria-hidden className="size-4" />
       <span className="hidden md:max-lg:inline xl:inline">Search</span>
-      <Kbd className="label bg-paper-deep text-graphite group-hover/search:bg-paper/15 group-hover/search:text-paper ease-mechanical hidden h-5 px-1.5 normal-case transition-colors duration-100 md:pointer-fine:inline-flex">
+      <Kbd className="label bg-surface text-muted-foreground group-hover/search:bg-foreground group-hover/search:text-background ease-mechanical hidden h-5 px-1.5 normal-case transition-colors duration-100 md:pointer-fine:inline-flex">
         {modifierKey}K
       </Kbd>
     </button>

@@ -1,8 +1,8 @@
 import { ExperimentCard } from "@/components/lab/experiment-card";
 import { LabArchive, LabTopicFilter } from "@/components/lab/lab-archive";
 import { DocumentHero } from "@/components/site/document-hero";
-import { FilterFold } from "@/components/site/filter-fold";
 import { JsonLd } from "@/components/site/json-ld";
+import { PlatePage } from "@/components/site/plate-page";
 import { activeTopics, experiments } from "@/lib/lab/experiments";
 import { buildPageMetadata, pageSeo } from "@/lib/site/seo";
 import { experimentsIndexJsonLd } from "@/lib/site/structured-data";
@@ -26,20 +26,28 @@ const items = experiments.map((experiment) => ({
 const ExperimentsPage = () => (
   <>
     <JsonLd data={experimentsIndexJsonLd(experiments)} />
-    <DocumentHero
-      code="LAB-01"
-      jp="実験"
-      lede="Techniques tested live"
-      meta={[
-        { label: "Entries", value: pad(experiments.length) },
-        { label: "Topics", value: pad(activeTopics.length) },
-      ]}
-      title="Experiments"
-    />
-    <FilterFold>
-      <LabTopicFilter topics={topicCounts} total={experiments.length} />
-    </FilterFold>
-    <LabArchive items={items} />
+    <PlatePage
+      plate={
+        <DocumentHero
+          code="Index · Lab"
+          lede="Small experiments in rendering, interaction and creative code. Built to explore, documented to share. Reusable ones install with the shadcn CLI."
+          meta={[
+            { label: "Entries", value: pad(experiments.length) },
+            { label: "Topics", value: pad(activeTopics.length) },
+          ]}
+          title={
+            <>
+              The <em>lab</em>
+            </>
+          }
+        />
+      }
+    >
+      <div>
+        <LabTopicFilter topics={topicCounts} total={experiments.length} />
+      </div>
+      <LabArchive items={items} />
+    </PlatePage>
   </>
 );
 

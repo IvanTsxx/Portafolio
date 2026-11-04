@@ -11,7 +11,7 @@ const cornerPlacements = [
 ] as const;
 
 const cornerVariants = cva(
-  "border-ink pointer-events-none absolute size-2 select-none",
+  "border-foreground pointer-events-none absolute size-2 select-none",
   {
     defaultVariants: { reveal: "always" },
     variants: {

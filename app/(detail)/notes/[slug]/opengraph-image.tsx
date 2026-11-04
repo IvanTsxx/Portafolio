@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
-import { noteKinds, stampOf } from "@/lib/content/note-domain";
-import { getNote, getNoteSlugs } from "@/lib/content/notes";
+import { formatNoteCode, noteKinds } from "@/lib/content/note-domain";
+import { getNote, getNoteSlugs, getNotes } from "@/lib/content/notes";
 import { renderOgImage } from "@/lib/content/og-image";
 
 export const alt = "Note";
@@ -16,19 +16,17 @@ const NoteOpenGraphImage = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug } = await params;
-  const document = await getNote(slug);
+  const [document, notes] = await Promise.all([getNote(slug), getNotes()]);
   if (!document) {
     notFound();
   }
   const { entry: note } = document;
-  const detail =
-    note.kind === "case-study"
-      ? note.role
-      : `${note.readingTimeMinutes} min read`;
+  const code = formatNoteCode(notes.findIndex((item) => item.slug === slug));
   return renderOgImage({
-    eyebrow: `${noteKinds[note.kind].label} · ${stampOf(note).label} · ${detail}`,
+    label: { code, meta: noteKinds[note.kind].label },
     sample: note.sample,
-    title: note.title,
+    summary: note.summary,
+    title: { text: note.title },
   });
 };
 

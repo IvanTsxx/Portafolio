@@ -3,25 +3,30 @@
 import { useId, useRef, useState } from "react";
 
 import { ExperimentStage } from "@/components/lab/experiment-stage";
+import { useThemeTones } from "@/components/lab/experiments/lunar-dither/use-theme-tones";
 import {
   SliderControl,
   SwitchControl,
   ToggleControl,
 } from "@/components/lab/lab-controls";
+import { useShowsOriginal } from "@/components/lab/source/stage-reveal";
 import {
   imageSourceOptions,
   sourceImages,
 } from "@/components/lab/source/tone-chunk";
-import {
-  releaseStagePointer,
-  trackStagePointer,
-} from "@/components/lab/source/use-source";
-import type { StagePointer } from "@/components/lab/source/use-source";
+import type { SourceImage } from "@/components/lab/source/tone-chunk";
+import { StageHint } from "@/components/lab/stage-hint";
 import { useStageActivity } from "@/components/lab/use-stage-activity";
 import { useViewSlot } from "@/components/scene/view-registry";
+import { SpeedSmearScene } from "@/registry/ivan/components/speed-smear/speed-smear-scene";
 
-import SmearView from "./smear-view";
-import type { SmearSettings } from "./smear-view";
+interface SmearSettings {
+  angle: number;
+  dither: boolean;
+  reach: number;
+  smear: number;
+  source: SourceImage;
+}
 
 const SpeedSmearPreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
@@ -32,23 +37,29 @@ const SpeedSmearPreview = () => {
     smear: 12,
     source: "ippo",
   });
-
+  const tones = useThemeTones();
+  const showsOriginal = useShowsOriginal();
   const field = useRef<HTMLDivElement>(null);
   const slotId = useId();
-  const pointer = useRef<StagePointer>({
-    isHovering: false,
-    x: 0.5,
-    y: 0.5,
-  });
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const { focus, path } = sourceImages[settings.source];
 
   useViewSlot(
     slotId,
     field,
-    <SmearView
-      animate={activity === "running"}
-      pointer={pointer}
-      settings={settings}
-    />
+    <group visible={!showsOriginal}>
+      <SpeedSmearScene
+        angle={settings.angle}
+        dither={settings.dither}
+        focus={focus}
+        ink={tones.ink}
+        paper={tones.paper}
+        paused={activity !== "running"}
+        reach={settings.reach / 100}
+        smear={settings.smear / 100}
+        src={path}
+      />
+    </group>
   );
 
   return (
@@ -114,9 +125,17 @@ const SpeedSmearPreview = () => {
     >
       <div
         className="pointer-events-auto size-full cursor-crosshair touch-pan-y"
-        onPointerLeave={() => releaseStagePointer(pointer.current)}
-        onPointerMove={(event) => trackStagePointer(pointer.current, event)}
+        onPointerMove={(event) => {
+          if (Math.abs(event.movementX) + Math.abs(event.movementY) > 24) {
+            setHasInteracted(true);
+          }
+        }}
         ref={field}
+      />
+      <StageHint
+        isDismissed={hasInteracted || showsOriginal}
+        label="Move fast across the face"
+        touchLabel="Drag across the face"
       />
     </ExperimentStage>
   );

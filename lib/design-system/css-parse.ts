@@ -11,6 +11,7 @@ export interface CssRule {
 }
 
 export interface GlobalsCss {
+  dark: ReadonlyMap<string, string>;
   root: ReadonlyMap<string, string>;
   rules: readonly CssRule[];
   theme: ReadonlyMap<string, string>;
@@ -158,6 +159,7 @@ const toUtilityMap = (rules: readonly CssRule[]) => {
 export const parseGlobalsCss = (source: string): GlobalsCss => {
   const rules = parseCss(source);
   return {
+    dark: toDeclarationMap(rules.filter((rule) => rule.header === ".dark")),
     root: toDeclarationMap(rules.filter((rule) => rule.header === ":root")),
     rules,
     theme: toDeclarationMap(
@@ -166,29 +168,3 @@ export const parseGlobalsCss = (source: string): GlobalsCss => {
     utilities: toUtilityMap(rules),
   };
 };
-
-const indentOf = (line: string) => line.length - line.trimStart().length;
-
-export const dedent = (text: string) => {
-  const lines = text.split("\n");
-  while (lines.length > 0 && lines[0]?.trim() === "") {
-    lines.shift();
-  }
-  while (lines.length > 0 && lines.at(-1)?.trim() === "") {
-    lines.pop();
-  }
-  let margin = Number.POSITIVE_INFINITY;
-  for (const line of lines) {
-    if (line.trim() !== "") {
-      margin = Math.min(margin, indentOf(line));
-    }
-  }
-  const trimBy = Number.isFinite(margin) ? margin : 0;
-  return lines.map((line) => line.slice(trimBy).trimEnd()).join("\n");
-};
-
-export const ruleToCss = (rule: CssRule) =>
-  `${rule.header} {\n${dedent(rule.body)
-    .split("\n")
-    .map((line) => `  ${line}`)
-    .join("\n")}\n}`;

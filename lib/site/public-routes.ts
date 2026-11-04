@@ -5,8 +5,6 @@ import { experiments } from "@/lib/lab/experiments";
 import { registryItems } from "@/lib/registry/registry";
 import { skills } from "@/lib/skills/skills";
 
-import { primaryRoutes } from "./config";
-import type { PrimaryRoute } from "./config";
 import routeDates from "./route-dates.json";
 import { experimentPath, registryItemPath, skillPath } from "./seo";
 
@@ -15,10 +13,10 @@ export interface PublicRoute {
   sources: readonly string[];
 }
 
-const primarySources: Record<PrimaryRoute["href"], readonly string[]> = {
+const indexRoutes: Record<`/${string}`, readonly string[]> = {
   "/": [
     "app/(document)/page.tsx",
-    "components/profile",
+    "components/home",
     "lib/site/config.ts",
     "lib/site/experience.ts",
   ],
@@ -38,13 +36,14 @@ const primarySources: Record<PrimaryRoute["href"], readonly string[]> = {
   "/skills": ["app/(document)/skills", "components/skills", "skills"],
 };
 
+const indexPaths = Object.keys(indexRoutes).filter(
+  (path): path is `/${string}` => path.startsWith("/")
+);
+
 export const getPublicRoutes = async (): Promise<PublicRoute[]> => {
   const notes = await getNotes();
   return [
-    ...primaryRoutes.map((route) => ({
-      path: route.href,
-      sources: primarySources[route.href],
-    })),
+    ...indexPaths.map((path) => ({ path, sources: indexRoutes[path] ?? [] })),
     ...notes.flatMap((note) =>
       isIndexable(note)
         ? [{ path: notePath(note.slug), sources: [noteSource(note.slug)] }]

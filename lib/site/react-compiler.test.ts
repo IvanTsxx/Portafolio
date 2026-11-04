@@ -4,7 +4,7 @@ import path from "node:path";
 
 import nextConfig from "@/next.config";
 
-const compiledDirectories = ["app", "components", "hooks", "lib"];
+const compiledDirectories = ["app", "components", "lib"];
 
 const sourceFilePattern = /\.(?:ts|tsx)$/u;
 

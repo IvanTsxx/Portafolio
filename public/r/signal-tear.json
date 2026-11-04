@@ -1,0 +1,248 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "signal-tear",
+  "title": "Signal Tear",
+  "description": "A grainy picture whose rows tear sideways and drag light into a ghost trail, like a bad VHS still.",
+  "dependencies": [
+    "three@^0.186.1",
+    "@react-three/fiber@^9.8.1"
+  ],
+  "devDependencies": [
+    "@types/three@^0.186.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/ivan/components/signal-tear/signal-tear.tsx",
+      "content": "\"use client\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n  CanvasStage,\n  ImageFallback,\n} from \"@/registry/ivan/components/canvas-stage/canvas-stage\";\nimport { centeredFocus } from \"@/registry/ivan/lib/image-cover\";\n\nimport { signalTearDefaults } from \"./signal-tear-material\";\nimport { SignalTearScene } from \"./signal-tear-scene\";\nimport type { SignalTearSceneProps } from \"./signal-tear-scene\";\n\nexport interface SignalTearProps extends SignalTearSceneProps {\n  className?: string;\n  label?: string;\n}\n\nconst defaultLabel =\n  \"A grainy picture whose rows tear sideways and leave light trails near the pointer\";\n\nexport const SignalTear = ({\n  className,\n  label = defaultLabel,\n  src,\n  focus = centeredFocus,\n  ink = signalTearDefaults.ink,\n  paper = signalTearDefaults.paper,\n  paused = signalTearDefaults.paused,\n  ...sceneProps\n}: SignalTearProps) => (\n  <CanvasStage\n    className={cn(\"touch-pan-y\", className)}\n    fallback={<ImageFallback focus={focus} src={src} />}\n    ground={ink}\n    label={label}\n    paused={paused}\n  >\n    {(isAnimating) => (\n      <SignalTearScene\n        {...sceneProps}\n        focus={focus}\n        ink={ink}\n        paper={paper}\n        paused={!isAnimating}\n        src={src}\n      />\n    )}\n  </CanvasStage>\n);\n",
+      "type": "registry:component",
+      "target": "@components/signal-tear/signal-tear.tsx"
+    },
+    {
+      "path": "registry/ivan/components/signal-tear/signal-tear-scene.tsx",
+      "content": "\"use client\";\n\nimport { useFrame, useThree } from \"@react-three/fiber\";\nimport { useEffect, useMemo } from \"react\";\nimport { PlaneGeometry } from \"three\";\nimport type { WebGLRenderer } from \"three\";\n\nimport { usePrintImage } from \"@/registry/ivan/hooks/use-print-image\";\nimport type { PrintImage } from \"@/registry/ivan/hooks/use-print-image\";\nimport {\n  centeredFocus,\n  readViewport,\n  setCoverImage,\n} from \"@/registry/ivan/lib/image-cover\";\nimport type { ImageFocus } from \"@/registry/ivan/lib/image-cover\";\nimport { PointerLight } from \"@/registry/ivan/lib/pointer-light\";\nimport type { PointerSample } from \"@/registry/ivan/lib/pointer-trace\";\n\nimport { SignalTearMaterial, signalTearDefaults } from \"./signal-tear-material\";\n\nexport interface SignalTearSceneProps {\n  src: string;\n  focus?: ImageFocus;\n  ink?: string;\n  paper?: string;\n  tear?: number;\n  ghost?: number;\n  grain?: number;\n  paused?: boolean;\n}\n\ninterface TearLook {\n  ink: string;\n  paper: string;\n  tear: number;\n  ghost: number;\n  grain: number;\n}\n\ninterface TearFrame {\n  delta: number;\n  paused: boolean;\n  pointer: PointerSample;\n}\n\nconst stillTime = 4.2;\nconst maxStep = 0.05;\n\nclass SignalTearRig {\n  readonly material = new SignalTearMaterial();\n  readonly geometry = new PlaneGeometry(1, 1);\n  private readonly light = new PointerLight();\n  private elapsed = 0;\n\n  applyLook({ ink, paper, tear, ghost, grain }: TearLook) {\n    const { uniforms } = this.material;\n    uniforms.uInk.value.set(ink);\n    uniforms.uPaper.value.set(paper);\n    uniforms.uTear.value = tear;\n    uniforms.uGhost.value = ghost;\n    uniforms.uGrain.value = grain;\n  }\n\n  applyImage(image: PrintImage | null, focus: ImageFocus) {\n    setCoverImage(this.material.uniforms, image, focus);\n  }\n\n  advance({ delta, paused, pointer }: TearFrame) {\n    const { uniforms } = this.material;\n    this.light.advance(pointer, delta, !paused);\n    if (paused) {\n      this.elapsed = stillTime;\n    } else {\n      this.elapsed += Math.min(delta, maxStep);\n    }\n    uniforms.uTime.value = this.elapsed;\n    uniforms.uKick.value = this.light.kick;\n  }\n\n  readonly handleBeforeRender = (renderer: WebGLRenderer) => {\n    const { uniforms } = this.material;\n    const viewport = readViewport(uniforms, renderer);\n    const aspect = viewport.z / Math.max(viewport.w, 1);\n    uniforms.uLight.value.set(\n      (this.light.x - 0.5) * aspect,\n      this.light.y - 0.5\n    );\n    uniforms.uPixelRatio.value = renderer.getPixelRatio();\n  };\n\n  dispose() {\n    this.material.dispose();\n    this.geometry.dispose();\n  }\n}\n\nexport const SignalTearScene = ({\n  src,\n  focus = centeredFocus,\n  ink = signalTearDefaults.ink,\n  paper = signalTearDefaults.paper,\n  tear = signalTearDefaults.tear,\n  ghost = signalTearDefaults.ghost,\n  grain = signalTearDefaults.grain,\n  paused = signalTearDefaults.paused,\n}: SignalTearSceneProps) => {\n  const invalidate = useThree((state) => state.invalidate);\n  const rig = useMemo(() => new SignalTearRig(), []);\n  const image = usePrintImage(src);\n\n  useEffect(() => () => rig.dispose(), [rig]);\n\n  useEffect(() => {\n    rig.applyLook({ ghost, grain, ink, paper, tear });\n    invalidate();\n  }, [ghost, grain, ink, invalidate, paper, rig, tear]);\n\n  useEffect(() => {\n    rig.applyImage(image, { x: focus.x, y: focus.y });\n    invalidate();\n  }, [focus.x, focus.y, image, invalidate, rig]);\n\n  useFrame((state, delta) => {\n    rig.advance({ delta, paused, pointer: state.pointer });\n  });\n\n  return (\n    <mesh\n      frustumCulled={false}\n      geometry={rig.geometry}\n      material={rig.material}\n      onBeforeRender={rig.handleBeforeRender}\n    />\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/signal-tear/signal-tear-scene.tsx"
+    },
+    {
+      "path": "registry/ivan/components/signal-tear/signal-tear-material.ts",
+      "content": "import { Color, ShaderMaterial, Vector2 } from \"three\";\nimport type { IUniform } from \"three\";\n\nimport {\n  createImageCoverUniforms,\n  fullscreenVertexShader,\n  imageCoverChunk,\n} from \"@/registry/ivan/lib/image-cover\";\nimport type { ImageCoverUniforms } from \"@/registry/ivan/lib/image-cover\";\nimport { hashChunk } from \"@/registry/ivan/lib/print-noise\";\n\nexport const signalTearDefaults = {\n  ghost: 0.6,\n  grain: 0.6,\n  ink: \"#0B0B0C\",\n  paper: \"#EDECE8\",\n  paused: false,\n  tear: 0.5,\n} as const;\n\nexport interface SignalTearUniforms extends ImageCoverUniforms {\n  uGhost: IUniform<number>;\n  uGrain: IUniform<number>;\n  uInk: IUniform<Color>;\n  uKick: IUniform<number>;\n  uLight: IUniform<Vector2>;\n  uPaper: IUniform<Color>;\n  uPixelRatio: IUniform<number>;\n  uTear: IUniform<number>;\n  uTime: IUniform<number>;\n}\n\nconst fragmentShader = `\n  uniform vec3 uInk;\n  uniform vec3 uPaper;\n  uniform vec2 uLight;\n  uniform float uTime;\n  uniform float uTear;\n  uniform float uGrain;\n  uniform float uGhost;\n  uniform float uKick;\n  uniform float uPixelRatio;\n\n  ${imageCoverChunk}\n  ${hashChunk}\n\n  const int ghostTaps = 12;\n\n  float lumaAt(vec2 point, float lod) {\n    float aspect = uResolution.x / uResolution.y;\n    return imageLuma(coverUv(vec2(point.x / aspect, point.y) + 0.5), lod);\n  }\n\n  void main() {\n    if (uHasImage < 0.5) {\n      discard;\n    }\n    float aspect = uResolution.x / uResolution.y;\n    vec2 pixel = gl_FragCoord.xy - uOrigin;\n    vec2 point = (pixel - uResolution * 0.5) / uResolution.y;\n    float frame = floor(uTime * 12.0);\n    float burst = floor(uTime * 3.0);\n    float row = pixel.y / uPixelRatio;\n    float bandHeight = mix(4.0, 42.0, hash(vec2(floor(row / 42.0), burst)));\n    float band = floor(row / bandHeight);\n    float pointerRows = (point.y - uLight.y) / 0.16;\n    float nearPointer = exp(-pointerRows * pointerRows);\n    float odds = 0.12 + 0.55 * uTear * nearPointer + 0.5 * uKick;\n    float isTorn = step(1.0 - odds, hash(vec2(band, burst + 0.37)));\n    float shift = (hash(vec2(band, frame)) - 0.5) * isTorn;\n    shift *= (0.03 + 0.22 * uTear) * (0.5 + nearPointer + uKick);\n    float jitter = (hash(vec2(floor(row), frame)) - 0.5) * 0.006 * uTear;\n    vec2 torn = point - vec2(shift + jitter, 0.0);\n\n    float lod = imageLod(1.0);\n    float luma = lumaAt(torn, lod);\n    float trail = luma;\n    float reach = 0.09 * uGhost * (0.6 + nearPointer + uKick);\n    for (int tap = 1; tap <= ghostTaps; tap++) {\n      float along = float(tap) / float(ghostTaps);\n      float ghost = lumaAt(torn - vec2(along * reach, 0.0), lod + 1.0);\n      trail = max(trail, ghost * (1.0 - along * 0.85));\n    }\n    luma = mix(luma, trail, 0.7 * uGhost);\n\n    vec2 fromCenter = point / vec2(max(aspect, 1.0) * 0.5, 0.5);\n    luma *= 1.0 - 0.32 * dot(fromCenter, fromCenter);\n    luma = smoothstep(0.03, 0.88, luma);\n\n    vec2 grainCell = floor(pixel / max(uPixelRatio, 1.0));\n    float grain = hash(grainCell + vec2(frame * 17.0, frame * 31.0)) - 0.5;\n    grain += hash(floor(grainCell * 0.5) + vec2(frame * 7.0, 3.0)) - 0.5;\n    luma += grain * uGrain * 0.42;\n\n    float ink = clamp(1.0 - luma, 0.0, 1.0);\n    gl_FragColor = vec4(mix(uPaper, uInk, ink), 1.0);\n    #include <colorspace_fragment>\n  }\n`;\n\nconst createUniforms = (): SignalTearUniforms => ({\n  ...createImageCoverUniforms(),\n  uGhost: { value: signalTearDefaults.ghost },\n  uGrain: { value: signalTearDefaults.grain },\n  uInk: { value: new Color(signalTearDefaults.ink) },\n  uKick: { value: 0 },\n  uLight: { value: new Vector2(0, 0) },\n  uPaper: { value: new Color(signalTearDefaults.paper) },\n  uPixelRatio: { value: 1 },\n  uTear: { value: signalTearDefaults.tear },\n  uTime: { value: 0 },\n});\n\nexport class SignalTearMaterial extends ShaderMaterial {\n  declare uniforms: SignalTearUniforms;\n\n  constructor() {\n    super({\n      depthTest: false,\n      depthWrite: false,\n      fragmentShader,\n      toneMapped: false,\n      uniforms: createUniforms(),\n      vertexShader: fullscreenVertexShader,\n    });\n  }\n}\n",
+      "type": "registry:component",
+      "target": "@components/signal-tear/signal-tear-material.ts"
+    },
+    {
+      "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+      "content": "\"use client\";\n\nimport { Canvas } from \"@react-three/fiber\";\nimport { useRef } from \"react\";\nimport type { ComponentProps, ReactNode } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { useInView } from \"@/registry/ivan/hooks/use-in-view\";\nimport { usePrefersReducedMotion } from \"@/registry/ivan/hooks/use-prefers-reduced-motion\";\nimport { useWebGLSupport } from \"@/registry/ivan/hooks/use-webgl-support\";\n\nexport interface CanvasStageProps {\n  ground: string;\n  label: string;\n  paused: boolean;\n  fallback: ReactNode;\n  antialias?: boolean;\n  camera?: ComponentProps<typeof Canvas>[\"camera\"];\n  className?: string;\n  children: (isAnimating: boolean) => ReactNode;\n}\n\ninterface ImageFallbackProps {\n  src: string;\n  focus: { x: number; y: number };\n}\n\nexport const ImageFallback = ({ src, focus }: ImageFallbackProps) => (\n  <div\n    aria-hidden\n    className=\"absolute inset-0 grayscale\"\n    style={{\n      backgroundImage: `url(${JSON.stringify(src)})`,\n      backgroundPosition: `${focus.x * 100}% ${focus.y * 100}%`,\n      backgroundSize: \"cover\",\n    }}\n  />\n);\n\nexport const CanvasStage = ({\n  ground,\n  label,\n  paused,\n  fallback,\n  antialias = false,\n  camera,\n  className,\n  children,\n}: CanvasStageProps) => {\n  const frame = useRef<HTMLElement>(null);\n  const hasWebGL = useWebGLSupport();\n  const isInView = useInView(frame);\n  const prefersReducedMotion = usePrefersReducedMotion();\n  const isAnimating = isInView && !prefersReducedMotion && !paused;\n\n  return (\n    <figure\n      aria-label={label}\n      className={cn(\n        \"relative m-0 aspect-4/3 w-full overflow-hidden\",\n        className\n      )}\n      ref={frame}\n      style={{ backgroundColor: ground }}\n    >\n      {hasWebGL ? (\n        <Canvas\n          aria-hidden\n          camera={camera}\n          dpr={[1, 1.75]}\n          frameloop={isAnimating ? \"always\" : \"demand\"}\n          gl={{\n            alpha: true,\n            antialias,\n            powerPreference: \"high-performance\",\n          }}\n        >\n          {children(isAnimating)}\n        </Canvas>\n      ) : (\n        fallback\n      )}\n    </figure>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/canvas-stage/canvas-stage.tsx"
+    },
+    {
+      "path": "registry/ivan/lib/image-cover.ts",
+      "content": "import { Vector2, Vector4 } from \"three\";\nimport type { IUniform, Texture, WebGLRenderer } from \"three\";\n\nexport interface CoverSource {\n  texture: Texture;\n  width: number;\n  height: number;\n}\n\nexport interface ImageFocus {\n  x: number;\n  y: number;\n}\n\nexport const centeredFocus: ImageFocus = { x: 0.5, y: 0.5 };\n\nexport const fullscreenVertexShader = `\n  void main() {\n    gl_Position = vec4(position.xy * 2.0, 0.0, 1.0);\n  }\n`;\n\nexport const imageCoverChunk = `\n  uniform vec2 uOrigin;\n  uniform vec2 uResolution;\n  uniform sampler2D uImage;\n  uniform vec2 uImageSize;\n  uniform vec2 uFocus;\n  uniform float uHasImage;\n\n  const vec3 lumaWeights = vec3(0.2126, 0.7152, 0.0722);\n\n  vec2 imageSpan() {\n    float stageAspect = uResolution.x / uResolution.y;\n    float imageAspect = uImageSize.x / uImageSize.y;\n    return stageAspect > imageAspect\n      ? vec2(1.0, imageAspect / stageAspect)\n      : vec2(stageAspect / imageAspect, 1.0);\n  }\n\n  vec2 coverUv(vec2 stage) {\n    vec2 span = imageSpan();\n    vec2 start = clamp(uFocus - span * 0.5, vec2(0.0), vec2(1.0) - span);\n    return start + stage * span;\n  }\n\n  float imageLuma(vec2 uv, float lod) {\n    return dot(textureLod(uImage, uv, lod).rgb, lumaWeights);\n  }\n\n  float imageLod(float footprint) {\n    float texels = footprint * imageSpan().y * uImageSize.y / uResolution.y;\n    return log2(max(texels, 1.0));\n  }\n`;\n\nexport interface ImageCoverUniforms {\n  [uniform: string]: IUniform;\n  uFocus: IUniform<Vector2>;\n  uHasImage: IUniform<number>;\n  uImage: IUniform<Texture | null>;\n  uImageSize: IUniform<Vector2>;\n  uOrigin: IUniform<Vector2>;\n  uResolution: IUniform<Vector2>;\n}\n\nexport const createImageCoverUniforms = (): ImageCoverUniforms => ({\n  uFocus: { value: new Vector2(0.5, 0.5) },\n  uHasImage: { value: 0 },\n  uImage: { value: null },\n  uImageSize: { value: new Vector2(1, 1) },\n  uOrigin: { value: new Vector2(0, 0) },\n  uResolution: { value: new Vector2(1, 1) },\n});\n\nexport const setCoverImage = (\n  uniforms: ImageCoverUniforms,\n  image: CoverSource | null,\n  focus: ImageFocus\n) => {\n  uniforms.uImage.value = image?.texture ?? null;\n  uniforms.uHasImage.value = image ? 1 : 0;\n  uniforms.uImageSize.value.set(image?.width ?? 1, image?.height ?? 1);\n  uniforms.uFocus.value.set(focus.x, 1 - focus.y);\n};\n\nconst viewport = new Vector4();\n\nexport const readViewport = (\n  uniforms: ImageCoverUniforms,\n  renderer: WebGLRenderer\n) => {\n  renderer.getCurrentViewport(viewport);\n  uniforms.uOrigin.value.set(viewport.x, viewport.y);\n  uniforms.uResolution.value.set(viewport.z, viewport.w);\n  return viewport;\n};\n",
+      "type": "registry:lib",
+      "target": "@lib/image-cover.ts"
+    },
+    {
+      "path": "registry/ivan/lib/print-noise.ts",
+      "content": "export const hashChunk = `\n  float hash(vec2 point) {\n    return fract(sin(dot(point, vec2(127.1, 311.7))) * 43758.5453);\n  }\n`;\n\nexport const valueNoiseChunk = `\n  float valueNoise(vec2 point) {\n    vec2 whole = floor(point);\n    vec2 part = fract(point);\n    vec2 blend = part * part * (3.0 - 2.0 * part);\n    return mix(\n      mix(hash(whole), hash(whole + vec2(1.0, 0.0)), blend.x),\n      mix(hash(whole + vec2(0.0, 1.0)), hash(whole + vec2(1.0, 1.0)), blend.x),\n      blend.y\n    );\n  }\n`;\n\nexport const bayerChunk = `\n  float bayer2(vec2 cell) {\n    cell = floor(cell);\n    return fract(cell.x / 2.0 + cell.y * cell.y * 0.75);\n  }\n\n  float bayer4(vec2 cell) {\n    return bayer2(0.5 * cell) * 0.25 + bayer2(cell);\n  }\n\n  float bayer8(vec2 cell) {\n    return bayer4(0.5 * cell) * 0.25 + bayer2(cell) + 0.5 / 64.0;\n  }\n`;\n",
+      "type": "registry:lib",
+      "target": "@lib/print-noise.ts"
+    },
+    {
+      "path": "registry/ivan/lib/pointer-trace.ts",
+      "content": "export interface PointerSample {\n  x: number;\n  y: number;\n}\n\nconst holdAfterMove = 2.5;\nconst movedBy = 0.0001;\n\nexport class PointerTrace {\n  x = 0.5;\n  y = 0.5;\n  isActive = false;\n  private hasMoved = false;\n  private idle = 0;\n\n  update({ x, y }: PointerSample, step: number, isAnimating: boolean) {\n    const nextX = (x + 1) / 2;\n    const nextY = (y + 1) / 2;\n    if (Math.abs(nextX - this.x) + Math.abs(nextY - this.y) > movedBy) {\n      this.hasMoved = true;\n      this.idle = 0;\n    } else {\n      this.idle += step;\n    }\n    this.x = nextX;\n    this.y = nextY;\n    this.isActive =\n      this.hasMoved && (!isAnimating || this.idle < holdAfterMove);\n  }\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/pointer-trace.ts"
+    },
+    {
+      "path": "registry/ivan/lib/pointer-light.ts",
+      "content": "import { PointerTrace } from \"@/registry/ivan/lib/pointer-trace\";\nimport type { PointerSample } from \"@/registry/ivan/lib/pointer-trace\";\n\nconst followRate = 9;\nconst maxStep = 0.05;\nconst minStep = 0.001;\n\nexport const restingLight = { x: 0.24, y: 0.78 } as const;\n\nexport class PointerLight {\n  readonly trace = new PointerTrace();\n  x: number = restingLight.x;\n  y: number = restingLight.y;\n  kick = 0;\n  private clock = 0;\n\n  advance(pointer: PointerSample, delta: number, isAnimating: boolean) {\n    const step = Math.min(delta, maxStep);\n    const { trace } = this;\n    trace.update(pointer, step, isAnimating);\n    if (isAnimating) {\n      this.clock += step;\n    }\n    const wanderX = 0.5 + Math.sin(this.clock * 0.4 - 1.3) * 0.32;\n    const wanderY = 0.62 + Math.cos(this.clock * 0.31) * 0.2;\n    let targetX = trace.isActive ? trace.x : wanderX;\n    let targetY = trace.isActive ? trace.y : wanderY;\n    if (!(isAnimating || trace.isActive)) {\n      targetX = restingLight.x;\n      targetY = restingLight.y;\n    }\n    const blend = isAnimating ? 1 - Math.exp(-step * followRate) : 1;\n    const previousX = this.x;\n    const previousY = this.y;\n    this.x += (targetX - this.x) * blend;\n    this.y += (targetY - this.y) * blend;\n    const velocity =\n      Math.hypot(this.x - previousX, this.y - previousY) /\n      Math.max(step, minStep);\n    const wanted = isAnimating ? Math.min(velocity / 2.5, 1) : 0;\n    const rate = wanted > this.kick ? 14 : 3;\n    this.kick += (wanted - this.kick) * (1 - Math.exp(-rate * step));\n  }\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/pointer-light.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nconst reducedMotionQuery = \"(prefers-reduced-motion: reduce)\";\n\nconst subscribe = (onChange: () => void) => {\n  const mediaQuery = window.matchMedia(reducedMotionQuery);\n  mediaQuery.addEventListener(\"change\", onChange);\n  return () => mediaQuery.removeEventListener(\"change\", onChange);\n};\n\nconst getSnapshot = () => window.matchMedia(reducedMotionQuery).matches;\n\nconst getServerSnapshot = () => false;\n\nexport const usePrefersReducedMotion = () =>\n  useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-prefers-reduced-motion.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-webgl-support.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nlet cachedSupport: boolean | null = null;\n\nconst detectWebGL = () => {\n  if (cachedSupport !== null) {\n    return cachedSupport;\n  }\n  try {\n    const probe = document.createElement(\"canvas\");\n    const context = probe.getContext(\"webgl2\") ?? probe.getContext(\"webgl\");\n    context?.getExtension(\"WEBGL_lose_context\")?.loseContext();\n    cachedSupport = context !== null;\n  } catch {\n    cachedSupport = false;\n  }\n  return cachedSupport;\n};\n\nconst subscribe = (onChange: () => void) => {\n  window.addEventListener(\"pageshow\", onChange);\n  return () => window.removeEventListener(\"pageshow\", onChange);\n};\n\nconst getServerSnapshot = () => true;\n\nexport const useWebGLSupport = () =>\n  useSyncExternalStore(subscribe, detectWebGL, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-webgl-support.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-in-view.ts",
+      "content": "\"use client\";\n\nimport { useEffect, useState } from \"react\";\nimport type { RefObject } from \"react\";\n\nexport const useInView = (\n  target: RefObject<Element | null>,\n  rootMargin = \"10% 0px\"\n) => {\n  const [isInView, setIsInView] = useState(false);\n\n  useEffect(() => {\n    const element = target.current;\n    if (!element) {\n      return;\n    }\n    const observer = new IntersectionObserver(\n      ([entry]) => setIsInView(entry?.isIntersecting ?? false),\n      { rootMargin }\n    );\n    observer.observe(element);\n    return () => observer.disconnect();\n  }, [rootMargin, target]);\n\n  return isInView;\n};\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-in-view.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-print-image.ts",
+      "content": "\"use client\";\n\nimport { useThree } from \"@react-three/fiber\";\nimport { useEffect, useState } from \"react\";\nimport { LinearMipmapLinearFilter, TextureLoader } from \"three\";\nimport type { Texture } from \"three\";\n\nexport interface PrintImage {\n  texture: Texture;\n  element: HTMLImageElement;\n  width: number;\n  height: number;\n}\n\ninterface LoadedImage {\n  src: string;\n  image: PrintImage;\n}\n\nconst loadTexture = async (src: string) => {\n  const loader = new TextureLoader();\n  loader.setCrossOrigin(\"anonymous\");\n  try {\n    return await loader.loadAsync(src);\n  } catch {\n    return null;\n  }\n};\n\nexport const usePrintImage = (src: string): PrintImage | null => {\n  const invalidate = useThree((state) => state.invalidate);\n  const [loaded, setLoaded] = useState<LoadedImage | null>(null);\n\n  useEffect(() => {\n    let isCurrent = true;\n    let texture: Texture | null = null;\n    const load = async () => {\n      const value = await loadTexture(src);\n      if (!value) {\n        return;\n      }\n      if (!isCurrent) {\n        value.dispose();\n        return;\n      }\n      value.generateMipmaps = true;\n      value.minFilter = LinearMipmapLinearFilter;\n      texture = value;\n      const element: HTMLImageElement = value.image;\n      setLoaded({\n        image: {\n          element,\n          height: element.naturalHeight,\n          texture: value,\n          width: element.naturalWidth,\n        },\n        src,\n      });\n      invalidate();\n    };\n    void load();\n    return () => {\n      isCurrent = false;\n      texture?.dispose();\n    };\n  }, [invalidate, src]);\n\n  return loaded && loaded.src === src ? loaded.image : null;\n};\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-print-image.ts"
+    }
+  ],
+  "meta": {
+    "docs": {
+      "props": [
+        {
+          "component": "SignalTear",
+          "description": "A figure that owns one Canvas. Size it with className.",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "required": true,
+              "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+            },
+            {
+              "name": "focus",
+              "type": "{ x: number; y: number }",
+              "default": "{ x: 0.5, y: 0.5 }",
+              "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+            },
+            {
+              "name": "ink",
+              "type": "string",
+              "default": "\"#0B0B0C\"",
+              "description": "Shadow tone. Any three.js color string."
+            },
+            {
+              "name": "paper",
+              "type": "string",
+              "default": "\"#EDECE8\"",
+              "description": "Light tone."
+            },
+            {
+              "name": "tear",
+              "type": "number",
+              "default": "0.5",
+              "description": "How often and how far rows tear, 0 to 1. Rows near the pointer tear first."
+            },
+            {
+              "name": "ghost",
+              "type": "number",
+              "default": "0.6",
+              "description": "Length of the light trail, 0 to 1."
+            },
+            {
+              "name": "grain",
+              "type": "number",
+              "default": "0.6",
+              "description": "Film grain, 0 to 1. 0 turns it off."
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "default": "false",
+              "description": "Holds one still frame and stops rendering."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "default": "\"A grainy picture whose rows tear sideways and leave light trails near the pointer\"",
+              "description": "Accessible name."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "default": "\"relative aspect-4/3 w-full\"",
+              "description": "Give the stage a size."
+            }
+          ]
+        },
+        {
+          "component": "SignalTearScene",
+          "description": "Full-frame plane without the Canvas. Mount it alone in a Canvas or a drei View. Reads state.pointer. The tear follows the pointer and drifts on its own after 2.5 seconds without a move.",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "required": true,
+              "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+            },
+            {
+              "name": "focus",
+              "type": "{ x: number; y: number }",
+              "default": "{ x: 0.5, y: 0.5 }",
+              "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+            },
+            {
+              "name": "ink",
+              "type": "string",
+              "default": "\"#0B0B0C\"",
+              "description": "Shadow tone. Any three.js color string."
+            },
+            {
+              "name": "paper",
+              "type": "string",
+              "default": "\"#EDECE8\"",
+              "description": "Light tone."
+            },
+            {
+              "name": "tear",
+              "type": "number",
+              "default": "0.5",
+              "description": "How often and how far rows tear, 0 to 1. Rows near the pointer tear first."
+            },
+            {
+              "name": "ghost",
+              "type": "number",
+              "default": "0.6",
+              "description": "Length of the light trail, 0 to 1."
+            },
+            {
+              "name": "grain",
+              "type": "number",
+              "default": "0.6",
+              "description": "Film grain, 0 to 1. 0 turns it off."
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "default": "false",
+              "description": "Holds one still frame and stops rendering."
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "examples": [
+        {
+          "title": "One image, one line",
+          "file": "registry/ivan/examples/signal-tear/basic.tsx"
+        }
+      ],
+      "accessibility": [
+        "A figure with an accessible name. The canvas is hidden from assistive tech.",
+        "Without WebGL it shows the source image in grayscale."
+      ],
+      "animation": [
+        {
+          "target": "Render loop",
+          "properties": "Canvas frameloop",
+          "timing": "Always while visible, on demand offscreen or paused",
+          "trigger": "IntersectionObserver",
+          "reducedMotion": "One still frame."
+        },
+        {
+          "target": "Torn bands",
+          "properties": "Row offset in the fragment shader",
+          "timing": "Bands reshuffle three times a second, grain twelve",
+          "trigger": "Time, pointer position and pointer speed",
+          "reducedMotion": "One torn frame holds still."
+        }
+      ]
+    }
+  },
+  "docs": "Requires React 19 and an image your page can read as a texture. Render <SignalTear src=\"/photo.jpg\" className=\"w-full max-w-xl\" /> anywhere. SignalTear owns a Canvas, so mount SignalTearScene inside an existing Canvas or drei View when a page already has one.",
+  "categories": [
+    "three",
+    "shaders",
+    "media"
+  ],
+  "type": "registry:block"
+}

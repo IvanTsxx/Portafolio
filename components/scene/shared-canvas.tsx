@@ -5,7 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { NeutralToneMapping } from "three";
 
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { usePrefersReducedMotion } from "@/registry/ivan/hooks/use-prefers-reduced-motion";
 
 import { setSceneFrameRequester, useNearViewSlots } from "./view-registry";
 
@@ -84,9 +84,9 @@ const TrackedViews = () => {
 
 const SharedCanvas = () => {
   const slots = useNearViewSlots();
-  const isReduced = useReducedMotion();
+  const isReduced = usePrefersReducedMotion();
   const [dpr, setDpr] = useState(maxDpr);
-  const isLive = slots.length > 0 && !isReduced;
+  const isLive = slots.some((slot) => slot.loop === "always") && !isReduced;
 
   return (
     <Canvas

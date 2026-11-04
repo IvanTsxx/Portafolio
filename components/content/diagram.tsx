@@ -17,12 +17,12 @@ export const Diagram = ({
   label,
 }: DiagramProps) => (
   <figure aria-label={label} className={cn("my-10", className)}>
-    <div className="blueprint-dots border-rule-strong bg-popover relative flex justify-center overflow-x-auto border p-6 [--grid-size:16px] md:p-8">
+    <div className="blueprint-dots border-border-strong bg-popover relative flex justify-center overflow-x-auto border p-6 [--grid-size:16px] md:p-8">
       <CornerMarks />
       {children}
     </div>
     {caption ? (
-      <figcaption className="label text-graphite mt-3 normal-case">
+      <figcaption className="label text-muted-foreground mt-3 normal-case">
         {caption}
       </figcaption>
     ) : null}

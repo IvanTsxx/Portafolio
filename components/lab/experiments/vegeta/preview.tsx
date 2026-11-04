@@ -1,29 +1,38 @@
 "use client";
 
-import type { PointerEvent } from "react";
 import { useId, useRef, useState } from "react";
 
+import { orderedDitherOptions } from "@/components/lab/dither-options";
 import { ExperimentStage } from "@/components/lab/experiment-stage";
+import { useThemeTones } from "@/components/lab/experiments/lunar-dither/use-theme-tones";
 import {
   ActionControl,
   SliderControl,
   ToggleControl,
 } from "@/components/lab/lab-controls";
-import { orderedDitherOptions } from "@/components/lab/source/ordered-print";
-import {
-  releaseStagePointer,
-  trackStagePointer,
-} from "@/components/lab/source/use-source";
+import { useShowsOriginal } from "@/components/lab/source/stage-reveal";
+import { sourceImages } from "@/components/lab/source/tone-chunk";
+import { StageHint } from "@/components/lab/stage-hint";
 import { useStageActivity } from "@/components/lab/use-stage-activity";
-import {
-  requestSceneFrame,
-  useViewSlot,
-} from "@/components/scene/view-registry";
+import { useViewSlot } from "@/components/scene/view-registry";
+import { BlastPrintScene } from "@/registry/ivan/components/blast-print/blast-print-scene";
+import type { OrderedDither } from "@/registry/ivan/lib/ordered-print";
 
-import { defaultSettings, vegetaImage } from "./settings";
-import type { VegetaSettings } from "./settings";
-import VegetaView from "./vegeta-view";
-import type { BlastPointer } from "./vegeta-view";
+const vegetaImage = sourceImages.vegeta;
+
+interface BlastSettings {
+  auraRadius: number;
+  cell: number;
+  dither: OrderedDither;
+  threshold: number;
+}
+
+const defaultSettings: BlastSettings = {
+  auraRadius: 1,
+  cell: 3,
+  dither: "blue-noise",
+  threshold: 0,
+};
 
 const signed = (value: number) => {
   const percent = Math.round(value * 100);
@@ -34,44 +43,38 @@ const percent = (value: number) => `${Math.round(value * 100)}%`;
 
 const VegetaPreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
-  const [settings, setSettings] = useState<VegetaSettings>(defaultSettings);
-
+  const [settings, setSettings] = useState<BlastSettings>(defaultSettings);
+  const [blasts, setBlasts] = useState(0);
+  const tones = useThemeTones();
+  const showsOriginal = useShowsOriginal();
   const field = useRef<HTMLDivElement>(null);
   const slotId = useId();
-  const pointer = useRef<BlastPointer>({
-    blast: { x: 0.5, y: 0.5 },
-    detonations: 0,
-    isHovering: false,
-    x: 0.5,
-    y: 0.5,
-  });
+  const [hasInteracted, setHasInteracted] = useState(false);
   const isReduced = activity === "reduced";
 
   const set =
-    <Key extends keyof VegetaSettings>(key: Key) =>
-    (value: VegetaSettings[Key]) =>
+    <Key extends keyof BlastSettings>(key: Key) =>
+    (value: BlastSettings[Key]) =>
       setSettings((current) => ({ ...current, [key]: value }));
 
   useViewSlot(
     slotId,
     field,
-    <VegetaView
-      animate={activity === "running"}
-      pointer={pointer}
-      settings={settings}
-    />
+    <group visible={!showsOriginal}>
+      <BlastPrintScene
+        auraRadius={settings.auraRadius}
+        blasts={blasts}
+        cell={settings.cell}
+        dither={settings.dither}
+        focus={vegetaImage.focus}
+        ink={tones.ink}
+        paper={tones.paper}
+        paused={activity !== "running"}
+        src={vegetaImage.path}
+        threshold={settings.threshold}
+      />
+    </group>
   );
-
-  const detonateAt = (x: number, y: number) => {
-    pointer.current.blast = { x, y };
-    pointer.current.detonations += 1;
-    requestSceneFrame();
-  };
-
-  const detonateHere = (event: PointerEvent<HTMLDivElement>) => {
-    trackStagePointer(pointer.current, event);
-    detonateAt(pointer.current.x, pointer.current.y);
-  };
 
   return (
     <ExperimentStage
@@ -84,7 +87,7 @@ const VegetaPreview = () => {
             actionLabel="Detonate"
             disabled={isReduced}
             label="Final Explosion"
-            onAction={() => detonateAt(0.5, 0.5)}
+            onAction={() => setBlasts((current) => current + 1)}
           />
           <ToggleControl
             label="Dither"
@@ -123,16 +126,21 @@ const VegetaPreview = () => {
         </>
       }
       reducedNote="Reduced motion is on. One still frame. No explosion. The aura jumps to the pointer."
-      stageLabel="Majin Vegeta dithered in ink on paper, with a negative ki aura around the pointer and a Final Explosion that reprints him in color"
+      stageLabel="Majin Vegeta dithered in ink on paper, with a negative aura around the pointer and a Final Explosion that reprints him in color"
       stageRef={ref}
     >
       <div
         className="pointer-events-auto size-full cursor-crosshair touch-pan-y"
-        onPointerDown={detonateHere}
-        onPointerLeave={() => releaseStagePointer(pointer.current)}
-        onPointerMove={(event) => trackStagePointer(pointer.current, event)}
+        onPointerDown={() => setHasInteracted(true)}
         ref={field}
       />
+      {isReduced ? null : (
+        <StageHint
+          isDismissed={hasInteracted || showsOriginal}
+          label="Hover to charge, click to detonate"
+          touchLabel="Tap to detonate"
+        />
+      )}
     </ExperimentStage>
   );
 };

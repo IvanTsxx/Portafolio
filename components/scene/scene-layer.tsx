@@ -3,17 +3,18 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
-import { useHasViewSlots } from "./view-registry";
-import { useWebGLSupport } from "./webgl-support";
+import { useWebGLSupport } from "@/registry/ivan/hooks/use-webgl-support";
+
+import { useNearViewSlots } from "./view-registry";
 
 const SharedCanvas = dynamic(() => import("./shared-canvas"), { ssr: false });
 
 export const SceneLayer = () => {
-  const hasSlots = useHasViewSlots();
+  const nearSlots = useNearViewSlots();
   const hasWebGL = useWebGLSupport();
   const [isActivated, setIsActivated] = useState(false);
 
-  if (hasSlots && hasWebGL && !isActivated) {
+  if (nearSlots.length > 0 && hasWebGL && !isActivated) {
     setIsActivated(true);
   }
 

@@ -61,13 +61,13 @@ const GroupHeading = ({
   count: number;
   group: SearchGroupId;
 }) => (
-  <span className="label text-mist flex items-baseline gap-3">
-    <span className="text-ink">{searchGroups[group].label}</span>
+  <span className="label text-faint flex items-baseline gap-3">
+    <span className="text-foreground">{searchGroups[group].label}</span>
     <span
       aria-hidden
-      className="border-rule-strong mb-1 h-px min-w-4 flex-1 border-b border-dotted"
+      className="border-border-strong mb-1 h-px min-w-4 flex-1 border-b border-dotted"
     />
-    <span className="text-graphite tabular-nums">
+    <span className="text-muted-foreground tabular-nums">
       {String(count).padStart(2, "0")}
     </span>
   </span>
@@ -91,11 +91,11 @@ const PaletteRow = ({
       onSelect={() => onSelect(entry)}
       value={entry.id}
     >
-      <span className="label text-mist w-12 shrink-0 tabular-nums">
+      <span className="label text-faint w-12 shrink-0 tabular-nums">
         {entry.code}
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-        <span className="text-ink min-w-0 truncate">
+        <span className="text-foreground min-w-0 truncate">
           {rowFeedback ? (
             copyFeedbackLabels[rowFeedback.status]
           ) : (
@@ -104,9 +104,9 @@ const PaletteRow = ({
         </span>
         <span
           aria-hidden
-          className="border-rule-strong mb-1 hidden h-px min-w-4 flex-1 self-end border-b border-dotted sm:block"
+          className="border-border-strong mb-1 hidden h-px min-w-4 flex-1 self-end border-b border-dotted sm:block"
         />
-        <span className="label text-mist min-w-0 shrink-3 truncate normal-case sm:max-w-2/5">
+        <span className="label text-faint min-w-0 shrink-3 truncate normal-case sm:max-w-2/5">
           <HighlightedText ranges={hit.detailRanges} text={entry.detail} />
         </span>
       </span>
@@ -128,7 +128,7 @@ const PaletteRow = ({
 
 const KeyHint = ({ keys, label }: { keys: string; label: string }) => (
   <span className="flex items-center gap-2">
-    <Kbd className="label bg-paper-deep text-graphite h-5 px-1.5 normal-case">
+    <Kbd className="label bg-surface text-muted-foreground h-5 px-1.5 normal-case">
       {keys}
     </Kbd>
     {label}
@@ -193,7 +193,7 @@ export const CommandPalette = ({
 
   return (
     <CommandDialog
-      className="ring-rule-strong top-[12svh] sm:max-w-2xl"
+      className="ring-border-strong top-[12svh] sm:max-w-2xl"
       description="Search pages, sections, notes, experiments, registry items and channels."
       onOpenChange={onOpenChange}
       onOpenChangeComplete={handleOpenChangeComplete}
@@ -213,13 +213,13 @@ export const CommandPalette = ({
         <CommandInput
           className="text-base md:text-sm"
           onValueChange={handleQueryChange}
-          placeholder="Pages, notes, experiments, registry, tags"
+          placeholder="Pages, writing, lab, registry, tags"
           value={query}
         />
         <CommandList className="max-h-80">
           {sections.map((section) => (
             <CommandGroup
-              className="border-rule not-first:border-t **:[[cmdk-group-heading]]:px-3 **:[[cmdk-group-heading]]:pt-3 **:[[cmdk-group-heading]]:pb-1.5"
+              className="border-border not-first:border-t **:[[cmdk-group-heading]]:px-3 **:[[cmdk-group-heading]]:pt-3 **:[[cmdk-group-heading]]:pb-1.5"
               heading={
                 <GroupHeading
                   count={section.hits.length}
@@ -239,14 +239,14 @@ export const CommandPalette = ({
             </CommandGroup>
           ))}
           <CommandEmpty className="flex flex-col items-center gap-2 px-6 py-10">
-            <span className="label text-mist">No match</span>
-            <span className="text-graphite max-w-full text-sm text-pretty break-words">
+            <span className="label text-faint">No match</span>
+            <span className="text-muted-foreground max-w-full text-sm text-pretty break-words">
               Nothing for “{query.trim()}”. Try a note title, a section or a
               tag.
             </span>
           </CommandEmpty>
         </CommandList>
-        <div className="label border-rule-strong text-mist flex items-center justify-between gap-4 border-t px-3 py-2">
+        <div className="label border-border-strong text-faint flex items-center justify-between gap-4 border-t px-3 py-2">
           {hitCount > 0 ? (
             <span className="hidden items-center gap-4 sm:flex">
               <KeyHint keys="↑↓" label="Move" />
@@ -255,7 +255,7 @@ export const CommandPalette = ({
           ) : null}
           <span
             aria-live="polite"
-            className="text-graphite tabular-nums sm:ml-auto"
+            className="text-muted-foreground tabular-nums sm:ml-auto"
           >
             {hasQuery
               ? `${hitCount} ${hitCount === 1 ? "result" : "results"}`

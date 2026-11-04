@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { DependenciesPanel } from "@/components/registry-docs/dependencies-panel";
 import { BulletList } from "@/components/registry-docs/docs-section";
@@ -12,11 +13,13 @@ import { InstallSection } from "@/components/registry-docs/install-section";
 import { ItemStyles } from "@/components/registry-docs/item-styles";
 import { loadDemoModule } from "@/components/registry-docs/load-demo";
 import { PreviewCodeTabs } from "@/components/registry-docs/preview-code-tabs";
+import { DetailFallback } from "@/components/site/detail-fallback";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { JsonLd } from "@/components/site/json-ld";
 import { NeighborNav } from "@/components/site/neighbor-link";
 import { OpenInMenu } from "@/components/site/open-in-menu";
+import { PlatePage } from "@/components/site/plate-page";
 import { markdownPathOf } from "@/lib/markdown/paths";
 import { highlightCode } from "@/lib/registry/highlight";
 import {
@@ -33,7 +36,6 @@ import {
   toCategoryLabel,
 } from "@/lib/registry/registry";
 import { buildItemCodeFiles } from "@/lib/registry/source";
-import { sectionScripts } from "@/lib/site/section-scripts";
 import { registrySections } from "@/lib/site/sections";
 import type { RegistrySectionId } from "@/lib/site/sections";
 import {
@@ -64,7 +66,9 @@ const registryNeighbor = (position: number) => {
     : undefined;
 };
 
-const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
+const RegistryItemContent = async ({
+  params,
+}: Pick<PageProps<"/registry/[slug]">, "params">) => {
   const { slug } = await params;
   const item = getRegistryItem(slug);
   if (!item) {
@@ -97,69 +101,79 @@ const RegistryItemPage = async ({ params }: PageProps<"/registry/[slug]">) => {
     <>
       <JsonLd data={registryItemJsonLd(item)} />
       <ItemStyles items={[item]} />
-      <DocumentHero
-        back={{ href: "/registry", label: "Registry" }}
-        code={code}
-        lede={item.categories.map(toCategoryLabel).join(" / ")}
-        meta={[{ label: "Type", value: item.type }]}
-        size="title"
-        title={item.title}
+      <PlatePage
+        plate={
+          <DocumentHero
+            back={{ href: "/registry", label: "Registry" }}
+            code={code}
+            lede={item.categories.map(toCategoryLabel).join(" / ")}
+            meta={[{ label: "Type", value: item.type }]}
+            size="title"
+            title={item.title}
+          >
+            <p className="text-muted-foreground max-w-prose text-base text-pretty">
+              {item.description}
+            </p>
+            <OpenInMenu
+              markdownPath={markdownPathOf(registryItemPath(item.name))}
+            />
+          </DocumentHero>
+        }
       >
-        <p className="text-graphite max-w-prose text-base text-pretty">
-          {item.description}
-        </p>
-        <OpenInMenu
-          markdownPath={markdownPathOf(registryItemPath(item.name))}
+        <DocumentSection {...sectionProps("preview")}>
+          <PreviewCodeTabs files={codeFiles} preview={<Demo />} />
+        </DocumentSection>
+        <DocumentSection {...sectionProps("installation")}>
+          <InstallSection
+            commands={packageRunners.map((runner) => ({
+              id: runner.id,
+              label: runner.label,
+              namespaced: getNamespacedInstallCommand(runner.id, item.name),
+              url: getInstallCommand(runner.id, item.name),
+            }))}
+            registriesLines={registriesLines}
+            registriesSource={registriesSource}
+          />
+        </DocumentSection>
+        <DocumentSection {...sectionProps("usage")}>
+          <div className="flex flex-col gap-12">
+            {docs.examples.map((example) => (
+              <ExampleBlock example={example} key={example.file} />
+            ))}
+          </div>
+        </DocumentSection>
+        <DocumentSection {...sectionProps("props")}>
+          <PropsTables groups={docs.props} />
+        </DocumentSection>
+        <DocumentSection {...sectionProps("accessibility")}>
+          <BulletList items={docs.accessibility} />
+        </DocumentSection>
+        <DocumentSection {...sectionProps("animation")}>
+          {docs.animation.length > 0 ? (
+            <AnimationTable animations={docs.animation} />
+          ) : (
+            <p className="label text-muted-foreground">
+              Static. Nothing to switch off.
+            </p>
+          )}
+        </DocumentSection>
+        <DocumentSection {...sectionProps("dependencies")}>
+          <DependenciesPanel item={item} />
+        </DocumentSection>
+        <NeighborNav
+          label="More registry items"
+          next={registryNeighbor(position + 1)}
+          previous={registryNeighbor(position - 1)}
         />
-      </DocumentHero>
-      <DocumentSection
-        {...sectionProps("preview")}
-        script={sectionScripts.registryPreview}
-      >
-        <PreviewCodeTabs files={codeFiles} preview={<Demo />} />
-      </DocumentSection>
-      <DocumentSection {...sectionProps("installation")}>
-        <InstallSection
-          commands={packageRunners.map((runner) => ({
-            id: runner.id,
-            label: runner.label,
-            namespaced: getNamespacedInstallCommand(runner.id, item.name),
-            url: getInstallCommand(runner.id, item.name),
-          }))}
-          registriesLines={registriesLines}
-          registriesSource={registriesSource}
-        />
-      </DocumentSection>
-      <DocumentSection {...sectionProps("usage")}>
-        <div className="flex flex-col gap-12">
-          {docs.examples.map((example) => (
-            <ExampleBlock example={example} key={example.file} />
-          ))}
-        </div>
-      </DocumentSection>
-      <DocumentSection {...sectionProps("props")}>
-        <PropsTables groups={docs.props} />
-      </DocumentSection>
-      <DocumentSection {...sectionProps("accessibility")}>
-        <BulletList items={docs.accessibility} />
-      </DocumentSection>
-      <DocumentSection {...sectionProps("animation")}>
-        {docs.animation.length > 0 ? (
-          <AnimationTable animations={docs.animation} />
-        ) : (
-          <p className="label text-graphite">Static. Nothing to switch off.</p>
-        )}
-      </DocumentSection>
-      <DocumentSection {...sectionProps("dependencies")}>
-        <DependenciesPanel item={item} />
-      </DocumentSection>
-      <NeighborNav
-        label="More registry items"
-        next={registryNeighbor(position + 1)}
-        previous={registryNeighbor(position - 1)}
-      />
+      </PlatePage>
     </>
   );
 };
+
+const RegistryItemPage = ({ params }: PageProps<"/registry/[slug]">) => (
+  <Suspense fallback={<DetailFallback />}>
+    <RegistryItemContent params={params} />
+  </Suspense>
+);
 
 export default RegistryItemPage;

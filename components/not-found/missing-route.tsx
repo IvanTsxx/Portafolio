@@ -3,5 +3,5 @@
 import { usePathname } from "next/navigation";
 
 export const MissingRoute = () => (
-  <span className="text-ink break-all">{usePathname()}</span>
+  <span className="text-foreground break-all">{usePathname()}</span>
 );

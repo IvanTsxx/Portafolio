@@ -70,12 +70,12 @@ const ControlField = ({
   if (control.kind === "toggle") {
     return (
       <div className="flex items-center justify-between gap-4">
-        <span className="label text-ink" id={labelId}>
+        <span className="label text-foreground" id={labelId}>
           {control.label}
         </span>
         <Switch
           aria-labelledby={labelId}
-          className="border-graphite/60 rounded-none *:rounded-none"
+          className="border-muted-foreground/60 rounded-none *:rounded-none"
           checked={value === true}
           onCheckedChange={onChange}
         />
@@ -88,10 +88,10 @@ const ControlField = ({
     return (
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-4">
-          <span className="label text-ink" id={labelId}>
+          <span className="label text-foreground" id={labelId}>
             {control.label}
           </span>
-          <output className="label text-graphite tabular-nums">
+          <output className="label text-muted-foreground tabular-nums">
             {current}
             {control.unit ?? ""}
           </output>
@@ -114,7 +114,7 @@ const ControlField = ({
     const current = readString(value);
     return (
       <div className="flex flex-col gap-3">
-        <span className="label text-ink" id={labelId}>
+        <span className="label text-foreground" id={labelId}>
           {control.label}
         </span>
         <ToggleGroup
@@ -147,11 +147,11 @@ const ControlField = ({
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="label text-ink" htmlFor={labelId}>
+      <label className="label text-foreground" htmlFor={labelId}>
         {control.label}
       </label>
       <Input
-        className="border-graphite/60 h-11 text-base md:text-sm"
+        className="border-muted-foreground/60 h-11 text-base md:text-sm"
         id={labelId}
         maxLength={control.maxLength}
         onChange={(event) => onChange(event.target.value)}
@@ -184,13 +184,15 @@ export const Playground = <
   };
 
   return (
-    <div className="border-rule-strong bg-popover grid border lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div className="border-border-strong bg-popover grid border lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div className="flex flex-col">
-        <div className="border-rule-strong bg-paper-deep flex items-center justify-between gap-4 border-b py-1 pl-4">
-          <p className="label text-graphite">Preview · Sample content</p>
+        <div className="border-border-strong bg-surface flex items-center justify-between gap-4 border-b py-1 pl-4">
+          <p className="label text-muted-foreground">
+            Preview · Sample content
+          </p>
           <button
             className={cn(
-              "label text-graphite hover:text-ink ease-mechanical inline-flex min-h-11 items-center gap-2 px-4 transition-colors duration-100 focus-visible:ring-inset",
+              "label text-muted-foreground hover:text-foreground ease-mechanical inline-flex min-h-11 items-center gap-2 px-4 transition-colors duration-100 focus-visible:ring-inset",
               focusRingClassName
             )}
             onClick={() => setRunId((current) => current + 1)}
@@ -206,11 +208,11 @@ export const Playground = <
       </div>
       <form
         aria-label="Edit parameters"
-        className="border-rule-strong flex flex-col gap-6 border-t p-4 lg:border-t-0 lg:border-l"
+        className="border-border-strong flex flex-col gap-6 border-t p-4 lg:border-t-0 lg:border-l"
         onSubmit={(event) => event.preventDefault()}
       >
         <div className="flex items-center justify-between gap-4">
-          <p className="label text-ink">Parameters</p>
+          <p className="label text-foreground">Parameters</p>
           <button
             className={technicalButtonVariants({ size: "sm" })}
             onClick={reset}

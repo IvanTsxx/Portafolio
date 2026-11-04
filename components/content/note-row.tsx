@@ -10,7 +10,7 @@ import { noteKinds, notePath, noteSource } from "@/lib/content/note-domain";
 import type { NoteIndexItem } from "@/lib/content/note-domain";
 import { cn } from "@/lib/utils";
 
-const noteTitleVariants = cva("display text-ink text-balance", {
+const noteTitleVariants = cva("display text-foreground text-balance", {
   defaultVariants: { density: "roomy" },
   variants: {
     density: {
@@ -23,8 +23,8 @@ const noteTitleVariants = cva("display text-ink text-balance", {
 const kindBadgeVariants = cva("label w-fit border px-1.5 py-0.5", {
   variants: {
     kind: {
-      "case-study": "border-ink bg-ink text-paper",
-      note: "border-rule-strong text-graphite",
+      "case-study": "border-foreground bg-foreground text-background",
+      note: "border-border-strong text-muted-foreground",
     } satisfies Record<NoteIndexItem["kind"], string>,
   },
 });
@@ -46,13 +46,13 @@ export const NoteRow = ({
   return (
     <li
       className={cn(
-        "group/marks border-rule relative border-b",
+        "group/marks border-border relative border-b",
         hoverRowClassName
       )}
     >
       <CornerMarks reveal="hover" />
-      <div className="grid gap-x-4 gap-y-4 p-4 md:p-5 lg:grid-cols-12">
-        <div className="label text-mist flex flex-wrap items-center gap-x-4 gap-y-2 lg:col-span-3 lg:flex-col lg:items-start">
+      <div className="grid gap-x-8 gap-y-4 py-8 lg:grid-cols-12">
+        <div className="label text-faint flex flex-wrap items-center gap-x-4 gap-y-2 lg:col-span-3 lg:flex-col lg:items-start">
           <span className="tabular-nums">{code}</span>
           <time className="tabular-nums" dateTime={note.stamp.dateTime}>
             {note.stamp.label}
@@ -70,30 +70,27 @@ export const NoteRow = ({
               <span>{note.title}</span>
               <ArrowUpRightIcon
                 aria-hidden
-                className="text-ink ease-out-quart mt-1 hidden size-6 shrink-0 -translate-x-2 opacity-0 transition-[opacity,translate] duration-300 group-focus-within/marks:translate-x-0 group-focus-within/marks:opacity-100 group-hover/marks:translate-x-0 group-hover/marks:opacity-100 lg:block"
+                className="text-foreground ease-out-quart mt-1 hidden size-6 shrink-0 -translate-x-2 opacity-0 transition-[opacity,translate] duration-300 group-focus-within/marks:translate-x-0 group-focus-within/marks:opacity-100 group-hover/marks:translate-x-0 group-hover/marks:opacity-100 lg:block"
               />
             </Link>
           </h3>
-          <p className="text-graphite max-w-prose text-sm text-pretty">
+          <p className="text-muted-foreground max-w-prose text-sm text-pretty">
             {note.summary}
           </p>
           <div className="flex flex-wrap items-center gap-2">
-            <ul className="flex flex-wrap gap-2">
+            <ul className="flex flex-wrap gap-x-3 gap-y-1 [&>li+li]:before:mr-3 [&>li+li]:before:content-['·']">
               {topics.slice(0, visibleTopicCount).map((topic) => (
-                <li
-                  className="label border-rule-strong text-graphite border px-2 py-1"
-                  key={topic}
-                >
+                <li className="label text-muted-foreground" key={topic}>
                   {topic}
                 </li>
               ))}
               {hiddenTopicCount > 0 ? (
-                <li className="label text-mist px-1 py-1 tabular-nums">
+                <li className="label text-faint px-1 py-1 tabular-nums">
                   +{String(hiddenTopicCount).padStart(2, "0")}
                 </li>
               ) : null}
             </ul>
-            <span className="label text-mist tabular-nums">
+            <span className="label text-faint tabular-nums">
               {String(note.readingTimeMinutes).padStart(2, "0")} min
             </span>
             {note.sample ? (

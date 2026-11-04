@@ -16,7 +16,6 @@ import {
   notePath,
 } from "@/lib/content/note-domain";
 import type { CaseStudy, Note } from "@/lib/content/note-domain";
-import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -24,9 +23,9 @@ const pad = (value: number) => String(value).padStart(2, "0");
 const Previews = ({ caseStudy }: { caseStudy: CaseStudy }) => {
   if (caseStudy.previews.length === 0) {
     return (
-      <div className="hatch border-rule-strong bg-popover relative grid min-h-48 place-items-center border md:min-h-72">
+      <div className="hatch border-border-strong bg-popover relative grid min-h-48 place-items-center border md:min-h-72">
         <CornerMarks />
-        <p className="label text-graphite">Preview slot</p>
+        <p className="label text-muted-foreground">Preview slot</p>
       </div>
     );
   }
@@ -79,19 +78,19 @@ export const AdjacentLink = ({
   return (
     <Link
       className={cn(
-        "group/marks border-rule-strong ease-mechanical hover:bg-paper-deep/60 relative flex min-h-11 flex-col gap-3 border p-5 transition-colors duration-100 md:p-6",
+        "group/marks border-border-strong ease-mechanical hover:bg-surface/60 relative flex min-h-11 flex-col gap-3 border p-5 transition-colors duration-100 md:p-6",
         focusRingClassName,
         !isNewer && "md:items-end md:text-right"
       )}
       href={notePath(note.slug)}
     >
       <CornerMarks reveal="hover" />
-      <span className="label text-mist group-hover/marks:text-ink flex items-center gap-2 transition-colors">
+      <span className="label text-faint group-hover/marks:text-foreground flex items-center gap-2 transition-colors">
         {isNewer ? <ArrowLeftIcon aria-hidden className="size-4" /> : null}
         {isNewer ? "Newer" : "Older"} · {noteKinds[note.kind].label}
         {isNewer ? null : <ArrowRightIcon aria-hidden className="size-4" />}
       </span>
-      <span className="display text-ink text-2xl text-balance">
+      <span className="display text-foreground text-2xl text-balance">
         {note.title}
       </span>
     </Link>
@@ -111,15 +110,17 @@ export const CaseStudySections = ({
       id="responsibilities"
       index={`${code}.1`}
       label="Responsibilities"
-      script={sectionScripts.noteResponsibilities}
     >
       <ul className="grid gap-x-8 sm:grid-cols-2">
         {caseStudy.responsibilities.map((responsibility) => (
           <li
-            className="border-rule text-ink flex gap-3 border-b border-dotted py-3 text-sm text-pretty"
+            className="border-border text-foreground flex gap-3 border-b border-dotted py-3 text-sm text-pretty"
             key={responsibility}
           >
-            <span aria-hidden className="bg-ink mt-1.5 size-1.5 shrink-0" />
+            <span
+              aria-hidden
+              className="bg-foreground mt-1.5 size-1.5 shrink-0"
+            />
             {responsibility}
           </li>
         ))}
@@ -141,7 +142,7 @@ export const CaseStudyLinks = ({ caseStudy }: { caseStudy: CaseStudy }) =>
           <a
             className={cn(
               linkClassName,
-              "text-ink inline-flex min-h-11 items-center gap-1 text-sm"
+              "text-foreground inline-flex min-h-11 items-center gap-1 text-sm"
             )}
             href={link.href}
             rel="noopener noreferrer"

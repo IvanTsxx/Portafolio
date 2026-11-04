@@ -11,25 +11,25 @@ const calloutVariants = cva(
     defaultVariants: { tone: "note" },
     variants: {
       tone: {
-        note: "border-rule-strong bg-popover",
-        sample: "border-ink bg-popover border-dashed",
-        tip: "border-rule-strong bg-popover",
+        note: "border-border-strong bg-popover",
+        sample: "border-foreground bg-popover border-dashed",
+        tip: "border-border-strong bg-popover",
         warning:
-          "border-ink bg-[repeating-linear-gradient(135deg,transparent_0_6px,var(--rule)_6px_7px)]",
+          "border-foreground bg-[repeating-linear-gradient(135deg,transparent_0_6px,var(--border)_6px_7px)]",
       },
     },
   }
 );
 
-const calloutMarkVariants = cva("border-ink size-2 shrink-0 border", {
+const calloutMarkVariants = cva("border-foreground size-2 shrink-0 border", {
   defaultVariants: { tone: "note" },
   variants: {
     tone: {
-      note: "bg-ink",
+      note: "bg-foreground",
       sample: "border-dashed",
       tip: "bg-transparent",
       warning:
-        "bg-[repeating-linear-gradient(135deg,var(--ink)_0_1px,transparent_1px_3px)]",
+        "bg-[repeating-linear-gradient(135deg,var(--foreground)_0_1px,transparent_1px_3px)]",
     },
   },
 });
@@ -59,11 +59,11 @@ export const Callout = ({
 }: CalloutProps) => (
   <aside className={cn(calloutVariants({ tone }), className)} {...props}>
     {tone === "warning" ? <CornerMarks /> : null}
-    <p className="label text-graphite flex items-center gap-2">
+    <p className="label text-muted-foreground flex items-center gap-2">
       <span aria-hidden className={calloutMarkVariants({ tone })} />
       {title ?? defaultTitles[tone ?? "note"]}
     </p>
-    <div className="text-ink [&_p]:text-base/7 [&>*]:my-0 [&>*+*]:mt-3">
+    <div className="text-foreground [&_p]:text-base/7 [&>*]:my-0 [&>*+*]:mt-3">
       {children}
     </div>
   </aside>

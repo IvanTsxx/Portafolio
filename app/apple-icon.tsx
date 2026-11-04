@@ -1,11 +1,8 @@
-import { iconMarks, renderIconMark } from "@/lib/site/icon-mark";
+import { renderIconMark, touchIconSize } from "@/lib/site/icon-mark";
 
-export const size = {
-  height: iconMarks.touch.size,
-  width: iconMarks.touch.size,
-};
+export const size = { height: touchIconSize, width: touchIconSize };
 export const contentType = "image/png";
 
-const AppleIcon = () => renderIconMark("touch");
+const AppleIcon = () => renderIconMark("touch", touchIconSize);
 
 export default AppleIcon;

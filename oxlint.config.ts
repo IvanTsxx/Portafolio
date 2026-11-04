@@ -18,10 +18,6 @@ export default defineConfig({
   jsPlugins: jsPlugins.jsPlugins,
   overrides: [
     {
-      files: ["components/profile/experience/experience-section.tsx"],
-      rules: { "require-await": "off" },
-    },
-    {
       files: ["app/**", "components/**", "hooks/**", "lib/**"],
       rules: { "react/jsx-no-constructed-context-values": "off" },
     },

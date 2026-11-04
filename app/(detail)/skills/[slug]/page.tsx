@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
+import { NoteToc } from "@/components/content/note-toc";
+import { DetailFallback } from "@/components/site/detail-fallback";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { JsonLd } from "@/components/site/json-ld";
 import { NeighborNav } from "@/components/site/neighbor-link";
 import { OpenInMenu } from "@/components/site/open-in-menu";
+import { PlatePage } from "@/components/site/plate-page";
 import { SkillBody } from "@/components/skills/skill-body";
 import { SkillFiles } from "@/components/skills/skill-files";
 import { SkillInstall } from "@/components/skills/skill-install";
+import { extractHeadings } from "@/lib/content/text";
 import { markdownPathOf } from "@/lib/markdown/paths";
-import { sectionScripts } from "@/lib/site/section-scripts";
 import { skillSections } from "@/lib/site/sections";
 import type { SkillSectionId } from "@/lib/site/sections";
 import { buildPageMetadata, skillPath, skillSeo } from "@/lib/site/seo";
@@ -49,7 +53,9 @@ const metaOf = (skill: Skill) =>
     { label: "License", value: skill.license },
   ].flatMap(({ label, value }) => (value ? [{ label, value }] : []));
 
-const SkillPage = async ({ params }: PageProps<"/skills/[slug]">) => {
+const SkillContent = async ({
+  params,
+}: Pick<PageProps<"/skills/[slug]">, "params">) => {
   const { slug } = await params;
   const skill = getSkill(slug);
   if (!skill) {
@@ -71,41 +77,58 @@ const SkillPage = async ({ params }: PageProps<"/skills/[slug]">) => {
   return (
     <>
       <JsonLd data={skillJsonLd(skill)} />
-      <DocumentHero
-        back={{ href: "/skills", label: "Skills" }}
-        code={code}
-        lede="Agent skill"
-        meta={metaOf(skill)}
-        size="title"
-        title={skill.name}
+      <PlatePage
+        plate={
+          <>
+            <DocumentHero
+              back={{ href: "/skills", label: "Skills" }}
+              code={code}
+              lede="Agent skill"
+              meta={metaOf(skill)}
+              size="title"
+              title={skill.name}
+            >
+              <p className="text-muted-foreground max-w-prose text-base text-pretty">
+                {skill.description}
+              </p>
+              <OpenInMenu
+                markdownPath={markdownPathOf(skillPath(skill.name))}
+              />
+            </DocumentHero>
+            <NoteToc headings={extractHeadings(skill.body)} />
+          </>
+        }
       >
-        <p className="text-graphite max-w-prose text-base text-pretty">
-          {skill.description}
-        </p>
-        <OpenInMenu markdownPath={markdownPathOf(skillPath(skill.name))} />
-      </DocumentHero>
-      <DocumentSection {...sectionProps("installation")}>
-        <SkillInstall name={skill.name} />
-      </DocumentSection>
-      <DocumentSection
-        {...sectionProps("instructions")}
-        script={sectionScripts.skillInstructions}
-      >
-        <SkillBody body={skill.body} />
-      </DocumentSection>
-      <DocumentSection
-        {...sectionProps("files")}
-        aside={String(skill.files.length).padStart(2, "0")}
-      >
-        <SkillFiles skill={skill} />
-      </DocumentSection>
-      <NeighborNav
-        label="More skills"
-        next={skillNeighbor(position + 1)}
-        previous={skillNeighbor(position - 1)}
-      />
+        <DocumentSection {...sectionProps("installation")}>
+          <SkillInstall name={skill.name} />
+        </DocumentSection>
+        <DocumentSection {...sectionProps("instructions")}>
+          <div className="contents">
+            <div className="min-w-0">
+              <SkillBody body={skill.body} />
+            </div>
+          </div>
+        </DocumentSection>
+        <DocumentSection
+          {...sectionProps("files")}
+          aside={String(skill.files.length).padStart(2, "0")}
+        >
+          <SkillFiles skill={skill} />
+        </DocumentSection>
+        <NeighborNav
+          label="More skills"
+          next={skillNeighbor(position + 1)}
+          previous={skillNeighbor(position - 1)}
+        />
+      </PlatePage>
     </>
   );
 };
+
+const SkillPage = ({ params }: PageProps<"/skills/[slug]">) => (
+  <Suspense fallback={<DetailFallback />}>
+    <SkillContent params={params} />
+  </Suspense>
+);
 
 export default SkillPage;

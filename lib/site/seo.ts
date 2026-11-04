@@ -72,15 +72,15 @@ export const buildPageMetadata = (page: PageSeo): Metadata => ({
 export const pageSeo = {
   designSystem: {
     description:
-      "Ivo's paper-and-ink design system: principles, color and type tokens, layout grid and motion rules. Copy it as a DESIGN.md for coding agents.",
+      "Ivo's monochrome design system: principles, color and type tokens, layout and motion rules. Copy it as a DESIGN.md for coding agents.",
     path: "/design-system",
     title: "Design system",
   },
   experiments: {
     description:
-      "Interactive experiments by Ivo in shaders, dithering, motion and variable type. Each one has a live preview and implementation notes.",
+      "The lab: interactive experiments by Ivo in shaders, dithering, R3F and creative code. Each one has a live preview, notes and, when reusable, a shadcn install command.",
     path: "/experiments",
-    title: "Experiments",
+    title: "Lab",
   },
   home: {
     description: siteConfig.description,
@@ -89,12 +89,12 @@ export const pageSeo = {
   },
   notes: {
     description:
-      "Builds and thoughts by Ivo, a frontend engineer. Case studies and notes on AI agents, motion and frontend craft.",
+      "Writing by Ivo, a frontend developer. Technical notes and breakdowns on rendering, motion and frontend craft.",
     path: "/notes",
-    title: "Notes",
+    title: "Writing",
   },
   registry: {
-    description: `Installable shadcn components by Ivo, from text scramble to technical grids and 3D agent figures. Add any item from ${registryUrlTemplate}.`,
+    description: `Installable shadcn components by Ivo, from a magnetic button to dithered print shaders and WebGPU slime. Add any item from ${registryUrlTemplate}.`,
     path: "/registry",
     title: "Registry",
   },
@@ -122,11 +122,13 @@ const fitDescription = (description: string) => {
 };
 
 export const experimentSeo = (experiment: Experiment): PageSeo => ({
-  description: `${experiment.summary} An interactive ${experiment.topics.join(", ")} experiment with a live preview and implementation notes.`,
+  description: fitDescription(
+    `${experiment.summary} An interactive ${experiment.topics.join(", ")} experiment with a live preview and implementation notes.`
+  ),
   keywords: [...experiment.topics, ...experiment.technologies],
   markdownPath: markdownPathOf(experimentPath(experiment.slug)),
   path: experimentPath(experiment.slug),
-  title: `${experiment.title} · Experiments`,
+  title: `${experiment.title} · Lab`,
 });
 
 export const registryItemSeo = (item: RegistryItem): PageSeo => ({

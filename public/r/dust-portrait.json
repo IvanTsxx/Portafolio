@@ -1,0 +1,306 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dust-portrait",
+  "title": "Dust Portrait",
+  "description": "A picture printed as GPU dust that blows apart under the pointer, bursts on click and settles back on a spring.",
+  "dependencies": [
+    "three@^0.186.1",
+    "@react-three/fiber@^9.8.1"
+  ],
+  "devDependencies": [
+    "@types/three@^0.186.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/ivan/components/dust-portrait/dust-portrait.tsx",
+      "content": "\"use client\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n  CanvasStage,\n  ImageFallback,\n} from \"@/registry/ivan/components/canvas-stage/canvas-stage\";\n\nimport { dustPortraitDefaults } from \"./dust-portrait-material\";\nimport { DustPortraitScene } from \"./dust-portrait-scene\";\nimport type { DustPortraitSceneProps } from \"./dust-portrait-scene\";\n\nexport interface DustPortraitProps extends Omit<\n  DustPortraitSceneProps,\n  \"pointerTarget\"\n> {\n  alt?: string;\n  className?: string;\n}\n\nconst defaultAlt = \"A picture printed in dust that scatters under the pointer\";\nconst centeredFocus = { x: 0.5, y: 0.5 };\n\nexport const DustPortrait = ({\n  alt = defaultAlt,\n  className,\n  src,\n  focus = centeredFocus,\n  ink = dustPortraitDefaults.ink,\n  paused = dustPortraitDefaults.paused,\n  ...sceneProps\n}: DustPortraitProps) => (\n  <CanvasStage\n    className={cn(\"touch-pan-y\", className)}\n    fallback={<ImageFallback focus={focus} src={src} />}\n    ground={ink}\n    label={alt}\n    paused={paused}\n  >\n    {(isAnimating) => (\n      <DustPortraitScene\n        {...sceneProps}\n        focus={focus}\n        ink={ink}\n        paused={!isAnimating}\n        src={src}\n      />\n    )}\n  </CanvasStage>\n);\n",
+      "type": "registry:component",
+      "target": "@components/dust-portrait/dust-portrait.tsx"
+    },
+    {
+      "path": "registry/ivan/components/dust-portrait/dust-portrait-scene.tsx",
+      "content": "\"use client\";\n\nimport { useFrame, useThree } from \"@react-three/fiber\";\nimport { useEffect, useMemo, useState } from \"react\";\nimport type { RefObject } from \"react\";\nimport { PlaneGeometry, Vector4 } from \"three\";\nimport type { WebGLRenderer } from \"three\";\n\nimport { usePrintImage } from \"@/registry/ivan/hooks/use-print-image\";\n\nimport { DustBursts } from \"./dust-portrait-bursts\";\nimport {\n  budgetDustCount,\n  createDustGeometry,\n  resolveDustCount,\n  sampleDustField,\n} from \"./dust-portrait-field\";\nimport type { DustFocus } from \"./dust-portrait-field\";\nimport { DustGroundMaterial } from \"./dust-portrait-ground\";\nimport {\n  DustPortraitMaterial,\n  dustPortraitDefaults,\n  isLighterThan,\n} from \"./dust-portrait-material\";\nimport { DustTrail } from \"./dust-portrait-trail\";\n\nexport interface DustPortraitSceneProps {\n  src: string;\n  burst?: boolean;\n  focus?: DustFocus;\n  density?: number;\n  dispersion?: number;\n  drift?: number;\n  idle?: boolean | number;\n  ink?: string;\n  paper?: string;\n  paused?: boolean;\n  pointerTarget?: RefObject<HTMLElement | null>;\n}\n\ninterface StageBox {\n  width: number;\n  height: number;\n}\n\nconst centeredFocus: DustFocus = { x: 0.5, y: 0.5 };\nconst maxStep = 0.05;\nconst revealRate = 7;\nconst aspectPrecision = 100;\nconst viewport = new Vector4();\n\nclass DustRig {\n  readonly trail = new DustTrail();\n  readonly bursts = new DustBursts();\n  readonly material = new DustPortraitMaterial(\n    this.trail.uniform,\n    this.bursts.uniform\n  );\n  readonly ground = new DustGroundMaterial({\n    uAspect: this.material.uniforms.uAspect,\n    uBursts: this.material.uniforms.uBursts,\n    uMark: this.material.uniforms.uMark,\n    uTime: this.material.uniforms.uTime,\n  });\n  readonly groundGeometry = new PlaneGeometry(1, 1);\n  private rows = 1;\n  private elapsed = 0;\n  private reveal = 0;\n  private imageElement: HTMLImageElement | null = null;\n\n  applyLook(ink: string, paper: string, dispersion: number, drift: number) {\n    const { uniforms } = this.material;\n    uniforms.uMark.value.set(paper);\n    uniforms.uIsLitMark.value = isLighterThan(paper, ink) ? 1 : 0;\n    uniforms.uDispersion.value = dispersion;\n    uniforms.uDrift.value = drift;\n    this.ground.uniforms.uGround.value.set(ink);\n  }\n\n  adoptField(rows: number, imageElement: HTMLImageElement) {\n    this.rows = rows;\n    if (imageElement !== this.imageElement) {\n      this.imageElement = imageElement;\n      this.reveal = 0;\n      this.writeReveal();\n    }\n  }\n\n  burst(x: number, y: number) {\n    this.bursts.add(x, y, this.elapsed);\n  }\n\n  readonly handleBeforeRender = (renderer: WebGLRenderer) => {\n    renderer.getCurrentViewport(viewport);\n    const { uniforms } = this.material;\n    uniforms.uAspect.value = viewport.z / Math.max(viewport.w, 1);\n    uniforms.uCellPx.value = viewport.w / Math.max(this.rows, 1);\n  };\n\n  advance(delta: number, paused: boolean, idle: number) {\n    const step = Math.min(delta, maxStep);\n    const { uniforms } = this.material;\n    if (paused) {\n      this.trail.clear();\n      this.bursts.clear();\n      this.reveal = 1;\n      uniforms.uIdle.value = 0;\n      this.writeReveal();\n      return false;\n    }\n    this.trail.advance(step);\n    this.elapsed += step;\n    this.reveal += (1 - this.reveal) * (1 - Math.exp(-revealRate * step));\n    if (this.reveal > 0.995) {\n      this.reveal = 1;\n    }\n    uniforms.uTime.value = this.elapsed;\n    uniforms.uIdle.value = idle;\n    this.writeReveal();\n    return (\n      idle > 0 ||\n      !this.trail.isSettled ||\n      this.bursts.isActiveAt(this.elapsed) ||\n      this.reveal < 1\n    );\n  }\n\n  dispose() {\n    this.material.dispose();\n    this.ground.dispose();\n    this.groundGeometry.dispose();\n  }\n\n  private writeReveal() {\n    this.material.uniforms.uReveal.value = this.reveal;\n    this.ground.uniforms.uReveal.value = this.reveal;\n  }\n}\n\nconst resolveTarget = (\n  pointerTarget: RefObject<HTMLElement | null> | undefined,\n  canvas: HTMLElement\n) => pointerTarget?.current ?? canvas;\n\nconst useStageBox = (\n  pointerTarget: RefObject<HTMLElement | null> | undefined,\n  canvas: HTMLElement\n) => {\n  const [box, setBox] = useState<StageBox | null>(null);\n\n  useEffect(() => {\n    const target = resolveTarget(pointerTarget, canvas);\n    if (!target) {\n      return;\n    }\n    const observer = new ResizeObserver(([entry]) => {\n      if (!entry) {\n        return;\n      }\n      const { width, height } = entry.contentRect;\n      if (width > 0 && height > 0) {\n        setBox((current) =>\n          current?.width === width && current.height === height\n            ? current\n            : { height, width }\n        );\n      }\n    });\n    observer.observe(target);\n    return () => observer.disconnect();\n  }, [canvas, pointerTarget]);\n\n  return box;\n};\n\ninterface PointerTrailInput {\n  pointerTarget: RefObject<HTMLElement | null> | undefined;\n  canvas: HTMLElement;\n  trail: DustTrail;\n  isEnabled: boolean;\n  invalidate: () => void;\n}\n\nconst usePointerTrail = ({\n  pointerTarget,\n  canvas,\n  trail,\n  isEnabled,\n  invalidate,\n}: PointerTrailInput) => {\n  useEffect(() => {\n    const target = resolveTarget(pointerTarget, canvas);\n    if (!(target && isEnabled)) {\n      return;\n    }\n    const aim = (event: PointerEvent) => {\n      const rect = target.getBoundingClientRect();\n      trail.aim(\n        (event.clientX - rect.left) / Math.max(rect.width, 1),\n        1 - (event.clientY - rect.top) / Math.max(rect.height, 1)\n      );\n      invalidate();\n    };\n    const release = () => {\n      trail.release();\n      invalidate();\n    };\n    const lift = (event: PointerEvent) => {\n      if (event.pointerType !== \"mouse\") {\n        release();\n      }\n    };\n    target.addEventListener(\"pointermove\", aim);\n    target.addEventListener(\"pointerdown\", aim);\n    target.addEventListener(\"pointerleave\", release);\n    target.addEventListener(\"pointercancel\", release);\n    target.addEventListener(\"pointerup\", lift);\n    return () => {\n      target.removeEventListener(\"pointermove\", aim);\n      target.removeEventListener(\"pointerdown\", aim);\n      target.removeEventListener(\"pointerleave\", release);\n      target.removeEventListener(\"pointercancel\", release);\n      target.removeEventListener(\"pointerup\", lift);\n      trail.release();\n    };\n  }, [canvas, invalidate, isEnabled, pointerTarget, trail]);\n};\n\ninterface BurstClickInput {\n  pointerTarget: RefObject<HTMLElement | null> | undefined;\n  canvas: HTMLElement;\n  rig: DustRig;\n  isEnabled: boolean;\n  invalidate: () => void;\n}\n\nconst useBurstClick = ({\n  pointerTarget,\n  canvas,\n  rig,\n  isEnabled,\n  invalidate,\n}: BurstClickInput) => {\n  useEffect(() => {\n    const target = resolveTarget(pointerTarget, canvas);\n    if (!(target && isEnabled)) {\n      return;\n    }\n    const strike = (event: MouseEvent) => {\n      const rect = target.getBoundingClientRect();\n      rig.burst(\n        (event.clientX - rect.left) / Math.max(rect.width, 1),\n        1 - (event.clientY - rect.top) / Math.max(rect.height, 1)\n      );\n      invalidate();\n    };\n    target.addEventListener(\"click\", strike);\n    return () => target.removeEventListener(\"click\", strike);\n  }, [canvas, invalidate, isEnabled, pointerTarget, rig]);\n};\n\nexport const DustPortraitScene = ({\n  src,\n  burst = dustPortraitDefaults.burst,\n  focus = centeredFocus,\n  density = dustPortraitDefaults.density,\n  dispersion = dustPortraitDefaults.dispersion,\n  drift = dustPortraitDefaults.drift,\n  idle = dustPortraitDefaults.idle,\n  ink = dustPortraitDefaults.ink,\n  paper = dustPortraitDefaults.paper,\n  paused = dustPortraitDefaults.paused,\n  pointerTarget,\n}: DustPortraitSceneProps) => {\n  const invalidate = useThree((state) => state.invalidate);\n  const canvas = useThree((state) => state.gl.domElement);\n  const rig = useMemo(() => new DustRig(), []);\n  const image = usePrintImage(src);\n  const box = useStageBox(pointerTarget, canvas);\n  const deviceCount = useMemo(() => resolveDustCount(), []);\n  const isLitMark = isLighterThan(paper, ink);\n  const idleStrength = Math.max(0, Number(idle));\n\n  usePointerTrail({\n    canvas,\n    invalidate,\n    isEnabled: !paused,\n    pointerTarget,\n    trail: rig.trail,\n  });\n\n  useBurstClick({\n    canvas,\n    invalidate,\n    isEnabled: burst && !paused,\n    pointerTarget,\n    rig,\n  });\n\n  useEffect(() => () => rig.dispose(), [rig]);\n\n  useEffect(() => {\n    rig.applyLook(ink, paper, dispersion, drift);\n    invalidate();\n  }, [dispersion, drift, ink, invalidate, paper, rig]);\n\n  const aspect = box\n    ? Math.round((box.width / box.height) * aspectPrecision) / aspectPrecision\n    : null;\n  const count = box\n    ? budgetDustCount(deviceCount, density, box.width, box.height)\n    : 0;\n  const roundedCount = Math.round(count / 1000) * 1000;\n\n  const field = useMemo(() => {\n    if (!(image && aspect)) {\n      return null;\n    }\n    return sampleDustField({\n      aspect,\n      count: roundedCount,\n      focus: { x: focus.x, y: focus.y },\n      image: image.element,\n      isLitMark,\n    });\n  }, [aspect, focus.x, focus.y, image, isLitMark, roundedCount]);\n\n  const geometry = useMemo(\n    () => (field ? createDustGeometry(field) : null),\n    [field]\n  );\n\n  useEffect(() => {\n    if (!geometry) {\n      return;\n    }\n    return () => geometry.dispose();\n  }, [geometry]);\n\n  useEffect(() => {\n    if (!(field && image)) {\n      return;\n    }\n    rig.adoptField(field.rows, image.element);\n    invalidate();\n  }, [field, image, invalidate, rig]);\n\n  useFrame((_, delta) => {\n    if (!geometry) {\n      return;\n    }\n    if (rig.advance(delta, paused, idleStrength)) {\n      invalidate();\n    }\n  });\n\n  if (!geometry) {\n    return null;\n  }\n\n  return (\n    <>\n      <mesh\n        frustumCulled={false}\n        geometry={rig.groundGeometry}\n        material={rig.ground}\n        renderOrder={0}\n      />\n      <points\n        frustumCulled={false}\n        geometry={geometry}\n        material={rig.material}\n        onBeforeRender={rig.handleBeforeRender}\n        renderOrder={1}\n      />\n    </>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/dust-portrait/dust-portrait-scene.tsx"
+    },
+    {
+      "path": "registry/ivan/components/dust-portrait/dust-portrait-material.ts",
+      "content": "import { Color, NormalBlending, ShaderMaterial } from \"three\";\nimport type { IUniform, Vector3 } from \"three\";\n\nimport { dustBurstChunk } from \"./dust-portrait-bursts\";\nimport { dustTrailLength } from \"./dust-portrait-trail\";\n\nexport const dustPortraitDefaults = {\n  burst: true,\n  density: 1,\n  dispersion: 1,\n  drift: 1,\n  idle: true,\n  ink: \"#0B0B0C\",\n  paper: \"#EDECE8\",\n  paused: false,\n} as const;\n\nexport interface DustPortraitUniforms {\n  [uniform: string]: IUniform;\n  uAspect: IUniform<number>;\n  uBursts: IUniform<Vector3[]>;\n  uCellPx: IUniform<number>;\n  uDispersion: IUniform<number>;\n  uDrift: IUniform<number>;\n  uIdle: IUniform<number>;\n  uMark: IUniform<Color>;\n  uIsLitMark: IUniform<number>;\n  uRadius: IUniform<number>;\n  uReveal: IUniform<number>;\n  uTime: IUniform<number>;\n  uTrail: IUniform<Vector3[]>;\n}\n\nconst noiseChunk = `\n  vec3 permute3(vec3 x) {\n    return mod(((x * 34.0) + 1.0) * x, 289.0);\n  }\n\n  float simplex(vec2 v) {\n    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);\n    vec2 i = floor(v + dot(v, C.yy));\n    vec2 x0 = v - i + dot(i, C.xx);\n    vec2 i1 = x0.x > x0.y ? vec2(1.0, 0.0) : vec2(0.0, 1.0);\n    vec4 x12 = x0.xyxy + C.xxzz;\n    x12.xy -= i1;\n    i = mod(i, 289.0);\n    vec3 p = permute3(permute3(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));\n    vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);\n    m = m * m;\n    m = m * m;\n    vec3 x = 2.0 * fract(p * C.www) - 1.0;\n    vec3 h = abs(x) - 0.5;\n    vec3 ox = floor(x + 0.5);\n    vec3 a0 = x - ox;\n    m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);\n    vec3 g;\n    g.x = a0.x * x0.x + h.x * x0.y;\n    g.yz = a0.yz * x12.xz + h.yz * x12.yw;\n    return 130.0 * dot(m, g);\n  }\n\n  vec2 curl(vec2 p) {\n    const float e = 0.08;\n    float up = simplex(p + vec2(0.0, e));\n    float down = simplex(p - vec2(0.0, e));\n    float right = simplex(p + vec2(e, 0.0));\n    float left = simplex(p - vec2(e, 0.0));\n    return vec2(up - down, left - right) / (2.0 * e);\n  }\n`;\n\nconst vertexShader = `\n  #define TRAIL ${dustTrailLength + 1}\n\n  attribute vec2 aMeta;\n\n  uniform vec3 uTrail[TRAIL];\n  uniform float uAspect;\n  uniform float uRadius;\n  uniform float uDispersion;\n  uniform float uDrift;\n  uniform float uTime;\n  uniform float uIdle;\n  uniform float uCellPx;\n  uniform float uIsLitMark;\n  uniform float uReveal;\n\n  varying float vAlpha;\n  varying float vRadius;\n  varying float vSize;\n\n  ${noiseChunk}\n  ${dustBurstChunk}\n\n  struct BurstPush {\n    vec2 offset;\n    float amount;\n    float ring;\n  };\n\n  BurstPush burstPushAt(vec2 stageHome, float seed) {\n    BurstPush push = BurstPush(vec2(0.0), 0.0, 0.0);\n    vec2 swirl = vec2(0.0);\n    bool hasSwirl = false;\n    float rise = BURST_RISE * (0.75 + 0.5 * fract(seed * 5.71));\n    float reach = 0.1 + 0.08 * fract(seed * 9.13);\n    for (int index = 0; index < BURSTS; index++) {\n      vec3 burst = uBursts[index];\n      float age = uTime - burst.z;\n      if (age < 0.0 || age > BURST_SECONDS) {\n        continue;\n      }\n      vec2 delta = stageHome - burst.xy * vec2(uAspect, 1.0);\n      float gap = length(delta);\n      float local = (age - burstArrival(gap)) / rise;\n      if (local <= 0.0) {\n        continue;\n      }\n      if (!hasSwirl) {\n        swirl = curl(stageHome * 3.1 + seed * 0.3);\n        hasSwirl = true;\n      }\n      float response = local * exp(1.0 - local);\n      float falloff = exp(-gap * 3.2);\n      float angle = seed * 6.2832;\n      vec2 radial = gap > 0.0001 ? delta / gap : vec2(cos(angle), sin(angle));\n      vec2 direction = normalize(radial + swirl * 0.45 * uDispersion + vec2(uDrift * 0.15, 0.0));\n      push.offset += direction * response * falloff * reach;\n      push.amount = max(push.amount, response * falloff);\n      float fade = 1.0 - smoothstep(0.0, BURST_WAVE_SECONDS * 1.3, age);\n      push.ring = max(push.ring, exp(-pow((local - 0.7) * 1.8, 2.0)) * fade);\n    }\n    float travel = length(push.offset);\n    if (travel > 0.28) {\n      push.offset *= 0.28 / travel;\n    }\n    push.amount = min(push.amount, 1.0);\n    return push;\n  }\n\n  float influenceAt(vec2 home, float ragged) {\n    float strongest = 0.0;\n    vec2 scale = vec2(uAspect, 1.0);\n    for (int index = 0; index < TRAIL; index++) {\n      vec3 mark = uTrail[index];\n      if (mark.z < 0.001) {\n        continue;\n      }\n      vec2 delta = (home - mark.xy) * scale;\n      delta.x *= delta.x > 0.0 ? 0.62 : 1.2;\n      float reach = length(delta) / (uRadius * ragged);\n      strongest = max(strongest, mark.z * (1.0 - smoothstep(0.3, 1.0, reach)));\n    }\n    return strongest;\n  }\n\n  void main() {\n    vec2 home = position.xy;\n    float luma = position.z;\n    float seed = aMeta.x;\n    float edge = aMeta.y;\n    vec2 stageHome = home * vec2(uAspect, 1.0);\n\n    float ragged = 0.78 + 0.44 * (simplex(stageHome * 9.0) * 0.5 + 0.5);\n    float pushed = influenceAt(home, ragged);\n    float idle = min(uIdle, 3.0);\n    float windward = smoothstep(0.45, 1.0, home.x);\n    float shedRate = 0.975 - idle * (0.012 + windward * 0.07);\n    float shedder = step(shedRate, fract(seed * 7.31)) * step(0.22 * (1.0 - windward * min(idle, 1.0)), edge);\n    float shed = min(idle, 1.0) * shedder * pow(max(sin(uTime * (0.22 + 0.3 * seed) + seed * 43.0), 0.0), mix(10.0, 4.0, windward * min(idle, 1.0))) * (0.55 + 0.25 * windward);\n    float gustFront = fract(uTime * 0.045 + seed * 0.015);\n    float gustBand = exp(-pow((home.x - (gustFront * 1.6 - 0.3)) * 7.0, 2.0));\n    float gustLift = step(0.82, fract(seed * 5.13 + floor(uTime * 0.045) * 0.37));\n    float gust = min(idle, 2.0) * 0.18 * gustBand * gustLift * (0.35 + 0.65 * windward);\n    float amount = max(max(pushed, shed), gust);\n    amount = amount * amount * (3.0 - 2.0 * amount);\n\n    vec2 offset = vec2(0.0);\n    if (amount > 0.0005) {\n      float lag = 0.35 + 0.65 * fract(seed * 3.17);\n      vec2 flow = curl(stageHome * 2.4 + vec2(-uTime * 0.16, uTime * 0.05) + seed * 0.4);\n      float gust = 0.85 + 0.15 * sin(uTime * 0.9 + seed * 20.0);\n      offset = flow * uDispersion * 0.09 * lag;\n      offset += vec2(uDrift * 0.42 * lag * gust, (seed - 0.45) * 0.06 * uDispersion);\n      offset *= amount;\n    }\n\n    BurstPush burst = burstPushAt(stageHome, seed);\n    offset += burst.offset;\n    offset += idle * windward * windward * 0.0016 * vec2(sin(uTime * 1.3 + seed * 50.0), cos(uTime * 1.1 + seed * 31.0));\n    vec2 stage = home + vec2(offset.x / uAspect, offset.y);\n    gl_Position = vec4(stage * 2.0 - 1.0, 0.0, 1.0);\n\n    float coverage = mix(1.0 - luma, luma, uIsLitMark);\n    float scatter = max(amount, burst.amount * 0.8);\n    float grain = mix(1.0, 0.62 + 0.28 * seed, scatter);\n    vRadius = sqrt(coverage) * 0.64 * uCellPx * grain * (1.0 + 0.45 * burst.ring);\n    vSize = ceil(uCellPx * 1.35 + 2.0);\n    vAlpha = min(mix(1.0, 0.5 + 0.5 * fract(seed * 13.7), scatter) + burst.ring * 0.5, 1.0) * uReveal;\n    gl_PointSize = vSize;\n  }\n`;\n\nconst fragmentShader = `\n  uniform vec3 uMark;\n\n  varying float vAlpha;\n  varying float vRadius;\n  varying float vSize;\n\n  void main() {\n    float reach = length(gl_PointCoord - 0.5) * vSize;\n    float alpha = (1.0 - smoothstep(vRadius - 0.6, vRadius + 0.6, reach)) * vAlpha;\n    if (alpha < 0.004) {\n      discard;\n    }\n    gl_FragColor = vec4(uMark, alpha);\n    #include <colorspace_fragment>\n  }\n`;\n\nexport const createDustUniforms = (\n  trail: Vector3[],\n  bursts: Vector3[]\n): DustPortraitUniforms => ({\n  uAspect: { value: 1 },\n  uBursts: { value: bursts },\n  uCellPx: { value: 2 },\n  uDispersion: { value: dustPortraitDefaults.dispersion },\n  uDrift: { value: dustPortraitDefaults.drift },\n  uIdle: { value: 0 },\n  uIsLitMark: { value: 1 },\n  uMark: { value: new Color(dustPortraitDefaults.paper) },\n  uRadius: { value: 0.16 },\n  uReveal: { value: 0 },\n  uTime: { value: 0 },\n  uTrail: { value: trail },\n});\n\nexport class DustPortraitMaterial extends ShaderMaterial {\n  declare uniforms: DustPortraitUniforms;\n\n  constructor(trail: Vector3[], bursts: Vector3[]) {\n    super({\n      blending: NormalBlending,\n      depthTest: false,\n      depthWrite: false,\n      fragmentShader,\n      toneMapped: false,\n      transparent: true,\n      uniforms: createDustUniforms(trail, bursts),\n      vertexShader,\n    });\n  }\n}\n\nconst luminance = (value: string) => {\n  const { r, g, b } = new Color(value);\n  return 0.2126 * r + 0.7152 * g + 0.0722 * b;\n};\n\nexport const isLighterThan = (mark: string, ground: string) =>\n  luminance(mark) >= luminance(ground);\n",
+      "type": "registry:component",
+      "target": "@components/dust-portrait/dust-portrait-material.ts"
+    },
+    {
+      "path": "registry/ivan/components/dust-portrait/dust-portrait-ground.ts",
+      "content": "import { Color, ShaderMaterial } from \"three\";\nimport type { IUniform, Vector3 } from \"three\";\n\nimport { dustBurstChunk } from \"./dust-portrait-bursts\";\n\nconst groundVertexShader = `\n  varying vec2 vUv;\n\n  void main() {\n    vUv = position.xy + 0.5;\n    gl_Position = vec4(position.xy * 2.0, 0.0, 1.0);\n  }\n`;\n\nconst groundFragmentShader = `\n  uniform vec3 uGround;\n  uniform vec3 uMark;\n  uniform float uReveal;\n  uniform float uAspect;\n  uniform float uTime;\n\n  varying vec2 vUv;\n\n  ${dustBurstChunk}\n\n  void main() {\n    vec2 stage = vUv * vec2(uAspect, 1.0);\n    float glow = 0.0;\n    for (int index = 0; index < BURSTS; index++) {\n      vec3 burst = uBursts[index];\n      float age = uTime - burst.z;\n      if (age < 0.0 || age > BURST_SECONDS) {\n        continue;\n      }\n      float gap = length(stage - burst.xy * vec2(uAspect, 1.0));\n      float wave = clamp(age / BURST_WAVE_SECONDS, 0.0, 1.0);\n      float ring = exp(-pow((gap - burstFront(age)) / 0.03, 2.0)) * pow(1.0 - wave, 2.0);\n      float flash = exp(-age * 12.0) * exp(-pow(gap / 0.14, 2.0));\n      glow += 0.2 * ring + 0.32 * flash;\n    }\n    gl_FragColor = vec4(mix(uGround, uMark, min(glow, 0.5)), uReveal);\n    #include <colorspace_fragment>\n  }\n`;\n\nexport interface DustGroundShared {\n  uAspect: IUniform<number>;\n  uBursts: IUniform<Vector3[]>;\n  uMark: IUniform<Color>;\n  uTime: IUniform<number>;\n}\n\ninterface DustGroundUniforms extends DustGroundShared {\n  [uniform: string]: IUniform;\n  uGround: IUniform<Color>;\n  uReveal: IUniform<number>;\n}\n\nexport class DustGroundMaterial extends ShaderMaterial {\n  declare uniforms: DustGroundUniforms;\n\n  constructor(shared: DustGroundShared) {\n    super({\n      depthTest: false,\n      depthWrite: false,\n      fragmentShader: groundFragmentShader,\n      toneMapped: false,\n      transparent: true,\n      uniforms: {\n        ...shared,\n        uGround: { value: new Color(\"#0B0B0C\") },\n        uReveal: { value: 0 },\n      },\n      vertexShader: groundVertexShader,\n    });\n  }\n}\n",
+      "type": "registry:component",
+      "target": "@components/dust-portrait/dust-portrait-ground.ts"
+    },
+    {
+      "path": "registry/ivan/components/dust-portrait/dust-portrait-field.ts",
+      "content": "import { BufferAttribute, BufferGeometry } from \"three\";\n\nexport interface DustFocus {\n  x: number;\n  y: number;\n}\n\nexport interface DustGrid {\n  cols: number;\n  rows: number;\n}\n\nexport interface DustCrop {\n  sx: number;\n  sy: number;\n  sw: number;\n  sh: number;\n}\n\nexport interface DustField {\n  count: number;\n  rows: number;\n  positions: Float32Array;\n  meta: Float32Array;\n}\n\nexport const dustLimits = {\n  maxCount: 160_000,\n  minCellCss: 1.6,\n  minCount: 8000,\n} as const;\n\nconst lumaWeights = [0.2126, 0.7152, 0.0722] as const;\nconst hiddenCoverage = 0.035;\n\nexport const resolveDustCount = () => {\n  if (typeof window === \"undefined\") {\n    return 90_000;\n  }\n  const isCoarse = window.matchMedia(\"(pointer: coarse)\").matches;\n  const cores = navigator.hardwareConcurrency || 4;\n  if (isCoarse || cores <= 4) {\n    return 45_000;\n  }\n  return cores >= 10 ? 120_000 : 90_000;\n};\n\nexport const budgetDustCount = (\n  deviceCount: number,\n  density: number,\n  cssWidth: number,\n  cssHeight: number\n) => {\n  const areaCap =\n    (Math.max(cssWidth, 1) * Math.max(cssHeight, 1)) /\n    dustLimits.minCellCss ** 2;\n  const wanted = Math.min(deviceCount * Math.max(density, 0), areaCap);\n  return Math.round(\n    Math.min(Math.max(wanted, dustLimits.minCount), dustLimits.maxCount)\n  );\n};\n\nexport const planDustGrid = (count: number, aspect: number): DustGrid => {\n  const safeAspect = Math.max(aspect, 0.01);\n  const cols = Math.max(2, Math.round(Math.sqrt(count * safeAspect)));\n  const rows = Math.max(2, Math.round(cols / safeAspect));\n  return { cols, rows };\n};\n\nexport const coverCrop = (\n  imageWidth: number,\n  imageHeight: number,\n  aspect: number,\n  focus: DustFocus\n): DustCrop => {\n  const imageAspect = imageWidth / imageHeight;\n  const sw = aspect > imageAspect ? imageWidth : imageHeight * aspect;\n  const sh = aspect > imageAspect ? imageWidth / aspect : imageHeight;\n  const sx = Math.min(\n    Math.max(focus.x * imageWidth - sw / 2, 0),\n    imageWidth - sw\n  );\n  const sy = Math.min(\n    Math.max(focus.y * imageHeight - sh / 2, 0),\n    imageHeight - sh\n  );\n  return { sh, sw, sx, sy };\n};\n\nconst seedAt = (index: number) => {\n  const value = Math.sin(index * 12.9898 + 78.233) * 43_758.5453;\n  return value - Math.floor(value);\n};\n\nexport const buildDustField = (\n  pixels: Uint8ClampedArray,\n  { cols, rows }: DustGrid,\n  isLitMark: boolean\n): DustField => {\n  const lumas = new Float32Array(cols * rows);\n  for (let index = 0; index < cols * rows; index += 1) {\n    const offset = index * 4;\n    const alpha = (pixels[offset + 3] ?? 255) / 255;\n    const luma =\n      ((pixels[offset] ?? 0) * lumaWeights[0] +\n        (pixels[offset + 1] ?? 0) * lumaWeights[1] +\n        (pixels[offset + 2] ?? 0) * lumaWeights[2]) /\n      255;\n    lumas[index] = isLitMark ? luma * alpha : 1 - (1 - luma) * alpha;\n  }\n  const lumaAt = (x: number, y: number) =>\n    lumas[\n      Math.min(Math.max(y, 0), rows - 1) * cols +\n        Math.min(Math.max(x, 0), cols - 1)\n    ] ?? 0;\n\n  const positions = new Float32Array(cols * rows * 3);\n  const meta = new Float32Array(cols * rows * 2);\n  let count = 0;\n  for (let y = 0; y < rows; y += 1) {\n    for (let x = 0; x < cols; x += 1) {\n      const luma = lumaAt(x, y);\n      const coverage = isLitMark ? luma : 1 - luma;\n      if (coverage < hiddenCoverage) {\n        continue;\n      }\n      const neighbors =\n        (lumaAt(x - 1, y) +\n          lumaAt(x + 1, y) +\n          lumaAt(x, y - 1) +\n          lumaAt(x, y + 1)) /\n        4;\n      positions[count * 3] = (x + 0.5) / cols;\n      positions[count * 3 + 1] = 1 - (y + 0.5) / rows;\n      positions[count * 3 + 2] = luma;\n      meta[count * 2] = seedAt(y * cols + x);\n      meta[count * 2 + 1] = Math.min(Math.abs(luma - neighbors) * 4, 1);\n      count += 1;\n    }\n  }\n  return {\n    count,\n    meta: meta.slice(0, count * 2),\n    positions: positions.slice(0, count * 3),\n    rows,\n  };\n};\n\nexport interface DustSampleRequest {\n  image: HTMLImageElement;\n  aspect: number;\n  count: number;\n  focus: DustFocus;\n  isLitMark: boolean;\n}\n\nexport const sampleDustField = ({\n  image,\n  aspect,\n  count,\n  focus,\n  isLitMark,\n}: DustSampleRequest): DustField | null => {\n  const grid = planDustGrid(count, aspect);\n  const canvas = document.createElement(\"canvas\");\n  canvas.width = grid.cols;\n  canvas.height = grid.rows;\n  const context = canvas.getContext(\"2d\", { willReadFrequently: true });\n  if (!context) {\n    return null;\n  }\n  const crop = coverCrop(\n    image.naturalWidth,\n    image.naturalHeight,\n    aspect,\n    focus\n  );\n  context.imageSmoothingEnabled = true;\n  context.imageSmoothingQuality = \"high\";\n  context.drawImage(\n    image,\n    crop.sx,\n    crop.sy,\n    crop.sw,\n    crop.sh,\n    0,\n    0,\n    grid.cols,\n    grid.rows\n  );\n  try {\n    const { data } = context.getImageData(0, 0, grid.cols, grid.rows);\n    return buildDustField(data, grid, isLitMark);\n  } catch {\n    return null;\n  }\n};\n\nexport const createDustGeometry = (field: DustField) => {\n  const geometry = new BufferGeometry();\n  geometry.setAttribute(\"position\", new BufferAttribute(field.positions, 3));\n  geometry.setAttribute(\"aMeta\", new BufferAttribute(field.meta, 2));\n  return geometry;\n};\n",
+      "type": "registry:component",
+      "target": "@components/dust-portrait/dust-portrait-field.ts"
+    },
+    {
+      "path": "registry/ivan/components/dust-portrait/dust-portrait-trail.ts",
+      "content": "import { Vector3 } from \"three\";\n\nimport { createSpring, driveSpring } from \"@/registry/ivan/lib/spring\";\nimport type { Spring, SpringConfig } from \"@/registry/ivan/lib/spring\";\n\nexport const dustTrailLength = 10;\n\nconst attack: SpringConfig = { damping: 36, stiffness: 324 };\nconst release: SpringConfig = { damping: 15, stiffness: 56.25 };\nconst dropEvery = 0.045;\nconst dropDistance = 0.012;\nconst restValue = 0.004;\nconst restVelocity = 0.02;\nconst substep = 1 / 120;\n\ninterface TrailMark {\n  x: number;\n  y: number;\n  spring: Spring;\n}\n\nconst createMark = (): TrailMark => ({ spring: createSpring(0), x: 0, y: 0 });\n\nconst isResting = ({ value, velocity }: Spring) =>\n  Math.abs(value) < restValue && Math.abs(velocity) < restVelocity;\n\nexport class DustTrail {\n  readonly uniform = Array.from(\n    { length: dustTrailLength + 1 },\n    () => new Vector3()\n  );\n  private readonly head = createMark();\n  private readonly marks = Array.from({ length: dustTrailLength }, createMark);\n  private isPointerIn = false;\n  private sinceDrop = 0;\n  private nextMark = 0;\n  private lastDropX = Number.NaN;\n  private lastDropY = Number.NaN;\n\n  aim(x: number, y: number) {\n    this.head.x = x;\n    this.head.y = y;\n    this.isPointerIn = true;\n  }\n\n  release() {\n    this.isPointerIn = false;\n  }\n\n  get isSettled() {\n    return (\n      !this.isPointerIn &&\n      isResting(this.head.spring) &&\n      this.marks.every((mark) => isResting(mark.spring))\n    );\n  }\n\n  get strength() {\n    return this.head.spring.value;\n  }\n\n  clear() {\n    this.isPointerIn = false;\n    for (const mark of [this.head, ...this.marks]) {\n      mark.spring.value = 0;\n      mark.spring.velocity = 0;\n    }\n    this.write();\n  }\n\n  advance(step: number) {\n    const { head } = this;\n    for (let elapsed = 0; elapsed < step; elapsed += substep) {\n      const slice = Math.min(substep, step - elapsed);\n      driveSpring(\n        head.spring,\n        this.isPointerIn ? 1 : 0,\n        this.isPointerIn ? attack : release,\n        slice,\n        true\n      );\n      for (const mark of this.marks) {\n        driveSpring(mark.spring, 0, release, slice, true);\n      }\n    }\n    this.sinceDrop += step;\n    const moved =\n      Number.isNaN(this.lastDropX) ||\n      Math.hypot(head.x - this.lastDropX, head.y - this.lastDropY) >\n        dropDistance;\n    if (this.isPointerIn && moved && this.sinceDrop >= dropEvery) {\n      this.drop();\n    }\n    for (const mark of [head, ...this.marks]) {\n      if (isResting(mark.spring)) {\n        mark.spring.value = 0;\n        mark.spring.velocity = 0;\n      }\n    }\n    this.write();\n  }\n\n  private drop() {\n    const { head } = this;\n    const mark = this.marks[this.nextMark];\n    if (!mark) {\n      return;\n    }\n    mark.x = head.x;\n    mark.y = head.y;\n    mark.spring.value = Math.max(head.spring.value, mark.spring.value * 0.5);\n    mark.spring.velocity = 0;\n    this.nextMark = (this.nextMark + 1) % this.marks.length;\n    this.sinceDrop = 0;\n    this.lastDropX = head.x;\n    this.lastDropY = head.y;\n  }\n\n  private write() {\n    const { head } = this;\n    this.uniform[0]?.set(head.x, head.y, Math.max(head.spring.value, 0));\n    for (const [index, mark] of this.marks.entries()) {\n      this.uniform[index + 1]?.set(\n        mark.x,\n        mark.y,\n        Math.max(mark.spring.value, 0)\n      );\n    }\n  }\n}\n",
+      "type": "registry:component",
+      "target": "@components/dust-portrait/dust-portrait-trail.ts"
+    },
+    {
+      "path": "registry/ivan/components/dust-portrait/dust-portrait-bursts.ts",
+      "content": "import { Vector3 } from \"three\";\n\nexport const dustBurstCapacity = 8;\n\nexport const dustBurstTiming = {\n  reach: 1.15,\n  rise: 0.13,\n  seconds: 2.4,\n  wave: 0.9,\n} as const;\n\nconst unbornAt = -1e4;\n\nexport const dustBurstChunk = `\n  #define BURSTS ${dustBurstCapacity}\n  #define BURST_REACH ${dustBurstTiming.reach.toFixed(3)}\n  #define BURST_RISE ${dustBurstTiming.rise.toFixed(3)}\n  #define BURST_SECONDS ${dustBurstTiming.seconds.toFixed(3)}\n  #define BURST_WAVE_SECONDS ${dustBurstTiming.wave.toFixed(3)}\n\n  uniform vec3 uBursts[BURSTS];\n\n  float burstFront(float age) {\n    float wave = clamp(age / BURST_WAVE_SECONDS, 0.0, 1.0);\n    return BURST_REACH * (1.0 - pow(1.0 - wave, 3.0));\n  }\n\n  float burstArrival(float gap) {\n    float travelled = clamp(gap / BURST_REACH, 0.0, 1.0);\n    return BURST_WAVE_SECONDS * (1.0 - pow(1.0 - travelled, 1.0 / 3.0));\n  }\n`;\n\nexport class DustBursts {\n  readonly uniform = Array.from(\n    { length: dustBurstCapacity },\n    () => new Vector3(0, 0, unbornAt)\n  );\n  private next = 0;\n  private lastBirth = unbornAt;\n\n  add(x: number, y: number, birth: number) {\n    this.uniform[this.next]?.set(x, y, birth);\n    this.next = (this.next + 1) % dustBurstCapacity;\n    this.lastBirth = birth;\n  }\n\n  isActiveAt(time: number) {\n    return time - this.lastBirth < dustBurstTiming.seconds;\n  }\n\n  clear() {\n    for (const burst of this.uniform) {\n      burst.z = unbornAt;\n    }\n    this.next = 0;\n    this.lastBirth = unbornAt;\n  }\n}\n",
+      "type": "registry:component",
+      "target": "@components/dust-portrait/dust-portrait-bursts.ts"
+    },
+    {
+      "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+      "content": "\"use client\";\n\nimport { Canvas } from \"@react-three/fiber\";\nimport { useRef } from \"react\";\nimport type { ComponentProps, ReactNode } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { useInView } from \"@/registry/ivan/hooks/use-in-view\";\nimport { usePrefersReducedMotion } from \"@/registry/ivan/hooks/use-prefers-reduced-motion\";\nimport { useWebGLSupport } from \"@/registry/ivan/hooks/use-webgl-support\";\n\nexport interface CanvasStageProps {\n  ground: string;\n  label: string;\n  paused: boolean;\n  fallback: ReactNode;\n  antialias?: boolean;\n  camera?: ComponentProps<typeof Canvas>[\"camera\"];\n  className?: string;\n  children: (isAnimating: boolean) => ReactNode;\n}\n\ninterface ImageFallbackProps {\n  src: string;\n  focus: { x: number; y: number };\n}\n\nexport const ImageFallback = ({ src, focus }: ImageFallbackProps) => (\n  <div\n    aria-hidden\n    className=\"absolute inset-0 grayscale\"\n    style={{\n      backgroundImage: `url(${JSON.stringify(src)})`,\n      backgroundPosition: `${focus.x * 100}% ${focus.y * 100}%`,\n      backgroundSize: \"cover\",\n    }}\n  />\n);\n\nexport const CanvasStage = ({\n  ground,\n  label,\n  paused,\n  fallback,\n  antialias = false,\n  camera,\n  className,\n  children,\n}: CanvasStageProps) => {\n  const frame = useRef<HTMLElement>(null);\n  const hasWebGL = useWebGLSupport();\n  const isInView = useInView(frame);\n  const prefersReducedMotion = usePrefersReducedMotion();\n  const isAnimating = isInView && !prefersReducedMotion && !paused;\n\n  return (\n    <figure\n      aria-label={label}\n      className={cn(\n        \"relative m-0 aspect-4/3 w-full overflow-hidden\",\n        className\n      )}\n      ref={frame}\n      style={{ backgroundColor: ground }}\n    >\n      {hasWebGL ? (\n        <Canvas\n          aria-hidden\n          camera={camera}\n          dpr={[1, 1.75]}\n          frameloop={isAnimating ? \"always\" : \"demand\"}\n          gl={{\n            alpha: true,\n            antialias,\n            powerPreference: \"high-performance\",\n          }}\n        >\n          {children(isAnimating)}\n        </Canvas>\n      ) : (\n        fallback\n      )}\n    </figure>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/canvas-stage/canvas-stage.tsx"
+    },
+    {
+      "path": "registry/ivan/lib/spring.ts",
+      "content": "export interface Spring {\n  value: number;\n  velocity: number;\n}\n\nexport interface SpringConfig {\n  stiffness: number;\n  damping: number;\n}\n\nexport const createSpring = (value: number): Spring => ({\n  value,\n  velocity: 0,\n});\n\nexport const driveSpring = (\n  spring: Spring,\n  target: number,\n  { stiffness, damping }: SpringConfig,\n  step: number,\n  isAnimating: boolean\n) => {\n  if (isAnimating) {\n    const acceleration =\n      stiffness * (target - spring.value) - damping * spring.velocity;\n    spring.velocity += acceleration * step;\n    spring.value += spring.velocity * step;\n  } else {\n    spring.value = target;\n    spring.velocity = 0;\n  }\n};\n\nexport const frameStep = (delta: number) => Math.min(delta, 1 / 30);\n",
+      "type": "registry:lib",
+      "target": "@lib/spring.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nconst reducedMotionQuery = \"(prefers-reduced-motion: reduce)\";\n\nconst subscribe = (onChange: () => void) => {\n  const mediaQuery = window.matchMedia(reducedMotionQuery);\n  mediaQuery.addEventListener(\"change\", onChange);\n  return () => mediaQuery.removeEventListener(\"change\", onChange);\n};\n\nconst getSnapshot = () => window.matchMedia(reducedMotionQuery).matches;\n\nconst getServerSnapshot = () => false;\n\nexport const usePrefersReducedMotion = () =>\n  useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-prefers-reduced-motion.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-webgl-support.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nlet cachedSupport: boolean | null = null;\n\nconst detectWebGL = () => {\n  if (cachedSupport !== null) {\n    return cachedSupport;\n  }\n  try {\n    const probe = document.createElement(\"canvas\");\n    const context = probe.getContext(\"webgl2\") ?? probe.getContext(\"webgl\");\n    context?.getExtension(\"WEBGL_lose_context\")?.loseContext();\n    cachedSupport = context !== null;\n  } catch {\n    cachedSupport = false;\n  }\n  return cachedSupport;\n};\n\nconst subscribe = (onChange: () => void) => {\n  window.addEventListener(\"pageshow\", onChange);\n  return () => window.removeEventListener(\"pageshow\", onChange);\n};\n\nconst getServerSnapshot = () => true;\n\nexport const useWebGLSupport = () =>\n  useSyncExternalStore(subscribe, detectWebGL, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-webgl-support.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-in-view.ts",
+      "content": "\"use client\";\n\nimport { useEffect, useState } from \"react\";\nimport type { RefObject } from \"react\";\n\nexport const useInView = (\n  target: RefObject<Element | null>,\n  rootMargin = \"10% 0px\"\n) => {\n  const [isInView, setIsInView] = useState(false);\n\n  useEffect(() => {\n    const element = target.current;\n    if (!element) {\n      return;\n    }\n    const observer = new IntersectionObserver(\n      ([entry]) => setIsInView(entry?.isIntersecting ?? false),\n      { rootMargin }\n    );\n    observer.observe(element);\n    return () => observer.disconnect();\n  }, [rootMargin, target]);\n\n  return isInView;\n};\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-in-view.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-print-image.ts",
+      "content": "\"use client\";\n\nimport { useThree } from \"@react-three/fiber\";\nimport { useEffect, useState } from \"react\";\nimport { LinearMipmapLinearFilter, TextureLoader } from \"three\";\nimport type { Texture } from \"three\";\n\nexport interface PrintImage {\n  texture: Texture;\n  element: HTMLImageElement;\n  width: number;\n  height: number;\n}\n\ninterface LoadedImage {\n  src: string;\n  image: PrintImage;\n}\n\nconst loadTexture = async (src: string) => {\n  const loader = new TextureLoader();\n  loader.setCrossOrigin(\"anonymous\");\n  try {\n    return await loader.loadAsync(src);\n  } catch {\n    return null;\n  }\n};\n\nexport const usePrintImage = (src: string): PrintImage | null => {\n  const invalidate = useThree((state) => state.invalidate);\n  const [loaded, setLoaded] = useState<LoadedImage | null>(null);\n\n  useEffect(() => {\n    let isCurrent = true;\n    let texture: Texture | null = null;\n    const load = async () => {\n      const value = await loadTexture(src);\n      if (!value) {\n        return;\n      }\n      if (!isCurrent) {\n        value.dispose();\n        return;\n      }\n      value.generateMipmaps = true;\n      value.minFilter = LinearMipmapLinearFilter;\n      texture = value;\n      const element: HTMLImageElement = value.image;\n      setLoaded({\n        image: {\n          element,\n          height: element.naturalHeight,\n          texture: value,\n          width: element.naturalWidth,\n        },\n        src,\n      });\n      invalidate();\n    };\n    void load();\n    return () => {\n      isCurrent = false;\n      texture?.dispose();\n    };\n  }, [invalidate, src]);\n\n  return loaded && loaded.src === src ? loaded.image : null;\n};\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-print-image.ts"
+    }
+  ],
+  "meta": {
+    "docs": {
+      "props": [
+        {
+          "component": "DustPortrait",
+          "description": "A figure that owns one Canvas. Size it with className.",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "description": "Image URL. An image from another origin needs CORS headers, because the grains are read from its pixels.",
+              "required": true
+            },
+            {
+              "name": "burst",
+              "type": "boolean",
+              "description": "A click or tap blows the dust outward from that point as a shockwave ring, then lets it settle home. Up to eight bursts stack.",
+              "default": "true"
+            },
+            {
+              "name": "focus",
+              "type": "{ x: number; y: number }",
+              "description": "Focal point of the cover crop, x and y from 0 to 1 from the top left.",
+              "default": "{ x: 0.5, y: 0.5 }"
+            },
+            {
+              "name": "density",
+              "type": "number",
+              "description": "Multiplies the device budget of 45k to 120k grains. Small stages are capped so a grain never drops under 1.6 CSS px.",
+              "default": "1"
+            },
+            {
+              "name": "dispersion",
+              "type": "number",
+              "description": "How far grains swirl along the curl noise when scattered.",
+              "default": "1"
+            },
+            {
+              "name": "drift",
+              "type": "number",
+              "description": "How far scattered dust blows to the right.",
+              "default": "1"
+            },
+            {
+              "name": "idle",
+              "type": "boolean | number",
+              "description": "Keeps the portrait alive at rest: grains shed and return, more on the windward right side, gusts sweep across now and then, and the right side shimmers. true = 1, a number sets the strength (up to 3).",
+              "default": "true"
+            },
+            {
+              "name": "ink",
+              "type": "string",
+              "description": "Ground tone. Any three.js color string.",
+              "default": "\"#0B0B0C\""
+            },
+            {
+              "name": "paper",
+              "type": "string",
+              "description": "Grain tone. Whichever of ink and paper is lighter decides the polarity, so the picture always prints as a positive.",
+              "default": "\"#EDECE8\""
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "description": "Holds the picture still and stops scattering.",
+              "default": "false"
+            },
+            {
+              "name": "alt",
+              "type": "string",
+              "description": "Accessible name of the figure.",
+              "default": "\"A picture printed in dust that scatters under the pointer\""
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "description": "Give the effect a size.",
+              "default": "\"aspect-4/3 w-full\""
+            }
+          ]
+        },
+        {
+          "component": "DustPortraitScene",
+          "description": "The grains and their ground without the Canvas. Mount it in a Canvas or a drei View.",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "description": "Image URL. An image from another origin needs CORS headers, because the grains are read from its pixels.",
+              "required": true
+            },
+            {
+              "name": "burst",
+              "type": "boolean",
+              "description": "A click or tap blows the dust outward from that point as a shockwave ring, then lets it settle home. Up to eight bursts stack.",
+              "default": "true"
+            },
+            {
+              "name": "focus",
+              "type": "{ x: number; y: number }",
+              "description": "Focal point of the cover crop, x and y from 0 to 1 from the top left.",
+              "default": "{ x: 0.5, y: 0.5 }"
+            },
+            {
+              "name": "density",
+              "type": "number",
+              "description": "Multiplies the device budget of 45k to 120k grains. Small stages are capped so a grain never drops under 1.6 CSS px.",
+              "default": "1"
+            },
+            {
+              "name": "dispersion",
+              "type": "number",
+              "description": "How far grains swirl along the curl noise when scattered.",
+              "default": "1"
+            },
+            {
+              "name": "drift",
+              "type": "number",
+              "description": "How far scattered dust blows to the right.",
+              "default": "1"
+            },
+            {
+              "name": "idle",
+              "type": "boolean | number",
+              "description": "Keeps the portrait alive at rest: grains shed and return, more on the windward right side, gusts sweep across now and then, and the right side shimmers. true = 1, a number sets the strength (up to 3).",
+              "default": "true"
+            },
+            {
+              "name": "ink",
+              "type": "string",
+              "description": "Ground tone. Any three.js color string.",
+              "default": "\"#0B0B0C\""
+            },
+            {
+              "name": "paper",
+              "type": "string",
+              "description": "Grain tone. Whichever of ink and paper is lighter decides the polarity, so the picture always prints as a positive.",
+              "default": "\"#EDECE8\""
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "description": "Clears the trail at once and freezes time. Use it for reduced motion and offscreen.",
+              "default": "false"
+            },
+            {
+              "name": "pointerTarget",
+              "type": "RefObject<HTMLElement | null>",
+              "description": "Element whose pointer events scatter the dust and whose size sets the grid. Defaults to the canvas. Pass the tracked element inside a drei View."
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "examples": [
+        {
+          "title": "One picture, one line",
+          "file": "registry/ivan/examples/dust-portrait/basic.tsx"
+        }
+      ],
+      "accessibility": [
+        "A figure with an accessible name. The canvas is hidden from assistive tech.",
+        "Without WebGL it shows the source image in grayscale, cropped on the focal point.",
+        "Touch drags across the picture scatter it, while vertical drags still scroll the page.",
+        "Bursts are decorative. The figure stays a single image to assistive tech, and nothing is lost without them."
+      ],
+      "animation": [
+        {
+          "target": "Render loop",
+          "properties": "Canvas frameloop",
+          "timing": "Always while visible. The scene stops invalidating once the dust settles and idle is off.",
+          "trigger": "IntersectionObserver",
+          "reducedMotion": "One still frame."
+        },
+        {
+          "target": "Scatter",
+          "properties": "Grain position, size and alpha in the vertex shader",
+          "timing": "Spring rise of about 150 ms, critically damped return of about 800 ms",
+          "trigger": "Pointer over the picture",
+          "reducedMotion": "No scatter."
+        },
+        {
+          "target": "Burst",
+          "properties": "Grain position, size and alpha in the vertex shader, ground ring and flash",
+          "timing": "Shockwave eases out over 900 ms; each grain kicks in about 130 ms and settles within about 1.5 s",
+          "trigger": "Click or tap on the picture",
+          "reducedMotion": "No burst."
+        },
+        {
+          "target": "Reveal",
+          "properties": "Ground and grain opacity",
+          "timing": "Exponential ease, about 400 ms",
+          "trigger": "Image sampled",
+          "reducedMotion": "Appears at once."
+        },
+        {
+          "target": "Idle shed",
+          "properties": "A few edge grains",
+          "timing": "Slow pulse, several seconds apart",
+          "trigger": "Clock",
+          "reducedMotion": "Off."
+        }
+      ]
+    }
+  },
+  "docs": "Requires React 19. Render <DustPortrait src=\"/photo.jpg\" className=\"h-96 w-full\" /> anywhere. DustPortrait owns a Canvas, so mount DustPortraitScene inside an existing Canvas or drei View when a page already has one, and pass pointerTarget the element the View tracks. The scene listens to pointer events on that element itself, so it works on a shared canvas with pointer-events: none.",
+  "categories": [
+    "three",
+    "shaders",
+    "media"
+  ],
+  "type": "registry:block"
+}

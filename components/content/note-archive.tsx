@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/empty";
 import { formatNoteCode, matchesNoteFilter } from "@/lib/content/note-domain";
 import type { NoteFacets, NoteIndexItem } from "@/lib/content/note-domain";
-import { sectionScripts } from "@/lib/site/section-scripts";
 import { cn } from "@/lib/utils";
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -33,13 +32,12 @@ export const NoteArchive = ({
       id="archive"
       index="NT-03"
       label="Archive"
-      script={sectionScripts.notesArchive}
     >
       <output aria-live="polite" className="sr-only">
         Showing {visibleNotes.length} of {notes.length}
       </output>
       {visibleNotes.length > 0 ? (
-        <ul className="border-rule border-t">
+        <ul className="border-border border-t">
           {visibleNotes.map((note) => (
             <NoteRow
               code={formatNoteCode(notes.indexOf(note))}
@@ -49,10 +47,10 @@ export const NoteArchive = ({
           ))}
         </ul>
       ) : (
-        <Empty className="border-rule-strong border py-16">
+        <Empty className="border-border-strong border py-16">
           <EmptyHeader>
-            <EmptyTitle className="label text-ink">No match</EmptyTitle>
-            <EmptyDescription className="label text-graphite">
+            <EmptyTitle className="label text-foreground">No match</EmptyTitle>
+            <EmptyDescription className="label text-muted-foreground">
               Nothing fits that combination of filters.
             </EmptyDescription>
           </EmptyHeader>

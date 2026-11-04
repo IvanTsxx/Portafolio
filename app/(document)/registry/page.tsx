@@ -6,8 +6,8 @@ import {
   RegistryGrid,
 } from "@/components/registry-docs/registry-browser";
 import { DocumentHero } from "@/components/site/document-hero";
-import { FilterFold } from "@/components/site/filter-fold";
 import { JsonLd } from "@/components/site/json-ld";
+import { PlatePage } from "@/components/site/plate-page";
 import { getRegistryItemUrl } from "@/lib/registry/install";
 import {
   formatRegistryIndex,
@@ -44,31 +44,42 @@ const RegistryPage = async () => {
     <>
       <JsonLd data={registryIndexJsonLd(registryItems)} />
       <ItemStyles items={registryItems} />
-      <DocumentHero
-        code="REG-01"
-        jp="登録簿"
-        lede="Install with one command"
-        meta={[
-          {
-            label: "Items",
-            value: String(registryItems.length).padStart(2, "0"),
-          },
-        ]}
-        title="Registry"
+      <PlatePage
+        plate={
+          <DocumentHero
+            code="Index · Registry"
+            lede="Every reusable Lab experiment and UI piece, installable as source with the shadcn CLI. No package, no lock-in."
+            meta={[
+              {
+                label: "Items",
+                value: String(registryItems.length).padStart(2, "0"),
+              },
+            ]}
+            title={
+              <>
+                The <em>registry</em>
+              </>
+            }
+          >
+            <div className="flex w-full max-w-2xl flex-col gap-2">
+              <CommandLine
+                command={`bunx --bun shadcn@latest add ${getRegistryItemUrl("<name>")}`}
+              />
+              <CommandLine
+                command={`bunx --bun shadcn@latest add ${siteConfig.registryNamespace}/<name>`}
+              />
+            </div>
+          </DocumentHero>
+        }
       >
-        <div className="flex w-full flex-col gap-2">
-          <CommandLine
-            command={`bunx --bun shadcn@latest add ${getRegistryItemUrl("<name>")}`}
-          />
-          <CommandLine
-            command={`bunx --bun shadcn@latest add ${siteConfig.registryNamespace}/<name>`}
+        <div>
+          <RegistryFilters
+            categories={categories}
+            total={registryItems.length}
           />
         </div>
-      </DocumentHero>
-      <FilterFold>
-        <RegistryFilters categories={categories} total={registryItems.length} />
-      </FilterFold>
-      <RegistryGrid categories={categories} entries={entries} />
+        <RegistryGrid categories={categories} entries={entries} />
+      </PlatePage>
     </>
   );
 };

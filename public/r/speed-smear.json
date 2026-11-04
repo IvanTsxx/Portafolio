@@ -1,0 +1,282 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "speed-smear",
+  "title": "Speed Smear",
+  "description": "A picture smeared sideways around the pointer in broken speed lines, printed as an ordered dither.",
+  "dependencies": [
+    "three@^0.186.1",
+    "@react-three/fiber@^9.8.1"
+  ],
+  "devDependencies": [
+    "@types/three@^0.186.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/ivan/components/speed-smear/speed-smear.tsx",
+      "content": "\"use client\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n  CanvasStage,\n  ImageFallback,\n} from \"@/registry/ivan/components/canvas-stage/canvas-stage\";\nimport { centeredFocus } from \"@/registry/ivan/lib/image-cover\";\n\nimport { speedSmearDefaults } from \"./speed-smear-material\";\nimport { SpeedSmearScene } from \"./speed-smear-scene\";\nimport type { SpeedSmearSceneProps } from \"./speed-smear-scene\";\n\nexport interface SpeedSmearProps extends SpeedSmearSceneProps {\n  className?: string;\n  label?: string;\n}\n\nconst defaultLabel =\n  \"A picture smeared sideways around the pointer, like a head turning fast\";\n\nexport const SpeedSmear = ({\n  className,\n  label = defaultLabel,\n  src,\n  focus = centeredFocus,\n  ink = speedSmearDefaults.ink,\n  paper = speedSmearDefaults.paper,\n  paused = speedSmearDefaults.paused,\n  ...sceneProps\n}: SpeedSmearProps) => (\n  <CanvasStage\n    className={cn(\"touch-pan-y\", className)}\n    fallback={<ImageFallback focus={focus} src={src} />}\n    ground={ink}\n    label={label}\n    paused={paused}\n  >\n    {(isAnimating) => (\n      <SpeedSmearScene\n        {...sceneProps}\n        focus={focus}\n        ink={ink}\n        paper={paper}\n        paused={!isAnimating}\n        src={src}\n      />\n    )}\n  </CanvasStage>\n);\n",
+      "type": "registry:component",
+      "target": "@components/speed-smear/speed-smear.tsx"
+    },
+    {
+      "path": "registry/ivan/components/speed-smear/speed-smear-scene.tsx",
+      "content": "\"use client\";\n\nimport { useFrame, useThree } from \"@react-three/fiber\";\nimport { useEffect, useMemo } from \"react\";\nimport { MathUtils, PlaneGeometry } from \"three\";\nimport type { WebGLRenderer } from \"three\";\n\nimport { usePrintImage } from \"@/registry/ivan/hooks/use-print-image\";\nimport type { PrintImage } from \"@/registry/ivan/hooks/use-print-image\";\nimport {\n  centeredFocus,\n  readViewport,\n  setCoverImage,\n} from \"@/registry/ivan/lib/image-cover\";\nimport type { ImageFocus } from \"@/registry/ivan/lib/image-cover\";\nimport { PointerLight } from \"@/registry/ivan/lib/pointer-light\";\nimport type { PointerSample } from \"@/registry/ivan/lib/pointer-trace\";\n\nimport { SpeedSmearMaterial, speedSmearDefaults } from \"./speed-smear-material\";\n\nexport interface SpeedSmearSceneProps {\n  src: string;\n  focus?: ImageFocus;\n  ink?: string;\n  paper?: string;\n  smear?: number;\n  reach?: number;\n  angle?: number;\n  cell?: number;\n  dither?: boolean;\n  paused?: boolean;\n}\n\ninterface SmearLook {\n  ink: string;\n  paper: string;\n  smear: number;\n  reach: number;\n  angle: number;\n  cell: number;\n  dither: boolean;\n}\n\ninterface SmearFrame {\n  delta: number;\n  paused: boolean;\n  pointer: PointerSample;\n}\n\nclass SpeedSmearRig {\n  readonly material = new SpeedSmearMaterial();\n  readonly geometry = new PlaneGeometry(1, 1);\n  private readonly light = new PointerLight();\n  private cell: number = speedSmearDefaults.cell;\n\n  applyLook({ ink, paper, smear, reach, angle, cell, dither }: SmearLook) {\n    const { uniforms } = this.material;\n    uniforms.uInk.value.set(ink);\n    uniforms.uPaper.value.set(paper);\n    uniforms.uSmear.value = smear;\n    uniforms.uReach.value = reach;\n    uniforms.uAngle.value = MathUtils.degToRad(angle);\n    uniforms.uDither.value = dither ? 1 : 0;\n    this.cell = cell;\n  }\n\n  applyImage(image: PrintImage | null, focus: ImageFocus) {\n    setCoverImage(this.material.uniforms, image, focus);\n  }\n\n  advance({ delta, paused, pointer }: SmearFrame) {\n    this.light.advance(pointer, delta, !paused);\n    this.material.uniforms.uKick.value = this.light.kick;\n  }\n\n  readonly handleBeforeRender = (renderer: WebGLRenderer) => {\n    const { uniforms } = this.material;\n    const viewport = readViewport(uniforms, renderer);\n    const aspect = viewport.z / Math.max(viewport.w, 1);\n    uniforms.uLight.value.set(\n      (this.light.x - 0.5) * aspect,\n      this.light.y - 0.5\n    );\n    uniforms.uCell.value = Math.max(\n      Math.round(this.cell * renderer.getPixelRatio()),\n      1\n    );\n  };\n\n  dispose() {\n    this.material.dispose();\n    this.geometry.dispose();\n  }\n}\n\nexport const SpeedSmearScene = ({\n  src,\n  focus = centeredFocus,\n  ink = speedSmearDefaults.ink,\n  paper = speedSmearDefaults.paper,\n  smear = speedSmearDefaults.smear,\n  reach = speedSmearDefaults.reach,\n  angle = speedSmearDefaults.angle,\n  cell = speedSmearDefaults.cell,\n  dither = speedSmearDefaults.dither,\n  paused = speedSmearDefaults.paused,\n}: SpeedSmearSceneProps) => {\n  const invalidate = useThree((state) => state.invalidate);\n  const rig = useMemo(() => new SpeedSmearRig(), []);\n  const image = usePrintImage(src);\n\n  useEffect(() => () => rig.dispose(), [rig]);\n\n  useEffect(() => {\n    rig.applyLook({ angle, cell, dither, ink, paper, reach, smear });\n    invalidate();\n  }, [angle, cell, dither, ink, invalidate, paper, reach, rig, smear]);\n\n  useEffect(() => {\n    rig.applyImage(image, { x: focus.x, y: focus.y });\n    invalidate();\n  }, [focus.x, focus.y, image, invalidate, rig]);\n\n  useFrame((state, delta) => {\n    rig.advance({ delta, paused, pointer: state.pointer });\n  });\n\n  return (\n    <mesh\n      frustumCulled={false}\n      geometry={rig.geometry}\n      material={rig.material}\n      onBeforeRender={rig.handleBeforeRender}\n    />\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/speed-smear/speed-smear-scene.tsx"
+    },
+    {
+      "path": "registry/ivan/components/speed-smear/speed-smear-material.ts",
+      "content": "import { Color, ShaderMaterial, Vector2 } from \"three\";\nimport type { IUniform } from \"three\";\n\nimport {\n  createImageCoverUniforms,\n  fullscreenVertexShader,\n  imageCoverChunk,\n} from \"@/registry/ivan/lib/image-cover\";\nimport type { ImageCoverUniforms } from \"@/registry/ivan/lib/image-cover\";\nimport { bayerChunk, hashChunk } from \"@/registry/ivan/lib/print-noise\";\nimport {\n  toneChunk,\n  toneCurve,\n  toneSeparationChunk,\n} from \"@/registry/ivan/lib/tone-curve\";\nimport type { ToneSeparation } from \"@/registry/ivan/lib/tone-curve\";\n\nexport const speedSmearDefaults = {\n  angle: 0,\n  cell: 2,\n  dither: true,\n  ink: \"#0B0B0C\",\n  paper: \"#EDECE8\",\n  paused: false,\n  reach: 0.16,\n  smear: 0.12,\n} as const;\n\nexport interface SpeedSmearUniforms extends ImageCoverUniforms {\n  uAngle: IUniform<number>;\n  uCell: IUniform<number>;\n  uDither: IUniform<number>;\n  uInk: IUniform<Color>;\n  uKick: IUniform<number>;\n  uLight: IUniform<Vector2>;\n  uPaper: IUniform<Color>;\n  uReach: IUniform<number>;\n  uSmear: IUniform<number>;\n}\n\nconst glslFloat = (value: number) => value.toFixed(4);\n\nexport const smearSeparation: ToneSeparation = {\n  amount: 0.8,\n  high: 0.8,\n  low: 0.2,\n};\n\nconst fragmentShader = `\n  uniform vec3 uInk;\n  uniform vec3 uPaper;\n  uniform vec2 uLight;\n  uniform float uSmear;\n  uniform float uAngle;\n  uniform float uReach;\n  uniform float uCell;\n  uniform float uDither;\n  uniform float uKick;\n\n  const float printContrast = ${glslFloat(toneCurve.contrast)};\n\n  ${imageCoverChunk}\n  ${hashChunk}\n  ${bayerChunk}\n  ${toneChunk}\n\n  const int taps = 32;\n\n  ${toneSeparationChunk(\"crispTone\", smearSeparation)}\n\n  void main() {\n    if (uHasImage < 0.5) {\n      discard;\n    }\n    float aspect = uResolution.x / uResolution.y;\n    vec2 pixel = gl_FragCoord.xy - uOrigin;\n    vec2 point = (pixel - uResolution * 0.5) / uResolution.y;\n    vec2 along = vec2(cos(uAngle), sin(uAngle));\n    vec2 across = vec2(-along.y, along.x);\n    vec2 away = point - uLight;\n    float reachAlong = dot(away, along) / (uReach * 1.6);\n    float reachAcross = dot(away, across) / uReach;\n    float mask = exp(-reachAlong * reachAlong - reachAcross * reachAcross);\n    float streak = floor(dot(point, across) * uResolution.y / (uCell * 3.0));\n    float streakLength = 0.45 + 1.1 * hash(vec2(streak, 3.7));\n    float smear = (uSmear + uKick * 0.32) * mask * streakLength;\n    float lod = imageLod(uCell);\n    float blurLod = lod + clamp(smear * 30.0, 0.0, 2.5);\n    float total = 0.0;\n    for (int index = 0; index < taps; index++) {\n      float offset = float(index) / float(taps - 1) - 0.5;\n      vec2 tap = point + along * offset * smear;\n      total += imageLuma(coverUv(vec2(tap.x / aspect, tap.y) + 0.5), blurLod);\n    }\n    float luma = total / float(taps);\n    float blurred = imageLuma(coverUv(vec2(point.x / aspect, point.y) + 0.5), blurLod + 2.3);\n    luma += (hash(vec2(streak, 9.1)) - 0.5) * 0.14 * mask * min(smear * 12.0, 1.0);\n    float tone = crispTone(curveTone(luma, mix(blurred, luma, min(smear * 8.0, 1.0)), printContrast, 1.0));\n\n    float row = floor(dot(point, across) * uResolution.y / uCell);\n    float isMiddleRow = step(abs(row - streak * 3.0 - 1.0), 0.5);\n    float lineSeed = hash(vec2(streak, 5.3));\n    float lineLength = (0.3 + 0.8 * hash(vec2(streak, 7.9))) * smoothstep(0.1, 0.9, uKick);\n    float fray = 1.0 - bayer8(pixel / uCell) * 0.45;\n    float speedLine = step(0.84, lineSeed) * isMiddleRow * step(abs(reachAlong) / max(lineLength, 0.001), fray) * step(0.3, mask);\n    tone = mix(tone, 1.0 - step(0.5, tone), speedLine);\n\n    float ink = 1.0 - tone;\n    float printed = step(bayer8(pixel / uCell), ink);\n    gl_FragColor = vec4(mix(uPaper, uInk, mix(ink, printed, uDither)), 1.0);\n    #include <colorspace_fragment>\n  }\n`;\n\nconst createUniforms = (): SpeedSmearUniforms => ({\n  ...createImageCoverUniforms(),\n  uAngle: { value: 0 },\n  uCell: { value: speedSmearDefaults.cell },\n  uDither: { value: 1 },\n  uInk: { value: new Color(speedSmearDefaults.ink) },\n  uKick: { value: 0 },\n  uLight: { value: new Vector2(0, 0) },\n  uPaper: { value: new Color(speedSmearDefaults.paper) },\n  uReach: { value: speedSmearDefaults.reach },\n  uSmear: { value: speedSmearDefaults.smear },\n});\n\nexport class SpeedSmearMaterial extends ShaderMaterial {\n  declare uniforms: SpeedSmearUniforms;\n\n  constructor() {\n    super({\n      depthTest: false,\n      depthWrite: false,\n      fragmentShader,\n      toneMapped: false,\n      uniforms: createUniforms(),\n      vertexShader: fullscreenVertexShader,\n    });\n  }\n}\n",
+      "type": "registry:component",
+      "target": "@components/speed-smear/speed-smear-material.ts"
+    },
+    {
+      "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+      "content": "\"use client\";\n\nimport { Canvas } from \"@react-three/fiber\";\nimport { useRef } from \"react\";\nimport type { ComponentProps, ReactNode } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { useInView } from \"@/registry/ivan/hooks/use-in-view\";\nimport { usePrefersReducedMotion } from \"@/registry/ivan/hooks/use-prefers-reduced-motion\";\nimport { useWebGLSupport } from \"@/registry/ivan/hooks/use-webgl-support\";\n\nexport interface CanvasStageProps {\n  ground: string;\n  label: string;\n  paused: boolean;\n  fallback: ReactNode;\n  antialias?: boolean;\n  camera?: ComponentProps<typeof Canvas>[\"camera\"];\n  className?: string;\n  children: (isAnimating: boolean) => ReactNode;\n}\n\ninterface ImageFallbackProps {\n  src: string;\n  focus: { x: number; y: number };\n}\n\nexport const ImageFallback = ({ src, focus }: ImageFallbackProps) => (\n  <div\n    aria-hidden\n    className=\"absolute inset-0 grayscale\"\n    style={{\n      backgroundImage: `url(${JSON.stringify(src)})`,\n      backgroundPosition: `${focus.x * 100}% ${focus.y * 100}%`,\n      backgroundSize: \"cover\",\n    }}\n  />\n);\n\nexport const CanvasStage = ({\n  ground,\n  label,\n  paused,\n  fallback,\n  antialias = false,\n  camera,\n  className,\n  children,\n}: CanvasStageProps) => {\n  const frame = useRef<HTMLElement>(null);\n  const hasWebGL = useWebGLSupport();\n  const isInView = useInView(frame);\n  const prefersReducedMotion = usePrefersReducedMotion();\n  const isAnimating = isInView && !prefersReducedMotion && !paused;\n\n  return (\n    <figure\n      aria-label={label}\n      className={cn(\n        \"relative m-0 aspect-4/3 w-full overflow-hidden\",\n        className\n      )}\n      ref={frame}\n      style={{ backgroundColor: ground }}\n    >\n      {hasWebGL ? (\n        <Canvas\n          aria-hidden\n          camera={camera}\n          dpr={[1, 1.75]}\n          frameloop={isAnimating ? \"always\" : \"demand\"}\n          gl={{\n            alpha: true,\n            antialias,\n            powerPreference: \"high-performance\",\n          }}\n        >\n          {children(isAnimating)}\n        </Canvas>\n      ) : (\n        fallback\n      )}\n    </figure>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/canvas-stage/canvas-stage.tsx"
+    },
+    {
+      "path": "registry/ivan/lib/image-cover.ts",
+      "content": "import { Vector2, Vector4 } from \"three\";\nimport type { IUniform, Texture, WebGLRenderer } from \"three\";\n\nexport interface CoverSource {\n  texture: Texture;\n  width: number;\n  height: number;\n}\n\nexport interface ImageFocus {\n  x: number;\n  y: number;\n}\n\nexport const centeredFocus: ImageFocus = { x: 0.5, y: 0.5 };\n\nexport const fullscreenVertexShader = `\n  void main() {\n    gl_Position = vec4(position.xy * 2.0, 0.0, 1.0);\n  }\n`;\n\nexport const imageCoverChunk = `\n  uniform vec2 uOrigin;\n  uniform vec2 uResolution;\n  uniform sampler2D uImage;\n  uniform vec2 uImageSize;\n  uniform vec2 uFocus;\n  uniform float uHasImage;\n\n  const vec3 lumaWeights = vec3(0.2126, 0.7152, 0.0722);\n\n  vec2 imageSpan() {\n    float stageAspect = uResolution.x / uResolution.y;\n    float imageAspect = uImageSize.x / uImageSize.y;\n    return stageAspect > imageAspect\n      ? vec2(1.0, imageAspect / stageAspect)\n      : vec2(stageAspect / imageAspect, 1.0);\n  }\n\n  vec2 coverUv(vec2 stage) {\n    vec2 span = imageSpan();\n    vec2 start = clamp(uFocus - span * 0.5, vec2(0.0), vec2(1.0) - span);\n    return start + stage * span;\n  }\n\n  float imageLuma(vec2 uv, float lod) {\n    return dot(textureLod(uImage, uv, lod).rgb, lumaWeights);\n  }\n\n  float imageLod(float footprint) {\n    float texels = footprint * imageSpan().y * uImageSize.y / uResolution.y;\n    return log2(max(texels, 1.0));\n  }\n`;\n\nexport interface ImageCoverUniforms {\n  [uniform: string]: IUniform;\n  uFocus: IUniform<Vector2>;\n  uHasImage: IUniform<number>;\n  uImage: IUniform<Texture | null>;\n  uImageSize: IUniform<Vector2>;\n  uOrigin: IUniform<Vector2>;\n  uResolution: IUniform<Vector2>;\n}\n\nexport const createImageCoverUniforms = (): ImageCoverUniforms => ({\n  uFocus: { value: new Vector2(0.5, 0.5) },\n  uHasImage: { value: 0 },\n  uImage: { value: null },\n  uImageSize: { value: new Vector2(1, 1) },\n  uOrigin: { value: new Vector2(0, 0) },\n  uResolution: { value: new Vector2(1, 1) },\n});\n\nexport const setCoverImage = (\n  uniforms: ImageCoverUniforms,\n  image: CoverSource | null,\n  focus: ImageFocus\n) => {\n  uniforms.uImage.value = image?.texture ?? null;\n  uniforms.uHasImage.value = image ? 1 : 0;\n  uniforms.uImageSize.value.set(image?.width ?? 1, image?.height ?? 1);\n  uniforms.uFocus.value.set(focus.x, 1 - focus.y);\n};\n\nconst viewport = new Vector4();\n\nexport const readViewport = (\n  uniforms: ImageCoverUniforms,\n  renderer: WebGLRenderer\n) => {\n  renderer.getCurrentViewport(viewport);\n  uniforms.uOrigin.value.set(viewport.x, viewport.y);\n  uniforms.uResolution.value.set(viewport.z, viewport.w);\n  return viewport;\n};\n",
+      "type": "registry:lib",
+      "target": "@lib/image-cover.ts"
+    },
+    {
+      "path": "registry/ivan/lib/print-noise.ts",
+      "content": "export const hashChunk = `\n  float hash(vec2 point) {\n    return fract(sin(dot(point, vec2(127.1, 311.7))) * 43758.5453);\n  }\n`;\n\nexport const valueNoiseChunk = `\n  float valueNoise(vec2 point) {\n    vec2 whole = floor(point);\n    vec2 part = fract(point);\n    vec2 blend = part * part * (3.0 - 2.0 * part);\n    return mix(\n      mix(hash(whole), hash(whole + vec2(1.0, 0.0)), blend.x),\n      mix(hash(whole + vec2(0.0, 1.0)), hash(whole + vec2(1.0, 1.0)), blend.x),\n      blend.y\n    );\n  }\n`;\n\nexport const bayerChunk = `\n  float bayer2(vec2 cell) {\n    cell = floor(cell);\n    return fract(cell.x / 2.0 + cell.y * cell.y * 0.75);\n  }\n\n  float bayer4(vec2 cell) {\n    return bayer2(0.5 * cell) * 0.25 + bayer2(cell);\n  }\n\n  float bayer8(vec2 cell) {\n    return bayer4(0.5 * cell) * 0.25 + bayer2(cell) + 0.5 / 64.0;\n  }\n`;\n",
+      "type": "registry:lib",
+      "target": "@lib/print-noise.ts"
+    },
+    {
+      "path": "registry/ivan/lib/tone-curve.ts",
+      "content": "export const toneCurve = {\n  black: 0.04,\n  contrast: 1.35,\n  detail: 1.4,\n  gamma: 1,\n  white: 0.9,\n} as const;\n\nconst glslFloat = (value: number) => value.toFixed(4);\n\nexport const toneChunk = `\n  float curveTone(float luma, float blurred, float contrast, float gamma) {\n    float sharpened = luma + (luma - blurred) * ${glslFloat(toneCurve.detail)};\n    float level = pow(clamp((sharpened - ${glslFloat(toneCurve.black)}) / ${glslFloat(toneCurve.white - toneCurve.black)}, 0.0, 1.0), gamma);\n    return clamp((level - 0.5) * contrast + 0.5, 0.0, 1.0);\n  }\n\n  vec3 curveColor(vec3 color, vec3 blurred, float contrast, float gamma) {\n    return vec3(\n      curveTone(color.r, blurred.r, contrast, gamma),\n      curveTone(color.g, blurred.g, contrast, gamma),\n      curveTone(color.b, blurred.b, contrast, gamma)\n    );\n  }\n`;\n\nexport interface ToneSeparation {\n  low: number;\n  high: number;\n  amount: number;\n}\n\nexport const printSeparation: ToneSeparation = {\n  amount: 0.55,\n  high: 0.84,\n  low: 0.16,\n};\n\nexport const toneSeparationChunk = (\n  name: string,\n  { low, high, amount }: ToneSeparation\n) => `\n  float ${name}(float tone) {\n    return mix(tone, smoothstep(${glslFloat(low)}, ${glslFloat(high)}, tone), ${glslFloat(amount)});\n  }\n`;\n",
+      "type": "registry:lib",
+      "target": "@lib/tone-curve.ts"
+    },
+    {
+      "path": "registry/ivan/lib/pointer-trace.ts",
+      "content": "export interface PointerSample {\n  x: number;\n  y: number;\n}\n\nconst holdAfterMove = 2.5;\nconst movedBy = 0.0001;\n\nexport class PointerTrace {\n  x = 0.5;\n  y = 0.5;\n  isActive = false;\n  private hasMoved = false;\n  private idle = 0;\n\n  update({ x, y }: PointerSample, step: number, isAnimating: boolean) {\n    const nextX = (x + 1) / 2;\n    const nextY = (y + 1) / 2;\n    if (Math.abs(nextX - this.x) + Math.abs(nextY - this.y) > movedBy) {\n      this.hasMoved = true;\n      this.idle = 0;\n    } else {\n      this.idle += step;\n    }\n    this.x = nextX;\n    this.y = nextY;\n    this.isActive =\n      this.hasMoved && (!isAnimating || this.idle < holdAfterMove);\n  }\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/pointer-trace.ts"
+    },
+    {
+      "path": "registry/ivan/lib/pointer-light.ts",
+      "content": "import { PointerTrace } from \"@/registry/ivan/lib/pointer-trace\";\nimport type { PointerSample } from \"@/registry/ivan/lib/pointer-trace\";\n\nconst followRate = 9;\nconst maxStep = 0.05;\nconst minStep = 0.001;\n\nexport const restingLight = { x: 0.24, y: 0.78 } as const;\n\nexport class PointerLight {\n  readonly trace = new PointerTrace();\n  x: number = restingLight.x;\n  y: number = restingLight.y;\n  kick = 0;\n  private clock = 0;\n\n  advance(pointer: PointerSample, delta: number, isAnimating: boolean) {\n    const step = Math.min(delta, maxStep);\n    const { trace } = this;\n    trace.update(pointer, step, isAnimating);\n    if (isAnimating) {\n      this.clock += step;\n    }\n    const wanderX = 0.5 + Math.sin(this.clock * 0.4 - 1.3) * 0.32;\n    const wanderY = 0.62 + Math.cos(this.clock * 0.31) * 0.2;\n    let targetX = trace.isActive ? trace.x : wanderX;\n    let targetY = trace.isActive ? trace.y : wanderY;\n    if (!(isAnimating || trace.isActive)) {\n      targetX = restingLight.x;\n      targetY = restingLight.y;\n    }\n    const blend = isAnimating ? 1 - Math.exp(-step * followRate) : 1;\n    const previousX = this.x;\n    const previousY = this.y;\n    this.x += (targetX - this.x) * blend;\n    this.y += (targetY - this.y) * blend;\n    const velocity =\n      Math.hypot(this.x - previousX, this.y - previousY) /\n      Math.max(step, minStep);\n    const wanted = isAnimating ? Math.min(velocity / 2.5, 1) : 0;\n    const rate = wanted > this.kick ? 14 : 3;\n    this.kick += (wanted - this.kick) * (1 - Math.exp(-rate * step));\n  }\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/pointer-light.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nconst reducedMotionQuery = \"(prefers-reduced-motion: reduce)\";\n\nconst subscribe = (onChange: () => void) => {\n  const mediaQuery = window.matchMedia(reducedMotionQuery);\n  mediaQuery.addEventListener(\"change\", onChange);\n  return () => mediaQuery.removeEventListener(\"change\", onChange);\n};\n\nconst getSnapshot = () => window.matchMedia(reducedMotionQuery).matches;\n\nconst getServerSnapshot = () => false;\n\nexport const usePrefersReducedMotion = () =>\n  useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-prefers-reduced-motion.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-webgl-support.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nlet cachedSupport: boolean | null = null;\n\nconst detectWebGL = () => {\n  if (cachedSupport !== null) {\n    return cachedSupport;\n  }\n  try {\n    const probe = document.createElement(\"canvas\");\n    const context = probe.getContext(\"webgl2\") ?? probe.getContext(\"webgl\");\n    context?.getExtension(\"WEBGL_lose_context\")?.loseContext();\n    cachedSupport = context !== null;\n  } catch {\n    cachedSupport = false;\n  }\n  return cachedSupport;\n};\n\nconst subscribe = (onChange: () => void) => {\n  window.addEventListener(\"pageshow\", onChange);\n  return () => window.removeEventListener(\"pageshow\", onChange);\n};\n\nconst getServerSnapshot = () => true;\n\nexport const useWebGLSupport = () =>\n  useSyncExternalStore(subscribe, detectWebGL, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-webgl-support.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-in-view.ts",
+      "content": "\"use client\";\n\nimport { useEffect, useState } from \"react\";\nimport type { RefObject } from \"react\";\n\nexport const useInView = (\n  target: RefObject<Element | null>,\n  rootMargin = \"10% 0px\"\n) => {\n  const [isInView, setIsInView] = useState(false);\n\n  useEffect(() => {\n    const element = target.current;\n    if (!element) {\n      return;\n    }\n    const observer = new IntersectionObserver(\n      ([entry]) => setIsInView(entry?.isIntersecting ?? false),\n      { rootMargin }\n    );\n    observer.observe(element);\n    return () => observer.disconnect();\n  }, [rootMargin, target]);\n\n  return isInView;\n};\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-in-view.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-print-image.ts",
+      "content": "\"use client\";\n\nimport { useThree } from \"@react-three/fiber\";\nimport { useEffect, useState } from \"react\";\nimport { LinearMipmapLinearFilter, TextureLoader } from \"three\";\nimport type { Texture } from \"three\";\n\nexport interface PrintImage {\n  texture: Texture;\n  element: HTMLImageElement;\n  width: number;\n  height: number;\n}\n\ninterface LoadedImage {\n  src: string;\n  image: PrintImage;\n}\n\nconst loadTexture = async (src: string) => {\n  const loader = new TextureLoader();\n  loader.setCrossOrigin(\"anonymous\");\n  try {\n    return await loader.loadAsync(src);\n  } catch {\n    return null;\n  }\n};\n\nexport const usePrintImage = (src: string): PrintImage | null => {\n  const invalidate = useThree((state) => state.invalidate);\n  const [loaded, setLoaded] = useState<LoadedImage | null>(null);\n\n  useEffect(() => {\n    let isCurrent = true;\n    let texture: Texture | null = null;\n    const load = async () => {\n      const value = await loadTexture(src);\n      if (!value) {\n        return;\n      }\n      if (!isCurrent) {\n        value.dispose();\n        return;\n      }\n      value.generateMipmaps = true;\n      value.minFilter = LinearMipmapLinearFilter;\n      texture = value;\n      const element: HTMLImageElement = value.image;\n      setLoaded({\n        image: {\n          element,\n          height: element.naturalHeight,\n          texture: value,\n          width: element.naturalWidth,\n        },\n        src,\n      });\n      invalidate();\n    };\n    void load();\n    return () => {\n      isCurrent = false;\n      texture?.dispose();\n    };\n  }, [invalidate, src]);\n\n  return loaded && loaded.src === src ? loaded.image : null;\n};\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-print-image.ts"
+    }
+  ],
+  "meta": {
+    "docs": {
+      "props": [
+        {
+          "component": "SpeedSmear",
+          "description": "A figure that owns one Canvas. Size it with className.",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "required": true,
+              "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+            },
+            {
+              "name": "focus",
+              "type": "{ x: number; y: number }",
+              "default": "{ x: 0.5, y: 0.5 }",
+              "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+            },
+            {
+              "name": "ink",
+              "type": "string",
+              "default": "\"#0B0B0C\"",
+              "description": "Shadow tone. Any three.js color string."
+            },
+            {
+              "name": "paper",
+              "type": "string",
+              "default": "\"#EDECE8\"",
+              "description": "Light tone."
+            },
+            {
+              "name": "smear",
+              "type": "number",
+              "default": "0.12",
+              "description": "Smear length as a share of the frame height. Pointer speed adds to it and fades out."
+            },
+            {
+              "name": "reach",
+              "type": "number",
+              "default": "0.16",
+              "description": "Size of the oval around the pointer, as a share of the frame height."
+            },
+            {
+              "name": "angle",
+              "type": "number",
+              "default": "0",
+              "description": "Smear direction in degrees."
+            },
+            {
+              "name": "cell",
+              "type": "number",
+              "default": "2",
+              "description": "Dither cell in CSS px."
+            },
+            {
+              "name": "dither",
+              "type": "boolean",
+              "default": "true",
+              "description": "Off shows the continuous tone."
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "default": "false",
+              "description": "Holds one still frame and stops rendering."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "default": "\"A picture smeared sideways around the pointer, like a head turning fast\"",
+              "description": "Accessible name."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "default": "\"relative aspect-4/3 w-full\"",
+              "description": "Give the stage a size."
+            }
+          ]
+        },
+        {
+          "component": "SpeedSmearScene",
+          "description": "Full-frame plane without the Canvas. Mount it alone in a Canvas or a drei View. Reads state.pointer. The smear follows the pointer and drifts on its own after 2.5 seconds without a move.",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "required": true,
+              "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+            },
+            {
+              "name": "focus",
+              "type": "{ x: number; y: number }",
+              "default": "{ x: 0.5, y: 0.5 }",
+              "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+            },
+            {
+              "name": "ink",
+              "type": "string",
+              "default": "\"#0B0B0C\"",
+              "description": "Shadow tone. Any three.js color string."
+            },
+            {
+              "name": "paper",
+              "type": "string",
+              "default": "\"#EDECE8\"",
+              "description": "Light tone."
+            },
+            {
+              "name": "smear",
+              "type": "number",
+              "default": "0.12",
+              "description": "Smear length as a share of the frame height. Pointer speed adds to it and fades out."
+            },
+            {
+              "name": "reach",
+              "type": "number",
+              "default": "0.16",
+              "description": "Size of the oval around the pointer, as a share of the frame height."
+            },
+            {
+              "name": "angle",
+              "type": "number",
+              "default": "0",
+              "description": "Smear direction in degrees."
+            },
+            {
+              "name": "cell",
+              "type": "number",
+              "default": "2",
+              "description": "Dither cell in CSS px."
+            },
+            {
+              "name": "dither",
+              "type": "boolean",
+              "default": "true",
+              "description": "Off shows the continuous tone."
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "default": "false",
+              "description": "Holds one still frame and stops rendering."
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "examples": [
+        {
+          "title": "One image, one line",
+          "file": "registry/ivan/examples/speed-smear/basic.tsx"
+        },
+        {
+          "title": "Angled and continuous",
+          "file": "registry/ivan/examples/speed-smear/angled.tsx"
+        }
+      ],
+      "accessibility": [
+        "A figure with an accessible name. The canvas is hidden from assistive tech.",
+        "Without WebGL it shows the source image in grayscale."
+      ],
+      "animation": [
+        {
+          "target": "Render loop",
+          "properties": "Canvas frameloop",
+          "timing": "Always while visible, on demand offscreen or paused",
+          "trigger": "IntersectionObserver",
+          "reducedMotion": "One still frame."
+        },
+        {
+          "target": "Smear",
+          "properties": "Sample span in the fragment shader",
+          "timing": "Rises in about 70 ms with pointer speed, falls in about 330 ms",
+          "trigger": "Pointer move",
+          "reducedMotion": "The smear holds still under the resting light."
+        }
+      ]
+    }
+  },
+  "docs": "Requires React 19 and an image your page can read as a texture. Render <SpeedSmear src=\"/photo.jpg\" className=\"w-full max-w-xl\" /> anywhere. SpeedSmear owns a Canvas, so mount SpeedSmearScene inside an existing Canvas or drei View when a page already has one.",
+  "categories": [
+    "three",
+    "shaders",
+    "media"
+  ],
+  "type": "registry:block"
+}

@@ -18,9 +18,12 @@ export const ContentNotFound = ({
 }) => (
   <section className="flex flex-1 flex-col justify-center gap-8 py-24">
     <PanelHeading aside="404" as="p" label="Not found" />
-    <span aria-hidden className="hazard-stripe text-ink block h-3 w-full" />
-    <h1 className="display text-ink text-5xl md:text-7xl">{title}</h1>
-    <p className="label text-graphite">{description}</p>
+    <span
+      aria-hidden
+      className="hazard-stripe text-foreground block h-3 w-full"
+    />
+    <h1 className="display text-foreground text-5xl md:text-7xl">{title}</h1>
+    <p className="label text-muted-foreground">{description}</p>
     <Link className={cn(technicalButtonVariants(), "w-fit")} href={backHref}>
       <ArrowLeft aria-hidden className="size-4" />
       {backLabel}

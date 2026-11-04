@@ -24,7 +24,7 @@ export const CodeBlock = ({
 }) => (
   <div
     className={cn(
-      "text-ink overflow-x-auto font-mono text-xs leading-6",
+      "text-foreground overflow-x-auto font-mono text-xs leading-6",
       className
     )}
   >

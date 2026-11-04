@@ -1,15 +1,15 @@
 import type { ComponentType } from "react";
 
-import { AsciiLive } from "@/components/lab/experiments/ascii/live";
-import { AsciiPoster } from "@/components/lab/experiments/ascii/poster";
-import { CloudStippleLive } from "@/components/lab/experiments/cloud-stipple/live";
-import { CloudStipplePoster } from "@/components/lab/experiments/cloud-stipple/poster";
-import { DotGridLive } from "@/components/lab/experiments/dot-grid/live";
-import { DotGridPoster } from "@/components/lab/experiments/dot-grid/poster";
-import { EngravingLive } from "@/components/lab/experiments/engraving/live";
-import { EngravingPoster } from "@/components/lab/experiments/engraving/poster";
+import { DustPortraitLive } from "@/components/lab/experiments/dust-portrait/live";
+import { DustPortraitPoster } from "@/components/lab/experiments/dust-portrait/poster";
+import { LunarDitherLive } from "@/components/lab/experiments/lunar-dither/live";
+import { LunarDitherPoster } from "@/components/lab/experiments/lunar-dither/poster";
+import { OrbitDustLive } from "@/components/lab/experiments/orbit-dust/live";
+import { OrbitDustPoster } from "@/components/lab/experiments/orbit-dust/poster";
 import { SignalTearLive } from "@/components/lab/experiments/signal-tear/live";
 import { SignalTearPoster } from "@/components/lab/experiments/signal-tear/poster";
+import { SlimeLive } from "@/components/lab/experiments/slime/live";
+import { SlimePoster } from "@/components/lab/experiments/slime/poster";
 import { SpeedSmearLive } from "@/components/lab/experiments/speed-smear/live";
 import { SpeedSmearPoster } from "@/components/lab/experiments/speed-smear/poster";
 import { SuperSaiyanLive } from "@/components/lab/experiments/super-saiyan/live";
@@ -20,14 +20,14 @@ import { labTopics } from "@/lib/lab/topics";
 import type { LabTopic } from "@/lib/lab/topics";
 
 export type ExperimentSlug =
-  | "dot-grid"
-  | "ascii"
-  | "engraving"
   | "super-saiyan"
   | "speed-smear"
   | "signal-tear"
-  | "cloud-stipple"
-  | "vegeta";
+  | "slime"
+  | "vegeta"
+  | "lunar-dither"
+  | "dust-portrait"
+  | "orbit-dust";
 
 export interface Experiment {
   slug: ExperimentSlug;
@@ -38,6 +38,8 @@ export interface Experiment {
   technologies: readonly string[];
   year: number;
   sourceUrl?: string;
+  registryItem?: string;
+  hasOriginal?: boolean;
   hasControls: boolean;
   technicalNotes: readonly string[];
   implementation: readonly string[];
@@ -47,100 +49,93 @@ export interface Experiment {
 }
 
 const experimentsBySlug = {
-  ascii: {
-    Poster: AsciiPoster,
-    Preview: AsciiLive,
+  "dust-portrait": {
+    Poster: DustPortraitPoster,
+    Preview: DustPortraitLive,
     hasControls: true,
+    hasOriginal: false,
     implementation: [
-      "Glyphs are drawn once in Geist Mono to a texture atlas and sorted by measured ink.",
-      "A fragment shader picks each cell's glyph from the source tone and samples it from the atlas.",
-      "Inside the scanner the grid halves its cell size or prints in negative.",
+      "The picture is drawn into a small canvas at the stage's shape, one pixel per grain. Each grain stores its home, its luminance, a seed and how sharp an edge it sits on.",
+      "Grains print as round dots whose area follows the tone, so at rest the field reads as the picture and not as a cloud.",
+      "The pointer leaves a trail of eleven marks. Each one rises and falls on a critically damped spring, and only those eleven numbers cross to the GPU.",
+      "The vertex shader pushes grains near a mark along curl noise and blows them to the right, then lets them settle home as the mark fades.",
+      "A click or tap stores its point and birth time in a ring of eight vec3 uniforms. A shockwave front eases out from it, and each grain kicks outward when the front reaches it, then falls home on a critically damped pulse.",
+      "The ground draws the same front as a faint paper ring with a short flash at the center, so quick clicks stack into overlapping waves.",
     ],
-    index: "LAB-04",
-    related: ["dot-grid", "engraving"],
-    slug: "ascii",
-    summary: "A picture typed in mono glyphs, read through a pointer scanner.",
+    index: "LAB-14",
+    registryItem: "dust-portrait",
+    related: ["orbit-dust", "slime"],
+    slug: "dust-portrait",
+    summary:
+      "A picture printed in dust that blows apart under the pointer and settles back.",
     technicalNotes: [
-      "The whole grid is one draw call. A new glyph set rebuilds only the atlas.",
-      "Custom sets accept twelve characters. A space is always the lightest step.",
-      "The render loop stops offscreen. Reduced motion renders a single frame.",
+      "45k to 120k grains, picked from the pointer type and hardwareConcurrency, capped so no grain is smaller than 1.6 CSS px.",
+      "Grains on the ground tone are dropped before upload, so a dark picture costs far less than its grid.",
+      "The darker theme tone is the ground. The picture always prints as a positive, in either theme.",
+      "When the dust has settled and idle shedding is off, the scene stops asking for frames. Reduced motion holds the picture still and never scatters or bursts it.",
     ],
-    technologies: ["React Three Fiber", "GLSL", "Canvas 2D", "Geist Mono"],
-    title: "ASCII scanner",
-    topics: ["Shader", "Typography", "WebGL"],
-    year: 2026,
-  },
-  "cloud-stipple": {
-    Poster: CloudStipplePoster,
-    Preview: CloudStippleLive,
-    hasControls: true,
-    implementation: [
-      "One full-viewport plane. Each cell reads a 64 px blue noise tile as its threshold.",
-      "A dot lands in the cell when the picture is bright enough, jittered inside the cell so no grid shows.",
-      "Boil reseeds the tile offset a few times a second. The pointer lifts the light under it.",
-    ],
-    index: "LAB-08",
-    related: ["dot-grid", "signal-tear"],
-    slug: "cloud-stipple",
-    summary: "Clouds stippled in blue noise dots, after Joanie Lemercier.",
-    technicalNotes: [
-      "Blue noise keeps the dots evenly spaced at every tone, with no clumps and no pattern.",
-      "The poster thresholds the same image against the same tile on the server.",
-      "The render loop stops offscreen. Reduced motion holds one set of dots.",
-    ],
-    technologies: ["React Three Fiber", "GLSL", "Blue noise", "Stippling"],
-    title: "Cloud stipple",
+    technologies: ["React Three Fiber", "GLSL", "Curl noise", "GPU points"],
+    title: "Dust portrait",
     topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
-  "dot-grid": {
-    Poster: DotGridPoster,
-    Preview: DotGridLive,
+  "lunar-dither": {
+    Poster: LunarDitherPoster,
+    Preview: LunarDitherLive,
     hasControls: true,
+    hasOriginal: false,
     implementation: [
-      "One full-viewport plane with a ShaderMaterial. Each pixel tests the dots of its own cell and the eight around it.",
-      "Value noise or a picture sets each dot's radius. The lens springs toward the pointer in useFrame and pushes dots outward.",
-      "With a picture, the lens also acts as the light, so tones shift as it moves.",
+      "A 160×120 sphere with one ShaderMaterial. Three octaves of cellular craters, a flat floor and a raised rim, give a height per pixel.",
+      "The height bends the normal through screen-space derivatives, so relief costs one evaluation and no extra vertices.",
+      "A soft terminator, a limb rim and a faint earthshine set the tone. An 8×8 Bayer matrix in gl_FragCoord cells prints it in two colors.",
+      "The light eases toward the pointer in useFrame. Per-pixel grain shifts the threshold 24 times a second.",
+      "A click raycasts an analytic unit sphere, not the 38k triangles, and stores the hit in object space in a vec4 ring of 32 uniforms: direction plus birth time.",
+      "The shader adds each impact to the height: a bowl, a raised rim and ejecta rays that fade with age. A 180 ms streak, a paper flash and a dithered shockwave ring announce it.",
     ],
-    index: "LAB-03",
-    related: ["cloud-stipple", "ascii"],
-    slug: "dot-grid",
-    summary: "A halftone dot grid of a picture that swells around the pointer.",
+    index: "LAB-09",
+    registryItem: "lunar-dither",
+    related: ["orbit-dust", "slime"],
+    slug: "lunar-dither",
+    summary:
+      "A cratered moon printed as an ordered dither, lit from the pointer.",
     technicalNotes: [
-      "It shares the site canvas, so the grid costs one draw call and no second WebGL context.",
-      "The render loop stops offscreen. Reduced motion renders a single frame.",
+      "It shares the site canvas through a View, so the moon costs one draw call and no second WebGL context.",
+      "Ink and paper come from the theme tokens. The darker one always takes the shadows.",
+      "The render loop stops offscreen. Reduced motion renders a single frame with frozen grain, and clicks add the crater at once with no streak or ring.",
+      "Craters live in object space, so they turn with the moon. The 33rd impact overwrites the oldest.",
+      "On the home page the resting light follows tonight's real moon phase over Tucumán.",
     ],
-    technologies: ["React Three Fiber", "Three.js", "GLSL", "ShaderMaterial"],
-    title: "Dot grid",
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "Bayer"],
+    title: "Lunar dither",
     topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
-  engraving: {
-    Poster: EngravingPoster,
-    Preview: EngravingLive,
+  "orbit-dust": {
+    Poster: OrbitDustPoster,
+    Preview: OrbitDustLive,
     hasControls: true,
+    hasOriginal: false,
     implementation: [
-      "One full-viewport plane. Each pixel measures its distance to the nearest line of a ruled field.",
-      "A relief height shifts that field, so the lines bend over the form like a burin following it.",
-      "Line width follows tone. Past 62% ink a second set crosses at 60°.",
+      "Each particle stores only its orbit band, start angle, height and a seed. The vertex shader turns them into a position every frame, so the CPU never touches a particle.",
+      "Angular velocity falls with the band as r^-1.5, so the inner ring laps the outer one like a Keplerian disc.",
+      "Curl noise from three value-noise potentials with analytic gradients adds a divergence-free swirl.",
+      "A hidden plane catches the pointer. Its hit point becomes a gravity well that pulls nearby dust in and down, eased in useFrame.",
     ],
-    index: "LAB-05",
-    related: ["ascii", "speed-smear"],
-    slug: "engraving",
-    summary: "Banknote line engraving of a picture, bent over its relief.",
+    index: "LAB-13",
+    registryItem: "orbit-dust",
+    related: ["lunar-dither", "slime"],
+    slug: "orbit-dust",
+    summary:
+      "A disc of dust orbiting a dark core, bent by a gravity well under the pointer.",
     technicalNotes: [
-      "Edges are antialiased with fwidth, so any pitch stays crisp without supersampling.",
-      "A picture's relief is a blurred mip of its own luminance.",
+      "50k to 200k points, picked from hardwareConcurrency, devicePixelRatio and pointer type. Opacity scales with the count so density stays even.",
+      "Light dust on a dark ground blends additively. On a light ground it switches to normal blending, so the ring prints in ink.",
+      "Far particles fade with depth, and the core's limb catches a thin rim of light.",
       "The render loop stops offscreen. Reduced motion renders a single frame.",
     ],
-    technologies: [
-      "React Three Fiber",
-      "GLSL",
-      "ShaderMaterial",
-      "Derivatives",
-    ],
-    title: "Engraving",
-    topics: ["Shader", "WebGL", "Image"],
+    technologies: ["React Three Fiber", "Three.js", "GLSL", "Curl noise"],
+    title: "Orbit dust",
+    topics: ["Shader", "WebGL", "Motion"],
     year: 2026,
   },
   "signal-tear": {
@@ -153,7 +148,8 @@ const experimentsBySlug = {
       "Light drags to the right as a ghost trail, then a vignette and two octaves of grain finish the frame.",
     ],
     index: "LAB-07",
-    related: ["speed-smear", "cloud-stipple"],
+    registryItem: "signal-tear",
+    related: ["speed-smear"],
     slug: "signal-tear",
     summary:
       "A grainy frame whose rows tear and smear light, like a bad VHS still.",
@@ -167,6 +163,35 @@ const experimentsBySlug = {
     topics: ["Shader", "WebGL", "Image"],
     year: 2026,
   },
+  slime: {
+    Poster: SlimePoster,
+    Preview: SlimeLive,
+    hasControls: true,
+    hasOriginal: false,
+    implementation: [
+      "One full-screen plane on a WebGPURenderer. A TSL node material raymarches 22 spheres joined by a wide smooth minimum, so every lobe stays fused like thick gel.",
+      "Six core spheres hang off one mass that crawls toward random targets past the stage edges. It squashes flat against a wall, slides back and wobbles on a slow, underdamped spring.",
+      "Ten drop spheres run a small life cycle: drip off the underside, fall, stick to a wall, ooze down and crawl back to merge. A click squashes the mass and flings six of them.",
+      "Hovering lures the mass and pulls a strand to the pointer that trails behind and snaps into a drop. Dragging pulls a stiffer strand that drags the mass along.",
+      "The light is faked in one pass: thickness from three inward samples, back-lit scatter where it is thin, a softbox and window reflection tinted by a thin-film spectrum, and noise veins read along the refracted ray.",
+    ],
+    index: "LAB-15",
+    registryItem: "slime",
+    related: ["orbit-dust", "lunar-dither"],
+    slug: "slime",
+    summary:
+      "A thick green goo that crawls the stage, drips and splats on the walls. Hover and it reaches for you, click to splat it, drag to pull strands.",
+    technicalNotes: [
+      "WebGPU cannot share the site's WebGL canvas, so this one owns a Canvas that mounts only while the stage is in view. Without WebGPU, three falls back to WebGL2 with the same TSL graph.",
+      "The physics is 22 spheres on the CPU. Only 22 vec4 uniforms cross to the GPU each frame.",
+      "Each ray is tested against every live sphere first and marches only between the nearest entry and the farthest exit, so drops spread over the stage cost little. The edge is antialiased from the nearest miss.",
+      "The veins and the scatter take the slime green. Quick clicks are latched, so a tap between two frames still splats. Reduced motion holds one frame, mid-splat.",
+    ],
+    technologies: ["React Three Fiber", "WebGPU", "TSL", "Raymarching"],
+    title: "Slime",
+    topics: ["Shader", "WebGPU", "Motion"],
+    year: 2026,
+  },
   "speed-smear": {
     Poster: SpeedSmearPoster,
     Preview: SpeedSmearLive,
@@ -177,6 +202,7 @@ const experimentsBySlug = {
       "Pointer speed adds to the smear and fades out, then an ordered dither prints the result.",
     ],
     index: "LAB-06",
+    registryItem: "speed-smear",
     related: ["signal-tear", "super-saiyan"],
     slug: "speed-smear",
     summary:
@@ -198,16 +224,17 @@ const experimentsBySlug = {
     implementation: [
       "One full-viewport plane. Each cell samples the image at a mip matched to its size, sharpens it against a blurrier mip and runs a contrast and gamma curve.",
       "The threshold comes from Bayer 2×2, 4×4 or 8×8, a 64×64 blue-noise tile, or a 45° dot screen for halftone.",
-      "A strike lifts the sky, draws a forked bolt in paper behind Goku and crossfades, cell by cell, to a color ordered dither in twelve inks taken from the image.",
-      "The aura springs to the pointer and gathers on the hair silhouette. A click shakes the frame by whole cells and sends a burst ring that bends the image.",
+      "A strike lifts the dark areas, draws a forked bolt and reprints the frame in color, tile by tile outward from where the bolt lands, in twelve inks taken from the image.",
+      "The aura springs to the pointer and rises as flame tongues in the dark areas. A click drops the bolt where you click, shakes the frame by whole cells and sends a burst ring that bends the image.",
     ],
     index: "LAB-01",
+    registryItem: "storm-print",
     related: ["vegeta", "speed-smear"],
     slug: "super-saiyan",
     summary:
       "Goku in a storm, dithered live in ink. Lightning prints him in color.",
     technicalNotes: [
-      "The palette is a median cut of the image, weighted toward saturated pixels. A script writes it next to the poster bitmap.",
+      "The palette is a median cut of the image, weighted toward saturated pixels. It runs in the browser on a small sample once the image loads.",
       "The tone curve is one table shared by the shader and the poster script, so the card matches the live frame.",
       "Strikes stay three seconds apart and Strike now waits a second between bolts. Reduced motion draws one still frame with no flashes.",
       "Everything is one draw call. The render loop stops offscreen and nothing animates through React state.",
@@ -229,11 +256,11 @@ const experimentsBySlug = {
     hasControls: true,
     implementation: [
       "The Super Saiyan print: each cell samples a mip matched to its size, sharpened against a blurrier mip, through Bayer or blue noise.",
-      "A ki aura springs to the pointer and prints in negative inside a flame-noise edge, dithered so the rim stays soft.",
-      "The Majin mark pulses: its strokes thicken where a blurrier mip of the forehead reads dark.",
-      "A click sends a ring that bleaches the frame to paper. Cells reprint in hashed order, in twelve inks cut from the image, then fade back to ink.",
+      "A ki aura springs to the pointer as rising flame tongues printed in negative, with a hard ink rim and a paper core.",
+      "A click sends a ring that bleaches the frame to paper. Tiles reprint outward from the blast point in twelve inks cut from the image, then fold back to ink from the edges in.",
     ],
     index: "LAB-02",
+    registryItem: "blast-print",
     related: ["super-saiyan", "speed-smear"],
     slug: "vegeta",
     summary:

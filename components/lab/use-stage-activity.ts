@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { usePrefersReducedMotion } from "@/registry/ivan/hooks/use-prefers-reduced-motion";
 
 export type StageActivity = "running" | "offscreen" | "reduced";
 
@@ -19,7 +19,7 @@ const activityFor = (
 export const useStageActivity = <Element extends HTMLElement>() => {
   const ref = useRef<Element>(null);
   const [isOnscreen, setIsOnscreen] = useState(false);
-  const isReduced = useReducedMotion();
+  const isReduced = usePrefersReducedMotion();
 
   useEffect(() => {
     const element = ref.current;

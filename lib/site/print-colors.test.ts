@@ -2,41 +2,35 @@ import { describe, expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { oklchToSrgb, parseOklch, toHex } from "@/lib/design-system/color";
 import { parseGlobalsCss } from "@/lib/design-system/css-parse";
 import { globalsCssPath } from "@/lib/design-system/load";
 
-import { inkAlpha, printColors } from "./print-colors";
+import { printColors } from "./print-colors";
 
 const globals = parseGlobalsCss(
   await readFile(path.join(process.cwd(), globalsCssPath), "utf-8")
 );
 
-const tokenHex = (token: string) => {
-  const parsed = parseOklch(globals.root.get(`--${token}`) ?? "");
-  if (!parsed) {
-    throw new Error(`--${token} is not an oklch token`);
-  }
-  return toHex(oklchToSrgb(parsed));
-};
+const darkTokens = {
+  bone: "foreground",
+  border: "border",
+  borderStrong: "border-strong",
+  charcoal: "background",
+  faint: "faint",
+  muted: "muted-foreground",
+  signal: "signal",
+} as const satisfies Record<keyof typeof printColors, string>;
 
-describe("print colors mirror the globals.css tokens", () => {
-  test.each(Object.entries(printColors))(
-    "%s matches its :root token",
-    (token, hex) => {
-      expect(tokenHex(token)).toBe(hex);
+const printedHex: Readonly<Record<string, string>> = printColors;
+
+const darkHex = (token: string) =>
+  (globals.dark.get(`--${token}`) ?? "").toLowerCase();
+
+describe("print colors mirror the dark theme tokens", () => {
+  test.each(Object.entries(darkTokens))(
+    "%s matches --%s in .dark",
+    (key, token) => {
+      expect(printedHex[key]).toBe(darkHex(token));
     }
   );
-
-  test("inkAlpha uses the ink channels", () => {
-    const [red, green, blue] = oklchToSrgb(
-      parseOklch(globals.root.get("--ink") ?? "") ?? {
-        alpha: 1,
-        chroma: 0,
-        hue: 0,
-        lightness: 0,
-      }
-    ).map((channel) => Math.round(channel * 255));
-    expect(inkAlpha(0.7)).toBe(`rgba(${red}, ${green}, ${blue}, 0.7)`);
-  });
 });

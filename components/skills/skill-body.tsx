@@ -25,9 +25,5 @@ export const SkillBody = async ({ body }: { body: string }) => {
       remarkPlugins: [remarkGfm],
     }
   );
-  return (
-    <div className="max-w-3xl min-w-0">
-      <Content components={mdxComponents} />
-    </div>
-  );
+  return <Content components={mdxComponents} />;
 };

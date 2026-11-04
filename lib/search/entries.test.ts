@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { FieldNote } from "@/lib/content/note-domain";
@@ -19,13 +19,10 @@ import {
 } from "./entries";
 import type { SearchEntry } from "./types";
 
-const profileDirectory = path.join(process.cwd(), "components", "profile");
-
-const profileSources = readdirSync(profileDirectory, { recursive: true })
-  .map(String)
-  .filter((file) => file.endsWith(".tsx"))
-  .map((file) => readFileSync(path.join(profileDirectory, file), "utf-8"))
-  .join("\n");
+const homeSectionsSource = readFileSync(
+  path.join(process.cwd(), "lib", "site", "home-sections.ts"),
+  "utf-8"
+);
 
 const note: FieldNote = {
   date: "2026-10-09",
@@ -41,11 +38,9 @@ const note: FieldNote = {
 };
 
 describe("home section entries", () => {
-  test("every home anchor exists in the profile components", () => {
+  test("every home anchor is rendered by the home page", () => {
     const missing = homeSections.filter(
-      (section) =>
-        !profileSources.includes(`id="${section.id}"`) &&
-        !profileSources.includes(`homeSectionById("${section.id}")`)
+      (section) => !homeSectionsSource.includes(`id: "${section.id}"`)
     );
     expect(missing).toEqual([]);
   });
@@ -88,7 +83,7 @@ describe("content entries", () => {
   test("an experiment links to its experiment page and searches its technologies", () => {
     const entry = experimentEntry({
       index: "LAB-01",
-      slug: "dot-grid",
+      slug: "signal-tear",
       summary: "Bayer dithering.",
       technologies: ["GLSL"],
       title: "Dither field",
@@ -97,7 +92,7 @@ describe("content entries", () => {
     });
 
     expect(entry).toMatchObject({
-      action: { href: "/experiments/dot-grid", type: "route" },
+      action: { href: "/experiments/signal-tear", type: "route" },
       code: "LAB-01",
       detail: "Shader, WebGL",
       group: "experiments",

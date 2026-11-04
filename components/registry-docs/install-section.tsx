@@ -60,9 +60,9 @@ export const InstallSection = ({
       <RunnerTabs commands={commands} field="url" />
     </TabsContent>
     <TabsContent className="flex flex-col gap-4 pt-4" value="namespace">
-      <div className="border-rule-strong bg-popover flex flex-col border">
-        <div className="border-rule-strong bg-paper-deep flex items-center justify-between gap-4 border-b pl-4">
-          <p className="label text-graphite">components.json</p>
+      <div className="border-border-strong bg-popover flex flex-col border">
+        <div className="border-border-strong bg-surface flex items-center justify-between gap-4 border-b pl-4">
+          <p className="label text-muted-foreground">components.json</p>
           <CopyButton
             label="Copy registries snippet"
             value={registriesSource}

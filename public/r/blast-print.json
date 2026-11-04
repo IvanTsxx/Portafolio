@@ -1,0 +1,314 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "blast-print",
+  "title": "Blast Print",
+  "description": "A click sends a ring that bleaches the picture, then reprints it in color inks cut from the image.",
+  "dependencies": [
+    "three@^0.186.1",
+    "@react-three/fiber@^9.8.1"
+  ],
+  "devDependencies": [
+    "@types/three@^0.186.0"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/ivan/components/blast-print/blast-print.tsx",
+      "content": "\"use client\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n  CanvasStage,\n  ImageFallback,\n} from \"@/registry/ivan/components/canvas-stage/canvas-stage\";\nimport { centeredFocus } from \"@/registry/ivan/lib/image-cover\";\n\nimport { blastPrintDefaults } from \"./blast-print-material\";\nimport { BlastPrintScene } from \"./blast-print-scene\";\nimport type { BlastPrintSceneProps } from \"./blast-print-scene\";\n\nexport interface BlastPrintProps extends BlastPrintSceneProps {\n  className?: string;\n  label?: string;\n}\n\nconst defaultLabel =\n  \"A picture printed as an ordered dither, bleached and reprinted in color by a click\";\n\nexport const BlastPrint = ({\n  className,\n  label = defaultLabel,\n  src,\n  focus = centeredFocus,\n  ink = blastPrintDefaults.ink,\n  paper = blastPrintDefaults.paper,\n  paused = blastPrintDefaults.paused,\n  ...sceneProps\n}: BlastPrintProps) => (\n  <CanvasStage\n    className={cn(\"touch-pan-y\", className)}\n    fallback={<ImageFallback focus={focus} src={src} />}\n    ground={ink}\n    label={label}\n    paused={paused}\n  >\n    {(isAnimating) => (\n      <BlastPrintScene\n        {...sceneProps}\n        focus={focus}\n        ink={ink}\n        paper={paper}\n        paused={!isAnimating}\n        src={src}\n      />\n    )}\n  </CanvasStage>\n);\n",
+      "type": "registry:component",
+      "target": "@components/blast-print/blast-print.tsx"
+    },
+    {
+      "path": "registry/ivan/components/blast-print/blast-print-scene.tsx",
+      "content": "\"use client\";\n\nimport { useFrame, useThree } from \"@react-three/fiber\";\nimport { useEffect, useMemo, useRef } from \"react\";\nimport { PlaneGeometry, Vector3 } from \"three\";\nimport type { Intersection, Mesh, Raycaster, WebGLRenderer } from \"three\";\n\nimport { usePrintImage } from \"@/registry/ivan/hooks/use-print-image\";\nimport type { PrintImage } from \"@/registry/ivan/hooks/use-print-image\";\nimport { createBlueNoiseTexture } from \"@/registry/ivan/lib/blue-noise\";\nimport {\n  centeredFocus,\n  readViewport,\n  setCoverImage,\n} from \"@/registry/ivan/lib/image-cover\";\nimport type { ImageFocus } from \"@/registry/ivan/lib/image-cover\";\nimport { orderedDitherIndex } from \"@/registry/ivan/lib/ordered-print\";\nimport type { OrderedDither } from \"@/registry/ivan/lib/ordered-print\";\nimport { samplePalette } from \"@/registry/ivan/lib/palette\";\nimport type { Rgb } from \"@/registry/ivan/lib/palette\";\nimport { PointerTrace } from \"@/registry/ivan/lib/pointer-trace\";\nimport type { PointerSample } from \"@/registry/ivan/lib/pointer-trace\";\nimport {\n  createSpring,\n  driveSpring,\n  frameStep,\n} from \"@/registry/ivan/lib/spring\";\n\nimport { BlastPrintMaterial, blastPrintDefaults } from \"./blast-print-material\";\nimport { advanceBlast, blastLength, createBlast } from \"./blast-timeline\";\nimport type { StagePoint } from \"./blast-timeline\";\n\nexport interface BlastPrintSceneProps {\n  src: string;\n  focus?: ImageFocus;\n  ink?: string;\n  paper?: string;\n  dither?: OrderedDither;\n  cell?: number;\n  threshold?: number;\n  auraRadius?: number;\n  blasts?: number;\n  paused?: boolean;\n}\n\ninterface BlastLook {\n  ink: string;\n  paper: string;\n  dither: OrderedDither;\n  cell: number;\n  threshold: number;\n  auraRadius: number;\n}\n\ninterface BlastFrameInput {\n  delta: number;\n  paused: boolean;\n  pointer: PointerSample;\n}\n\nconst followSpring = { damping: 16, stiffness: 120 } as const;\nconst auraSpring = { damping: 11, stiffness: 90 } as const;\nconst auraBase = 0.24;\nconst maxAuraStrength = 1.2;\nconst frameCenter: StagePoint = { x: 0.5, y: 0.5 };\n\nconst hitEverywhere = function hitEverywhere(\n  this: Mesh,\n  _raycaster: Raycaster,\n  intersects: Intersection[]\n) {\n  intersects.push({ distance: 0, object: this, point: new Vector3() });\n};\n\nclass BlastPrintRig {\n  readonly material = new BlastPrintMaterial();\n  readonly geometry = new PlaneGeometry(1, 1);\n  private readonly blueNoise = createBlueNoiseTexture();\n  private readonly trace = new PointerTrace();\n  private readonly blast = createBlast();\n  private readonly aura = {\n    strength: createSpring(0),\n    x: createSpring(0.4),\n    y: createSpring(0.7),\n  };\n  private cell: number = blastPrintDefaults.cell;\n  private request: StagePoint | null = null;\n\n  constructor() {\n    this.material.uniforms.uBlueNoise.value = this.blueNoise;\n  }\n\n  applyLook({ ink, paper, dither, cell, threshold, auraRadius }: BlastLook) {\n    const { uniforms } = this.material;\n    uniforms.uInk.value.set(ink);\n    uniforms.uPaper.value.set(paper);\n    uniforms.uDither.value = orderedDitherIndex(dither);\n    uniforms.uThreshold.value = threshold;\n    uniforms.uAuraRadius.value = auraBase * auraRadius;\n    this.cell = cell;\n  }\n\n  applyImage(image: PrintImage | null, focus: ImageFocus) {\n    setCoverImage(this.material.uniforms, image, focus);\n  }\n\n  applyPalette(palette: readonly Rgb[]) {\n    const inks = this.material.uniforms.uPalette.value;\n    for (const [index, [red, green, blue]] of palette.entries()) {\n      inks[index]?.set(red / 255, green / 255, blue / 255);\n    }\n  }\n\n  detonate(origin: StagePoint) {\n    this.request = origin;\n  }\n\n  advance({ delta, paused, pointer }: BlastFrameInput) {\n    const { aura, blast, trace } = this;\n    const { uniforms } = this.material;\n    const step = frameStep(delta);\n    const isMoving = !paused;\n    trace.update(pointer, step, isMoving);\n    advanceBlast(blast, {\n      mode: isMoving ? \"running\" : \"still\",\n      request: this.request,\n      step,\n    });\n    this.request = null;\n\n    const targetX = trace.isActive ? trace.x : aura.x.value;\n    const targetY = trace.isActive ? trace.y : aura.y.value;\n    driveSpring(aura.x, targetX, followSpring, step, isMoving);\n    driveSpring(aura.y, targetY, followSpring, step, isMoving);\n    const isBlasting = blast.time - blast.firedAt < blastLength;\n    driveSpring(\n      aura.strength,\n      trace.isActive && !isBlasting ? 1 : 0,\n      auraSpring,\n      step,\n      isMoving\n    );\n\n    const { frame } = blast;\n    uniforms.uTime.value = blast.time;\n    uniforms.uAuraStrength.value = Math.min(\n      Math.max(aura.strength.value, 0),\n      maxAuraStrength\n    );\n    uniforms.uRing.value = frame.ring;\n    uniforms.uFront.value = frame.front;\n    uniforms.uReprint.value = frame.reprint;\n    uniforms.uColor.value = frame.color;\n  }\n\n  readonly handleBeforeRender = (renderer: WebGLRenderer) => {\n    const { uniforms } = this.material;\n    const viewport = readViewport(uniforms, renderer);\n    uniforms.uCell.value = this.cell * renderer.getPixelRatio();\n    uniforms.uAura.value.set(\n      this.aura.x.value * viewport.z,\n      this.aura.y.value * viewport.w\n    );\n    uniforms.uBlast.value.set(\n      this.blast.origin.x * viewport.z,\n      this.blast.origin.y * viewport.w\n    );\n  };\n\n  dispose() {\n    this.material.dispose();\n    this.geometry.dispose();\n    this.blueNoise.dispose();\n  }\n}\n\nexport const BlastPrintScene = ({\n  src,\n  focus = centeredFocus,\n  ink = blastPrintDefaults.ink,\n  paper = blastPrintDefaults.paper,\n  dither = blastPrintDefaults.dither,\n  cell = blastPrintDefaults.cell,\n  threshold = blastPrintDefaults.threshold,\n  auraRadius = blastPrintDefaults.auraRadius,\n  blasts = blastPrintDefaults.blasts,\n  paused = blastPrintDefaults.paused,\n}: BlastPrintSceneProps) => {\n  const invalidate = useThree((state) => state.invalidate);\n  const rig = useMemo(() => new BlastPrintRig(), []);\n  const image = usePrintImage(src);\n  const palette = useMemo(\n    () => (image ? samplePalette(image.element) : null),\n    [image]\n  );\n\n  useEffect(() => () => rig.dispose(), [rig]);\n\n  useEffect(() => {\n    rig.applyLook({ auraRadius, cell, dither, ink, paper, threshold });\n    invalidate();\n  }, [auraRadius, cell, dither, ink, invalidate, paper, rig, threshold]);\n\n  useEffect(() => {\n    rig.applyImage(image, { x: focus.x, y: focus.y });\n    if (palette) {\n      rig.applyPalette(palette);\n    }\n    invalidate();\n  }, [focus.x, focus.y, image, invalidate, palette, rig]);\n\n  const handledBlasts = useRef(blasts);\n  useEffect(() => {\n    if (blasts !== handledBlasts.current) {\n      handledBlasts.current = blasts;\n      rig.detonate(frameCenter);\n      invalidate();\n    }\n  }, [blasts, invalidate, rig]);\n\n  useFrame((state, delta) => {\n    rig.advance({ delta, paused, pointer: state.pointer });\n  });\n\n  return (\n    <mesh\n      frustumCulled={false}\n      geometry={rig.geometry}\n      material={rig.material}\n      onBeforeRender={rig.handleBeforeRender}\n      onPointerDown={(event) => {\n        rig.detonate({\n          x: (event.pointer.x + 1) / 2,\n          y: (event.pointer.y + 1) / 2,\n        });\n        invalidate();\n      }}\n      raycast={hitEverywhere}\n    />\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/blast-print/blast-print-scene.tsx"
+    },
+    {
+      "path": "registry/ivan/components/blast-print/blast-print-material.ts",
+      "content": "import { Color, ShaderMaterial, Vector2, Vector3 } from \"three\";\nimport type { IUniform, Texture } from \"three\";\n\nimport { blueNoiseSize } from \"@/registry/ivan/lib/blue-noise\";\nimport {\n  createImageCoverUniforms,\n  fullscreenVertexShader,\n  imageCoverChunk,\n} from \"@/registry/ivan/lib/image-cover\";\nimport type { ImageCoverUniforms } from \"@/registry/ivan/lib/image-cover\";\nimport {\n  nearestInkChunk,\n  orderedChunk,\n  orderedDitherIndex,\n} from \"@/registry/ivan/lib/ordered-print\";\nimport { paletteSize } from \"@/registry/ivan/lib/palette\";\nimport {\n  bayerChunk,\n  hashChunk,\n  valueNoiseChunk,\n} from \"@/registry/ivan/lib/print-noise\";\nimport {\n  printSeparation,\n  toneChunk,\n  toneCurve,\n  toneSeparationChunk,\n} from \"@/registry/ivan/lib/tone-curve\";\n\nexport const blastPrintDefaults = {\n  auraRadius: 1,\n  blasts: 0,\n  cell: 3,\n  dither: \"blue-noise\",\n  ink: \"#0B0B0C\",\n  paper: \"#EDECE8\",\n  paused: false,\n  threshold: 0,\n} as const;\n\nexport interface BlastPrintUniforms extends ImageCoverUniforms {\n  uAura: IUniform<Vector2>;\n  uAuraRadius: IUniform<number>;\n  uAuraStrength: IUniform<number>;\n  uBlast: IUniform<Vector2>;\n  uBlueNoise: IUniform<Texture | null>;\n  uCell: IUniform<number>;\n  uColor: IUniform<number>;\n  uDither: IUniform<number>;\n  uFront: IUniform<number>;\n  uInk: IUniform<Color>;\n  uNoiseSize: IUniform<number>;\n  uPaper: IUniform<Color>;\n  uPalette: IUniform<Vector3[]>;\n  uReprint: IUniform<number>;\n  uRing: IUniform<number>;\n  uThreshold: IUniform<number>;\n  uTime: IUniform<number>;\n}\n\nconst glslFloat = (value: number) => value.toFixed(4);\n\nconst fragmentShader = `\n  uniform vec3 uInk;\n  uniform vec3 uPaper;\n  uniform float uCell;\n  uniform float uThreshold;\n  uniform float uTime;\n  uniform vec2 uAura;\n  uniform float uAuraRadius;\n  uniform float uAuraStrength;\n  uniform vec2 uBlast;\n  uniform float uRing;\n  uniform float uFront;\n  uniform float uReprint;\n  uniform float uColor;\n\n  const float printContrast = ${glslFloat(toneCurve.contrast)};\n  const float colorSpread = 0.3;\n  const float tileCells = 6.0;\n\n  ${imageCoverChunk}\n  ${hashChunk}\n  ${valueNoiseChunk}\n  ${bayerChunk}\n  ${orderedChunk}\n  ${toneChunk}\n  ${nearestInkChunk(paletteSize)}\n\n  ${toneSeparationChunk(\"crispTone\", printSeparation)}\n\n  void main() {\n    if (uHasImage < 0.5) {\n      discard;\n    }\n    vec2 pixel = gl_FragCoord.xy - uOrigin;\n    vec2 cell = floor(pixel / uCell);\n    vec2 center = (cell + 0.5) * uCell;\n    vec2 stage = center / uResolution.y;\n\n    vec2 uv = coverUv(center / uResolution);\n    float lod = imageLod(uCell);\n\n    vec3 color = textureLod(uImage, uv, lod).rgb;\n    vec3 blurredColor = textureLod(uImage, uv, lod + 2.3).rgb;\n    float luma = dot(color, lumaWeights);\n    float blurred = dot(blurredColor, lumaWeights);\n    float tone = crispTone(curveTone(luma, blurred, printContrast, 1.0));\n    vec3 print = curveColor(color, blurredColor, printContrast, 1.0);\n\n    vec2 fromAura = stage - uAura / uResolution.y;\n    float above = step(0.0, fromAura.y);\n    vec2 shaped = vec2(fromAura.x * 1.2, fromAura.y * mix(1.0, 0.45, above)) / max(uAuraRadius, 0.001);\n    float heat = exp(-dot(shaped, shaped) * 1.25) * uAuraStrength;\n    float tongue = valueNoise(vec2(cell.x * 0.14, cell.y * 0.032 - uTime * 3.4));\n    float flicker = valueNoise(vec2(cell.x * 0.33, cell.y * 0.09 - uTime * 6.5));\n    float field = tongue * 0.78 + flicker * 0.22;\n    float flame = step(1.0 - heat * 0.95, field) * step(0.001, uAuraStrength);\n    float core = step(1.0 - heat * 0.5, field);\n    float rim = flame * step(field, 1.0 - heat * 0.95 + 0.04);\n    float isNegative = flame * (1.0 - core);\n    tone = mix(tone, 1.0 - tone, isNegative);\n    print = mix(print, 1.0 - print, isNegative);\n\n    float level = orderedLevel(cell);\n    float isInk = max(step(tone - uThreshold - level, -0.0001), rim);\n\n    vec3 printed = mix(uPaper, uInk, isInk);\n\n    float aspect = uResolution.x / uResolution.y;\n    float diagonal = length(vec2(aspect, 1.0));\n    vec2 blast = uBlast / uResolution.y;\n    float blastDistance = length(stage - blast);\n    float ragged = (valueNoise(cell * 0.2) - 0.5) * 0.07;\n    float swept = step(blastDistance + ragged, uRing);\n    vec2 tile = floor(cell / tileCells);\n    vec2 tileStage = (tile + 0.5) * tileCells * uCell / uResolution.y;\n    float order = clamp(length(tileStage - blast) / diagonal * 0.82 + hash(tile + 17.0) * 0.18, 0.0, 1.0);\n    float reprinted = step(order, uReprint) * step(0.001, uReprint);\n    vec3 colorPrint = toLinear(nearestInk(print - uThreshold + (level - 0.5) * colorSpread));\n    float isColor = swept * reprinted * step(order, uColor) * step(0.001, uColor);\n    printed = mix(printed, colorPrint, isColor);\n\n    float frontOffset = (blastDistance + ragged - uRing) / 0.04;\n    float front = exp(-frontOffset * frontOffset) * uFront;\n    float isFront = step(level, front) * step(0.001, front);\n    printed = mix(printed, uPaper, swept * (1.0 - reprinted));\n    printed = mix(printed, uInk, isFront);\n\n    gl_FragColor = vec4(printed, 1.0);\n    #include <colorspace_fragment>\n  }\n`;\n\nconst createUniforms = (): BlastPrintUniforms => ({\n  ...createImageCoverUniforms(),\n  uAura: { value: new Vector2(0, 0) },\n  uAuraRadius: { value: 0.24 },\n  uAuraStrength: { value: 0 },\n  uBlast: { value: new Vector2(0, 0) },\n  uBlueNoise: { value: null },\n  uCell: { value: blastPrintDefaults.cell },\n  uColor: { value: 0 },\n  uDither: { value: orderedDitherIndex(blastPrintDefaults.dither) },\n  uFront: { value: 0 },\n  uInk: { value: new Color(blastPrintDefaults.ink) },\n  uNoiseSize: { value: blueNoiseSize },\n  uPalette: {\n    value: Array.from({ length: paletteSize }, () => new Vector3()),\n  },\n  uPaper: { value: new Color(blastPrintDefaults.paper) },\n  uReprint: { value: 1 },\n  uRing: { value: 0 },\n  uThreshold: { value: blastPrintDefaults.threshold },\n  uTime: { value: 0 },\n});\n\nexport class BlastPrintMaterial extends ShaderMaterial {\n  declare uniforms: BlastPrintUniforms;\n\n  constructor() {\n    super({\n      depthTest: false,\n      depthWrite: false,\n      fragmentShader,\n      toneMapped: false,\n      uniforms: createUniforms(),\n      vertexShader: fullscreenVertexShader,\n    });\n  }\n}\n",
+      "type": "registry:component",
+      "target": "@components/blast-print/blast-print-material.ts"
+    },
+    {
+      "path": "registry/ivan/components/blast-print/blast-timeline.ts",
+      "content": "export const ringLength = 0.3;\nexport const reprintLength = 0.75;\nexport const colorHoldLength = 1.1;\nexport const colorFadeLength = 0.8;\nexport const blastLength =\n  ringLength + reprintLength + colorHoldLength + colorFadeLength;\nexport const rearmAfter = ringLength + reprintLength;\nexport const ringReach = 2.2;\n\nexport interface BlastFrame {\n  ring: number;\n  front: number;\n  reprint: number;\n  color: number;\n}\n\nexport const idleFrame: BlastFrame = {\n  color: 0,\n  front: 0,\n  reprint: 1,\n  ring: 0,\n};\n\nconst easeOutCubic = (progress: number) => 1 - (1 - progress) ** 3;\nconst easeOutQuad = (progress: number) => 1 - (1 - progress) ** 2;\nconst easeInOutCubic = (progress: number) =>\n  progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;\n\nexport const blastFrame = (age: number): BlastFrame => {\n  if (!(age >= 0) || age >= blastLength) {\n    return idleFrame;\n  }\n  if (age < ringLength) {\n    const progress = age / ringLength;\n    return {\n      color: 0,\n      front: (1 - progress) ** 2,\n      reprint: 0,\n      ring: ringReach * easeOutCubic(progress),\n    };\n  }\n  const reprintAge = age - ringLength;\n  const fadeAge = reprintAge - reprintLength - colorHoldLength;\n  return {\n    color:\n      fadeAge <= 0\n        ? 1\n        : 1 - easeInOutCubic(Math.min(fadeAge / colorFadeLength, 1)),\n    front: 0,\n    reprint: easeOutQuad(Math.min(reprintAge / reprintLength, 1)),\n    ring: ringReach,\n  };\n};\n\nexport type BlastMode = \"running\" | \"still\";\n\nexport interface StagePoint {\n  x: number;\n  y: number;\n}\n\nexport interface Blast {\n  time: number;\n  firedAt: number;\n  origin: StagePoint;\n  frame: BlastFrame;\n}\n\nexport const createBlast = (): Blast => ({\n  firedAt: -Infinity,\n  frame: idleFrame,\n  origin: { x: 0.5, y: 0.5 },\n  time: 0,\n});\n\nexport interface BlastStep {\n  step: number;\n  mode: BlastMode;\n  request: StagePoint | null;\n}\n\nexport const advanceBlast = (\n  blast: Blast,\n  { step, mode, request }: BlastStep\n) => {\n  if (mode === \"still\") {\n    blast.firedAt = -Infinity;\n    blast.frame = idleFrame;\n    return blast;\n  }\n  blast.time += step;\n  if (request && blast.time - blast.firedAt >= rearmAfter) {\n    blast.firedAt = blast.time;\n    blast.origin = { x: request.x, y: request.y };\n  }\n  blast.frame = blastFrame(blast.time - blast.firedAt);\n  return blast;\n};\n",
+      "type": "registry:component",
+      "target": "@components/blast-print/blast-timeline.ts"
+    },
+    {
+      "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+      "content": "\"use client\";\n\nimport { Canvas } from \"@react-three/fiber\";\nimport { useRef } from \"react\";\nimport type { ComponentProps, ReactNode } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { useInView } from \"@/registry/ivan/hooks/use-in-view\";\nimport { usePrefersReducedMotion } from \"@/registry/ivan/hooks/use-prefers-reduced-motion\";\nimport { useWebGLSupport } from \"@/registry/ivan/hooks/use-webgl-support\";\n\nexport interface CanvasStageProps {\n  ground: string;\n  label: string;\n  paused: boolean;\n  fallback: ReactNode;\n  antialias?: boolean;\n  camera?: ComponentProps<typeof Canvas>[\"camera\"];\n  className?: string;\n  children: (isAnimating: boolean) => ReactNode;\n}\n\ninterface ImageFallbackProps {\n  src: string;\n  focus: { x: number; y: number };\n}\n\nexport const ImageFallback = ({ src, focus }: ImageFallbackProps) => (\n  <div\n    aria-hidden\n    className=\"absolute inset-0 grayscale\"\n    style={{\n      backgroundImage: `url(${JSON.stringify(src)})`,\n      backgroundPosition: `${focus.x * 100}% ${focus.y * 100}%`,\n      backgroundSize: \"cover\",\n    }}\n  />\n);\n\nexport const CanvasStage = ({\n  ground,\n  label,\n  paused,\n  fallback,\n  antialias = false,\n  camera,\n  className,\n  children,\n}: CanvasStageProps) => {\n  const frame = useRef<HTMLElement>(null);\n  const hasWebGL = useWebGLSupport();\n  const isInView = useInView(frame);\n  const prefersReducedMotion = usePrefersReducedMotion();\n  const isAnimating = isInView && !prefersReducedMotion && !paused;\n\n  return (\n    <figure\n      aria-label={label}\n      className={cn(\n        \"relative m-0 aspect-4/3 w-full overflow-hidden\",\n        className\n      )}\n      ref={frame}\n      style={{ backgroundColor: ground }}\n    >\n      {hasWebGL ? (\n        <Canvas\n          aria-hidden\n          camera={camera}\n          dpr={[1, 1.75]}\n          frameloop={isAnimating ? \"always\" : \"demand\"}\n          gl={{\n            alpha: true,\n            antialias,\n            powerPreference: \"high-performance\",\n          }}\n        >\n          {children(isAnimating)}\n        </Canvas>\n      ) : (\n        fallback\n      )}\n    </figure>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "@components/canvas-stage/canvas-stage.tsx"
+    },
+    {
+      "path": "registry/ivan/lib/image-cover.ts",
+      "content": "import { Vector2, Vector4 } from \"three\";\nimport type { IUniform, Texture, WebGLRenderer } from \"three\";\n\nexport interface CoverSource {\n  texture: Texture;\n  width: number;\n  height: number;\n}\n\nexport interface ImageFocus {\n  x: number;\n  y: number;\n}\n\nexport const centeredFocus: ImageFocus = { x: 0.5, y: 0.5 };\n\nexport const fullscreenVertexShader = `\n  void main() {\n    gl_Position = vec4(position.xy * 2.0, 0.0, 1.0);\n  }\n`;\n\nexport const imageCoverChunk = `\n  uniform vec2 uOrigin;\n  uniform vec2 uResolution;\n  uniform sampler2D uImage;\n  uniform vec2 uImageSize;\n  uniform vec2 uFocus;\n  uniform float uHasImage;\n\n  const vec3 lumaWeights = vec3(0.2126, 0.7152, 0.0722);\n\n  vec2 imageSpan() {\n    float stageAspect = uResolution.x / uResolution.y;\n    float imageAspect = uImageSize.x / uImageSize.y;\n    return stageAspect > imageAspect\n      ? vec2(1.0, imageAspect / stageAspect)\n      : vec2(stageAspect / imageAspect, 1.0);\n  }\n\n  vec2 coverUv(vec2 stage) {\n    vec2 span = imageSpan();\n    vec2 start = clamp(uFocus - span * 0.5, vec2(0.0), vec2(1.0) - span);\n    return start + stage * span;\n  }\n\n  float imageLuma(vec2 uv, float lod) {\n    return dot(textureLod(uImage, uv, lod).rgb, lumaWeights);\n  }\n\n  float imageLod(float footprint) {\n    float texels = footprint * imageSpan().y * uImageSize.y / uResolution.y;\n    return log2(max(texels, 1.0));\n  }\n`;\n\nexport interface ImageCoverUniforms {\n  [uniform: string]: IUniform;\n  uFocus: IUniform<Vector2>;\n  uHasImage: IUniform<number>;\n  uImage: IUniform<Texture | null>;\n  uImageSize: IUniform<Vector2>;\n  uOrigin: IUniform<Vector2>;\n  uResolution: IUniform<Vector2>;\n}\n\nexport const createImageCoverUniforms = (): ImageCoverUniforms => ({\n  uFocus: { value: new Vector2(0.5, 0.5) },\n  uHasImage: { value: 0 },\n  uImage: { value: null },\n  uImageSize: { value: new Vector2(1, 1) },\n  uOrigin: { value: new Vector2(0, 0) },\n  uResolution: { value: new Vector2(1, 1) },\n});\n\nexport const setCoverImage = (\n  uniforms: ImageCoverUniforms,\n  image: CoverSource | null,\n  focus: ImageFocus\n) => {\n  uniforms.uImage.value = image?.texture ?? null;\n  uniforms.uHasImage.value = image ? 1 : 0;\n  uniforms.uImageSize.value.set(image?.width ?? 1, image?.height ?? 1);\n  uniforms.uFocus.value.set(focus.x, 1 - focus.y);\n};\n\nconst viewport = new Vector4();\n\nexport const readViewport = (\n  uniforms: ImageCoverUniforms,\n  renderer: WebGLRenderer\n) => {\n  renderer.getCurrentViewport(viewport);\n  uniforms.uOrigin.value.set(viewport.x, viewport.y);\n  uniforms.uResolution.value.set(viewport.z, viewport.w);\n  return viewport;\n};\n",
+      "type": "registry:lib",
+      "target": "@lib/image-cover.ts"
+    },
+    {
+      "path": "registry/ivan/lib/print-noise.ts",
+      "content": "export const hashChunk = `\n  float hash(vec2 point) {\n    return fract(sin(dot(point, vec2(127.1, 311.7))) * 43758.5453);\n  }\n`;\n\nexport const valueNoiseChunk = `\n  float valueNoise(vec2 point) {\n    vec2 whole = floor(point);\n    vec2 part = fract(point);\n    vec2 blend = part * part * (3.0 - 2.0 * part);\n    return mix(\n      mix(hash(whole), hash(whole + vec2(1.0, 0.0)), blend.x),\n      mix(hash(whole + vec2(0.0, 1.0)), hash(whole + vec2(1.0, 1.0)), blend.x),\n      blend.y\n    );\n  }\n`;\n\nexport const bayerChunk = `\n  float bayer2(vec2 cell) {\n    cell = floor(cell);\n    return fract(cell.x / 2.0 + cell.y * cell.y * 0.75);\n  }\n\n  float bayer4(vec2 cell) {\n    return bayer2(0.5 * cell) * 0.25 + bayer2(cell);\n  }\n\n  float bayer8(vec2 cell) {\n    return bayer4(0.5 * cell) * 0.25 + bayer2(cell) + 0.5 / 64.0;\n  }\n`;\n",
+      "type": "registry:lib",
+      "target": "@lib/print-noise.ts"
+    },
+    {
+      "path": "registry/ivan/lib/ordered-print.ts",
+      "content": "export const orderedDithers = [\n  \"bayer-2\",\n  \"bayer-4\",\n  \"bayer-8\",\n  \"blue-noise\",\n] as const;\n\nexport type OrderedDither = (typeof orderedDithers)[number];\n\nexport const orderedDitherIndex = (mode: OrderedDither) =>\n  orderedDithers.indexOf(mode);\n\nexport const orderedChunk = `\n  uniform sampler2D uBlueNoise;\n  uniform float uNoiseSize;\n  uniform float uDither;\n\n  float orderedLevel(vec2 cell) {\n    if (uDither < 0.5) {\n      return bayer2(cell) + 0.125;\n    }\n    if (uDither < 1.5) {\n      return bayer4(cell) + 0.5 / 16.0;\n    }\n    if (uDither < 2.5) {\n      return bayer8(cell);\n    }\n    return texture(uBlueNoise, (cell + 0.5) / uNoiseSize).r;\n  }\n\n  vec3 toLinear(vec3 color) {\n    return mix(\n      color / 12.92,\n      pow((color + 0.055) / 1.055, vec3(2.4)),\n      step(vec3(0.04045), color)\n    );\n  }\n`;\n\nexport const nearestInkChunk = (size: number) => `\n  uniform vec3 uPalette[${size}];\n\n  vec3 nearestInk(vec3 color) {\n    vec3 best = uPalette[0];\n    float bestGap = 1e9;\n    for (int index = 0; index < ${size}; index++) {\n      vec3 difference = (color - uPalette[index]) * vec3(0.9, 1.2, 0.7);\n      float gap = dot(difference, difference);\n      if (gap < bestGap) {\n        bestGap = gap;\n        best = uPalette[index];\n      }\n    }\n    return best;\n  }\n`;\n",
+      "type": "registry:lib",
+      "target": "@lib/ordered-print.ts"
+    },
+    {
+      "path": "registry/ivan/lib/tone-curve.ts",
+      "content": "export const toneCurve = {\n  black: 0.04,\n  contrast: 1.35,\n  detail: 1.4,\n  gamma: 1,\n  white: 0.9,\n} as const;\n\nconst glslFloat = (value: number) => value.toFixed(4);\n\nexport const toneChunk = `\n  float curveTone(float luma, float blurred, float contrast, float gamma) {\n    float sharpened = luma + (luma - blurred) * ${glslFloat(toneCurve.detail)};\n    float level = pow(clamp((sharpened - ${glslFloat(toneCurve.black)}) / ${glslFloat(toneCurve.white - toneCurve.black)}, 0.0, 1.0), gamma);\n    return clamp((level - 0.5) * contrast + 0.5, 0.0, 1.0);\n  }\n\n  vec3 curveColor(vec3 color, vec3 blurred, float contrast, float gamma) {\n    return vec3(\n      curveTone(color.r, blurred.r, contrast, gamma),\n      curveTone(color.g, blurred.g, contrast, gamma),\n      curveTone(color.b, blurred.b, contrast, gamma)\n    );\n  }\n`;\n\nexport interface ToneSeparation {\n  low: number;\n  high: number;\n  amount: number;\n}\n\nexport const printSeparation: ToneSeparation = {\n  amount: 0.55,\n  high: 0.84,\n  low: 0.16,\n};\n\nexport const toneSeparationChunk = (\n  name: string,\n  { low, high, amount }: ToneSeparation\n) => `\n  float ${name}(float tone) {\n    return mix(tone, smoothstep(${glslFloat(low)}, ${glslFloat(high)}, tone), ${glslFloat(amount)});\n  }\n`;\n",
+      "type": "registry:lib",
+      "target": "@lib/tone-curve.ts"
+    },
+    {
+      "path": "registry/ivan/lib/palette.ts",
+      "content": "export type Rgb = readonly [number, number, number];\n\nexport const paletteSize = 12;\n\ninterface Box {\n  pixels: Rgb[];\n  channel: 0 | 1 | 2;\n  range: number;\n}\n\nconst channels = [0, 1, 2] as const;\n\nconst measure = (pixels: Rgb[]): Box => {\n  let channel: 0 | 1 | 2 = 0;\n  let range = -1;\n  for (const index of channels) {\n    let low = 255;\n    let high = 0;\n    for (const pixel of pixels) {\n      low = Math.min(low, pixel[index]);\n      high = Math.max(high, pixel[index]);\n    }\n    if (high - low > range) {\n      range = high - low;\n      channel = index;\n    }\n  }\n  return { channel, pixels, range };\n};\n\nconst splitPriority = (box: Box) => box.range * Math.sqrt(box.pixels.length);\n\nconst average = (pixels: Rgb[]): Rgb => {\n  let red = 0;\n  let green = 0;\n  let blue = 0;\n  for (const pixel of pixels) {\n    red += pixel[0];\n    green += pixel[1];\n    blue += pixel[2];\n  }\n  return [\n    Math.round(red / pixels.length),\n    Math.round(green / pixels.length),\n    Math.round(blue / pixels.length),\n  ];\n};\n\nconst chromaWeight = 6;\n\nconst chromaOf = (pixel: Rgb) => Math.max(...pixel) - Math.min(...pixel);\n\nconst lumaOf = ([red, green, blue]: Rgb) =>\n  0.2126 * red + 0.7152 * green + 0.0722 * blue;\n\nconst inkSaturation = 1.55;\nconst inkContrast = 1.18;\n\nconst clampChannel = (value: number) =>\n  Math.round(Math.min(Math.max(value, 0), 255));\n\nconst printInk = (color: Rgb): Rgb => {\n  const luma = lumaOf(color);\n  const printed = (luma - 128) * inkContrast + 128;\n  return [\n    clampChannel(printed + (color[0] - luma) * inkSaturation),\n    clampChannel(printed + (color[1] - luma) * inkSaturation),\n    clampChannel(printed + (color[2] - luma) * inkSaturation),\n  ];\n};\n\nexport const extractPalette = (rgb: Uint8Array, size = paletteSize) => {\n  const pixels: Rgb[] = [];\n  for (let offset = 0; offset + 2 < rgb.length; offset += 3) {\n    const pixel: Rgb = [\n      rgb[offset] ?? 0,\n      rgb[offset + 1] ?? 0,\n      rgb[offset + 2] ?? 0,\n    ];\n    const copies = 1 + Math.round((chromaOf(pixel) / 255) * chromaWeight);\n    for (let copy = 0; copy < copies; copy += 1) {\n      pixels.push(pixel);\n    }\n  }\n  const boxes = [measure(pixels)];\n  while (boxes.length < size) {\n    let widest = 0;\n    for (const [index, box] of boxes.entries()) {\n      const current = boxes[widest];\n      if (current && splitPriority(box) > splitPriority(current)) {\n        widest = index;\n      }\n    }\n    const box = boxes[widest];\n    if (!box || box.pixels.length < 2 || box.range === 0) {\n      break;\n    }\n    const sorted = box.pixels.toSorted(\n      (first, second) =>\n        first[box.channel] - second[box.channel] ||\n        lumaOf(first) - lumaOf(second)\n    );\n    const middle = Math.floor(sorted.length / 2);\n    boxes.splice(\n      widest,\n      1,\n      measure(sorted.slice(0, middle)),\n      measure(sorted.slice(middle))\n    );\n  }\n  return boxes\n    .map((box) => printInk(average(box.pixels)))\n    .toSorted((first, second) => lumaOf(first) - lumaOf(second));\n};\n\nconst sampleColumns = 120;\n\nconst greyRamp = Array.from({ length: paletteSize }, (_, step): Rgb => {\n  const level = Math.round((step / (paletteSize - 1)) * 255);\n  return [level, level, level];\n});\n\nconst padPalette = (palette: readonly Rgb[]) => {\n  const last = palette.at(-1);\n  if (!last) {\n    return greyRamp;\n  }\n  return Array.from(\n    { length: paletteSize },\n    (_, index) => palette[index] ?? last\n  );\n};\n\nexport const samplePalette = (image: HTMLImageElement): readonly Rgb[] => {\n  if (image.naturalWidth === 0) {\n    return greyRamp;\n  }\n  const rows = Math.max(\n    Math.round((sampleColumns * image.naturalHeight) / image.naturalWidth),\n    1\n  );\n  try {\n    const canvas = document.createElement(\"canvas\");\n    canvas.width = sampleColumns;\n    canvas.height = rows;\n    const context = canvas.getContext(\"2d\", { willReadFrequently: true });\n    if (!context) {\n      return greyRamp;\n    }\n    context.drawImage(image, 0, 0, sampleColumns, rows);\n    const { data } = context.getImageData(0, 0, sampleColumns, rows);\n    const rgb = new Uint8Array((data.length / 4) * 3);\n    for (let index = 0; index < data.length / 4; index += 1) {\n      rgb[index * 3] = data[index * 4] ?? 0;\n      rgb[index * 3 + 1] = data[index * 4 + 1] ?? 0;\n      rgb[index * 3 + 2] = data[index * 4 + 2] ?? 0;\n    }\n    return padPalette(extractPalette(rgb));\n  } catch {\n    return greyRamp;\n  }\n};\n",
+      "type": "registry:lib",
+      "target": "@lib/palette.ts"
+    },
+    {
+      "path": "registry/ivan/lib/blue-noise.ts",
+      "content": "import {\n  DataTexture,\n  NearestFilter,\n  RedFormat,\n  RepeatWrapping,\n  UnsignedByteType,\n} from \"three\";\n\nexport const blueNoiseSize = 64;\n\nconst blueNoiseTile =\n  \"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\";\n\nexport const createBlueNoiseTexture = () => {\n  const bytes = Uint8Array.from(\n    atob(blueNoiseTile),\n    (character) => character.codePointAt(0) ?? 0\n  );\n  const texture = new DataTexture(\n    bytes,\n    blueNoiseSize,\n    blueNoiseSize,\n    RedFormat,\n    UnsignedByteType\n  );\n  texture.generateMipmaps = false;\n  texture.magFilter = NearestFilter;\n  texture.minFilter = NearestFilter;\n  texture.wrapS = RepeatWrapping;\n  texture.wrapT = RepeatWrapping;\n  texture.needsUpdate = true;\n  return texture;\n};\n",
+      "type": "registry:lib",
+      "target": "@lib/blue-noise.ts"
+    },
+    {
+      "path": "registry/ivan/lib/spring.ts",
+      "content": "export interface Spring {\n  value: number;\n  velocity: number;\n}\n\nexport interface SpringConfig {\n  stiffness: number;\n  damping: number;\n}\n\nexport const createSpring = (value: number): Spring => ({\n  value,\n  velocity: 0,\n});\n\nexport const driveSpring = (\n  spring: Spring,\n  target: number,\n  { stiffness, damping }: SpringConfig,\n  step: number,\n  isAnimating: boolean\n) => {\n  if (isAnimating) {\n    const acceleration =\n      stiffness * (target - spring.value) - damping * spring.velocity;\n    spring.velocity += acceleration * step;\n    spring.value += spring.velocity * step;\n  } else {\n    spring.value = target;\n    spring.velocity = 0;\n  }\n};\n\nexport const frameStep = (delta: number) => Math.min(delta, 1 / 30);\n",
+      "type": "registry:lib",
+      "target": "@lib/spring.ts"
+    },
+    {
+      "path": "registry/ivan/lib/pointer-trace.ts",
+      "content": "export interface PointerSample {\n  x: number;\n  y: number;\n}\n\nconst holdAfterMove = 2.5;\nconst movedBy = 0.0001;\n\nexport class PointerTrace {\n  x = 0.5;\n  y = 0.5;\n  isActive = false;\n  private hasMoved = false;\n  private idle = 0;\n\n  update({ x, y }: PointerSample, step: number, isAnimating: boolean) {\n    const nextX = (x + 1) / 2;\n    const nextY = (y + 1) / 2;\n    if (Math.abs(nextX - this.x) + Math.abs(nextY - this.y) > movedBy) {\n      this.hasMoved = true;\n      this.idle = 0;\n    } else {\n      this.idle += step;\n    }\n    this.x = nextX;\n    this.y = nextY;\n    this.isActive =\n      this.hasMoved && (!isAnimating || this.idle < holdAfterMove);\n  }\n}\n",
+      "type": "registry:lib",
+      "target": "@lib/pointer-trace.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nconst reducedMotionQuery = \"(prefers-reduced-motion: reduce)\";\n\nconst subscribe = (onChange: () => void) => {\n  const mediaQuery = window.matchMedia(reducedMotionQuery);\n  mediaQuery.addEventListener(\"change\", onChange);\n  return () => mediaQuery.removeEventListener(\"change\", onChange);\n};\n\nconst getSnapshot = () => window.matchMedia(reducedMotionQuery).matches;\n\nconst getServerSnapshot = () => false;\n\nexport const usePrefersReducedMotion = () =>\n  useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-prefers-reduced-motion.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-webgl-support.ts",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\n\nlet cachedSupport: boolean | null = null;\n\nconst detectWebGL = () => {\n  if (cachedSupport !== null) {\n    return cachedSupport;\n  }\n  try {\n    const probe = document.createElement(\"canvas\");\n    const context = probe.getContext(\"webgl2\") ?? probe.getContext(\"webgl\");\n    context?.getExtension(\"WEBGL_lose_context\")?.loseContext();\n    cachedSupport = context !== null;\n  } catch {\n    cachedSupport = false;\n  }\n  return cachedSupport;\n};\n\nconst subscribe = (onChange: () => void) => {\n  window.addEventListener(\"pageshow\", onChange);\n  return () => window.removeEventListener(\"pageshow\", onChange);\n};\n\nconst getServerSnapshot = () => true;\n\nexport const useWebGLSupport = () =>\n  useSyncExternalStore(subscribe, detectWebGL, getServerSnapshot);\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-webgl-support.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-in-view.ts",
+      "content": "\"use client\";\n\nimport { useEffect, useState } from \"react\";\nimport type { RefObject } from \"react\";\n\nexport const useInView = (\n  target: RefObject<Element | null>,\n  rootMargin = \"10% 0px\"\n) => {\n  const [isInView, setIsInView] = useState(false);\n\n  useEffect(() => {\n    const element = target.current;\n    if (!element) {\n      return;\n    }\n    const observer = new IntersectionObserver(\n      ([entry]) => setIsInView(entry?.isIntersecting ?? false),\n      { rootMargin }\n    );\n    observer.observe(element);\n    return () => observer.disconnect();\n  }, [rootMargin, target]);\n\n  return isInView;\n};\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-in-view.ts"
+    },
+    {
+      "path": "registry/ivan/hooks/use-print-image.ts",
+      "content": "\"use client\";\n\nimport { useThree } from \"@react-three/fiber\";\nimport { useEffect, useState } from \"react\";\nimport { LinearMipmapLinearFilter, TextureLoader } from \"three\";\nimport type { Texture } from \"three\";\n\nexport interface PrintImage {\n  texture: Texture;\n  element: HTMLImageElement;\n  width: number;\n  height: number;\n}\n\ninterface LoadedImage {\n  src: string;\n  image: PrintImage;\n}\n\nconst loadTexture = async (src: string) => {\n  const loader = new TextureLoader();\n  loader.setCrossOrigin(\"anonymous\");\n  try {\n    return await loader.loadAsync(src);\n  } catch {\n    return null;\n  }\n};\n\nexport const usePrintImage = (src: string): PrintImage | null => {\n  const invalidate = useThree((state) => state.invalidate);\n  const [loaded, setLoaded] = useState<LoadedImage | null>(null);\n\n  useEffect(() => {\n    let isCurrent = true;\n    let texture: Texture | null = null;\n    const load = async () => {\n      const value = await loadTexture(src);\n      if (!value) {\n        return;\n      }\n      if (!isCurrent) {\n        value.dispose();\n        return;\n      }\n      value.generateMipmaps = true;\n      value.minFilter = LinearMipmapLinearFilter;\n      texture = value;\n      const element: HTMLImageElement = value.image;\n      setLoaded({\n        image: {\n          element,\n          height: element.naturalHeight,\n          texture: value,\n          width: element.naturalWidth,\n        },\n        src,\n      });\n      invalidate();\n    };\n    void load();\n    return () => {\n      isCurrent = false;\n      texture?.dispose();\n    };\n  }, [invalidate, src]);\n\n  return loaded && loaded.src === src ? loaded.image : null;\n};\n",
+      "type": "registry:hook",
+      "target": "@hooks/use-print-image.ts"
+    }
+  ],
+  "meta": {
+    "docs": {
+      "props": [
+        {
+          "component": "BlastPrint",
+          "description": "A figure that owns one Canvas. Size it with className.",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "required": true,
+              "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+            },
+            {
+              "name": "focus",
+              "type": "{ x: number; y: number }",
+              "default": "{ x: 0.5, y: 0.5 }",
+              "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+            },
+            {
+              "name": "ink",
+              "type": "string",
+              "default": "\"#0B0B0C\"",
+              "description": "Shadow tone. Any three.js color string."
+            },
+            {
+              "name": "paper",
+              "type": "string",
+              "default": "\"#EDECE8\"",
+              "description": "Light tone."
+            },
+            {
+              "name": "dither",
+              "type": "\"bayer-2\" | \"bayer-4\" | \"bayer-8\" | \"blue-noise\"",
+              "default": "\"blue-noise\"",
+              "description": "Threshold pattern. Blue noise uses a 64 px tile that ships with the item."
+            },
+            {
+              "name": "cell",
+              "type": "number",
+              "default": "3",
+              "description": "Dither cell in CSS px."
+            },
+            {
+              "name": "threshold",
+              "type": "number",
+              "default": "0",
+              "description": "Raise it to ink more of the frame, lower it to ink less."
+            },
+            {
+              "name": "auraRadius",
+              "type": "number",
+              "default": "1",
+              "description": "Radius multiplier of the negative aura around the pointer."
+            },
+            {
+              "name": "blasts",
+              "type": "number",
+              "default": "0",
+              "description": "Increase it to detonate at the center of the frame from code. A click detonates at the pointer."
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "default": "false",
+              "description": "Holds one still frame and stops rendering."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "default": "\"A picture printed as an ordered dither, bleached and reprinted in color by a click\"",
+              "description": "Accessible name."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "default": "\"relative aspect-4/3 w-full\"",
+              "description": "Give the stage a size."
+            }
+          ]
+        },
+        {
+          "component": "BlastPrintScene",
+          "description": "Full-frame plane without the Canvas. Mount it alone in a Canvas or a drei View. Reads state.pointer and pointer down events. The aura follows the pointer and fades after 2.5 seconds without a move.",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "required": true,
+              "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+            },
+            {
+              "name": "focus",
+              "type": "{ x: number; y: number }",
+              "default": "{ x: 0.5, y: 0.5 }",
+              "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+            },
+            {
+              "name": "ink",
+              "type": "string",
+              "default": "\"#0B0B0C\"",
+              "description": "Shadow tone. Any three.js color string."
+            },
+            {
+              "name": "paper",
+              "type": "string",
+              "default": "\"#EDECE8\"",
+              "description": "Light tone."
+            },
+            {
+              "name": "dither",
+              "type": "\"bayer-2\" | \"bayer-4\" | \"bayer-8\" | \"blue-noise\"",
+              "default": "\"blue-noise\"",
+              "description": "Threshold pattern. Blue noise uses a 64 px tile that ships with the item."
+            },
+            {
+              "name": "cell",
+              "type": "number",
+              "default": "3",
+              "description": "Dither cell in CSS px."
+            },
+            {
+              "name": "threshold",
+              "type": "number",
+              "default": "0",
+              "description": "Raise it to ink more of the frame, lower it to ink less."
+            },
+            {
+              "name": "auraRadius",
+              "type": "number",
+              "default": "1",
+              "description": "Radius multiplier of the negative aura around the pointer."
+            },
+            {
+              "name": "blasts",
+              "type": "number",
+              "default": "0",
+              "description": "Increase it to detonate at the center of the frame from code. A click detonates at the pointer."
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "default": "false",
+              "description": "Holds one still frame and stops rendering."
+            }
+          ]
+        }
+      ],
+      "variants": [],
+      "examples": [
+        {
+          "title": "One image, one line",
+          "file": "registry/ivan/examples/blast-print/basic.tsx"
+        },
+        {
+          "title": "Bayer dots and a wide aura",
+          "file": "registry/ivan/examples/blast-print/bayer.tsx"
+        }
+      ],
+      "accessibility": [
+        "A figure with an accessible name. The canvas is hidden from assistive tech.",
+        "Reduced motion draws one still frame and never detonates.",
+        "Without WebGL it shows the source image in grayscale."
+      ],
+      "animation": [
+        {
+          "target": "Render loop",
+          "properties": "Canvas frameloop",
+          "timing": "Always while visible, on demand offscreen or paused",
+          "trigger": "IntersectionObserver",
+          "reducedMotion": "One still frame."
+        },
+        {
+          "target": "Blast",
+          "properties": "Ring radius, reprint order and color mix in the fragment shader",
+          "timing": "0.6 s ring, 1.1 s reprint, 0.8 s hold, 0.9 s fade",
+          "trigger": "Click or the blasts prop. A new blast waits until the reprint ends.",
+          "reducedMotion": "No blast."
+        },
+        {
+          "target": "Aura",
+          "properties": "Aura position and radius springs",
+          "timing": "Spring, stiffness 120, damping 16",
+          "trigger": "Pointer move",
+          "reducedMotion": "The aura jumps to the pointer without easing."
+        }
+      ]
+    }
+  },
+  "docs": "Requires React 19 and an image your page can read as a texture. Render <BlastPrint src=\"/photo.jpg\" className=\"w-full max-w-xl\" /> anywhere. BlastPrint owns a Canvas, so mount BlastPrintScene inside an existing Canvas or drei View when a page already has one. The color palette is cut from the image in the browser, so the image must be readable by canvas (same origin or CORS).",
+  "categories": [
+    "three",
+    "shaders",
+    "media"
+  ],
+  "type": "registry:block"
+}

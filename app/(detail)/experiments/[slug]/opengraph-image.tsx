@@ -20,8 +20,10 @@ const ExperimentOpenGraphImage = async ({
     notFound();
   }
   return renderOgImage({
-    eyebrow: `Experiments · ${experiment.index} · ${experiment.topics.join(" / ")}`,
-    title: experiment.title,
+    figure: { kind: "poster", slug: experiment.slug },
+    label: { code: experiment.index, meta: experiment.topics.join(" / ") },
+    summary: experiment.summary,
+    title: { text: experiment.title },
   });
 };
 

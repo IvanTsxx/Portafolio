@@ -151,523 +151,6 @@
       }
     },
     {
-      "name": "agent",
-      "type": "registry:component",
-      "title": "Agent",
-      "description": "Procedural 3D mascot for React Three Fiber.",
-      "categories": ["characters", "three"],
-      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
-      "devDependencies": ["@types/three@^0.186.0"],
-      "registryDependencies": [],
-      "docs": "Requires React 19. Render <Agent role=\"builder\" /> inside a React Three Fiber <Canvas> with lights, or add agent-stage for a ready scene.",
-      "files": [
-        {
-          "path": "registry/ivan/components/agent/agent.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/agent.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/types.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/types.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/outfit.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/outfit.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/outfit-motion.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/outfit-motion.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/rig.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/rig.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/actions.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/actions.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/use-agent-rig.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/use-agent-rig.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/reaction-deck.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/reaction-deck.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/held-pose.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/held-pose.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/part.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/part.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/geometry.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/geometry.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/materials.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/materials.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/textures.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/textures.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/kit.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/accessories/kit.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/registry.ts",
-          "type": "registry:lib",
-          "target": "@components/agent/accessories/registry.ts"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/shapes.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/shapes.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/orchestrator.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/orchestrator.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/architect.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/architect.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/researcher.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/researcher.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/builder.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/builder.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/debugger.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/debugger.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/inspector.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/inspector.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/analyst.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/analyst.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent/accessories/knitwear.tsx",
-          "type": "registry:component",
-          "target": "@components/agent/accessories/knitwear.tsx"
-        },
-        {
-          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
-          "type": "registry:hook",
-          "target": "@hooks/use-prefers-reduced-motion.ts"
-        }
-      ],
-      "meta": {
-        "docs": {
-          "props": [
-            {
-              "component": "Agent",
-              "description": "A group of meshes. Render it inside a Canvas with lights.",
-              "props": [
-                {
-                  "name": "role",
-                  "type": "\"orchestrator\" | \"architect\" | \"researcher\" | \"builder\" | \"debugger\" | \"inspector\" | \"analyst\"",
-                  "required": true,
-                  "description": "Preset outfit from rolePresets."
-                },
-                {
-                  "name": "outfit",
-                  "type": "Outfit",
-                  "default": "rolePresets[role]",
-                  "description": "Mix pieces across roles. Overrides the preset."
-                },
-                {
-                  "name": "animateOutfit",
-                  "type": "boolean",
-                  "default": "false",
-                  "description": "Hops and drops pieces when the outfit changes."
-                },
-                {
-                  "name": "action",
-                  "type": "AgentAction",
-                  "default": "\"idle\"",
-                  "description": "Clip to play. Crossfades over 0.38 seconds."
-                },
-                {
-                  "name": "actionRef",
-                  "type": "RefObject<AgentAction>",
-                  "description": "Drives the action from a ref without re-rendering."
-                },
-                {
-                  "name": "motion",
-                  "type": "\"full\" | \"reduced\"",
-                  "default": "prefers-reduced-motion",
-                  "description": "reduced holds each key pose."
-                },
-                {
-                  "name": "shadow",
-                  "type": "boolean",
-                  "default": "true",
-                  "description": "Blob contact shadow."
-                },
-                {
-                  "name": "position",
-                  "type": "[number, number, number]",
-                  "default": "[0, 0, 0]",
-                  "description": "Placement. Accepts group props."
-                }
-              ]
-            },
-            {
-              "component": "Outfit",
-              "description": "One piece id per slot.",
-              "props": [
-                {
-                  "name": "head",
-                  "type": "\"none\" | \"yellow-hard-hat\" | \"white-hard-hat\" | \"safety-helmet\" | \"deerstalker\" | \"mortarboard\" | \"headset\" | \"goggles\"",
-                  "required": true,
-                  "description": "Hats and helmets."
-                },
-                {
-                  "name": "face",
-                  "type": "\"none\" | \"round-glasses\" | \"pixel-shades\" | \"teal-visor\"",
-                  "required": true,
-                  "description": "Glasses and shades."
-                },
-                {
-                  "name": "torso",
-                  "type": "\"none\" | \"safety-vest\" | \"tweed-vest\" | \"lab-coat\" | \"plaid-coat\" | \"knit-sweater\"",
-                  "required": true,
-                  "description": "Coats and vests."
-                },
-                {
-                  "name": "held",
-                  "type": "\"none\" | \"laptop\" | \"book\" | \"magnifier\" | \"tape-measure\" | \"pointer\" | \"pencil\"",
-                  "required": true,
-                  "description": "Main prop."
-                },
-                {
-                  "name": "offhand",
-                  "type": "\"none\" | \"clipboard\" | \"blueprint-roll\" | \"tablet\"",
-                  "required": true,
-                  "description": "Left-hand prop."
-                }
-              ]
-            }
-          ],
-          "variants": [
-            {
-              "name": "role",
-              "default": "required",
-              "options": [
-                "orchestrator",
-                "architect",
-                "researcher",
-                "builder",
-                "debugger",
-                "inspector",
-                "analyst"
-              ],
-              "description": "Selects the preset outfit."
-            },
-            {
-              "name": "action",
-              "default": "idle",
-              "options": [
-                "idle",
-                "wave",
-                "walk",
-                "type",
-                "inspect",
-                "point",
-                "read",
-                "carry",
-                "direct",
-                "celebrate",
-                "measure",
-                "check",
-                "build"
-              ],
-              "description": "Selects the clip."
-            },
-            {
-              "name": "motion",
-              "default": "prefers-reduced-motion",
-              "options": ["full", "reduced"],
-              "description": "Full plays clips. Reduced holds the key pose."
-            }
-          ],
-          "examples": [
-            {
-              "title": "Agent in your own Canvas",
-              "file": "registry/ivan/examples/agent/basic.tsx"
-            },
-            {
-              "title": "Switch actions without re-rendering",
-              "file": "registry/ivan/examples/agent/action-ref.tsx"
-            },
-            {
-              "title": "Mix an outfit",
-              "file": "registry/ivan/examples/agent/outfit.tsx"
-            }
-          ],
-          "accessibility": [
-            "The mascot is decorative. Label the Canvas wrapper or mark it aria-hidden.",
-            "Reduced motion holds each key pose."
-          ],
-          "animation": [
-            {
-              "target": "Action clip",
-              "properties": "Arm, leg, body and eye transforms",
-              "timing": "0.38 second crossfade",
-              "trigger": "action or actionRef changes",
-              "reducedMotion": "Key pose."
-            },
-            {
-              "target": "Outfit change",
-              "properties": "Hop, squash and drop",
-              "timing": "0.34 second hop, 0.46 second drop",
-              "trigger": "outfit changes",
-              "reducedMotion": "Pieces swap in place."
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "agent-stage",
-      "type": "registry:block",
-      "title": "Agent Stage",
-      "description": "Ready canvas for one agent.",
-      "categories": ["characters", "three"],
-      "dependencies": [
-        "three@^0.186.1",
-        "@react-three/fiber@^9.8.1",
-        "@react-three/drei@^10.7.9"
-      ],
-      "devDependencies": ["@types/three@^0.186.0"],
-      "registryDependencies": ["https://bongi.dev/r/agent.json"],
-      "docs": "Requires React 19. Render <AgentStage role=\"debugger\" className=\"h-72 w-full\" /> anywhere. Each stage owns a Canvas, so mount AgentStageScene in one shared canvas when a page needs many agents.",
-      "files": [
-        {
-          "path": "registry/ivan/components/agent-stage/agent-stage.tsx",
-          "type": "registry:component",
-          "target": "@components/agent-stage/agent-stage.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent-stage/agent-stage-scene.tsx",
-          "type": "registry:component",
-          "target": "@components/agent-stage/agent-stage-scene.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent-stage/stage-lights.tsx",
-          "type": "registry:component",
-          "target": "@components/agent-stage/stage-lights.tsx"
-        },
-        {
-          "path": "registry/ivan/components/agent-stage/agent-poster.tsx",
-          "type": "registry:component",
-          "target": "@components/agent-stage/agent-poster.tsx"
-        }
-      ],
-      "meta": {
-        "docs": {
-          "props": [
-            {
-              "component": "AgentStage",
-              "description": "A div that owns one Canvas. Size it with className.",
-              "props": [
-                {
-                  "name": "role",
-                  "type": "AgentRole",
-                  "required": true,
-                  "description": "Accessory kit."
-                },
-                {
-                  "name": "action",
-                  "type": "AgentAction",
-                  "default": "the role's signature action",
-                  "description": "Clip to play."
-                },
-                {
-                  "name": "motion",
-                  "type": "\"full\" | \"reduced\"",
-                  "default": "prefers-reduced-motion",
-                  "description": "reduced holds the key pose."
-                },
-                {
-                  "name": "shadow",
-                  "type": "boolean",
-                  "default": "true",
-                  "description": "Blob contact shadow."
-                },
-                {
-                  "name": "label",
-                  "type": "string",
-                  "default": "\"{Role} agent\"",
-                  "description": "Accessible name of the figure."
-                },
-                {
-                  "name": "fallback",
-                  "type": "ReactNode",
-                  "default": "<AgentPoster />",
-                  "description": "Shown without WebGL."
-                },
-                {
-                  "name": "className",
-                  "type": "string",
-                  "default": "\"relative aspect-4/3 w-full\"",
-                  "description": "Give the stage a size."
-                }
-              ]
-            },
-            {
-              "component": "AgentStageScene",
-              "description": "Camera, lights and agent without the Canvas.",
-              "props": [
-                {
-                  "name": "role",
-                  "type": "AgentRole",
-                  "required": true,
-                  "description": "Accessory kit."
-                },
-                {
-                  "name": "action",
-                  "type": "AgentAction",
-                  "default": "the role's signature action",
-                  "description": "Clip to play."
-                },
-                {
-                  "name": "motion",
-                  "type": "\"full\" | \"reduced\"",
-                  "description": "Forwarded to the agent."
-                },
-                {
-                  "name": "shadow",
-                  "type": "boolean",
-                  "default": "true",
-                  "description": "Blob contact shadow."
-                }
-              ]
-            },
-            {
-              "component": "AgentPoster",
-              "description": "Static SVG of the role, used as the WebGL fallback.",
-              "props": [
-                {
-                  "name": "role",
-                  "type": "AgentRole",
-                  "required": true,
-                  "description": "Which kit to draw."
-                },
-                {
-                  "name": "label",
-                  "type": "string",
-                  "description": "Names the poster as an img."
-                },
-                {
-                  "name": "className",
-                  "type": "string",
-                  "description": "Applied to the svg."
-                }
-              ]
-            }
-          ],
-          "variants": [
-            {
-              "name": "role",
-              "default": "required",
-              "options": [
-                "orchestrator",
-                "architect",
-                "researcher",
-                "builder",
-                "debugger",
-                "inspector",
-                "analyst"
-              ],
-              "description": "Selects the accessory kit."
-            },
-            {
-              "name": "action",
-              "default": "signature action",
-              "options": [
-                "idle",
-                "wave",
-                "walk",
-                "type",
-                "inspect",
-                "point",
-                "read",
-                "carry",
-                "direct",
-                "celebrate",
-                "measure",
-                "check",
-                "build"
-              ],
-              "description": "Clip to play. Defaults to the signature action."
-            }
-          ],
-          "examples": [
-            {
-              "title": "One agent, one line",
-              "file": "registry/ivan/examples/agent-stage/basic.tsx"
-            },
-            {
-              "title": "Switch role with typed props",
-              "file": "registry/ivan/examples/agent-stage/role-picker.tsx"
-            }
-          ],
-          "accessibility": [
-            "A figure with an accessible name. Override it with label.",
-            "Reduced motion holds the key pose and stops continuous rendering."
-          ],
-          "animation": [
-            {
-              "target": "Render loop",
-              "properties": "Canvas frameloop",
-              "timing": "Always while visible, never offscreen",
-              "trigger": "IntersectionObserver",
-              "reducedMotion": "One frame per change."
-            },
-            {
-              "target": "Agent clips and focus",
-              "properties": "Body transforms",
-              "timing": "0.38 second crossfade, 0.42 second hop",
-              "trigger": "action changes or pointer enters",
-              "reducedMotion": "Key pose. No hop."
-            }
-          ]
-        }
-      }
-    },
-    {
       "name": "dither-image",
       "type": "registry:ui",
       "title": "Dither Image",
@@ -784,6 +267,2297 @@
               "timing": "rAF while hovered, eases out on leave",
               "trigger": "Mouse move",
               "reducedMotion": "No drift."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "lunar-dither",
+      "type": "registry:block",
+      "title": "Lunar Dither",
+      "description": "A cratered moon printed as an 8×8 Bayer dither, lit by the pointer. Click to drop meteors.",
+      "categories": ["three", "shaders", "motion"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19. Render <LunarDither className=\"h-96 w-96\" /> anywhere. LunarDither owns a Canvas, so mount LunarDitherScene inside an existing Canvas or drei View when a page already has one. Click the moon to bombard it; pass impacts={false} to turn that off.",
+      "files": [
+        {
+          "path": "registry/ivan/components/lunar-dither/lunar-dither.tsx",
+          "type": "registry:component",
+          "target": "@components/lunar-dither/lunar-dither.tsx"
+        },
+        {
+          "path": "registry/ivan/components/lunar-dither/lunar-dither-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/lunar-dither/lunar-dither-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/lunar-dither/lunar-dither-material.ts",
+          "type": "registry:component",
+          "target": "@components/lunar-dither/lunar-dither-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/lunar-dither/lunar-dither-streaks.ts",
+          "type": "registry:component",
+          "target": "@components/lunar-dither/lunar-dither-streaks.ts"
+        },
+        {
+          "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/canvas-stage/canvas-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-webgl-support.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-webgl-support.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-in-view.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-in-view.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "LunarDither",
+              "description": "A div with role img that owns one Canvas. Size it with className.",
+              "props": [
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "pixelSize",
+                  "type": "number",
+                  "default": "2",
+                  "description": "Bayer cell in CSS px."
+                },
+                {
+                  "name": "grain",
+                  "type": "number",
+                  "default": "0.35",
+                  "description": "Film grain, 0 to 1. 0 turns it off."
+                },
+                {
+                  "name": "craterScale",
+                  "type": "number",
+                  "default": "3",
+                  "description": "Crater density. Higher is smaller and busier."
+                },
+                {
+                  "name": "rotationSpeed",
+                  "type": "number",
+                  "default": "0.06",
+                  "description": "Spin in radians per second."
+                },
+                {
+                  "name": "followPointer",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "The light eases toward the pointer."
+                },
+                {
+                  "name": "lightDirection",
+                  "type": "[number, number, number]",
+                  "description": "Resting light direction in view space, used while followPointer is false. Point it at the viewer for a full moon."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds the frame and stops rendering."
+                },
+                {
+                  "name": "impacts",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Clicking the moon drops a meteor and leaves a crater where it hit."
+                },
+                {
+                  "name": "maxImpacts",
+                  "type": "number",
+                  "default": "32",
+                  "description": "Craters kept, 1 to 64. The next impact overwrites the oldest."
+                },
+                {
+                  "name": "onImpact",
+                  "type": "(point: Vector3) => void",
+                  "description": "Called on each hit with the crater center on the unit sphere, in the moon's object space."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "default": "\"A cratered moon printed as an ordered dither\"",
+                  "description": "Accessible name."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"relative aspect-square w-full\"",
+                  "description": "Give the moon a size."
+                }
+              ]
+            },
+            {
+              "component": "LunarDitherScene",
+              "description": "Camera and moon without the Canvas. Mount it alone in a Canvas or a drei View.",
+              "props": [
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "pixelSize",
+                  "type": "number",
+                  "default": "2",
+                  "description": "Bayer cell in CSS px."
+                },
+                {
+                  "name": "grain",
+                  "type": "number",
+                  "default": "0.35",
+                  "description": "Film grain, 0 to 1."
+                },
+                {
+                  "name": "craterScale",
+                  "type": "number",
+                  "default": "3",
+                  "description": "Crater density."
+                },
+                {
+                  "name": "rotationSpeed",
+                  "type": "number",
+                  "default": "0.06",
+                  "description": "Spin in radians per second."
+                },
+                {
+                  "name": "followPointer",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Reads state.pointer for the light."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Freezes time, spin and light easing."
+                },
+                {
+                  "name": "impacts",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Clicking the moon drops a meteor and leaves a crater where it hit."
+                },
+                {
+                  "name": "maxImpacts",
+                  "type": "number",
+                  "default": "32",
+                  "description": "Craters kept, 1 to 64. The next impact overwrites the oldest."
+                },
+                {
+                  "name": "onImpact",
+                  "type": "(point: Vector3) => void",
+                  "description": "Called on each hit with the crater center on the unit sphere, in the moon's object space."
+                },
+                {
+                  "name": "ref",
+                  "type": "Ref<LunarDitherSceneHandle>",
+                  "description": "Exposes clearImpacts() to wipe every added crater."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "One moon, one line",
+              "file": "registry/ivan/examples/lunar-dither/basic.tsx"
+            }
+          ],
+          "accessibility": [
+            "A role img element with an accessible name. The canvas is hidden from assistive tech.",
+            "Without WebGL it shows a static gradient disc in the same two tones.",
+            "Bombarding is pointer only and decorative. Nothing depends on it, so there is no keyboard path."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "Always while visible, on demand offscreen or paused",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One still frame."
+            },
+            {
+              "target": "Light",
+              "properties": "Light direction uniform",
+              "timing": "Exponential ease, about 0.3 s",
+              "trigger": "Pointer move",
+              "reducedMotion": "No easing, no spin, frozen grain."
+            },
+            {
+              "target": "Meteor impact",
+              "properties": "Instanced streak quad, impact uniforms",
+              "timing": "180 ms flight, then a flash and a 600 ms shockwave ring",
+              "trigger": "Click or tap on the moon",
+              "reducedMotion": "No streak or ring. The crater appears at once in one frame."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "orbit-dust",
+      "type": "registry:block",
+      "title": "Orbit Dust",
+      "description": "A GPU particle ring orbiting a dark core, bent by a gravity well under the pointer.",
+      "categories": ["three", "shaders", "motion"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19. Render <OrbitDust className=\"aspect-video w-full\" /> anywhere. OrbitDust owns a Canvas, so mount OrbitDustScene inside an existing Canvas or drei View when a page already has one.",
+      "files": [
+        {
+          "path": "registry/ivan/components/orbit-dust/orbit-dust.tsx",
+          "type": "registry:component",
+          "target": "@components/orbit-dust/orbit-dust.tsx"
+        },
+        {
+          "path": "registry/ivan/components/orbit-dust/orbit-dust-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/orbit-dust/orbit-dust-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/orbit-dust/orbit-dust-material.ts",
+          "type": "registry:component",
+          "target": "@components/orbit-dust/orbit-dust-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/orbit-dust/orbit-core-material.ts",
+          "type": "registry:component",
+          "target": "@components/orbit-dust/orbit-core-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/canvas-stage/canvas-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-webgl-support.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-webgl-support.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-in-view.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-in-view.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "OrbitDust",
+              "description": "A figure with an accessible name that owns one Canvas. Size it with className.",
+              "props": [
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Ground tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "count",
+                  "type": "number",
+                  "description": "Particles, clamped to 50k–200k. Omit it to pick from hardwareConcurrency, devicePixelRatio and pointer type."
+                },
+                {
+                  "name": "radius",
+                  "type": "number",
+                  "default": "1.6",
+                  "description": "Outer radius of the disc in world units. The camera frames 2."
+                },
+                {
+                  "name": "thickness",
+                  "type": "number",
+                  "default": "0.06",
+                  "description": "Vertical spread of the disc."
+                },
+                {
+                  "name": "turbulence",
+                  "type": "number",
+                  "default": "0.5",
+                  "description": "Curl-noise swirl. 0 gives clean orbits."
+                },
+                {
+                  "name": "speed",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Time scale of the orbits and the swirl."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds the frame and stops rendering."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "default": "\"A ring of dust orbiting a dark core\"",
+                  "description": "Accessible name."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"relative aspect-video w-full\"",
+                  "description": "Give the disc a size."
+                }
+              ]
+            },
+            {
+              "component": "OrbitDustScene",
+              "description": "Camera, core and dust without the Canvas. Mount it alone in a Canvas or a drei View.",
+              "props": [
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Ground tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "count",
+                  "type": "number",
+                  "description": "Particles. Changing it rebuilds the geometry."
+                },
+                {
+                  "name": "radius",
+                  "type": "number",
+                  "default": "1.6",
+                  "description": "Outer radius."
+                },
+                {
+                  "name": "thickness",
+                  "type": "number",
+                  "default": "0.06",
+                  "description": "Vertical spread."
+                },
+                {
+                  "name": "turbulence",
+                  "type": "number",
+                  "default": "0.5",
+                  "description": "Curl-noise swirl."
+                },
+                {
+                  "name": "speed",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Time scale."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Freezes time. The gravity well jumps instead of easing."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "One disc, one line",
+              "file": "registry/ivan/examples/orbit-dust/basic.tsx"
+            }
+          ],
+          "accessibility": [
+            "A figure with an accessible name. The canvas is hidden from assistive tech.",
+            "Without WebGL it shows a static gradient ring in the same two tones."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "Always while visible, on demand offscreen or paused",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One still frame."
+            },
+            {
+              "target": "Dust",
+              "properties": "Vertex positions in the shader",
+              "timing": "Keplerian, inner bands faster",
+              "trigger": "Time",
+              "reducedMotion": "Frozen."
+            },
+            {
+              "target": "Gravity well",
+              "properties": "Well position and strength uniforms",
+              "timing": "Exponential ease, about 0.25 s",
+              "trigger": "Pointer over the disc plane",
+              "reducedMotion": "Jumps to the pointer."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "slime",
+      "type": "registry:block",
+      "title": "Slime",
+      "description": "A glossy WebGPU slime that crawls, drips and splats. Hover and it reaches, click to splat it, drag to pull strands.",
+      "categories": ["three", "shaders", "motion"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19 and three r171 or later. Render <Slime className=\"aspect-video w-full\" /> anywhere. Slime owns a Canvas with a WebGPURenderer, which falls back to WebGL2 on its own. SlimeScene uses TSL node materials, so mount it only in a Canvas whose renderer is a WebGPURenderer, such as GpuStage; a WebGL Canvas or drei View cannot draw it.",
+      "files": [
+        {
+          "path": "registry/ivan/components/slime/slime.tsx",
+          "type": "registry:component",
+          "target": "@components/slime/slime.tsx"
+        },
+        {
+          "path": "registry/ivan/components/slime/slime-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/slime/slime-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/slime/slime-material.ts",
+          "type": "registry:component",
+          "target": "@components/slime/slime-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/slime/slime-body.ts",
+          "type": "registry:component",
+          "target": "@components/slime/slime-body.ts"
+        },
+        {
+          "path": "registry/ivan/components/gpu-stage/gpu-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/gpu-stage/gpu-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-webgl-support.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-webgl-support.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-in-view.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-in-view.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "Slime",
+              "description": "A figure with an accessible name that owns one WebGPU Canvas, mounted only while it is in view. Size it with className.",
+              "props": [
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "description": "Dark tone. Any three.js color string.",
+                  "default": "\"#0b0b0c\""
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "description": "Light tone.",
+                  "default": "\"#edece8\""
+                },
+                {
+                  "name": "glow",
+                  "type": "string",
+                  "description": "Green for the scatter and the veins.",
+                  "default": "\"#7ddc3c\""
+                },
+                {
+                  "name": "night",
+                  "type": "boolean",
+                  "description": "Ink ground with a dark glassy body. Off gives a paper ground and a milky body.",
+                  "default": "true"
+                },
+                {
+                  "name": "viscosity",
+                  "type": "number",
+                  "description": "How thick the goo is: slower crawl, laggier lobes, heavier drips. 0.4 to 2.5.",
+                  "default": "1"
+                },
+                {
+                  "name": "reach",
+                  "type": "number",
+                  "description": "How far it reaches for the pointer and how far a strand stretches before it snaps. Also sets splat speed. 0.3 to 2.",
+                  "default": "1"
+                },
+                {
+                  "name": "veins",
+                  "type": "number",
+                  "description": "Strength of the veins. 0 hides them.",
+                  "default": "1"
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "description": "Holds the frame and stops rendering.",
+                  "default": "false"
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "description": "Accessible name.",
+                  "default": "\"A glossy green slime that crawls around, drips, reaches for the pointer and splats when clicked\""
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "description": "Give the slime a size.",
+                  "default": "\"aspect-4/3 w-full\""
+                }
+              ]
+            },
+            {
+              "component": "SlimeScene",
+              "description": "The raymarched plane and its physics without the Canvas. Needs a WebGPURenderer. Listens for pointer events on the canvas element.",
+              "props": [
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "description": "Dark tone. Any three.js color string.",
+                  "default": "\"#0b0b0c\""
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "description": "Light tone.",
+                  "default": "\"#edece8\""
+                },
+                {
+                  "name": "glow",
+                  "type": "string",
+                  "description": "Green for the scatter and the veins.",
+                  "default": "\"#7ddc3c\""
+                },
+                {
+                  "name": "night",
+                  "type": "boolean",
+                  "description": "Ink ground with a dark glassy body. Off gives a paper ground and a milky body.",
+                  "default": "true"
+                },
+                {
+                  "name": "viscosity",
+                  "type": "number",
+                  "description": "How thick the goo is: slower crawl, laggier lobes, heavier drips. 0.4 to 2.5.",
+                  "default": "1"
+                },
+                {
+                  "name": "reach",
+                  "type": "number",
+                  "description": "How far it reaches for the pointer and how far a strand stretches before it snaps. Also sets splat speed. 0.3 to 2.",
+                  "default": "1"
+                },
+                {
+                  "name": "veins",
+                  "type": "number",
+                  "description": "Strength of the veins. 0 hides them.",
+                  "default": "1"
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "description": "Freezes the physics and the veins.",
+                  "default": "false"
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "One slime, one line",
+              "file": "registry/ivan/examples/slime/basic.tsx"
+            }
+          ],
+          "accessibility": [
+            "A figure with an accessible name. The canvas is hidden from assistive tech.",
+            "Without WebGL it shows a static disc in the same tones.",
+            "Hover, click and drag are pointer gestures with no keyboard equivalent; the slime is decoration and holds no content."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "Always while visible. The Canvas unmounts offscreen.",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One still frame, mid-splat."
+            },
+            {
+              "target": "Body",
+              "properties": "22 sphere uniforms",
+              "timing": "Crawls toward random targets past the edges, squashes on walls on underdamped springs, slower with viscosity",
+              "trigger": "Time and pointer",
+              "reducedMotion": "Frozen."
+            },
+            {
+              "target": "Strand",
+              "properties": "Sphere positions and radii",
+              "timing": "Trails the pointer with lag, snaps past the reach into a falling drop and recoils",
+              "trigger": "Hover or drag near the body",
+              "reducedMotion": "Frozen."
+            },
+            {
+              "target": "Drops",
+              "properties": "Sphere positions and radii",
+              "timing": "Drip, fly under gravity, stick to a wall, ooze down and crawl back to merge",
+              "trigger": "Time, wall hits and clicks",
+              "reducedMotion": "Frozen."
+            },
+            {
+              "target": "Veins",
+              "properties": "Vein brightness uniform",
+              "timing": "Rises with tension, flashes on a splat or a snap and fades over about 0.5 s",
+              "trigger": "Strand tension and pointer",
+              "reducedMotion": "Frozen."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "signal-tear",
+      "type": "registry:block",
+      "title": "Signal Tear",
+      "description": "A grainy picture whose rows tear sideways and drag light into a ghost trail, like a bad VHS still.",
+      "categories": ["three", "shaders", "media"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19 and an image your page can read as a texture. Render <SignalTear src=\"/photo.jpg\" className=\"w-full max-w-xl\" /> anywhere. SignalTear owns a Canvas, so mount SignalTearScene inside an existing Canvas or drei View when a page already has one.",
+      "files": [
+        {
+          "path": "registry/ivan/components/signal-tear/signal-tear.tsx",
+          "type": "registry:component",
+          "target": "@components/signal-tear/signal-tear.tsx"
+        },
+        {
+          "path": "registry/ivan/components/signal-tear/signal-tear-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/signal-tear/signal-tear-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/signal-tear/signal-tear-material.ts",
+          "type": "registry:component",
+          "target": "@components/signal-tear/signal-tear-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/canvas-stage/canvas-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/lib/image-cover.ts",
+          "type": "registry:lib",
+          "target": "@lib/image-cover.ts"
+        },
+        {
+          "path": "registry/ivan/lib/print-noise.ts",
+          "type": "registry:lib",
+          "target": "@lib/print-noise.ts"
+        },
+        {
+          "path": "registry/ivan/lib/pointer-trace.ts",
+          "type": "registry:lib",
+          "target": "@lib/pointer-trace.ts"
+        },
+        {
+          "path": "registry/ivan/lib/pointer-light.ts",
+          "type": "registry:lib",
+          "target": "@lib/pointer-light.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-webgl-support.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-webgl-support.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-in-view.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-in-view.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-print-image.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-print-image.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "SignalTear",
+              "description": "A figure that owns one Canvas. Size it with className.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "default": "{ x: 0.5, y: 0.5 }",
+                  "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "tear",
+                  "type": "number",
+                  "default": "0.5",
+                  "description": "How often and how far rows tear, 0 to 1. Rows near the pointer tear first."
+                },
+                {
+                  "name": "ghost",
+                  "type": "number",
+                  "default": "0.6",
+                  "description": "Length of the light trail, 0 to 1."
+                },
+                {
+                  "name": "grain",
+                  "type": "number",
+                  "default": "0.6",
+                  "description": "Film grain, 0 to 1. 0 turns it off."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds one still frame and stops rendering."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "default": "\"A grainy picture whose rows tear sideways and leave light trails near the pointer\"",
+                  "description": "Accessible name."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"relative aspect-4/3 w-full\"",
+                  "description": "Give the stage a size."
+                }
+              ]
+            },
+            {
+              "component": "SignalTearScene",
+              "description": "Full-frame plane without the Canvas. Mount it alone in a Canvas or a drei View. Reads state.pointer. The tear follows the pointer and drifts on its own after 2.5 seconds without a move.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "default": "{ x: 0.5, y: 0.5 }",
+                  "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "tear",
+                  "type": "number",
+                  "default": "0.5",
+                  "description": "How often and how far rows tear, 0 to 1. Rows near the pointer tear first."
+                },
+                {
+                  "name": "ghost",
+                  "type": "number",
+                  "default": "0.6",
+                  "description": "Length of the light trail, 0 to 1."
+                },
+                {
+                  "name": "grain",
+                  "type": "number",
+                  "default": "0.6",
+                  "description": "Film grain, 0 to 1. 0 turns it off."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds one still frame and stops rendering."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "One image, one line",
+              "file": "registry/ivan/examples/signal-tear/basic.tsx"
+            }
+          ],
+          "accessibility": [
+            "A figure with an accessible name. The canvas is hidden from assistive tech.",
+            "Without WebGL it shows the source image in grayscale."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "Always while visible, on demand offscreen or paused",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One still frame."
+            },
+            {
+              "target": "Torn bands",
+              "properties": "Row offset in the fragment shader",
+              "timing": "Bands reshuffle three times a second, grain twelve",
+              "trigger": "Time, pointer position and pointer speed",
+              "reducedMotion": "One torn frame holds still."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "speed-smear",
+      "type": "registry:block",
+      "title": "Speed Smear",
+      "description": "A picture smeared sideways around the pointer in broken speed lines, printed as an ordered dither.",
+      "categories": ["three", "shaders", "media"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19 and an image your page can read as a texture. Render <SpeedSmear src=\"/photo.jpg\" className=\"w-full max-w-xl\" /> anywhere. SpeedSmear owns a Canvas, so mount SpeedSmearScene inside an existing Canvas or drei View when a page already has one.",
+      "files": [
+        {
+          "path": "registry/ivan/components/speed-smear/speed-smear.tsx",
+          "type": "registry:component",
+          "target": "@components/speed-smear/speed-smear.tsx"
+        },
+        {
+          "path": "registry/ivan/components/speed-smear/speed-smear-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/speed-smear/speed-smear-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/speed-smear/speed-smear-material.ts",
+          "type": "registry:component",
+          "target": "@components/speed-smear/speed-smear-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/canvas-stage/canvas-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/lib/image-cover.ts",
+          "type": "registry:lib",
+          "target": "@lib/image-cover.ts"
+        },
+        {
+          "path": "registry/ivan/lib/print-noise.ts",
+          "type": "registry:lib",
+          "target": "@lib/print-noise.ts"
+        },
+        {
+          "path": "registry/ivan/lib/tone-curve.ts",
+          "type": "registry:lib",
+          "target": "@lib/tone-curve.ts"
+        },
+        {
+          "path": "registry/ivan/lib/pointer-trace.ts",
+          "type": "registry:lib",
+          "target": "@lib/pointer-trace.ts"
+        },
+        {
+          "path": "registry/ivan/lib/pointer-light.ts",
+          "type": "registry:lib",
+          "target": "@lib/pointer-light.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-webgl-support.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-webgl-support.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-in-view.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-in-view.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-print-image.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-print-image.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "SpeedSmear",
+              "description": "A figure that owns one Canvas. Size it with className.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "default": "{ x: 0.5, y: 0.5 }",
+                  "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "smear",
+                  "type": "number",
+                  "default": "0.12",
+                  "description": "Smear length as a share of the frame height. Pointer speed adds to it and fades out."
+                },
+                {
+                  "name": "reach",
+                  "type": "number",
+                  "default": "0.16",
+                  "description": "Size of the oval around the pointer, as a share of the frame height."
+                },
+                {
+                  "name": "angle",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Smear direction in degrees."
+                },
+                {
+                  "name": "cell",
+                  "type": "number",
+                  "default": "2",
+                  "description": "Dither cell in CSS px."
+                },
+                {
+                  "name": "dither",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Off shows the continuous tone."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds one still frame and stops rendering."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "default": "\"A picture smeared sideways around the pointer, like a head turning fast\"",
+                  "description": "Accessible name."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"relative aspect-4/3 w-full\"",
+                  "description": "Give the stage a size."
+                }
+              ]
+            },
+            {
+              "component": "SpeedSmearScene",
+              "description": "Full-frame plane without the Canvas. Mount it alone in a Canvas or a drei View. Reads state.pointer. The smear follows the pointer and drifts on its own after 2.5 seconds without a move.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "default": "{ x: 0.5, y: 0.5 }",
+                  "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "smear",
+                  "type": "number",
+                  "default": "0.12",
+                  "description": "Smear length as a share of the frame height. Pointer speed adds to it and fades out."
+                },
+                {
+                  "name": "reach",
+                  "type": "number",
+                  "default": "0.16",
+                  "description": "Size of the oval around the pointer, as a share of the frame height."
+                },
+                {
+                  "name": "angle",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Smear direction in degrees."
+                },
+                {
+                  "name": "cell",
+                  "type": "number",
+                  "default": "2",
+                  "description": "Dither cell in CSS px."
+                },
+                {
+                  "name": "dither",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Off shows the continuous tone."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds one still frame and stops rendering."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "One image, one line",
+              "file": "registry/ivan/examples/speed-smear/basic.tsx"
+            },
+            {
+              "title": "Angled and continuous",
+              "file": "registry/ivan/examples/speed-smear/angled.tsx"
+            }
+          ],
+          "accessibility": [
+            "A figure with an accessible name. The canvas is hidden from assistive tech.",
+            "Without WebGL it shows the source image in grayscale."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "Always while visible, on demand offscreen or paused",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One still frame."
+            },
+            {
+              "target": "Smear",
+              "properties": "Sample span in the fragment shader",
+              "timing": "Rises in about 70 ms with pointer speed, falls in about 330 ms",
+              "trigger": "Pointer move",
+              "reducedMotion": "The smear holds still under the resting light."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "storm-print",
+      "type": "registry:block",
+      "title": "Storm Print",
+      "description": "Rain, lightning and ordered dither. A strike or a click reprints the picture in color inks cut from it.",
+      "categories": ["three", "shaders", "media"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19 and an image your page can read as a texture. Render <StormPrint src=\"/photo.jpg\" className=\"w-full max-w-xl\" /> anywhere. StormPrint owns a Canvas, so mount StormPrintScene inside an existing Canvas or drei View when a page already has one. The color palette is cut from the image in the browser, so the image must be readable by canvas (same origin or CORS).",
+      "files": [
+        {
+          "path": "registry/ivan/components/storm-print/storm-print.tsx",
+          "type": "registry:component",
+          "target": "@components/storm-print/storm-print.tsx"
+        },
+        {
+          "path": "registry/ivan/components/storm-print/storm-print-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/storm-print/storm-print-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/storm-print/storm-print-material.ts",
+          "type": "registry:component",
+          "target": "@components/storm-print/storm-print-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/storm-print/storm-timeline.ts",
+          "type": "registry:component",
+          "target": "@components/storm-print/storm-timeline.ts"
+        },
+        {
+          "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/canvas-stage/canvas-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/lib/image-cover.ts",
+          "type": "registry:lib",
+          "target": "@lib/image-cover.ts"
+        },
+        {
+          "path": "registry/ivan/lib/print-noise.ts",
+          "type": "registry:lib",
+          "target": "@lib/print-noise.ts"
+        },
+        {
+          "path": "registry/ivan/lib/ordered-print.ts",
+          "type": "registry:lib",
+          "target": "@lib/ordered-print.ts"
+        },
+        {
+          "path": "registry/ivan/lib/tone-curve.ts",
+          "type": "registry:lib",
+          "target": "@lib/tone-curve.ts"
+        },
+        {
+          "path": "registry/ivan/lib/palette.ts",
+          "type": "registry:lib",
+          "target": "@lib/palette.ts"
+        },
+        {
+          "path": "registry/ivan/lib/blue-noise.ts",
+          "type": "registry:lib",
+          "target": "@lib/blue-noise.ts"
+        },
+        {
+          "path": "registry/ivan/lib/spring.ts",
+          "type": "registry:lib",
+          "target": "@lib/spring.ts"
+        },
+        {
+          "path": "registry/ivan/lib/pointer-trace.ts",
+          "type": "registry:lib",
+          "target": "@lib/pointer-trace.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-webgl-support.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-webgl-support.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-in-view.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-in-view.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-print-image.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-print-image.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "StormPrint",
+              "description": "A figure that owns one Canvas. Size it with className.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "default": "{ x: 0.5, y: 0.5 }",
+                  "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "dither",
+                  "type": "\"bayer-2\" | \"bayer-4\" | \"bayer-8\" | \"blue-noise\" | \"halftone\"",
+                  "default": "\"bayer-8\"",
+                  "description": "Threshold pattern. Halftone prints a 45 degree dot screen."
+                },
+                {
+                  "name": "print",
+                  "type": "\"ink\" | \"color\"",
+                  "default": "\"ink\"",
+                  "description": "ink prints two tones and turns to color on a strike. color always prints in color."
+                },
+                {
+                  "name": "cell",
+                  "type": "number",
+                  "default": "3",
+                  "description": "Dither cell in CSS px."
+                },
+                {
+                  "name": "threshold",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Raise it to ink more of the frame, lower it to ink less."
+                },
+                {
+                  "name": "contrast",
+                  "type": "number",
+                  "default": "1.35",
+                  "description": "Contrast of the tone curve."
+                },
+                {
+                  "name": "rain",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Rain amount, 0 to 1. 0 turns it off."
+                },
+                {
+                  "name": "rainSpeed",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Rain speed multiplier."
+                },
+                {
+                  "name": "rainAngle",
+                  "type": "number",
+                  "default": "9",
+                  "description": "Rain slant in degrees."
+                },
+                {
+                  "name": "lightning",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Storm strikes on a timer. Off leaves clicks and the strikes prop as the only triggers."
+                },
+                {
+                  "name": "frequency",
+                  "type": "number",
+                  "default": "0.5",
+                  "description": "Strike rate, 0 to 1. Strikes stay at least three seconds apart."
+                },
+                {
+                  "name": "flash",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Flash strength, 0 to 1."
+                },
+                {
+                  "name": "colorHold",
+                  "type": "number",
+                  "default": "1.2",
+                  "description": "Seconds a strike holds the color print before it fades back. Infinity never fades."
+                },
+                {
+                  "name": "aura",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Strength of the aura around the pointer. 0 turns it off."
+                },
+                {
+                  "name": "auraRadius",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Aura radius multiplier."
+                },
+                {
+                  "name": "strikes",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Increase it to fire a strike from code. A click on the stage fires one too, with a shaking burst ring."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds one still frame and stops rendering."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "default": "\"A picture printed as an ordered dither, reprinted in color by lightning strikes and clicks\"",
+                  "description": "Accessible name."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"relative aspect-4/3 w-full\"",
+                  "description": "Give the stage a size."
+                }
+              ]
+            },
+            {
+              "component": "StormPrintScene",
+              "description": "Full-frame plane without the Canvas. Mount it alone in a Canvas or a drei View. Reads state.pointer and pointer down events. The aura follows the pointer and fades after 2.5 seconds without a move.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "default": "{ x: 0.5, y: 0.5 }",
+                  "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "dither",
+                  "type": "\"bayer-2\" | \"bayer-4\" | \"bayer-8\" | \"blue-noise\" | \"halftone\"",
+                  "default": "\"bayer-8\"",
+                  "description": "Threshold pattern. Halftone prints a 45 degree dot screen."
+                },
+                {
+                  "name": "print",
+                  "type": "\"ink\" | \"color\"",
+                  "default": "\"ink\"",
+                  "description": "ink prints two tones and turns to color on a strike. color always prints in color."
+                },
+                {
+                  "name": "cell",
+                  "type": "number",
+                  "default": "3",
+                  "description": "Dither cell in CSS px."
+                },
+                {
+                  "name": "threshold",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Raise it to ink more of the frame, lower it to ink less."
+                },
+                {
+                  "name": "contrast",
+                  "type": "number",
+                  "default": "1.35",
+                  "description": "Contrast of the tone curve."
+                },
+                {
+                  "name": "rain",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Rain amount, 0 to 1. 0 turns it off."
+                },
+                {
+                  "name": "rainSpeed",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Rain speed multiplier."
+                },
+                {
+                  "name": "rainAngle",
+                  "type": "number",
+                  "default": "9",
+                  "description": "Rain slant in degrees."
+                },
+                {
+                  "name": "lightning",
+                  "type": "boolean",
+                  "default": "true",
+                  "description": "Storm strikes on a timer. Off leaves clicks and the strikes prop as the only triggers."
+                },
+                {
+                  "name": "frequency",
+                  "type": "number",
+                  "default": "0.5",
+                  "description": "Strike rate, 0 to 1. Strikes stay at least three seconds apart."
+                },
+                {
+                  "name": "flash",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Flash strength, 0 to 1."
+                },
+                {
+                  "name": "colorHold",
+                  "type": "number",
+                  "default": "1.2",
+                  "description": "Seconds a strike holds the color print before it fades back. Infinity never fades."
+                },
+                {
+                  "name": "aura",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Strength of the aura around the pointer. 0 turns it off."
+                },
+                {
+                  "name": "auraRadius",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Aura radius multiplier."
+                },
+                {
+                  "name": "strikes",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Increase it to fire a strike from code. A click on the stage fires one too, with a shaking burst ring."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds one still frame and stops rendering."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "One image, one line",
+              "file": "registry/ivan/examples/storm-print/basic.tsx"
+            },
+            {
+              "title": "Halftone that holds its color",
+              "file": "registry/ivan/examples/storm-print/halftone.tsx"
+            }
+          ],
+          "accessibility": [
+            "A figure with an accessible name. The canvas is hidden from assistive tech.",
+            "Reduced motion draws one still frame with no flashes, no rain and no strikes. Set print to color to show the color print.",
+            "Without WebGL it shows the source image in grayscale."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "Always while visible, on demand offscreen or paused",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One still frame."
+            },
+            {
+              "target": "Lightning strike",
+              "properties": "Sky lift, bolt and color print mix in the fragment shader",
+              "timing": "At most two pulses in 0.9 s, color fades after the hold",
+              "trigger": "Timer, click or the strikes prop. Strikes stay 3 s apart on the timer and 1 s apart by hand.",
+              "reducedMotion": "No strikes, no flash."
+            },
+            {
+              "target": "Burst ring",
+              "properties": "Image offset and whole-cell shake",
+              "timing": "1.1 s ring, 0.32 s shake",
+              "trigger": "Click",
+              "reducedMotion": "None."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "blast-print",
+      "type": "registry:block",
+      "title": "Blast Print",
+      "description": "A click sends a ring that bleaches the picture, then reprints it in color inks cut from the image.",
+      "categories": ["three", "shaders", "media"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19 and an image your page can read as a texture. Render <BlastPrint src=\"/photo.jpg\" className=\"w-full max-w-xl\" /> anywhere. BlastPrint owns a Canvas, so mount BlastPrintScene inside an existing Canvas or drei View when a page already has one. The color palette is cut from the image in the browser, so the image must be readable by canvas (same origin or CORS).",
+      "files": [
+        {
+          "path": "registry/ivan/components/blast-print/blast-print.tsx",
+          "type": "registry:component",
+          "target": "@components/blast-print/blast-print.tsx"
+        },
+        {
+          "path": "registry/ivan/components/blast-print/blast-print-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/blast-print/blast-print-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/blast-print/blast-print-material.ts",
+          "type": "registry:component",
+          "target": "@components/blast-print/blast-print-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/blast-print/blast-timeline.ts",
+          "type": "registry:component",
+          "target": "@components/blast-print/blast-timeline.ts"
+        },
+        {
+          "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/canvas-stage/canvas-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/lib/image-cover.ts",
+          "type": "registry:lib",
+          "target": "@lib/image-cover.ts"
+        },
+        {
+          "path": "registry/ivan/lib/print-noise.ts",
+          "type": "registry:lib",
+          "target": "@lib/print-noise.ts"
+        },
+        {
+          "path": "registry/ivan/lib/ordered-print.ts",
+          "type": "registry:lib",
+          "target": "@lib/ordered-print.ts"
+        },
+        {
+          "path": "registry/ivan/lib/tone-curve.ts",
+          "type": "registry:lib",
+          "target": "@lib/tone-curve.ts"
+        },
+        {
+          "path": "registry/ivan/lib/palette.ts",
+          "type": "registry:lib",
+          "target": "@lib/palette.ts"
+        },
+        {
+          "path": "registry/ivan/lib/blue-noise.ts",
+          "type": "registry:lib",
+          "target": "@lib/blue-noise.ts"
+        },
+        {
+          "path": "registry/ivan/lib/spring.ts",
+          "type": "registry:lib",
+          "target": "@lib/spring.ts"
+        },
+        {
+          "path": "registry/ivan/lib/pointer-trace.ts",
+          "type": "registry:lib",
+          "target": "@lib/pointer-trace.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-webgl-support.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-webgl-support.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-in-view.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-in-view.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-print-image.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-print-image.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "BlastPrint",
+              "description": "A figure that owns one Canvas. Size it with className.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "default": "{ x: 0.5, y: 0.5 }",
+                  "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "dither",
+                  "type": "\"bayer-2\" | \"bayer-4\" | \"bayer-8\" | \"blue-noise\"",
+                  "default": "\"blue-noise\"",
+                  "description": "Threshold pattern. Blue noise uses a 64 px tile that ships with the item."
+                },
+                {
+                  "name": "cell",
+                  "type": "number",
+                  "default": "3",
+                  "description": "Dither cell in CSS px."
+                },
+                {
+                  "name": "threshold",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Raise it to ink more of the frame, lower it to ink less."
+                },
+                {
+                  "name": "auraRadius",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Radius multiplier of the negative aura around the pointer."
+                },
+                {
+                  "name": "blasts",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Increase it to detonate at the center of the frame from code. A click detonates at the pointer."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds one still frame and stops rendering."
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "default": "\"A picture printed as an ordered dither, bleached and reprinted in color by a click\"",
+                  "description": "Accessible name."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "default": "\"relative aspect-4/3 w-full\"",
+                  "description": "Give the stage a size."
+                }
+              ]
+            },
+            {
+              "component": "BlastPrintScene",
+              "description": "Full-frame plane without the Canvas. Mount it alone in a Canvas or a drei View. Reads state.pointer and pointer down events. The aura follows the pointer and fades after 2.5 seconds without a move.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "required": true,
+                  "description": "Image URL. A cross-origin image needs CORS headers (Access-Control-Allow-Origin)."
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "default": "{ x: 0.5, y: 0.5 }",
+                  "description": "Point of the image kept in frame when the crop fills the stage. 0 to 1, y counted from the top."
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "default": "\"#0B0B0C\"",
+                  "description": "Shadow tone. Any three.js color string."
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "default": "\"#EDECE8\"",
+                  "description": "Light tone."
+                },
+                {
+                  "name": "dither",
+                  "type": "\"bayer-2\" | \"bayer-4\" | \"bayer-8\" | \"blue-noise\"",
+                  "default": "\"blue-noise\"",
+                  "description": "Threshold pattern. Blue noise uses a 64 px tile that ships with the item."
+                },
+                {
+                  "name": "cell",
+                  "type": "number",
+                  "default": "3",
+                  "description": "Dither cell in CSS px."
+                },
+                {
+                  "name": "threshold",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Raise it to ink more of the frame, lower it to ink less."
+                },
+                {
+                  "name": "auraRadius",
+                  "type": "number",
+                  "default": "1",
+                  "description": "Radius multiplier of the negative aura around the pointer."
+                },
+                {
+                  "name": "blasts",
+                  "type": "number",
+                  "default": "0",
+                  "description": "Increase it to detonate at the center of the frame from code. A click detonates at the pointer."
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "default": "false",
+                  "description": "Holds one still frame and stops rendering."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "One image, one line",
+              "file": "registry/ivan/examples/blast-print/basic.tsx"
+            },
+            {
+              "title": "Bayer dots and a wide aura",
+              "file": "registry/ivan/examples/blast-print/bayer.tsx"
+            }
+          ],
+          "accessibility": [
+            "A figure with an accessible name. The canvas is hidden from assistive tech.",
+            "Reduced motion draws one still frame and never detonates.",
+            "Without WebGL it shows the source image in grayscale."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "Always while visible, on demand offscreen or paused",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One still frame."
+            },
+            {
+              "target": "Blast",
+              "properties": "Ring radius, reprint order and color mix in the fragment shader",
+              "timing": "0.6 s ring, 1.1 s reprint, 0.8 s hold, 0.9 s fade",
+              "trigger": "Click or the blasts prop. A new blast waits until the reprint ends.",
+              "reducedMotion": "No blast."
+            },
+            {
+              "target": "Aura",
+              "properties": "Aura position and radius springs",
+              "timing": "Spring, stiffness 120, damping 16",
+              "trigger": "Pointer move",
+              "reducedMotion": "The aura jumps to the pointer without easing."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "page-peel",
+      "type": "registry:component",
+      "title": "Page Peel",
+      "description": "A dog-ear in the corner that peels the whole page back along a real fold to show what is drawn underneath.",
+      "categories": ["motion", "gestures"],
+      "dependencies": [],
+      "registryDependencies": [],
+      "docs": "Wrap your page in <PagePeel underside={<YourUnderside />}>. The default scope is the viewport: the dog-ear sits in the bottom-right corner of the window. Use scope=\"container\" to peel a single box. Put <PagePeelTrigger /> anywhere inside for a keyboard path.",
+      "files": [
+        {
+          "path": "registry/ivan/components/page-peel/page-peel.tsx",
+          "type": "registry:component",
+          "target": "@components/page-peel/page-peel.tsx"
+        },
+        {
+          "path": "registry/ivan/components/page-peel/peel-controller.ts",
+          "type": "registry:component",
+          "target": "@components/page-peel/peel-controller.ts"
+        },
+        {
+          "path": "registry/ivan/lib/page-fold.ts",
+          "type": "registry:lib",
+          "target": "@lib/page-fold.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "PagePeel",
+              "description": "Wraps the page and draws the corner, the folded flap and the underside.",
+              "props": [
+                {
+                  "name": "underside",
+                  "type": "ReactNode",
+                  "required": true,
+                  "description": "What the peel reveals. Give it its own ground color."
+                },
+                {
+                  "name": "scope",
+                  "type": "\"viewport\" | \"container\"",
+                  "default": "\"viewport\"",
+                  "description": "Peel the window or the nearest box."
+                },
+                {
+                  "name": "openAt",
+                  "type": "number",
+                  "default": "0.25",
+                  "description": "Share of the page peeled past which a release opens fully, about 60% of the diagonal. Below it the page settles back. A fast flick decides on its own."
+                },
+                {
+                  "name": "undersideLabel",
+                  "type": "string",
+                  "default": "\"Underside\"",
+                  "description": "Accessible name of the revealed region."
+                },
+                {
+                  "name": "undersideClassName",
+                  "type": "string",
+                  "description": "Classes for the underside layer."
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "description": "Classes for the page wrapper."
+                }
+              ]
+            },
+            {
+              "component": "PagePeelTrigger",
+              "description": "A native button that opens and closes the peel. Extends every button prop except onClick and type.",
+              "props": [
+                {
+                  "name": "children",
+                  "type": "ReactNode",
+                  "default": "\"View the underside\"",
+                  "description": "Button label."
+                }
+              ]
+            }
+          ],
+          "variants": [
+            {
+              "name": "scope",
+              "default": "viewport",
+              "options": ["viewport", "container"],
+              "description": "What gets peeled."
+            }
+          ],
+          "examples": [
+            {
+              "title": "Peel a box",
+              "file": "registry/ivan/examples/page-peel/basic.tsx"
+            }
+          ],
+          "accessibility": [
+            "The corner and the open fold are pointer only. PagePeelTrigger gives keyboard and screen reader users the same toggle, with aria-expanded and aria-controls.",
+            "Open, the page is inert, focus moves to the underside and Escape closes it. Focus returns to the trigger.",
+            "Closed, the underside is inert and hidden from assistive tech."
+          ],
+          "animation": [
+            {
+              "target": "Dog-ear",
+              "properties": "clip-path, transform",
+              "timing": "220 ms, ease-out-quart",
+              "trigger": "Pointer enters the corner or the open fold",
+              "reducedMotion": "Stays at rest size."
+            },
+            {
+              "target": "Fold",
+              "properties": "clip-path, transform",
+              "timing": "Tracks the pointer 1:1",
+              "trigger": "Drag the corner, or the fold when open",
+              "reducedMotion": "No fold. A tap opens or closes."
+            },
+            {
+              "target": "Settle",
+              "properties": "clip-path, transform",
+              "timing": "Critically damped spring seeded with the release velocity, about 500 ms, no overshoot",
+              "trigger": "Release, tap, trigger, Escape",
+              "reducedMotion": "200 ms crossfade."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "dust-portrait",
+      "type": "registry:block",
+      "title": "Dust Portrait",
+      "description": "A picture printed as GPU dust that blows apart under the pointer, bursts on click and settles back on a spring.",
+      "categories": ["three", "shaders", "media"],
+      "dependencies": ["three@^0.186.1", "@react-three/fiber@^9.8.1"],
+      "devDependencies": ["@types/three@^0.186.0"],
+      "registryDependencies": [],
+      "docs": "Requires React 19. Render <DustPortrait src=\"/photo.jpg\" className=\"h-96 w-full\" /> anywhere. DustPortrait owns a Canvas, so mount DustPortraitScene inside an existing Canvas or drei View when a page already has one, and pass pointerTarget the element the View tracks. The scene listens to pointer events on that element itself, so it works on a shared canvas with pointer-events: none.",
+      "files": [
+        {
+          "path": "registry/ivan/components/dust-portrait/dust-portrait.tsx",
+          "type": "registry:component",
+          "target": "@components/dust-portrait/dust-portrait.tsx"
+        },
+        {
+          "path": "registry/ivan/components/dust-portrait/dust-portrait-scene.tsx",
+          "type": "registry:component",
+          "target": "@components/dust-portrait/dust-portrait-scene.tsx"
+        },
+        {
+          "path": "registry/ivan/components/dust-portrait/dust-portrait-material.ts",
+          "type": "registry:component",
+          "target": "@components/dust-portrait/dust-portrait-material.ts"
+        },
+        {
+          "path": "registry/ivan/components/dust-portrait/dust-portrait-ground.ts",
+          "type": "registry:component",
+          "target": "@components/dust-portrait/dust-portrait-ground.ts"
+        },
+        {
+          "path": "registry/ivan/components/dust-portrait/dust-portrait-field.ts",
+          "type": "registry:component",
+          "target": "@components/dust-portrait/dust-portrait-field.ts"
+        },
+        {
+          "path": "registry/ivan/components/dust-portrait/dust-portrait-trail.ts",
+          "type": "registry:component",
+          "target": "@components/dust-portrait/dust-portrait-trail.ts"
+        },
+        {
+          "path": "registry/ivan/components/dust-portrait/dust-portrait-bursts.ts",
+          "type": "registry:component",
+          "target": "@components/dust-portrait/dust-portrait-bursts.ts"
+        },
+        {
+          "path": "registry/ivan/components/canvas-stage/canvas-stage.tsx",
+          "type": "registry:component",
+          "target": "@components/canvas-stage/canvas-stage.tsx"
+        },
+        {
+          "path": "registry/ivan/lib/spring.ts",
+          "type": "registry:lib",
+          "target": "@lib/spring.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-prefers-reduced-motion.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-prefers-reduced-motion.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-webgl-support.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-webgl-support.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-in-view.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-in-view.ts"
+        },
+        {
+          "path": "registry/ivan/hooks/use-print-image.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-print-image.ts"
+        }
+      ],
+      "meta": {
+        "docs": {
+          "props": [
+            {
+              "component": "DustPortrait",
+              "description": "A figure that owns one Canvas. Size it with className.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "description": "Image URL. An image from another origin needs CORS headers, because the grains are read from its pixels.",
+                  "required": true
+                },
+                {
+                  "name": "burst",
+                  "type": "boolean",
+                  "description": "A click or tap blows the dust outward from that point as a shockwave ring, then lets it settle home. Up to eight bursts stack.",
+                  "default": "true"
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "description": "Focal point of the cover crop, x and y from 0 to 1 from the top left.",
+                  "default": "{ x: 0.5, y: 0.5 }"
+                },
+                {
+                  "name": "density",
+                  "type": "number",
+                  "description": "Multiplies the device budget of 45k to 120k grains. Small stages are capped so a grain never drops under 1.6 CSS px.",
+                  "default": "1"
+                },
+                {
+                  "name": "dispersion",
+                  "type": "number",
+                  "description": "How far grains swirl along the curl noise when scattered.",
+                  "default": "1"
+                },
+                {
+                  "name": "drift",
+                  "type": "number",
+                  "description": "How far scattered dust blows to the right.",
+                  "default": "1"
+                },
+                {
+                  "name": "idle",
+                  "type": "boolean | number",
+                  "description": "Keeps the portrait alive at rest: grains shed and return, more on the windward right side, gusts sweep across now and then, and the right side shimmers. true = 1, a number sets the strength (up to 3).",
+                  "default": "true"
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "description": "Ground tone. Any three.js color string.",
+                  "default": "\"#0B0B0C\""
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "description": "Grain tone. Whichever of ink and paper is lighter decides the polarity, so the picture always prints as a positive.",
+                  "default": "\"#EDECE8\""
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "description": "Holds the picture still and stops scattering.",
+                  "default": "false"
+                },
+                {
+                  "name": "alt",
+                  "type": "string",
+                  "description": "Accessible name of the figure.",
+                  "default": "\"A picture printed in dust that scatters under the pointer\""
+                },
+                {
+                  "name": "className",
+                  "type": "string",
+                  "description": "Give the effect a size.",
+                  "default": "\"aspect-4/3 w-full\""
+                }
+              ]
+            },
+            {
+              "component": "DustPortraitScene",
+              "description": "The grains and their ground without the Canvas. Mount it in a Canvas or a drei View.",
+              "props": [
+                {
+                  "name": "src",
+                  "type": "string",
+                  "description": "Image URL. An image from another origin needs CORS headers, because the grains are read from its pixels.",
+                  "required": true
+                },
+                {
+                  "name": "burst",
+                  "type": "boolean",
+                  "description": "A click or tap blows the dust outward from that point as a shockwave ring, then lets it settle home. Up to eight bursts stack.",
+                  "default": "true"
+                },
+                {
+                  "name": "focus",
+                  "type": "{ x: number; y: number }",
+                  "description": "Focal point of the cover crop, x and y from 0 to 1 from the top left.",
+                  "default": "{ x: 0.5, y: 0.5 }"
+                },
+                {
+                  "name": "density",
+                  "type": "number",
+                  "description": "Multiplies the device budget of 45k to 120k grains. Small stages are capped so a grain never drops under 1.6 CSS px.",
+                  "default": "1"
+                },
+                {
+                  "name": "dispersion",
+                  "type": "number",
+                  "description": "How far grains swirl along the curl noise when scattered.",
+                  "default": "1"
+                },
+                {
+                  "name": "drift",
+                  "type": "number",
+                  "description": "How far scattered dust blows to the right.",
+                  "default": "1"
+                },
+                {
+                  "name": "idle",
+                  "type": "boolean | number",
+                  "description": "Keeps the portrait alive at rest: grains shed and return, more on the windward right side, gusts sweep across now and then, and the right side shimmers. true = 1, a number sets the strength (up to 3).",
+                  "default": "true"
+                },
+                {
+                  "name": "ink",
+                  "type": "string",
+                  "description": "Ground tone. Any three.js color string.",
+                  "default": "\"#0B0B0C\""
+                },
+                {
+                  "name": "paper",
+                  "type": "string",
+                  "description": "Grain tone. Whichever of ink and paper is lighter decides the polarity, so the picture always prints as a positive.",
+                  "default": "\"#EDECE8\""
+                },
+                {
+                  "name": "paused",
+                  "type": "boolean",
+                  "description": "Clears the trail at once and freezes time. Use it for reduced motion and offscreen.",
+                  "default": "false"
+                },
+                {
+                  "name": "pointerTarget",
+                  "type": "RefObject<HTMLElement | null>",
+                  "description": "Element whose pointer events scatter the dust and whose size sets the grid. Defaults to the canvas. Pass the tracked element inside a drei View."
+                }
+              ]
+            }
+          ],
+          "variants": [],
+          "examples": [
+            {
+              "title": "One picture, one line",
+              "file": "registry/ivan/examples/dust-portrait/basic.tsx"
+            }
+          ],
+          "accessibility": [
+            "A figure with an accessible name. The canvas is hidden from assistive tech.",
+            "Without WebGL it shows the source image in grayscale, cropped on the focal point.",
+            "Touch drags across the picture scatter it, while vertical drags still scroll the page.",
+            "Bursts are decorative. The figure stays a single image to assistive tech, and nothing is lost without them."
+          ],
+          "animation": [
+            {
+              "target": "Render loop",
+              "properties": "Canvas frameloop",
+              "timing": "Always while visible. The scene stops invalidating once the dust settles and idle is off.",
+              "trigger": "IntersectionObserver",
+              "reducedMotion": "One still frame."
+            },
+            {
+              "target": "Scatter",
+              "properties": "Grain position, size and alpha in the vertex shader",
+              "timing": "Spring rise of about 150 ms, critically damped return of about 800 ms",
+              "trigger": "Pointer over the picture",
+              "reducedMotion": "No scatter."
+            },
+            {
+              "target": "Burst",
+              "properties": "Grain position, size and alpha in the vertex shader, ground ring and flash",
+              "timing": "Shockwave eases out over 900 ms; each grain kicks in about 130 ms and settles within about 1.5 s",
+              "trigger": "Click or tap on the picture",
+              "reducedMotion": "No burst."
+            },
+            {
+              "target": "Reveal",
+              "properties": "Ground and grain opacity",
+              "timing": "Exponential ease, about 400 ms",
+              "trigger": "Image sampled",
+              "reducedMotion": "Appears at once."
+            },
+            {
+              "target": "Idle shed",
+              "properties": "A few edge grains",
+              "timing": "Slow pulse, several seconds apart",
+              "trigger": "Clock",
+              "reducedMotion": "Off."
             }
           ]
         }

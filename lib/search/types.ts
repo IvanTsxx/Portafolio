@@ -12,8 +12,8 @@ export type SearchGroupId = (typeof searchGroupOrder)[number];
 
 export const searchGroups = {
   channels: { label: "Channels" },
-  experiments: { label: "Experiments" },
-  notes: { label: "Notes" },
+  experiments: { label: "Lab" },
+  notes: { label: "Writing" },
   pages: { label: "Pages" },
   registry: { label: "Registry" },
   sections: { label: "Sections" },

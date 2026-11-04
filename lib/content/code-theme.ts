@@ -1,16 +1,16 @@
 import type { ThemeRegistration } from "shiki";
 
 const palette = {
-  comment: "#646361",
-  constant: "#844100",
-  foreground: "#121212",
-  keyword: "#3250d8",
-  property: "#3d3d3b",
-  punctuation: "#646361",
-  rust: "#b53700",
-  string: "#b53700",
-  type: "#0d5665",
-  variable: "#121212",
+  comment: "var(--code-comment)",
+  constant: "var(--code-constant)",
+  foreground: "var(--code-foreground)",
+  keyword: "var(--code-keyword)",
+  property: "var(--code-property)",
+  punctuation: "var(--code-punctuation)",
+  rust: "var(--code-string)",
+  string: "var(--code-string)",
+  type: "var(--code-type)",
+  variable: "var(--code-foreground)",
 } as const;
 
 export const codeTheme: ThemeRegistration = {
@@ -18,7 +18,7 @@ export const codeTheme: ThemeRegistration = {
     "editor.background": "#00000000",
     "editor.foreground": palette.foreground,
   },
-  name: "workshop-paper",
+  name: "observatory",
   tokenColors: [
     {
       scope: ["comment", "punctuation.definition.comment"],

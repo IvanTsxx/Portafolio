@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import {
   AdjacentLink,
@@ -8,11 +9,14 @@ import {
   CaseStudySections,
 } from "@/components/content/note-detail";
 import { NoteRow } from "@/components/content/note-row";
+import { NoteToc } from "@/components/content/note-toc";
 import { SampleBadge } from "@/components/content/sample-badge";
+import { DetailFallback } from "@/components/site/detail-fallback";
 import { DocumentHero } from "@/components/site/document-hero";
 import { DocumentSection } from "@/components/site/document-section";
 import { JsonLd } from "@/components/site/json-ld";
 import { OpenInMenu } from "@/components/site/open-in-menu";
+import { PlatePage } from "@/components/site/plate-page";
 import { chipClassName } from "@/components/site/styles";
 import { buildNoteMetadata } from "@/lib/content/metadata";
 import {
@@ -32,7 +36,6 @@ import {
   getRelatedNotes,
 } from "@/lib/content/notes";
 import { markdownPathOf } from "@/lib/markdown/paths";
-import { sectionScripts } from "@/lib/site/section-scripts";
 import { noteJsonLd } from "@/lib/site/structured-data";
 
 export const generateStaticParams = () =>
@@ -48,7 +51,9 @@ export const generateMetadata = async ({
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
-const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
+const NoteContent = async ({
+  params,
+}: Pick<PageProps<"/notes/[slug]">, "params">) => {
   const { slug } = await params;
   const document = await getNote(slug);
   if (!document) {
@@ -76,62 +81,73 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
   const relatedIndex = `${code}.${leadSectionCount(note) + proseSectionCount + 1}`;
 
   return (
-    <>
-      <DocumentHero
-        back={{ href: "/notes", label: "Notes" }}
-        code={code}
-        meta={[
-          { label: "Kind", value: kind.label },
-          { label: "Stamp", value: stampOf(note).label },
-          { label: "Read", value: `${pad(note.readingTimeMinutes)} min` },
-        ]}
-        size="title"
-        title={note.title}
-      >
-        <p className="text-graphite max-w-prose text-base text-pretty">
-          {note.summary}
-        </p>
-        <div className="flex flex-wrap items-center gap-2">
-          {note.sample ? <SampleBadge source={noteSource(note.slug)} /> : null}
-          <ul className="flex flex-wrap gap-2">
-            {topicLinks.map(({ param, topic }) => (
-              <li key={topic}>
-                <Link
-                  className={chipClassName}
-                  href={`/notes?${param}=${encodeURIComponent(topic)}`}
-                >
-                  {topic}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {note.kind === "case-study" ? (
-          <CaseStudyLinks caseStudy={note} />
-        ) : null}
-        <OpenInMenu markdownPath={markdownPathOf(notePath(note.slug))} />
-      </DocumentHero>
+    <PlatePage
+      plate={
+        <>
+          <DocumentHero
+            back={{ href: "/notes", label: "Writing" }}
+            code={code}
+            meta={[
+              { label: "Kind", value: kind.label },
+              { label: "Stamp", value: stampOf(note).label },
+              { label: "Read", value: `${pad(note.readingTimeMinutes)} min` },
+            ]}
+            size="title"
+            title={note.title}
+          >
+            <p className="text-muted-foreground max-w-prose text-base text-pretty">
+              {note.summary}
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              {note.sample ? (
+                <SampleBadge source={noteSource(note.slug)} />
+              ) : null}
+              <ul className="flex flex-wrap gap-2">
+                {topicLinks.map(({ param, topic }) => (
+                  <li key={topic}>
+                    <Link
+                      className={chipClassName}
+                      href={`/notes?${param}=${encodeURIComponent(topic)}`}
+                    >
+                      {topic}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {note.kind === "case-study" ? (
+              <CaseStudyLinks caseStudy={note} />
+            ) : null}
+            <OpenInMenu markdownPath={markdownPathOf(notePath(note.slug))} />
+          </DocumentHero>
+          <NoteToc headings={document.headings} />
+        </>
+      }
+    >
       <JsonLd data={noteJsonLd(note)} />
       {note.kind === "case-study" ? (
         <CaseStudySections caseStudy={note} code={code} />
       ) : null}
 
       {note.kind === "case-study" ? (
-        <div
-          className="group/prose max-w-3xl min-w-0 [counter-reset:section] [&_img]:h-auto [&_img]:max-w-full"
-          data-numbered
-        >
-          <Content />
+        <div className="contents">
+          <div
+            className="group/prose min-w-0 [counter-reset:section] [&_img]:h-auto [&_img]:max-w-full"
+            data-numbered
+            id="note-body"
+          >
+            <Content />
+          </div>
         </div>
       ) : (
-        <DocumentSection
-          id="text"
-          index={`${code}.1`}
-          label="Text"
-          script={sectionScripts.noteText}
-        >
-          <div className="max-w-3xl min-w-0 [&_img]:h-auto [&_img]:max-w-full">
-            <Content />
+        <DocumentSection id="text" index={`${code}.1`} label="Text">
+          <div className="contents">
+            <div
+              className="min-w-0 [&_img]:h-auto [&_img]:max-w-full"
+              id="note-body"
+            >
+              <Content />
+            </div>
           </div>
         </DocumentSection>
       )}
@@ -150,7 +166,7 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
           index={relatedIndex}
           label="Related"
         >
-          <ul className="border-rule border-t">
+          <ul className="border-border border-t">
             {related.map((item) => (
               <NoteRow
                 code={formatNoteCode(
@@ -164,8 +180,14 @@ const NotePage = async ({ params }: PageProps<"/notes/[slug]">) => {
           </ul>
         </DocumentSection>
       ) : null}
-    </>
+    </PlatePage>
   );
 };
+
+const NotePage = ({ params }: PageProps<"/notes/[slug]">) => (
+  <Suspense fallback={<DetailFallback />}>
+    <NoteContent params={params} />
+  </Suspense>
+);
 
 export default NotePage;

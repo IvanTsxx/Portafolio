@@ -44,16 +44,15 @@ describe("site naming", () => {
     expect(filesContaining(surname)).toEqual(["lib/site/config.ts"]);
   });
 
-  test("reads the legal name only in the home intro dossier", () => {
+  test("reads the legal name only in the home intro", () => {
     expect(filesContaining("siteConfig.name")).toEqual([
-      "components/profile/profile-intro.tsx",
+      "components/site/signature.tsx",
     ]);
   });
 
-  test("reaches the dossier only through the home page", () => {
-    expect(filesContaining("ProfileIntro")).toEqual([
+  test("renders the home layout only on the home page", () => {
+    expect(filesContaining("<GalleryLayout")).toEqual([
       "app/(document)/page.tsx",
-      "components/profile/profile-intro.tsx",
     ]);
   });
 
@@ -67,7 +66,7 @@ describe("site naming", () => {
     expect(
       routePages("document").filter((route) => route.includes("["))
     ).toEqual([]);
-    expect(filesContaining("<Dossier>")).toEqual([
+    expect(filesContaining("<PageFrame>")).toEqual([
       "app/(detail)/layout.tsx",
       "app/(document)/layout.tsx",
       "app/not-found.tsx",

@@ -22,16 +22,18 @@ export const NeighborLink = ({
   return (
     <Link
       className={cn(
-        "group/marks border-rule-strong ease-mechanical hover:bg-paper-deep/60 relative flex min-h-11 flex-col gap-1 border px-4 py-3 transition-colors duration-100",
+        "group/marks border-border-strong ease-mechanical hover:bg-surface/60 relative flex min-h-11 flex-col gap-1 border px-4 py-3 transition-colors duration-100",
         focusRingClassName
       )}
       href={neighbor.href}
     >
       <CornerMarks reveal="hover" />
-      <span className="label text-mist group-hover/marks:text-ink transition-colors">
+      <span className="label text-faint group-hover/marks:text-foreground transition-colors">
         {direction}
       </span>
-      <span className="text-ink text-sm font-medium">{neighbor.title}</span>
+      <span className="text-foreground text-sm font-medium">
+        {neighbor.title}
+      </span>
     </Link>
   );
 };
@@ -47,7 +49,7 @@ export const NeighborNav = ({
 }) => (
   <nav
     aria-label={label}
-    className="border-rule-strong grid gap-4 border-t pt-8 sm:grid-cols-2"
+    className="border-border-strong grid gap-4 border-t pt-8 sm:grid-cols-2"
   >
     <NeighborLink direction="Previous" neighbor={previous} />
     <NeighborLink direction="Next" neighbor={next} />

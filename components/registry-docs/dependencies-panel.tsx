@@ -1,5 +1,8 @@
+import { ManifestList } from "@/components/site/manifest-list";
 import { toInstalledPath } from "@/lib/registry/installed";
 import type { RegistryItem } from "@/lib/registry/schema";
+import { fileEntry, packageEntry } from "@/lib/site/manifest";
+import type { ManifestEntry } from "@/lib/site/manifest";
 
 const formatCssVariables = (item: RegistryItem) => {
   const { cssVars } = item;
@@ -23,34 +26,35 @@ const formatCssRules = (item: RegistryItem) => Object.keys(item.css ?? {});
 
 const groupsOf = (item: RegistryItem) =>
   [
-    { items: item.dependencies, title: "npm packages" },
-    { items: item.registryDependencies, title: "Registry dependencies" },
+    { entries: item.dependencies.map(packageEntry), title: "npm packages" },
     {
-      items: item.files.map((file) => toInstalledPath(file)),
+      entries: item.registryDependencies.map((name): ManifestEntry => ({
+        kind: "registry",
+        name,
+      })),
+      title: "Registry dependencies",
+    },
+    {
+      entries: item.files.map((file) => fileEntry(toInstalledPath(file))),
       title: "Files written",
     },
     {
-      items: [...formatCssRules(item), ...formatCssVariables(item)],
+      entries: [...formatCssRules(item), ...formatCssVariables(item)].map(
+        (name): ManifestEntry => ({ kind: "css", name })
+      ),
       title: "Added to your CSS",
     },
-  ].filter((group) => group.items.length > 0);
+  ].filter((group) => group.entries.length > 0);
 
 export const DependenciesPanel = ({ item }: { item: RegistryItem }) => (
-  <div className="border-graphite/30 grid border-t border-l md:grid-cols-2">
+  <div className="grid gap-8 md:grid-cols-2">
     {groupsOf(item).map((group) => (
-      <div
-        className="border-graphite/30 flex flex-col gap-3 border-r border-b p-4 md:odd:last:col-span-2"
+      <ManifestList
+        className="md:odd:last:col-span-2"
+        entries={group.entries}
         key={group.title}
-      >
-        <h3 className="label text-mist">{group.title}</h3>
-        <ul className="flex flex-col gap-1.5">
-          {group.items.map((entry) => (
-            <li className="text-ink font-mono text-xs break-all" key={entry}>
-              {entry}
-            </li>
-          ))}
-        </ul>
-      </div>
+        title={group.title}
+      />
     ))}
   </div>
 );

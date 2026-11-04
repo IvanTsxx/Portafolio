@@ -3,23 +3,26 @@
 import { useId, useRef, useState } from "react";
 
 import { ExperimentStage } from "@/components/lab/experiment-stage";
+import { useThemeTones } from "@/components/lab/experiments/lunar-dither/use-theme-tones";
 import { SliderControl, ToggleControl } from "@/components/lab/lab-controls";
+import { useShowsOriginal } from "@/components/lab/source/stage-reveal";
 import {
   imageSourceOptions,
   sourceImages,
 } from "@/components/lab/source/tone-chunk";
-import {
-  releaseStagePointer,
-  trackStagePointer,
-} from "@/components/lab/source/use-source";
-import type { StagePointer } from "@/components/lab/source/use-source";
+import type { SourceImage } from "@/components/lab/source/tone-chunk";
 import { useStageActivity } from "@/components/lab/use-stage-activity";
 import { useViewSlot } from "@/components/scene/view-registry";
-
-import TearView from "./tear-view";
-import type { TearSettings } from "./tear-view";
+import { SignalTearScene } from "@/registry/ivan/components/signal-tear/signal-tear-scene";
 
 const percent = (value: number) => `${value}%`;
+
+interface TearSettings {
+  ghost: number;
+  grain: number;
+  source: SourceImage;
+  tear: number;
+}
 
 const SignalTearPreview = () => {
   const { activity, ref } = useStageActivity<HTMLDivElement>();
@@ -29,23 +32,27 @@ const SignalTearPreview = () => {
     source: "messi",
     tear: 50,
   });
-
+  const tones = useThemeTones();
+  const showsOriginal = useShowsOriginal();
   const field = useRef<HTMLDivElement>(null);
   const slotId = useId();
-  const pointer = useRef<StagePointer>({
-    isHovering: false,
-    x: 0.5,
-    y: 0.5,
-  });
+  const { focus, path } = sourceImages[settings.source];
 
   useViewSlot(
     slotId,
     field,
-    <TearView
-      animate={activity === "running"}
-      pointer={pointer}
-      settings={settings}
-    />
+    <group visible={!showsOriginal}>
+      <SignalTearScene
+        focus={focus}
+        ghost={settings.ghost / 100}
+        grain={settings.grain / 100}
+        ink={tones.ink}
+        paper={tones.paper}
+        paused={activity !== "running"}
+        src={path}
+        tear={settings.tear / 100}
+      />
+    </group>
   );
 
   return (
@@ -105,8 +112,6 @@ const SignalTearPreview = () => {
     >
       <div
         className="pointer-events-auto size-full cursor-crosshair touch-pan-y"
-        onPointerLeave={() => releaseStagePointer(pointer.current)}
-        onPointerMove={(event) => trackStagePointer(pointer.current, event)}
         ref={field}
       />
     </ExperimentStage>
