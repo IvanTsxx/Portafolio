@@ -200,7 +200,7 @@ const Readout = ({
   activeIndex: number;
   total: number;
 }) => (
-  <span className="label text-faint tracking-normal tabular-nums">
+  <span className="label text-faint shrink-0 tracking-normal whitespace-nowrap tabular-nums">
     <span className="text-foreground">
       {activeIndex < 0 ? "--" : pad(activeIndex + 1)}
     </span>
