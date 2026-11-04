@@ -24,7 +24,7 @@ type TocVariant = "plate" | "sheet";
 
 const readingLineRatio = 0.3;
 
-const footerClearance = "0px 0px -20% 0px";
+const footerClearance = "0px 0px -55% 0px";
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
@@ -53,15 +53,18 @@ const useActiveSection = (ids: readonly string[]) => {
     let frame = 0;
     const update = () => {
       frame = 0;
-      const readingLine = window.innerHeight * readingLineRatio;
-      const isAtBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 2;
-      const current = isAtBottom
-        ? headings.at(-1)
-        : headings.findLast(
-            (heading) => heading.getBoundingClientRect().top <= readingLine
-          );
+      const viewport = window.innerHeight;
+      const remaining =
+        document.documentElement.scrollHeight - viewport - window.scrollY;
+      const endSweep = Math.min(1, Math.max(0, 1 - remaining / viewport));
+      const readingLine =
+        viewport * (readingLineRatio + (1 - readingLineRatio) * endSweep);
+      const current =
+        remaining <= 2
+          ? headings.at(-1)
+          : headings.findLast(
+              (heading) => heading.getBoundingClientRect().top <= readingLine
+            );
       setActiveId(current?.id ?? null);
     };
     const schedule = () => {
