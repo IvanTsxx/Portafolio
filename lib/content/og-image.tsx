@@ -39,33 +39,40 @@ const paddingX = 64;
 const paddingY = 56;
 const figureWidths = { portrait: 440, poster: 560 } as const;
 
-const fontFile = (...segments: string[]) =>
-  readFileSync(path.join(process.cwd(), ...segments));
-
 const loadFonts = () => [
   {
-    data: fontFile("assets/fonts/InstrumentSerif-Regular.ttf"),
+    data: readFileSync(
+      path.join(process.cwd(), "assets/fonts/InstrumentSerif-Regular.ttf")
+    ),
     name: "Instrument Serif",
     style: "normal" as const,
     weight: 400 as const,
   },
   {
-    data: fontFile("assets/fonts/InstrumentSerif-Italic.ttf"),
+    data: readFileSync(
+      path.join(process.cwd(), "assets/fonts/InstrumentSerif-Italic.ttf")
+    ),
     name: "Instrument Serif",
     style: "italic" as const,
     weight: 400 as const,
   },
   {
-    data: fontFile(
-      "node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.ttf"
+    data: readFileSync(
+      path.join(
+        process.cwd(),
+        "node_modules/geist/dist/fonts/geist-mono/GeistMono-Regular.ttf"
+      )
     ),
     name: "Geist Mono",
     style: "normal" as const,
     weight: 400 as const,
   },
   {
-    data: fontFile(
-      "node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf"
+    data: readFileSync(
+      path.join(
+        process.cwd(),
+        "node_modules/geist/dist/fonts/geist-sans/Geist-Regular.ttf"
+      )
     ),
     name: "Geist",
     style: "normal" as const,
